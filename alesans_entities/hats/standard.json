@@ -1,0 +1,22 @@
+{
+	"i": 1,
+
+	"x": 7,
+	"y": 2,
+	"height": 2,
+	"graphic": "standard",
+	"sliding": "standardsliding",
+	"death": "standarddeath",
+
+	"bigx": 0,
+	"bigy": 0,
+	"bigheight": 4,
+	"biggraphic": "standardbig",
+	"bigemblem": "standardbigemblem",
+	"bigsliding": "standardbigsliding",
+	"bigslidingemblem": "standardbigslidingemblem",
+	"raccoon": "standardraccoon",
+	"raccoonsliding": "standardslidingraccoon",
+
+	"directions": true
+}

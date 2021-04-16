@@ -1,0 +1,15 @@
+{
+	"i": 26,
+
+	"x": 3,
+	"y": 0,
+	"height": 4,
+	"graphic": "santahat",
+
+	"bigx": -3,
+	"bigy": -1,
+	"bigheight": 4,
+	"biggraphic": "santahatbig",
+
+	"directions": true
+}

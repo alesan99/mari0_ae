@@ -1,0 +1,15 @@
+{
+	"i": 5,
+
+	"x": 5,
+	"y": 1,
+	"height": 2,
+	"graphic": "towering3",
+
+	"bigx": -3,
+	"bigy": -1,
+	"bigheight": 2,
+	"biggraphic": "towering3big",
+
+	"directions": true
+}

@@ -1,0 +1,15 @@
+{
+	"i": 20,
+
+	"x": 6,
+	"y": -1,
+	"height": 4,
+	"graphic": "milkman",
+
+	"bigx": -1,
+	"bigy": -1,
+	"bigheight": 4,
+	"biggraphic": "milkmanbig",
+
+	"directions": true
+}

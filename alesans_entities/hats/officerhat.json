@@ -1,0 +1,15 @@
+{
+	"i": 12,
+
+	"x": 6,
+	"y": -1,
+	"height": 3,
+	"graphic": "officerhat",
+
+	"bigx": -1,
+	"bigy": -2,
+	"bigheight": 4,
+	"biggraphic": "officerhatbig",
+
+	"directions": true
+}

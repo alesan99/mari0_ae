@@ -1,0 +1,15 @@
+{
+	"i": 16,
+
+	"x": 6,
+	"y": 0,
+	"height": 2,
+	"graphic": "bonk",
+
+	"bigx": -2,
+	"bigy": 0,
+	"bigheight": 3,
+	"biggraphic": "bonkbig",
+
+	"directions": true
+}

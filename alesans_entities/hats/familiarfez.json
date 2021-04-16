@@ -1,0 +1,15 @@
+{
+	"i": 25,
+
+	"x": 6,
+	"y": -2,
+	"height": 4,
+	"graphic": "familiarfez",
+
+	"bigx": -1,
+	"bigy": -2,
+	"bigheight": 4,
+	"biggraphic": "familiarfezbig",
+
+	"directions": true
+}

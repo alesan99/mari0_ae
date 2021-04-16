@@ -1,0 +1,15 @@
+{
+	"i": 24,
+
+	"x": 7,
+	"y": 0,
+	"height": 3,
+	"graphic": "superfan",
+
+	"bigx": 0,
+	"bigy": -1,
+	"bigheight": 3,
+	"biggraphic": "superfanbig",
+
+	"directions": true
+}

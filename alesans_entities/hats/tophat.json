@@ -1,0 +1,15 @@
+{
+	"i": 14,
+
+	"x": 5,
+	"y": -5,
+	"height": 9,
+	"graphic": "tophat",
+
+	"bigx": -2,
+	"bigy": -7,
+	"bigheight": 10,
+	"biggraphic": "tophatbig",
+
+	"directions": false
+}

@@ -1,0 +1,5 @@
+name=alesan's entities
+author=alesan99
+description=brand new worlds! see all of the    new enemies!
+lives=3
+physics=5

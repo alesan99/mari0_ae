@@ -1,0 +1,15 @@
+{
+	"i": 28,
+
+	"x": 3,
+	"y": -3,
+	"height": 5,
+	"graphic": "koopa",
+
+	"bigx": -3,
+	"bigy": 0,
+	"bigheight": 5,
+	"biggraphic": "koopabig",
+
+	"directions": false
+}

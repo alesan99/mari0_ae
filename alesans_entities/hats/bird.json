@@ -1,0 +1,15 @@
+{
+	"i": 7,
+
+	"x": 4,
+	"y": -7,
+	"height": 8,
+	"graphic": "bird",
+
+	"bigx": -3,
+	"bigy": -8,
+	"bigheight": 8,
+	"biggraphic": "birdbig",
+
+	"directions": false
+}

@@ -1,0 +1,15 @@
+{
+	"i": 30,
+
+	"x": 7,
+	"y": 1,
+	"height": 2,
+	"graphic": "shyguy",
+
+	"bigx": -1,
+	"bigy": 1,
+	"bigheight": 3,
+	"biggraphic": "shyguybig",
+
+	"directions": true
+}

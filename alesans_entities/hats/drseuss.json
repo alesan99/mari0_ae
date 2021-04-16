@@ -1,0 +1,15 @@
+{
+	"i": 6,
+
+	"x": 5,
+	"y": -7,
+	"height": 10,
+	"graphic": "drseuss",
+
+	"bigx": -1,
+	"bigy": -7,
+	"bigheight": 10,
+	"biggraphic": "drseussbig",
+
+	"directions": false
+}

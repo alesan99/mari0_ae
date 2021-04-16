@@ -1,0 +1,15 @@
+{
+	"i": 27,
+
+	"x": 6,
+	"y": 0,
+	"height": 2,
+	"graphic": "sailor",
+
+	"bigx": -1,
+	"bigy": 0,
+	"bigheight": 3,
+	"biggraphic": "sailorbig",
+
+	"directions": true
+}

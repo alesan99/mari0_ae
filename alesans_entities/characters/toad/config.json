@@ -1,0 +1,192 @@
+{
+	"name": "toad",
+	
+	"colorables": [
+		"hat",
+		"spots",
+		"skin"
+	],
+	"colors": [
+		[252,252,252],
+		[32,56,236],
+		[252,152,56]
+		],
+	"defaultcolors": [
+		[[252,252,252],
+		[32,56,236],
+		[252,151,58]],
+		
+		[[225,255,255],
+		[255,160,68],
+		[252, 188, 176]],
+		
+		[[252,252,252],
+		[216,40,0],
+		[252,151,58]],
+		
+		[[252,252,252],
+		[0,168,0],
+		[252,151,58]]
+		],
+	"flowercolor": [[60,188,252], [216,40,0], [252,152,56]],
+	"hammersuitcolor": [[252,252,252], [0,0,0], [252,152,56]],
+	"frogsuitcolor": [[36,24,140], [32,56,236], [252,152,56]],
+	"iceflowercolor": [[168,240,188], [60,188,252], [252,152,56]],
+	"tanookisuitcolor": [[200,76,12], [0,0,0], [252,152,56]],
+	"superballcolor": [[230,230,180], [100,100,50], [160,160,100]],
+	"boomerangcolor": [[252,252,252], [32,56,236], [252,152,56]],
+	"blueshellcolor": [[252,252,252], [0,0,168], [252,152,56]],
+
+	"smallducking": false,
+
+	"swimpushframes": 1,
+	"fenceframes": 2,
+	"smallduckingframes": 1,
+
+	"smalloffsetX": 6,
+	"smalloffsetY": 3,
+	"smallquadcenterX": 11,
+	"smallquadcenterY": 10,
+	"smallquadwidth": 20,
+	"smallquadheight": 20,
+	"smallimgwidth": 380,
+	"smallimgheight": 100,
+
+	"shrinkquadcenterX": 9,
+	"shrinkquadcenterY": 32,
+	"shrinkoffsetY": -3,
+	"shrinkquadcenterY2": 16,
+
+	"growquadwidth": 20,
+	"growquadheight": 24,
+	"growquadcenterY": 16,
+	"growquadcenterY2": 10,
+
+	"bigquadcenterY": 20,
+	"bigquadcenterX": 9,
+	"bigoffsetY": -3,
+	"bigoffsetX": 6,
+	"bigquadwidth": 20,
+	"bigquadheight": 36,
+	"bigimgwidth": 340,
+	"bigimgheight": 180,
+
+	"duckquadcenterY": 26,
+	"duckoffsetY": 3,
+
+	"hammerquadcenterY": 20,
+	"hammerquadcenterX": 9,
+	"hammeroffsetY": -3,
+	"hammeroffsetX": 6,
+	"hammerquadwidth": 20,
+	"hammerquadheight": 36,
+	"hammerimgwidth": 340,
+	"hammerimgheight": 180,
+	
+	"frogquadcenterY": 24,
+	"frogquadcenterX": 9,
+	"frogoffsetY": -1,
+	"frogoffsetX": 6,
+	"frogquadwidth": 20,
+	"frogquadheight": 36,
+	"frogimgwidth": 340,
+	"frogimgheight": 180,
+
+	"raccoonquadcenterY": 20,
+	"raccoonquadcenterX": 14,
+	"raccoonoffsetY": -3,
+	"raccoonoffsetX": 6,
+	"raccoonquadwidth": 26,
+	"raccoonquadheight": 36,
+	"raccoonimgwidth": 754,
+	"raccoonimgheight": 180,
+
+	"hugeoffsetX": 18,
+	"hugeoffsetY": -41,
+	"hugequadcenterX": 9,
+	"hugequadcenterY": 20,
+	"hugeclassicoffsetX": 12,
+	"hugeclassicoffsetY": -1,
+	"hugeclassicquadcenterX": 11,
+	"hugeclassicquadcenterY": 10,
+
+	"hugeclassicduckquadcenterY": 22,
+	"hugeclassicduckoffsetY": 7,
+
+	"capequadwidth": 34,
+	"capequadheight": 36,
+	"capeimgwidth": 984,
+	"capeimgheight": 180,
+	"capequadcenterY": 20,
+	"capequadcenterX": 17,
+	"capeoffsetY": -3,
+	"capeoffsetX": 6,
+
+	"tinyoffsetX": 3,
+	"tinyoffsetY": 4,
+	"tinyquadcenterX": 5,
+	"tinyquadcenterY": 6,
+	"tinyquadwidth": 10,
+	"tinyquadheight": 10,
+	"tinyimgwidth": 190,
+	"tinyimgheight": 50,
+
+	"shellquadcenterY": 20,
+	"shellquadcenterX": 9,
+	"shelloffsetY": -3,
+	"shelloffsetX": 6,
+	"shellquadwidth": 20,
+	"shellquadheight": 36,
+	"shellimgwidth": 400,
+	"shellimgheight": 180,
+
+	"boomerangquadcenterY": 20,
+	"boomerangquadcenterX": 9,
+	"boomerangoffsetY": -3,
+	"boomerangoffsetX": 6,
+	"boomerangquadwidth": 20,
+	"boomerangquadheight": 36,
+	"boomerangimgwidth": 340,
+	"boomerangimgheight": 180,
+
+	"defaulthat": 0,
+	"hats": true,
+	"hatoffsets": {
+		"idle": [0,0],
+		"running": [[0,0],[0,0],[-1,-1]],
+		"sliding": [0,0],
+		"jumping": [1,0],
+		"falling": [0,0],
+		"climbing": [[1,0],[1,-1]],
+		"swimming": [[1,0],[1,0],[1,0],[1,0],[1,0]],
+		"grow": [-6,2],
+		"dead": [1,-2]
+	},
+	
+	"bighatoffsets": {
+		"idle": [-4,-3],
+		"fire": [-5,-4],
+		"running": [[-6,-4],[-5,-3],[-5,-2]],
+		"sliding": [-6,-2],
+		"jumping": [-3,-2],
+		"falling": [-4,-2],
+		"climbing": [[-5,-3],[-5,-3]],
+		"swimming": [[-5,-2],[-5,-2],[-5,-3],[-5,-2],[-5,-2]],
+		"ducking": [-5,-10],
+		"capefly": [[-10, -10], [-11, -15], [-10, -19], [-11, -21], [-9, -22], [-9, -24]],
+		"grow": [-6,2]
+	},
+
+	"skinnyhatoffsets": {
+		"idle": [1,2],
+		"running": [[1, 0],[2,1],[3,2]],
+		"sliding": [-1,-1],
+		"jumping": [2,0],
+		"falling": [1,2],
+		"climbing": [[2,2],[4,0]],
+		"swimming": [[-1,1],[-1,1],[-2,1],[0,1],[-1,1]],
+		"ducking": [1,-11]
+	},
+
+	"author": "NH1507"
+}

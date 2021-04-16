@@ -1,0 +1,15 @@
+{
+	"i": 10,
+
+	"x": 7,
+	"y": -5,
+	"height": 8,
+	"graphic": "toilet",
+
+	"bigx": -1,
+	"bigy": -5,
+	"bigheight": 8,
+	"biggraphic": "toiletbig",
+
+	"directions": false
+}

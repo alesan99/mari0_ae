@@ -1,0 +1,15 @@
+{
+	"i": 23,
+
+	"x": 6,
+	"y": 0,
+	"height": 3,
+	"graphic": "flippedtrilby",
+
+	"bigx": -2,
+	"bigy": -1,
+	"bigheight": 4,
+	"biggraphic": "flippedtrilbybig",
+
+	"directions": false
+}

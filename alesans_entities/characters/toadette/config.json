@@ -1,0 +1,200 @@
+{
+	"name": "toadette",
+	
+	"colorables": [
+		"hat",
+		"spots",
+		"skin"
+	],
+	"colors": [
+		[252,116,180],
+		[252,252,252],
+		[252,188,176]
+		],
+	"defaultcolors": [
+		[[252,116,180],
+		[252,252,252],
+		[252,216,168]],
+		
+		[[252,116,180],
+		[252,252,252],
+		[252,216,168]],
+		
+		[[252,116,180],
+		[252,252,252],
+		[252,216,168]],
+		
+		[[252,116,180],
+		[252,252,252],
+		[252,216,168]]
+		],
+	"flowercolor": [[216,40,0], [252,116,180], [252,216,168]],
+	"hammersuitcolor": [[0,0,0], [252,252,252], [252,216,168]],
+	"frogsuitcolor": [[252,116,180], [228,0,88], [252,216,168]],
+	"iceflowercolor": [[60,188,252], [156,252,240], [252,216,168]],
+	"tanookisuitcolor": [[200,76,12], [0,0,0], [252,216,168]],
+	"superballcolor": [[100,100,50], [230,230,180], [160,160,100]],
+	"boomerangcolor": [[32,56,236], [252,252,252], [252,216,168]],
+	"blueshellcolor": [[228,0,88], [252,252,252], [252,188,176]],
+
+	"smallducking": false,
+
+	"swimpushframes": 1,
+	"fenceframes": 2,
+	"smallduckingframes": 1,
+	"fallframes": 1,
+
+	"smalloffsetX": 6,
+	"smalloffsetY": 3,
+	"smallquadcenterX": 21,
+	"smallquadcenterY": 10,
+	"smallquadwidth": 30,
+	"smallquadheight": 20,
+	"smallimgwidth": 600,
+	"smallimgheight": 100,
+
+	"shrinkquadcenterX": 19,
+	"shrinkquadcenterY": 32,
+	"shrinkoffsetY": -3,
+	"shrinkquadcenterY2": 16,
+
+	"growquadwidth": 30,
+	"growquadheight": 24,
+	"growquadcenterY": 16,
+	"growquadcenterY2": 16,
+
+	"bigquadcenterY": 20,
+	"bigquadcenterX": 19,
+	"bigoffsetY": -3,
+	"bigoffsetX": 6,
+	"bigquadwidth": 30,
+	"bigquadheight": 36,
+	"bigimgwidth": 540,
+	"bigimgheight": 180,
+
+	"duckquadcenterY": 26,
+	"duckoffsetY": 3,
+
+	"hammerquadcenterY": 20,
+	"hammerquadcenterX": 19,
+	"hammeroffsetY": -3,
+	"hammeroffsetX": 6,
+	"hammerquadwidth": 30,
+	"hammerquadheight": 36,
+	"hammerimgwidth": 540,
+	"hammerimgheight": 180,
+
+	"frogquadcenterY": 24,
+	"frogquadcenterX": 9,
+	"frogoffsetY": -1,
+	"frogoffsetX": 6,
+	"frogquadwidth": 20,
+	"frogquadheight": 36,
+	"frogimgwidth": 360,
+	"frogimgheight": 180,
+
+	"raccoonquadcenterY": 20,
+	"raccoonquadcenterX": 14,
+	"raccoonoffsetY": -3,
+	"raccoonoffsetX": 6,
+	"raccoonquadwidth": 26,
+	"raccoonquadheight": 36,
+	"raccoonimgwidth": 780,
+	"raccoonimgheight": 180,
+
+	"hugeoffsetX": 18,
+	"hugeoffsetY": -41,
+	"hugequadcenterX": 29,
+	"hugequadcenterY": 20,
+	"hugeclassicoffsetX": 12,
+	"hugeclassicoffsetY": -1,
+	"hugeclassicquadcenterX": 21,
+	"hugeclassicquadcenterY": 10,
+
+	"hugeclassicduckquadcenterY": 22,
+	"hugeclassicduckoffsetY": 7,
+
+	"capequadwidth": 44,
+	"capequadheight": 36,
+	"capeimgwidth": 1320,
+	"capeimgheight": 180,
+	"capequadcenterY": 20,
+	"capequadcenterX": 22,
+	"capeoffsetY": -3,
+	"capeoffsetX": 6,
+
+	"capeimgoffsetX": -6,
+	"capeimgoffsetY": -2,
+
+	"tinyoffsetX": 3,
+	"tinyoffsetY": 4,
+	"tinyquadcenterX": 10,
+	"tinyquadcenterY": 6,
+	"tinyquadwidth": 15,
+	"tinyquadheight": 10,
+	"tinyimgwidth": 300,
+	"tinyimgheight": 50,
+
+	"shellquadcenterY": 20,
+	"shellquadcenterX": 19,
+	"shelloffsetY": -3,
+	"shelloffsetX": 6,
+	"shellquadwidth": 30,
+	"shellquadheight": 36,
+	"shellimgwidth": 630,
+	"shellimgheight": 180,
+
+	"boomerangquadcenterY": 20,
+	"boomerangquadcenterX": 19,
+	"boomerangoffsetY": -3,
+	"boomerangoffsetX": 6,
+	"boomerangquadwidth": 30,
+	"boomerangquadheight": 36,
+	"boomerangimgwidth": 540,
+	"boomerangimgheight": 180,
+
+	"hats": true,
+	"defaulthat": 0,
+	
+	"hatoffsets": {
+		"idle": [-10,0],
+		"running": [[-10,0],[-10,0],[-11,-1]],
+		"sliding": [-10,0],
+		"jumping": [-9,0],
+		"falling": [-9,0],
+		"climbing": [[-9,0],[-9,-1]],
+		"fence": [[-10,0],[-10,0]],
+		"swimming": [[-9,0],[-9,0],[-9,0],[-9,0],[-9,0]],
+		"ducking": [-10,-2],
+		"grow": [-15,0],
+		"dead": [-8,0]
+	},
+	
+	"bighatoffsets": {
+		"idle": [-13,-5],
+		"fire": [-14,-7],
+		"running": [[-14,-5],[-14,-4],[-14,-3]],
+		"sliding": [-14,-4],
+		"jumping": [-13,-4],
+		"falling": [-13,-4],
+		"climbing": [[-14,-5],[-14,-5]],
+		"fence": [[-14,-4],[-14,-4]],
+		"swimming": [[-15,-4],[-15,-4],[-15,-4],[-15,-4],[-15,-4]],
+		"ducking": [-14,-12],
+		"grow": [-15,0]
+	},
+
+	"skinnyhatoffsets": {
+		"idle": [-8,1],
+		"running": [[-8,-1],[-7,0],[-6,-1]],
+		"sliding": [-11,-2],
+		"jumping": [-8,-1],
+		"falling": [-8,-1],
+		"climbing": [[-7,0],[-5,-1]],
+		"fence": [[-7,-1],[-7,-1]],
+		"swimming": [[-10,0],[-10,0],[-10,0],[-10,0],[-10,0]],
+		"ducking": [-8,-12]
+	},
+
+	"author": "NH1507"
+}

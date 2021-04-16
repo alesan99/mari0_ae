@@ -1,0 +1,15 @@
+{
+	"i": 29,
+
+	"x": 5,
+	"y": -5,
+	"height": 5,
+	"graphic": "blooper",
+
+	"bigx": -2,
+	"bigy": -5,
+	"bigheight": 5,
+	"biggraphic": "blooperbig",
+
+	"directions": false
+}

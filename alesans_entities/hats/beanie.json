@@ -1,0 +1,15 @@
+{
+	"i": 9,
+
+	"x": 7,
+	"y": -2,
+	"height": 3,
+	"graphic": "beanie",
+
+	"bigx": 1,
+	"bigy": -3,
+	"bigheight": 3,
+	"biggraphic": "beaniebig",
+
+	"directions": false
+}

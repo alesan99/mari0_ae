@@ -1,0 +1,15 @@
+endingtextcolor=255,255,255
+endingcolorname=white
+endingtext=congratulations!,you have finished this mappack!
+playername=mario
+hudtextcolor=255,255,255
+hudcolorname=white
+hudvisible=true
+hudworldletter=false
+hudoutline=true
+hudsimple=false
+toadtext=thank you mario!,but our princess is in,another castle!
+peachtext=thank you mario!,your quest is over.,we present you a new quest.,push button b,to play as steve
+steve=true
+levelscreen=1|1|
+hudhidecollectables=f,f,f,f,f,f,f,f,f,f

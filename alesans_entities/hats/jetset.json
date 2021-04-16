@@ -1,0 +1,15 @@
+{
+	"i": 32,
+
+	"x": 5,
+	"y": 1,
+	"height": 4,
+	"graphic": "jetset",
+
+	"bigx": -3,
+	"bigy": -1,
+	"bigheight": 5,
+	"biggraphic": "jetsetbig",
+
+	"directions": true
+}

@@ -1,0 +1,15 @@
+{
+	"i": 4,
+
+	"x": 5,
+	"y": -6,
+	"height": 8,
+	"graphic": "towering2",
+
+	"bigx": -2,
+	"bigy": -8,
+	"bigheight": 9,
+	"biggraphic": "towering2big",
+
+	"directions": false
+}

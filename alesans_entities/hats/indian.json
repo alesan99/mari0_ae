@@ -1,0 +1,15 @@
+{
+	"i": 11,
+
+	"x": 5,
+	"y": -4,
+	"height": 5,
+	"graphic": "indian",
+
+	"bigx": -1,
+	"bigy": -4,
+	"bigheight": 5,
+	"biggraphic": "indianbig",
+
+	"directions": true
+}

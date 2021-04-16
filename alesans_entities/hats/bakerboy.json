@@ -1,0 +1,15 @@
+{
+	"i": 17,
+
+	"x": 6,
+	"y": 0,
+	"height": 3,
+	"graphic": "bakerboy",
+
+	"bigx": 0,
+	"bigy": 0,
+	"bigheight": 4,
+	"biggraphic": "bakerboybig",
+
+	"directions": true
+}

@@ -1,0 +1,15 @@
+{
+	"i": 18,
+
+	"x": 5,
+	"y": 1,
+	"height": 2,
+	"graphic": "troublemaker",
+
+	"bigx": -3,
+	"bigy": 0,
+	"bigheight": 3,
+	"biggraphic": "troublemakerbig",
+
+	"directions": true
+}

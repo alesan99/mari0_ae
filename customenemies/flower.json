@@ -1,0 +1,46 @@
+{
+	"quadcount": 4,
+
+	"movement": "none",
+	
+	"animationtype": "frames",
+	"animationframes": 4,
+	"animationstart": 1,
+	"animationspeed": 0.04,
+	
+	"makesmariogrow": 3,
+	"removeonmariocontact": true,
+	
+	"notkilledfromblocksbelow": true,
+	"mushroomifmariosmall": true,
+	
+	"quadno": 1,
+	
+	"width": 0.75,
+	"height": 0.75,
+	
+	"static": false,
+	"active": true,
+	
+	"category": 6,
+	
+	"mask": [	true,
+				false, false, true, true, true,
+				false, true, false, true, true,
+				false, true, true, false, true,
+				true, true, false, true, true,
+				false, true, true, false, false,
+				true, false, true, true, true,
+				false],
+					
+	
+	"emancipatecheck": true,
+	"autodelete": true,
+	
+	"offsetX": 6,
+	"offsetY": 3,
+	"quadcenterX": 8,
+	"quadcenterY": 8,
+	
+	"light": 2
+}

@@ -1,0 +1,15 @@
+{
+	"i": 31,
+
+	"x": 6,
+	"y": 4,
+	"height": 4,
+	"graphic": "goodnewseverybody",
+
+	"bigx": -1,
+	"bigy": 3,
+	"bigheight": 4,
+	"biggraphic": "goodnewseverybodybig",
+
+	"directions": true
+}
