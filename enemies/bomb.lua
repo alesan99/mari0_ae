@@ -344,7 +344,7 @@ function bomb:globalcollide(a, b)
 		end
 	end
 
-	if (not self.stomped) and (a == "castlefirefire" or a == "longfire" or a == "plantfire" or a == "brofireball" or a == "fire" or a == "upfire" or a == "angrysun" or (b and b.fireenemy and a ~= "player")) then
+	if (not self.stomped) and (a == "castlefirefire" or a == "longfire" or a == "plantfire" or a == "brofireball" or a == "fire" or a == "upfire" or a == "angrysun" or (b and b.meltsice)) then
 		playsound(shotsound)
 		self:stomp()
 		return true

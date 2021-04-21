@@ -362,7 +362,7 @@ function loadcustomplayers()
 						end)
 					JSONcrashgame = true
 				end
-				if playerstuff.fireenemy then
+				if playerstuff.fireenemy and type(playerstuff.fireenemy) == "table" then
 					for i, v in pairs(playerstuff.fireenemy) do
 						local a = i:lower()
 						if type(v) == "string" then
