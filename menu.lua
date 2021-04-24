@@ -1152,7 +1152,6 @@ function menu_draw()
 				end
 			end
 		elseif optionstab == 2 then
-			local v = characters.data[mariocharacter[skinningplayer]]
 			--SKINS
 			if optionsselection == 2 then
 				love.graphics.setColor(255, 255, 255, 255)
@@ -1164,13 +1163,17 @@ function menu_draw()
 			
 			--PREVIEW MARIO IN BIG. WITH BIG LETTERS
 			local v = characters.data[mariocharacter[skinningplayer]]
+			if v.portalgununderhat then
+				love.graphics.setColor(255, 255, 255, 255)
+				love.graphics.draw(v["animations"][0], v["small"]["idle"][3], (34+46+v.smalloffsetX*2)*scale, (32+32-v.smalloffsetY*2)*scale, 0, scale*2, scale*2, v.smallquadcenterX, v.smallquadcenterY)
+			end
 			love.graphics.setColor(255, 255, 255, 255)
 			for i = 1, #v.colorables do
 				if mariocolors[skinningplayer][i] then
 					love.graphics.setColor(unpack(mariocolors[skinningplayer][i]))
 				end
 				if mariocharacter[skinningplayer] then
-					love.graphics.draw(characters.data[mariocharacter[skinningplayer]]["animations"][i], characters.data[mariocharacter[skinningplayer]]["small"]["idle"][3], (34+46+v.smalloffsetX*2)*scale, (32+32-v.smalloffsetY*2)*scale, 0, scale*2, scale*2, v.smallquadcenterX, v.smallquadcenterY)
+					love.graphics.draw(v["animations"][i], v["small"]["idle"][3], (34+46+v.smalloffsetX*2)*scale, (32+32-v.smalloffsetY*2)*scale, 0, scale*2, scale*2, v.smallquadcenterX, v.smallquadcenterY)
 				end
 			end
 			
@@ -1188,7 +1191,7 @@ function menu_draw()
 			
 			properprintF("{", 64*scale, 56*scale)
 			properprintF("}", 112*scale, 56*scale)
-			properprint(characters.data[mariocharacter[skinningplayer]].name, (118-#characters.data[mariocharacter[skinningplayer]].name*4)*scale, 80*scale)
+			properprint(v.name, (118-#v.name*4)*scale, 80*scale)
 			
 			--hat
 			offsets = customplayerhatoffsets(mariocharacter[skinningplayer], "hatoffsets", "idle") or hatoffsets["idle"]
@@ -1206,19 +1209,27 @@ function menu_draw()
 				end
 			end
 			
-			love.graphics.setColor(255, 255, 255, 255)
-			love.graphics.draw(characters.data[mariocharacter[skinningplayer]]["animations"][0], characters.data[mariocharacter[skinningplayer]]["small"]["idle"][3], (34+46+v.smalloffsetX*2)*scale, (32+32-v.smalloffsetY*2)*scale, 0, scale*2, scale*2, v.smallquadcenterX, v.smallquadcenterY)
+			if not v.portalgununderhat then
+				love.graphics.setColor(255, 255, 255, 255)
+				love.graphics.draw(v["animations"][0], v["small"]["idle"][3], (34+46+v.smalloffsetX*2)*scale, (32+32-v.smalloffsetY*2)*scale, 0, scale*2, scale*2, v.smallquadcenterX, v.smallquadcenterY)
+			end
 			
 			--PREVIEW PORTALS WITH FALLING MARIO BECAUSE I CAN AND IT LOOKS RAD
 			love.graphics.setScissor(142*scale, 42*scale, 32*scale, 32*scale)
 			
 			for j = 1, #v.colorables do
+				if v.portalgununderhat then
+					love.graphics.setColor(255, 255, 255, 255)
+					love.graphics.draw(v["animations"][0], v["small"]["jump"][3][1], (152+v.smalloffsetX)*scale, (2+((j-1)*32)+infmarioY-v.smalloffsetY)*scale, infmarioR, scale, scale, v.smallquadcenterX, v.smallquadcenterY)
+				end
 				for i = 1, #v.colorables do
 					love.graphics.setColor(unpack(mariocolors[skinningplayer][i]))
-					love.graphics.draw(characters.data[mariocharacter[skinningplayer]]["animations"][i], characters.data[mariocharacter[skinningplayer]]["small"]["jump"][3][1], (152+v.smalloffsetX)*scale, (2+((j-1)*32)+infmarioY-v.smalloffsetY)*scale, infmarioR, scale, scale, v.smallquadcenterX, v.smallquadcenterY)
+					love.graphics.draw(v["animations"][i], v["small"]["jump"][3][1], (152+v.smalloffsetX)*scale, (2+((j-1)*32)+infmarioY-v.smalloffsetY)*scale, infmarioR, scale, scale, v.smallquadcenterX, v.smallquadcenterY)
 				end
-				love.graphics.setColor(255, 255, 255, 255)
-				love.graphics.draw(characters.data[mariocharacter[skinningplayer]]["animations"][0], characters.data[mariocharacter[skinningplayer]]["small"]["jump"][3][1], (152+v.smalloffsetX)*scale, (2+((j-1)*32)+infmarioY-v.smalloffsetY)*scale, infmarioR, scale, scale, v.smallquadcenterX, v.smallquadcenterY)
+				if not v.portalgununderhat then
+					love.graphics.setColor(255, 255, 255, 255)
+					love.graphics.draw(v["animations"][0], v["small"]["jump"][3][1], (152+v.smalloffsetX)*scale, (2+((j-1)*32)+infmarioY-v.smalloffsetY)*scale, infmarioR, scale, scale, v.smallquadcenterX, v.smallquadcenterY)
+				end
 			end
 			
 			local portalframe = portalanimation
