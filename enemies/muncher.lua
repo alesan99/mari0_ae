@@ -31,6 +31,7 @@ function muncher:init(x, y, physics, r)
 			self.x = math.floor(self.x)
 			self.y = math.floor(self.y)
 			self.static = true
+			self.mask = {true}
 		end
 	end
 	
@@ -205,6 +206,16 @@ function muncher:melt()
 		self.y = self.y+(2/16)*(self.supersized or 1)
 		self.width = (14/16)*(self.supersized or 1)
 		self.height = (14/16)*(self.supersized or 1)
+		
+		self.mask = {	true, 
+			false, false, false, false, true,
+			false, true, false, true, false,
+			false, false, true, false, false,
+			true, true, false, false, false,
+			false, true, true, false, false,
+			true, false, true, true, true,
+			false, true}
+		
 		self:updateimage()
 		if self.physics then
 			self.static = false
