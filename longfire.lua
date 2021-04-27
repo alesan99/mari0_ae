@@ -104,12 +104,17 @@ function longfire:update(dt)
 	end
 
 	if self.active then
-		--melt frozen coins
+		--melt frozen coins / munchers
 		for x = 1, math.ceil(self.width) do
 			for y = 1, math.ceil(self.height) do
 				local cox, coy = math.floor(self.x+(x-1))+1, math.floor(self.y+(y-1))+1
 				if objects["frozencoin"][tilemap(cox, coy)] then
 					objects["frozencoin"][tilemap(cox, coy)]:meltice()
+				end
+				for i, v in pairs(objects["muncher"]) do
+					if v.frozen and aabb(cox-1, coy-1, 1, 1, v.x, v.y, v.width, v.height) then
+						v:melt()
+					end
 				end
 			end
 		end
