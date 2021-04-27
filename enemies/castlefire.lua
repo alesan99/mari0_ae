@@ -251,6 +251,12 @@ function castlefire:updatepos()
 		if objects["frozencoin"][tilemap(cox, coy)] then
 			objects["frozencoin"][tilemap(cox, coy)]:meltice()
 		end
+		--melt frozen munchers
+		for i, v in pairs(objects["muncher"]) do
+			if v.frozen and aabb(cox-1, coy-1, 1, 1, v.x, v.y, v.width, v.height) then
+				v:melt()
+			end
+		end
 	end
 end
 
