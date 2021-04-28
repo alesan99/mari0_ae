@@ -113,7 +113,7 @@ function laser:update(dt)
 			self.blocked = true
 		
 			local obj
-			if self.lasertable[i] == "right" or self.lasertable[i] == "down" then
+			if self.lasertable[i] == "right" then
 				local smallestx = mapwidth+1
 				local smallesti
 			
@@ -124,7 +124,7 @@ function laser:update(dt)
 					end
 				end
 				obj = objects[rectcol[smallesti]][rectcol[smallesti+1]]
-			else
+			elseif self.lasertable[i] == "left" then
 				local biggestx = -1
 				local biggesti
 			
@@ -136,8 +136,30 @@ function laser:update(dt)
 				end
 				
 				obj = objects[rectcol[biggesti]][rectcol[biggesti+1]]
-			end
+			elseif self.lasertable[i] == "up" then
+				local biggesty = -1
+				local biggesti
 			
+				for j = 1, #rectcol, 2 do
+					if objects[rectcol[j]][rectcol[j+1]].y > biggesty then
+						biggesty = objects[rectcol[j]][rectcol[j+1]].y
+						biggesti = j
+					end
+				end
+				
+				obj = objects[rectcol[biggesti]][rectcol[biggesti+1]]
+			elseif self.lasertable[i] == "down" then
+				local smallesty = mapheight+1
+				local smallesti
+			
+				for j = 1, #rectcol, 2 do
+					if objects[rectcol[j]][rectcol[j+1]].y < smallesty then
+						smallesty = objects[rectcol[j]][rectcol[j+1]].y
+						smallesti = j
+					end
+				end
+				obj = objects[rectcol[smallesti]][rectcol[smallesti+1]]
+			end
 			local newtable = {}
 			for k = 1, i*5 do
 				table.insert(newtable, self.lasertable[k])
@@ -160,7 +182,7 @@ function laser:update(dt)
 					obj:laser("down")
 				end
 				
-				newtable[i+4] = obj.y - newtable[i+2]+1
+				newtable[i+4] = obj.y - newtable[i+2]+1+obj.height
 			elseif self.lasertable[i] == "down" then
 				if obj.laser then
 					obj:laser("up")
@@ -248,11 +270,15 @@ function laser:draw()
 				end
 			end
 		elseif self.lasertable[i] == "up" then
-			for y = self.lasertable[i+2], self.lasertable[i+2]+self.lasertable[i+4], -1 do
+			love.graphics.setScissor(math.floor((self.lasertable[i+1]-xscroll-1)*16*scale), (self.lasertable[i+2]+self.lasertable[i+4]-yscroll-1.5)*16*scale, 16*scale, (-self.lasertable[i+4]+1)*16*scale)
+
+			for y = self.lasertable[i+2], self.lasertable[i+2]+self.lasertable[i+4]-1, -1 do
 				love.graphics.draw(laserimg, math.floor((self.lasertable[i+1]-xscroll-5/16)*16*scale), (y-yscroll-1)*16*scale, math.pi/2, scale, scale, 8, 1)
 			end
 		elseif self.lasertable[i] == "down" then
-			for y = self.lasertable[i+2], self.lasertable[i+2]+self.lasertable[i+4] do
+			love.graphics.setScissor(math.floor((self.lasertable[i+1]-xscroll-1)*16*scale), (self.lasertable[i+2]-yscroll-1.5)*16*scale, 16*scale, (self.lasertable[i+4]+1)*16*scale)
+
+			for y = self.lasertable[i+2], self.lasertable[i+2]+self.lasertable[i+4]+1 do
 				love.graphics.draw(laserimg, math.floor((self.lasertable[i+1]-xscroll-5/16)*16*scale), (y-yscroll-1)*16*scale, math.pi/2, scale, scale, 8, 1)
 			end
 		end
