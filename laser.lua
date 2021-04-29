@@ -270,13 +270,13 @@ function laser:draw()
 				end
 			end
 		elseif self.lasertable[i] == "up" then
-			love.graphics.setScissor(math.floor((self.lasertable[i+1]-xscroll-1)*16*scale), (self.lasertable[i+2]+self.lasertable[i+4]-yscroll-1.5)*16*scale, 16*scale, (-self.lasertable[i+4]+1)*16*scale)
+			love.graphics.setScissor(math.floor((self.lasertable[i+1]-xscroll-1)*16*scale), (self.lasertable[i+2]+self.lasertable[i+4]-yscroll-1.5)*16*scale, 16*scale, (math.abs(self.lasertable[i+4])+1)*16*scale)
 
 			for y = self.lasertable[i+2], self.lasertable[i+2]+self.lasertable[i+4]-1, -1 do
 				love.graphics.draw(laserimg, math.floor((self.lasertable[i+1]-xscroll-5/16)*16*scale), (y-yscroll-1)*16*scale, math.pi/2, scale, scale, 8, 1)
 			end
 		elseif self.lasertable[i] == "down" then
-			love.graphics.setScissor(math.floor((self.lasertable[i+1]-xscroll-1)*16*scale), (self.lasertable[i+2]-yscroll-1.5)*16*scale, 16*scale, (self.lasertable[i+4]+1)*16*scale)
+			love.graphics.setScissor(math.floor((self.lasertable[i+1]-xscroll-1)*16*scale), (self.lasertable[i+2]-yscroll-1.5)*16*scale, 16*scale, (math.abs(self.lasertable[i+4])+1)*16*scale)
 
 			for y = self.lasertable[i+2], self.lasertable[i+2]+self.lasertable[i+4]+1 do
 				love.graphics.draw(laserimg, math.floor((self.lasertable[i+1]-xscroll-5/16)*16*scale), (y-yscroll-1)*16*scale, math.pi/2, scale, scale, 8, 1)
