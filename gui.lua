@@ -545,7 +545,7 @@ function guielement:draw(a, offx, offy)
 		
 		love.graphics.setColor(self.textcolor)
 		--format string
-		local oldstring = self.value--string.sub(self.value, self.offset+1, self.offset+self.width)
+		local oldstring = self.value--string.sub(self.value, self.textoffset+1, self.textoffset+self.width)  --old offsets
 		local newstring = {}
 		for i = 1, string.len(oldstring), self.width do
 			if math.ceil(i/self.width) > self.height then
@@ -556,7 +556,7 @@ function guielement:draw(a, offx, offy)
 		
 		if self.height == 1 then
 			local s = tostring(self.value)
-			properprint(s:sub(self.textoffset+1, self.textoffset+1+self.width), (self.x+1+self.spacing)*scale, (self.y+2+self.spacing)*scale)
+			properprint(s:sub(self.textoffset+1, self.textoffset+self.width), (self.x+1+self.spacing)*scale, (self.y+2+self.spacing)*scale)
 		else
 			for i = 1, #newstring do
 				properprint(newstring[i], (self.x+2)*scale, (self.y+2+self.spacing+(i-1)*10)*scale)
@@ -565,23 +565,16 @@ function guielement:draw(a, offx, offy)
 		
 		--cursor
 		if self.inputting and self.cursorblink then
-			local x, y
-			if #newstring == 0 then
-				x, y = 1, 1
-			else
-				x, y = #newstring[#newstring]+1, #newstring
-			end
+			local x, y = math.ceil((self.cursorpos-1-self.textoffset) % self.width)+1, math.min(math.ceil(self.cursorpos/self.width), self.height) --bookmark
 			
-			if x > self.width then
-				if y < self.height and self.height > 1 then
-					x = 1
-					y = y + 1
-				else
-					x = x - 1
-				end
+			if (self.cursorpos == self.maxlength+1) and (self.height > 1 or self.width >= self.maxlength) then
+				x = self.width+1
 			end
-			
-			love.graphics.rectangle("fill", (self.x+1+self.spacing+(x-1)*8)*scale, (self.y+9+self.spacing+(y-1)*10)*scale, 8*scale, 1*scale)
+			--print(x)
+			love.graphics.rectangle("fill", (self.x+1+self.spacing+(x-1)*8)*scale, (self.y+2+self.spacing+(y-1)*10)*scale, 1*scale, 7*scale)
+		end
+		if self.width >= self.maxlength or self.height > 1 then
+			self.textoffset = 0
 		end
 	elseif self.type == "text" then
 		love.graphics.setColor(self.color)
@@ -747,17 +740,55 @@ function guielement:keypress(key)
 							love.keyboard.setTextInput(false)--[DROID]
 						end
 					end
-				elseif key == "backspace" then
-					if string.len(self.value) > self.width-1 and self.width ~= self.maxlength then
-						self.textoffset = self.textoffset - 1
+				elseif key == "left" then --bookmark
+					self.cursorpos = math.max(1, self.cursorpos - 1)
+					if self.cursorpos-1 <= self.textoffset then
+						self.textoffset = math.max(self.textoffset - 1, 0)
 					end
-					self.value = string.sub(self.value, 1, string.len(self.value)-1)
-					if self.cursorpos > 1 and self.cursorpos > string.len(self.value)+1 then
+					self.cursorblink = true
+					self.timer = 0
+
+					print(self.cursorpos)
+					print(self.textoffset)
+					print("")
+				elseif key == "right" then
+					self.cursorpos = math.min(#self.value + 1, self.cursorpos + 1)
+					if self.cursorpos-1 >= self.textoffset+self.width then
+						self.textoffset = math.min(self.textoffset + 1, self.maxlength - self.width)
+					end
+					self.cursorblink = true
+					self.timer = 0
+
+					print(self.cursorpos)
+					print(self.textoffset)
+					print("")
+				elseif key == "up" and self.height > 1 then
+					self.cursorpos = math.max(1, self.cursorpos - self.width)
+					self.cursorblink = true
+					self.timer = 0
+
+					print(self.cursorpos)
+					print(self.textoffset)
+					print("")
+				elseif key == "down" and self.height > 1 then
+					self.cursorpos = math.min(#self.value + 1, self.cursorpos + self.width)
+					self.cursorblink = true
+					self.timer = 0
+
+					print(self.cursorpos)
+					print(self.textoffset)
+					print("")
+				elseif key == "backspace" then
+					self.value = self.value:sub(1,self.cursorpos-2)..self.value:sub(self.cursorpos) --self.value = string.sub(self.value, 1, string.len(self.value)-1)
+
+					if self.cursorpos > 1 then --and self.cursorpos > string.len(self.value)+1 then
 						self.cursorpos = self.cursorpos - 1
 					end
-					if self.offset > 0 and self.offset > string.len(self.value)-self.width then
-						self.offset = self.offset - 1
-					end
+
+					self.textoffset = math.max(self.textoffset - 1, 0)
+
+					self.cursorblink = true
+					self.timer = 0
 				else
 					if string.len(self.value) < self.maxlength or self.maxlength == 0 then
 						local found = false
@@ -766,6 +797,16 @@ function guielement:keypress(key)
 						if self.shift then
 							if key == "1" then
 								targetkey = "!"
+							elseif key == "2" then
+								targetkey = "@"
+							elseif key == "3" then
+								targetkey = "#"
+							elseif key == "4" then
+								targetkey = "^"
+							elseif key == "5" then
+								targetkey = "%"
+							elseif key == "7" then
+								targetkey = "&"
 							elseif key == "8" then
 								targetkey = "*"
 							elseif key == "9" then
@@ -798,16 +839,19 @@ function guielement:keypress(key)
 						end
 						
 						if found then
-							self.value = self.value .. targetkey
-							if self.cursorpos ~= self.maxlength then
+							self.value = self.value:sub(1,self.cursorpos-1)..targetkey..self.value:sub(self.cursorpos)
+							if self.cursorpos <= self.maxlength then
 								self.cursorpos = self.cursorpos + 1
 							end
-							if self.cursorpos > self.offset+self.width then
-								self.offset = self.offset + 1
+							if self.cursorpos > self.textoffset+self.width then  --old offsets
+								self.textoffset = self.textoffset + 1  --old offsets
 							end
-							if string.len(self.value) > self.width-1 and self.width ~= self.maxlength then
-								self.textoffset = self.textoffset + 1
-							end
+							self.cursorblink = true
+							self.timer = 0
+
+							print(self.cursorpos)
+							print(self.textoffset)
+							print("")
 						end
 					end
 				end
