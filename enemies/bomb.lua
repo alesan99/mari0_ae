@@ -180,6 +180,7 @@ function bomb:explode()
 	self.explodetimer = 0
 	self.explosion = true
 	self.stompbounce = false
+	self.freezable = false
 	
 	local oldw, oldh = self.width, self.height
 	self.width = 2
