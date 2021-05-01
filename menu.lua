@@ -707,11 +707,8 @@ function menu_draw()
 			if mappackhorscrollsmooth < 1 then
 				--draw each butten (even if all you do, is press ONE. BUTTEN.)
 				--scrollbar offset
-				
 				love.graphics.translate(0, -round(mappackscrollsmooth*60*scale))
 				
-				love.graphics.setScissor(240*scale, 16*scale, 200*scale, 200*scale)
-				love.graphics.setColor(0, 0, 0, 200)
 				love.graphics.setScissor(21*scale, 16*scale, 218*scale, 200*scale)
 				
 				for i = math.max(1, math.floor(mappackscrollsmooth+1)), math.min(#mappacklist, math.floor(mappackscrollsmooth+5)) do
