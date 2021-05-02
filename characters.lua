@@ -111,7 +111,7 @@ function loadcustomplayers()
 				smallducking = false,
 				breaksblockssmall = false,
 				skid = false,
-				groundpound = true,
+				groundpound = false,
 				doublejump = false,
 				
 				--frames (anything that is quoted out doesn't work)

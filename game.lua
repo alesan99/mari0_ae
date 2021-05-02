@@ -4539,7 +4539,7 @@ function startlevel(level, reason)
 	else
 		stopmusic()
 	end
-	if doplaymusic then
+	if doplaymusic and not NoMusic then
 		if intermission == false then
 			playmusic()
 		else

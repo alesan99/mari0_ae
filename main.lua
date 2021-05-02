@@ -3810,6 +3810,7 @@ function loadnitpicks()
 		InfiniteLivesMultiplayer = t.infinitelivesmultiplayer
 		SlowBackgrounds = t.slowbackgrounds
 		NoCharacterZipNotices = t.nocharacterzipnotices
+		NoMusic = t.nomusic
 		_3DMODE = t.render3d
 		HITBOXDEBUG = t.viewhitboxes
 	end
