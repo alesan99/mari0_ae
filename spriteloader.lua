@@ -227,6 +227,10 @@ function loadcustomsprites(initial) --Sprite loader
 	end
 end
 
+function rgbaToInt(r,g,b,a)
+	return r*1000000000 + g+1000000 + b*1000 + a
+end
+
 function loaddebris()
 	blockdebrisquads = {}
 	blockdebrisquads.default = {}
@@ -243,7 +247,7 @@ function loaddebris()
 		for i = 2, math.floor(blockdebrisimage:getWidth()/17) do
 			local r, g, b, a = blockdebrisimgd:getPixel(i*17-1, 0)
 			--id of block debris is r,g,b,a
-			local name = r .. "," .. g .. "," .. b .. "," .. a
+			local name = rgbaToInt(r,g,b,a)
 			blockdebrisquads[name] = {}
 			for y = 1, 4 do
 				blockdebrisquads[name][y] = {}

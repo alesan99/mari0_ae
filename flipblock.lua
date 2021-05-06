@@ -123,7 +123,7 @@ function flipblock:update(dt)
 		if self.flip then
 			self.active = false
 			self.rotatetimer = self.rotatetimer + dt
-			if self.rotatetimer > 6.6 and (not checkintile(self.x, self.y, self.width, self.height, self.checktable, self)) then --how long the rotation lasts
+			if self.rotatetimer > 6.6 and self.quadi == 1 and #checkrect(self.x, self.y, self.width, self.height, self.checktable) == 0 then --how long the rotation lasts
 				self.quad = flipblockquad[spriteset][1]
 				self.rotatetimer = 0
 				self.flip = false
@@ -261,7 +261,7 @@ function flipblock:destroy()
 		return false
 	end
 	playsound(blockbreaksound)
-	local debris = "252,152,56,255"
+	local debris = rgbaToInt(252,152,56,255)
 	if blockdebrisquads[debris] then
 		table.insert(blockdebristable, blockdebris:new(self.cox-.5, self.coy-.5, 3.5, -23, blockdebrisimage, blockdebrisquads[debris][spriteset]))
 		table.insert(blockdebristable, blockdebris:new(self.cox-.5, self.coy-.5, -3.5, -23, blockdebrisimage, blockdebrisquads[debris][spriteset]))

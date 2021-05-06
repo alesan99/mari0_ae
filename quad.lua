@@ -42,7 +42,7 @@ function getquadprops(imgdata, x, y, self)
 	local r, g, b, a = imgdata:getPixel(x*17-1, (y-1)*17)
 	if a > 127 then
 		self.collision = true
-		self.debris = r .. "," .. g .. "," .. b .. "," .. a
+		self.debris = rgbaToInt(r,g,b,a)
 	end
 	
 	--get invisible
