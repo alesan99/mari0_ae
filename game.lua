@@ -592,7 +592,7 @@ function game_update(dt)
 	if delete then
 		table.sort(delete, function(a,b) return a>b end)
 		for i, v in pairs(delete) do
-			table.remove(miniblocks, v) --remove
+			table.remove(emancipationfizzles, v) --remove
 		end
 	end
 	
@@ -607,7 +607,7 @@ function game_update(dt)
 	if delete then
 		table.sort(delete, function(a,b) return a>b end)
 		for i, v in pairs(delete) do
-			table.remove(miniblocks, v) --remove
+			table.remove(emancipateanimations, v) --remove
 		end
 	end
 	
