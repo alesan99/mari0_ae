@@ -360,17 +360,26 @@ function turretrocket:update(dt)
 	end
 end
 
-function turretrocket:hit(a, b)
+function turretrocket:hit(a, b, gelside)
 	if a == "tile" then
 		local x, y = b.cox, b.coy
-		local ti = 1
-		if ismaptile(x, y) and map[x][y][1] then ti = map[x][y][1] end
-		if (tilequads[ti].coinblock or (tilequads[ti].debris and blockdebrisquads[tilequads[ti].debris])) then -- hard block
-			destroyblock(x, y)
+		if gelside and map[x][y]["gels"] and map[x][y]["gels"][gelside] == 1 then
+			if gelside == "left" or gelside == "right" then
+				self.speedx = -self.speedx
+			else
+				self.speedy = -self.speedy
+			end
+			return
 		else
-			hitblock(x, y, {size=2})
+			local ti = 1
+			if ismaptile(x, y) and map[x][y][1] then ti = map[x][y][1] end
+			if (tilequads[ti].coinblock or (tilequads[ti].debris and blockdebrisquads[tilequads[ti].debris])) then -- hard block
+				destroyblock(x, y)
+			else
+				hitblock(x, y, {size=2})
+			end
+			self.delete = true
 		end
-		self.delete = true
 	elseif a == "glados" then
 		self.delete = true
 	else
@@ -397,12 +406,12 @@ function turretrocket:emancipate()
 end
 
 function turretrocket:leftcollide(a, b)
-	self:hit(a, b)
+	self:hit(a, b, "right")
 	return false
 end
 
 function turretrocket:rightcollide(a, b)
-	self:hit(a, b)
+	self:hit(a, b, "left")
 	return false
 end
 
@@ -412,12 +421,12 @@ function turretrocket:globalcollide(a, b)
 end
 
 function turretrocket:floorcollide(a, b)
-	self:hit(a, b)
+	self:hit(a, b, "top")
 	return false
 end
 
 function turretrocket:ceilcollide(a, b)
-	self:hit(a, b)
+	self:hit(a, b, "bottom")
 	return false
 end
 
