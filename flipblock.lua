@@ -35,17 +35,13 @@ function flipblock:init(x, y, t, r)
 	self.quadcenterX = 8
 	self.quadcenterY = 8
 	self.quadi = 1
-
-	self.rotatetimer = 0
-	self.flippable = true
-
+	
 	self.t = t or "flipblock"
 	if self.t == "actionblock" then
 		self.on = false
 		self.graphic = actionblockimg
 		self.quad = goombaquad[spriteset][1]
 		self.outtable = {}
-		self.flippable = false
 	elseif self.t == "switchblock" then
 		self.on = true
 		self.graphic = switchblockimg
@@ -53,20 +49,24 @@ function flipblock:init(x, y, t, r)
 		self.animtimer = 0
 		self.quadi = 1
 		self.quad = flipblockquad[self.color][1]
-		self.flippable = false
 	elseif self.t == "propellerbox" then
 		self.graphic = helmetpropellerimg
 		self.quad = helmetpropellerquad[1]
 		self.animtimer = 0
 		self.quadi = 1
-		self.flippable = false
 		self.quadcenterY = 16
 		self.helmetable = "propellerbox"
 	elseif self.t == "cannonbox" then
 		self.graphic = helmetcannonimg
 		self.quad = helmetcannonquad.box
-		self.flippable = false
 		self.helmetable = "cannonbox"
+	else
+		self.rotatetimer = 0
+		self.flippable = true
+	
+		self.checktable = deepcopy(enemies)
+		table.insert(self.checktable, "player")
+		table.insert(self.checktable, "enemy")
 	end
 	
 	self.flip = false
@@ -123,7 +123,7 @@ function flipblock:update(dt)
 		if self.flip then
 			self.active = false
 			self.rotatetimer = self.rotatetimer + dt
-			if self.rotatetimer > 6.6 then --how long the rotation lasts
+			if self.rotatetimer > 6.6 and (not checkintile(self.x, self.y, self.width, self.height, self.checktable, self)) then --how long the rotation lasts
 				self.quad = flipblockquad[spriteset][1]
 				self.rotatetimer = 0
 				self.flip = false
