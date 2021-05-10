@@ -2467,20 +2467,20 @@ function enemy:globalcollide(a, b, c, d, dir)
 
 	if self.transforms and (self:gettransformtrigger("globalcollide") or self:gettransformtrigger("collide")) and (not self.justspawned) then
 		if self:gettransformtrigger("globalcollide") then
-			if self:handlecollisiontransform("globalcollide",a,b) then
+			if self:handlecollisiontransform("globalcollide",a,b,dir) then
 				if not self.dotransformaftercollision then
 					return true
 				end
 			end
 		else
-			if self:handlecollisiontransform("collide",a,b) then
+			if self:handlecollisiontransform("collide",a,b,dir) then
 				if not self.dotransformaftercollision then
 					return true
 				end
 			end
 		end
 	elseif self.transforms and dir == "passive" and self:gettransformtrigger("passivecollide") and (not self.justspawned) then
-		if self:handlecollisiontransform("passivecollide",a,b) then
+		if self:handlecollisiontransform("passivecollide",a,b,dir) then
 			if not self.dotransformaftercollision then
 				return true
 			end
@@ -3747,8 +3747,9 @@ function enemy:applygel(side, x, y)
 	return false
 end
 
-function enemy:handlecollisiontransform(side,a,b)
+function enemy:handlecollisiontransform(side,a,b,dir)
 	local docancel = false
+
 	if self.transformtriggerenemycollide then
 		--mutliple enemy collides
 		if type(self.transformtriggerenemycollide) == "table" and type(self.transformtrigger) == "table" then
@@ -3763,7 +3764,7 @@ function enemy:handlecollisiontransform(side,a,b)
 						if self.enemykillsdontflyaway then
 							b.doesntflyawayonfireball = true
 						end
-						b:shotted(dir)
+						b:shotted()
 					end
 					return true
 				end
@@ -3775,7 +3776,7 @@ function enemy:handlecollisiontransform(side,a,b)
 					if self.enemykillsdontflyaway then
 						b.doesntflyawayonfireball = true
 					end
-					b:shotted(dir)
+					b:shotted()
 				end
 				return true
 			end
@@ -3804,11 +3805,111 @@ function enemy:handlecollisiontransform(side,a,b)
 		end
 		docancel = true
 	end
+
+	if self.transformtriggercollidecondition then
+		-- collide conditions, like above but for more
+
+		if self.transformtriggercollidecondition then
+			if type(self.transformtriggercollidecondition) == "table" and type(self.transformtrigger) == "table" then
+				local yay = false
+				for i, s in pairs(self.transformtrigger) do
+					yay = self:handlecollidecondition(self.transformtriggercollidecondition[i][1], self.transformtriggercollidecondition[i][2], side, a, b, dir)
+					if yay then
+						break
+					end
+				end
+				
+				if yay then
+					if type(self.transformsinto) == "table" then
+						self:transform(self.transformsinto[i])
+					else
+						self:transform(self:gettransformsinto(side))
+					end
+					return true
+				end
+			else
+				if self:handlecollidecondition(self.transformtriggercollidecondition[1], self.transformtriggercollidecondition[2], side, a, b, dir) then
+					self:transform(self:gettransformsinto(side))
+					return true
+				end
+			end
+		end
+
+		docancel = true
+	end
+	
 	if docancel then
 		return false
 	end
+
 	self:transform(self:gettransformsinto(side))
 	return true
+end
+
+function enemy:handlecollidecondition(typ, con, side, a, b, dir)
+	local gelside = self:getgelside(side, dir)
+	local x, y = b.cox, b.coy
+	print(gelside)
+
+	local yay = false
+	if typ == "tileno" and a == "tile" and inmap(x, y) and map[x][y][1] == con then -- tile id
+		yay = true
+	elseif typ == "tileproperty" and a == "tile" and inmap(x, y) and tilequads[map[x][y][1]]:getproperty(con, x, y) then -- tile property
+		yay = true
+	elseif typ == "gel" and a == "tile" and inmap(x, y) and gelside then -- gel type
+		print(gelside, side, dir)
+		if gelside ~= "all" and map[x][y]["gels"][gelside] == con then
+			yay = true
+		elseif gelside == "all" and (map[x][y]["gels"]["top"] == con or map[x][y]["gels"]["bottom"] == con or map[x][y]["gels"]["left"] == con or map[x][y]["gels"]["right"] == con) then
+			yay = true
+		end
+	elseif typ == "entity" then -- entity
+		if type(con) == "table" then
+			for i, v in pairs(con) do
+				if a == v then
+					yay = true
+					break
+				end
+			end
+		elseif a == con then
+			yay = true
+		end
+	elseif typ == "enemy" and a == "enemy" then -- spesific enemy / enemies
+		if type(con) == "table" then
+			for i, v in pairs(con) do
+				if b.t == v then
+					yay = true
+					break
+				end
+			end
+		elseif b.t == con then
+			yay = true
+		end
+
+		if yay and self.transformtriggerenemycollidekill then
+			if self.enemykillsdontflyaway then
+				b.doesntflyawayonfireball = true
+			end
+			b:shotted(dir)
+		end
+	end
+
+	return yay
+end
+
+function enemy:getgelside(side, dir)
+	if side == "leftcollide" or dir == "left" then
+		return "right"
+	elseif side == "rightcollide" or dir == "right" then
+		return "left"
+	elseif side == "floorcollide" or dir == "floor" then
+		return "top"
+	elseif side == "ceilcollide" or dir == "ceil" then
+		return "bottom"
+	elseif side == "collide" or side == "globalcollide" or side == "passivecollide" or dir == "passive" then
+		return "all"
+	end
+	return false
 end
 
 function enemy:dosupersize()
