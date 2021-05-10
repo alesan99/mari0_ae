@@ -1277,11 +1277,14 @@ function editor_draw()
 							love.graphics.draw(platformimg, platformquad[3], math.floor((x-(platwidth/2)+t[1]+platwidth-1.5-xscroll)*16*scale), math.floor((y+t[3]-yscroll-25/16)*16*scale), 0, scale, scale)
 						end
 					end
-				elseif customrcopen == "platformup" or customrcopen == "platformright" or customrcopen == "platform" then
+				elseif customrcopen == "platformup" or customrcopen == "platformright" or customrcopen == "platform" or customrcopen == "platformfall" then
 					local t = rightclickvalues2
 					if t[1] then
 						local platwidth = math.floor((rightclickobjects[2].value*9+1)*2)/2
-						local dx, dy = round(rightclickobjects[4].value*30-15, 4), round(rightclickobjects[6].value*30-15, 4)
+						local dx, dy = 0, 0
+						if customrcopen ~= "platformfall" then
+							dx, dy = round(rightclickobjects[4].value*30-15, 4), round(rightclickobjects[6].value*30-15, 4)
+						end
 						local x, y = rightclickmenucox, rightclickmenucoy
 						local offx, offy = 0, 0
 						if platwidth ~= math.floor(platwidth) then --or customrcopen == "platform" then
@@ -1291,8 +1294,6 @@ function editor_draw()
 							offy = -8/16
 						elseif (customrcopen == "platformright" and dy ~= 0) then
 							offy = -15/16
-						elseif customrcopen == "platform" then
-							offy = 0
 						end
 						
 						for i = 1, platwidth do
