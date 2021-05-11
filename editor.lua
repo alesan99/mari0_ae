@@ -4173,7 +4173,7 @@ function placetile(x, y, tilei)
 	elseif editentities == false then
 		if objects["tile"][tilemap(cox, coy)] and objects["tile"][tilemap(cox, coy)].slant then
 			for num = 1, objects["tile"][tilemap(cox, coy)].slants do
-				objects["pixeltile"][cox .. "-" .. coy .. "-" .. num] = nil
+				objects["pixeltile"][num + tilemap(cox, coy)*100] = nil
 			end
 		end
 		if tilequads[currenttile].collision == true and (tilequads[map[cox][coy][1]].collision == false or (objects["tile"][tilemap(cox, coy)] and objects["tile"][tilemap(cox, coy)].slant)) then

@@ -7099,7 +7099,7 @@ function destroyblock(x, y, v) --v = true, "nopoints"
 	if objects["tile"][tilemap(x, y)] and objects["tile"][tilemap(x, y)].slant then
 		local tile = objects["tile"][tilemap(x, y)]
 		for num = 1, tile.slants do
-			objects["pixeltile"][tile.cox .. "-" .. tile.coy .. "-" .. num] = nil
+			objects["pixeltile"][num + tilemap(tile.cox, tile.coy)*100] = nil
 		end
 	end
 	map[x][y][1] = 1

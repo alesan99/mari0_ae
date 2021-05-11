@@ -50,47 +50,47 @@ function tile:init(x, y)
 			self.active = false
 			self.step = 1/(self.slants)
 			for num = 1, self.slants do
-				objects["pixeltile"][self.cox .. "-" .. self.coy .. "-" .. num] = pixeltile:new(self.x+((num-1)*self.step), self.y+((num-1)*self.step), self.cox, self.coy, 1/self.slants, 1-((num-1)*self.step), "right", self.step)
+				objects["pixeltile"][num + tilemap(self.cox, self.coy)*100] = pixeltile:new(self.x+((num-1)*self.step), self.y+((num-1)*self.step), self.cox, self.coy, 1/self.slants, 1-((num-1)*self.step), "right", self.step)
 			end
 		elseif t.halfrightslant1 then
 			self.slant = "right"
 			self.active = false
 			self.step = 1/self.slants/2
 			for num = 1, self.slants do
-				objects["pixeltile"][self.cox .. "-" .. self.coy .. "-" .. num] = pixeltile:new(self.x+((num-1)/self.slants), self.y+0.5+((num-1)*self.step), self.cox, self.coy, 1/self.slants,  0.5-((num-1)*self.step), "right", self.step)
+				objects["pixeltile"][num + tilemap(self.cox, self.coy)*100] = pixeltile:new(self.x+((num-1)/self.slants), self.y+0.5+((num-1)*self.step), self.cox, self.coy, 1/self.slants,  0.5-((num-1)*self.step), "right", self.step)
 			end
 		elseif t.halfrightslant2 then
 			self.slant = "right"
 			self.active = false
 			self.step = 1/self.slants/2
 			for num = 1, self.slants do
-				objects["pixeltile"][self.cox .. "-" .. self.coy .. "-" .. num] = pixeltile:new(self.x+((num-1)/self.slants), self.y+((num-1)*self.step), self.cox, self.coy, 1/self.slants, 1-((num-1)*self.step), "right", self.step)
+				objects["pixeltile"][num + tilemap(self.cox, self.coy)*100] = pixeltile:new(self.x+((num-1)/self.slants), self.y+((num-1)*self.step), self.cox, self.coy, 1/self.slants, 1-((num-1)*self.step), "right", self.step)
 			end
 		elseif t.leftslant then
 			self.slant = "left"
 			self.active = false
 			self.step = 1/(self.slants)
 			for num = 1, self.slants do
-				objects["pixeltile"][self.cox .. "-" .. self.coy .. "-" .. self.slants+1-num] = pixeltile:new(self.x+(1-(num*self.step)), self.y+((num-1)*self.step), self.cox, self.coy, 1/self.slants, 1-((num-1)*self.step), "left", self.step)
+				objects["pixeltile"][self.slants+1-num + tilemap(self.cox, self.coy)*100] = pixeltile:new(self.x+(1-(num*self.step)), self.y+((num-1)*self.step), self.cox, self.coy, 1/self.slants, 1-((num-1)*self.step), "left", self.step)
 			end
 		elseif t.halfleftslant1 then
 			self.slant = "left"
 			self.active = false
 			self.step = 1/self.slants/2
 			for num = 1, self.slants do
-				objects["pixeltile"][self.cox .. "-" .. self.coy .. "-" .. self.slants+1-num] = pixeltile:new(self.x+(1-(num/self.slants)), self.y+0.5+((num-1)*self.step), self.cox, self.coy, 1/self.slants, 0.5-((num-1)*self.step), "left", self.step)
+				objects["pixeltile"][self.slants+1-num + tilemap(self.cox, self.coy)*100] = pixeltile:new(self.x+(1-(num/self.slants)), self.y+0.5+((num-1)*self.step), self.cox, self.coy, 1/self.slants, 0.5-((num-1)*self.step), "left", self.step)
 			end
 		elseif t.halfleftslant2 then
 			self.slant = "left"
 			self.active = false
 			self.step = 1/self.slants/2
 			for num = 1, self.slants do
-				objects["pixeltile"][self.cox .. "-" .. self.coy .. "-" .. self.slants+1-num] = pixeltile:new(self.x+(1-(num/self.slants)), self.y+((num-1)*self.step), self.cox, self.coy, 1/self.slants, 1-((num-1)*self.step), "left", self.step)
+				objects["pixeltile"][self.slants+1-num + tilemap(self.cox, self.coy)*100] = pixeltile:new(self.x+(1-(num/self.slants)), self.y+((num-1)*self.step), self.cox, self.coy, 1/self.slants, 1-((num-1)*self.step), "left", self.step)
 			end
 		end
 		if self.slants and t.downslant then
 			for num = 1, self.slants do
-				local b = objects["pixeltile"][self.cox .. "-" .. self.coy .. "-" .. num]
+				local b = objects["pixeltile"][num + tilemap(self.cox, self.coy)*100]
 				b.y = self.y
 				b.step = 0
 			end

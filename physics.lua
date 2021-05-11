@@ -169,7 +169,7 @@ function physicsupdate(dt)
 										--slants
 										if t.slant then
 											for num = 1, t.slants do
-												local t2 = lobjects["pixeltile"][x .. "-" .. y .. "-" .. num]
+												local t2 = lobjects["pixeltile"][num + tilemap(x, y)*100]
 												if t2 then
 													local collision1, collision2 = checkcollisionslope(v, t2, "pixeltile", x .. "-" .. y .. "-" .. num, j, i, dt, passed)
 													if collision1 then
