@@ -108,7 +108,7 @@ function guielement:init(...)
 		self.y = arg[3]
 		self.width = arg[4]
 		self.func = arg[5]
-		self.value = arg[6] or ""
+		self.value = tostring(arg[6]) or ""
 		self.maxlength = arg[7] or 0
 		self.height = arg[8] or 1
 		self.extra = arg[9] or "none"
@@ -565,14 +565,16 @@ function guielement:draw(a, offx, offy)
 		
 		--cursor
 		if self.inputting and self.cursorblink then
-			--bookmark
-			local x = math.ceil((self.cursorpos-1-self.textoffset) % self.width)+1
-			local y = math.min(math.ceil(self.cursorpos/self.width), self.height)
+			local x, y = math.ceil((self.cursorpos-1-self.textoffset) % self.width)+1, math.min(math.ceil(self.cursorpos/self.width), self.height) --bookmark
 			
 			if (self.cursorpos == self.maxlength+1) and (self.height > 1 or self.width >= self.maxlength) then
 				x = self.width+1
 			end
+			--print(x)
 			love.graphics.rectangle("fill", (self.x+1+self.spacing+(x-1)*8)*scale, (self.y+2+self.spacing+(y-1)*10)*scale, 1*scale, 7*scale)
+		end
+		if self.width >= self.maxlength or self.height > 1 then
+			self.textoffset = 0
 		end
 	elseif self.type == "text" then
 		love.graphics.setColor(self.color)
@@ -666,12 +668,9 @@ function guielement:click(x, y, button)
 			if button ~= "wd" and button ~= "wu" then
 				if self:inhighlight(x, y) then
 					self.inputting = true
+					self.cursorpos = math.max(math.min(round(((love.mouse.getX()/scale-self.x)+6.5)/8) + self.textoffset + math.max((math.min(math.ceil(((love.mouse.getY()/scale-self.y)-1)/10),self.height)-1)*self.width,0), #self.value+1),0) --bookmark
 					self.timer = 0
 					self.cursorblink = true
-					self.cursorpos = string.len(self.value)+1
-					if self.width >= self.maxlength or self.height > 1 then
-						self.textoffset = 0
-					end
 					if self.numdrag and (not android) and tonumber(self.value) then
 						self.numdraggingstart = true
 						self.oldmousex, self.oldmousey = love.mouse.getPosition()
@@ -744,36 +743,50 @@ function guielement:keypress(key)
 					end
 				elseif key == "left" then --bookmark
 					self.cursorpos = math.max(1, self.cursorpos - 1)
-					if self.cursorpos-1 <= self.textoffset and not (self.width >= self.maxlength or self.height > 1) then
+					if self.cursorpos-1 <= self.textoffset then
 						self.textoffset = math.max(self.textoffset - 1, 0)
 					end
 					self.cursorblink = true
 					self.timer = 0
+
+					print(self.cursorpos)
+					print(self.textoffset)
+					print("")
 				elseif key == "right" then
-					self.cursorpos = math.min(string.len(self.value) + 1, self.cursorpos + 1)
-					if self.cursorpos-1 >= self.textoffset+self.width and not (self.width >= self.maxlength or self.height > 1) then
+					self.cursorpos = math.min(#self.value + 1, self.cursorpos + 1)
+					if self.cursorpos-1 >= self.textoffset+self.width then
 						self.textoffset = math.min(self.textoffset + 1, self.maxlength - self.width)
 					end
 					self.cursorblink = true
 					self.timer = 0
+
+					print(self.cursorpos)
+					print(self.textoffset)
+					print("")
 				elseif key == "up" and self.height > 1 then
 					self.cursorpos = math.max(1, self.cursorpos - self.width)
 					self.cursorblink = true
 					self.timer = 0
+
+					print(self.cursorpos)
+					print(self.textoffset)
+					print("")
 				elseif key == "down" and self.height > 1 then
-					self.cursorpos = math.min(string.len(self.value) + 1, self.cursorpos + self.width)
+					self.cursorpos = math.min(#self.value + 1, self.cursorpos + self.width)
 					self.cursorblink = true
 					self.timer = 0
+
+					print(self.cursorpos)
+					print(self.textoffset)
+					print("")
 				elseif key == "backspace" then
-					self.value = string.sub(self.value,1,self.cursorpos-2)..string.sub(self.value,self.cursorpos) --self.value = string.sub(self.value, 1, string.len(self.value)-1)
+					self.value = self.value:sub(1,self.cursorpos-2)..self.value:sub(self.cursorpos) --self.value = string.sub(self.value, 1, string.len(self.value)-1)
 
 					if self.cursorpos > 1 then --and self.cursorpos > string.len(self.value)+1 then
 						self.cursorpos = self.cursorpos - 1
 					end
 
-					if not (self.width >= self.maxlength or self.height > 1) then
-						self.textoffset = math.max(self.textoffset - 1, 0)
-					end
+					self.textoffset = math.max(self.textoffset - 1, 0)
 
 					self.cursorblink = true
 					self.timer = 0
@@ -827,15 +840,19 @@ function guielement:keypress(key)
 						end
 						
 						if found then
-							self.value = string.sub(self.value,1,self.cursorpos-1)..targetkey..string.sub(self.value,self.cursorpos)
+							self.value = self.value:sub(1,self.cursorpos-1)..targetkey..self.value:sub(self.cursorpos)
 							if self.cursorpos <= self.maxlength then
 								self.cursorpos = self.cursorpos + 1
 							end
-							if self.cursorpos > self.textoffset+self.width and not (self.width >= self.maxlength or self.height > 1) then  --old offsets
+							if self.cursorpos > self.textoffset+self.width then  --old offsets
 								self.textoffset = self.textoffset + 1  --old offsets
 							end
 							self.cursorblink = true
 							self.timer = 0
+
+							print(self.cursorpos)
+							print(self.textoffset)
+							print("")
 						end
 					end
 				end
