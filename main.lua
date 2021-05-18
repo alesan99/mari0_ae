@@ -2184,6 +2184,9 @@ end
 
 function love.keypressed(key, unicode, isrepeat)
 	if key == "space" then key = " " end
+	if key == "lgui" and love.system.getOS() == "OS X" then key = "lctrl" end
+	if key == "rgui" and love.system.getOS() == "OS X" then key = "rctrl" end
+	
 	if debugconsole then
 		if key == "backspace" and debuginputon then
 			debuginput = debuginput:sub(1, -2)
@@ -2707,10 +2710,12 @@ end
 
 local oldkeyboard_isDown = love.keyboard.isDown
 function love.keyboard.isDown(k)
-	if k == " " then
-		k = "space"
-	end
-	return oldkeyboard_isDown(k)
+	local k2 = "efsfesfesfef"
+	if k == " " then k = "space" end
+	if k == "lctrl" and love.system.getOS() == "OS X" then k2 = "lgui" end
+	if k == "rctrl" and love.system.getOS() == "OS X" then k2 = "rgui" end
+
+	return oldkeyboard_isDown(k, k2)
 end
 
 function love.joystickpressed(joystick, button)
