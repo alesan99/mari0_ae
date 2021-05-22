@@ -813,7 +813,7 @@ function editor_update(dt)
 				brushsizetoggle = false
 			end
 		end
-		if love.keyboard.isDown("rctrl") or love.keyboard.isDown("lctrl") then
+		if love.keyboard.isDown("rctrl") or love.keyboard.isDown("lctrl") or ((love.keyboard.isDown("rgui") or love.keyboard.isDown("lgui")) and love.system.getOS() == "OS X") then
 			ctrlpressed = true
 		else
 			ctrlpressed = false
