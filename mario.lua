@@ -876,12 +876,20 @@ function mario:update(dt)
 	end
 	if self.characterdata.jumpframes > 1 then
 		local frames = self.characterdata.jumpframes
-		self.jumpanimationprogress = math.min(frames,self.jumpanimationprogress+self.characterdata.jumpanimationspeed*dt)
+		if self.characterdata.jumpanimationcycle then
+			self.jumpanimationprogress = ((self.jumpanimationprogress+self.characterdata.jumpanimationspeed*dt-1)%(frames))+1
+		else
+			self.jumpanimationprogress = math.min(frames,self.jumpanimationprogress+self.characterdata.jumpanimationspeed*dt)
+		end
 		self.jumpframe = math.floor(self.jumpanimationprogress)
 	end
-	if self.characterdata.fallframes > 1 then
+	if self.characterdata.fallframes > 1 and self.falling and self.speedy > 0 then
 		local frames = self.characterdata.fallframes
-		self.fallanimationprogress = math.min(frames,self.fallanimationprogress+self.characterdata.fallanimationspeed*dt)
+		if self.characterdata.fallanimationcycle then
+			self.fallanimationprogress = ((self.fallanimationprogress+self.characterdata.fallanimationspeed*dt-1)%(frames))+1
+		else
+			self.fallanimationprogress = math.min(frames,self.fallanimationprogress+self.characterdata.fallanimationspeed*dt)
+		end
 		self.fallframe = math.floor(self.fallanimationprogress)
 	end
 	
@@ -3724,6 +3732,10 @@ function mario:jump(force)
 					end
 					self.jumping = true
 					self.animationstate = "jumping"
+					self.jumpframe = 1
+					self.jumpanimationprogress = 1
+					self.fallframe = 1
+					self.fallanimationprogress = 1
 					self:setquad()
 
 					--high blue gel jump
