@@ -1896,7 +1896,20 @@ function editor_draw()
 					if t[1] == 1 and tilequads[t[2]] then
 						love.graphics.draw(tilequads[t[2]].image, tilequads[t[2]].quad, x*scale, (quickmenuy+4)*scale, 0, scale, scale)
 					elseif t[1] == 2 and entityquads[t[2]] then
-						love.graphics.draw(entityquads[t[2]].image, entityquads[t[2]].quad, x*scale, (quickmenuy+4)*scale, 0, scale, scale)
+						if type(t[2]) == "string" then
+							local v = enemiesdata[t[2]]
+							love.graphics.setScissor(x*scale, (quickmenuy+4)*scale, 16*scale, 16*scale)
+							if v.icongraphic then
+								love.graphics.draw(v.icongraphic, x*scale, (quickmenuy+4)*scale, 0, scale, scale)
+							elseif v.quad then
+								love.graphics.draw(v.graphic, v.quad, x*scale, (quickmenuy+4)*scale, 0, scale, scale)
+							else
+								love.graphics.draw(entityquads[1].image, entityquads[1].quad, x*scale, (quickmenuy+4)*scale, 0, scale, scale)
+							end
+							love.graphics.setScissor()
+						else
+							love.graphics.draw(entityquads[t[2]].image, entityquads[t[2]].quad, x*scale, (quickmenuy+4)*scale, 0, scale, scale)
+						end
 					end
 					if quickmenusel == i then
 						love.graphics.setColor(255, 255, 255, 127)
