@@ -572,7 +572,7 @@ function guielement:draw(a, offx, offy)
 			if (self.cursorpos == self.maxlength+1) and (self.height > 1 or self.width >= self.maxlength) then
 				x = self.width+1
 			end
-			love.graphics.rectangle("fill", (self.x+1+self.spacing+(x-1)*8)*scale, (self.y+2+self.spacing+(y-1)*10)*scale, 1*scale, 7*scale)
+			love.graphics.rectangle("fill", (self.x+1+self.spacing+(x-1)*8)*scale, (self.y+1+self.spacing+(y-1)*10)*scale, 2*scale, 9*scale)
 		end
 	elseif self.type == "text" then
 		love.graphics.setColor(self.color)
@@ -665,10 +665,16 @@ function guielement:click(x, y, button)
 		elseif self.type == "input" then
 			if button ~= "wd" and button ~= "wu" then
 				if self:inhighlight(x, y) then
+					if self.inputting then
+						--click where you want the cursor
+						local mx, my = love.mouse.getX()/scale, love.mouse.getY()/scale
+						self.cursorpos = math.max(math.min(round(((mx-self.x)+6.5)/8) + self.textoffset + math.max((math.min(math.ceil(((my-self.y)-1)/10),self.height)-1)*self.width,0), string.len(self.value)+1),0)
+					else
+						self.cursorpos = string.len(self.value)+1
+					end
 					self.inputting = true
 					self.timer = 0
 					self.cursorblink = true
-					self.cursorpos = string.len(self.value)+1
 					if self.width >= self.maxlength or self.height > 1 then
 						self.textoffset = 0
 					end
