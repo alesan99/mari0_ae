@@ -813,7 +813,7 @@ function editor_update(dt)
 				brushsizetoggle = false
 			end
 		end
-		if love.keyboard.isDown("rctrl") or love.keyboard.isDown("lctrl") or ((love.keyboard.isDown("rgui") or love.keyboard.isDown("lgui")) and love.system.getOS() == "OS X") then
+		if love.keyboard.isDown("rctrl") or love.keyboard.isDown("lctrl") or love.keyboard.isDown("rgui") or love.keyboard.isDown("lgui") then
 			ctrlpressed = true
 		else
 			ctrlpressed = false
@@ -6947,6 +6947,10 @@ function savecustomimage()
 			customtiles = false
 			customtilecount = 0
 			notice.new("No tiles found!", notice.red, 2)
+		end
+		if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/animated/1.png") then
+			loadanimatedtiles()
+			notice.new("Updated animated tiles", notice.white, 2)
 		end
 	elseif customtabstate == "backgrounds" then
 		if editorbackgroundstate == "foreground" then
