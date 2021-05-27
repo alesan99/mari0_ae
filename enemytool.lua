@@ -229,7 +229,13 @@ function enemytool:spawn()
 	--actually spawn the enemy
 	local obj, wasenemy, objtable
 	if self.customenemy and tablecontains(customenemies, i) then
-		obj, wasenemy, objtable = enemy:new(x, y, i)
+		obj = enemy:new(x, y, i)
+		--turn in the right direction
+		if obj and self.animation == "piperight" and (not obj.dontmirror) then
+			obj.animationdirection = "left"
+		elseif obj and self.animation == "pipeleft" and (not obj.dontmirror) then
+			obj.animationdirection = "right"
+		end
 		table.insert(objects["enemy"], obj)
 	elseif i == "groundmole" or i == "ground mole" then
 		obj = mole:new(x-0.5, y-1/16)
