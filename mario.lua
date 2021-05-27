@@ -8702,9 +8702,17 @@ function mario:respawn()
 	local fastestplayer = objects["player"][i]
 	
 	if fastestplayer then
-		for i = 2, players do
-			if objects["player"][i].x > fastestplayer.x and not objects["player"][i].dead then
-				fastestplayer = objects["player"][i]
+		if mapwidth <= width then
+			for i = 2, players do
+				if not objects["player"][i].dead and math.abs(starty-objects["player"][i].y) > math.abs(fastestplayer.y) then
+					fastestplayer = objects["player"][i]
+				end
+			end
+		else
+			for i = 2, players do
+				if not objects["player"][i].dead and objects["player"][i].x > fastestplayer.x then
+					fastestplayer = objects["player"][i]
+				end
 			end
 		end
 	end
