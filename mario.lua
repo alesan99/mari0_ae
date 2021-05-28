@@ -6702,6 +6702,15 @@ function mario:dropfence()
 	net_action(self.playernumber, "dropfence")
 end
 
+function mario:doclearpipe(inpipe)
+	if inpipe then
+		if self.fence then
+			self:dropfence()
+		end
+		self:setquad()
+	end
+end
+
 function portalintile(x, y)
 	for i = 1, players do
 		local v = objects["player"][i].portal
