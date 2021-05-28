@@ -788,7 +788,7 @@ function guielement:keypress(key)
 						local found = false
 						local targetkey = key
 						
-						if self.shift then
+						if self.shift and not android then
 							if key == "1" then
 								targetkey = "!"
 							elseif key == "2" then
