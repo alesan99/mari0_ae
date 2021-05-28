@@ -876,7 +876,7 @@ function mario:update(dt)
 	end
 	if self.characterdata.jumpframes > 1 then
 		local frames = self.characterdata.jumpframes
-		if self.characterdata.jumpanimationcycle then
+		if self.characterdata.jumpanimationloop then
 			self.jumpanimationprogress = ((self.jumpanimationprogress+self.characterdata.jumpanimationspeed*dt-1)%(frames))+1
 		else
 			self.jumpanimationprogress = math.min(frames,self.jumpanimationprogress+self.characterdata.jumpanimationspeed*dt)
@@ -885,7 +885,7 @@ function mario:update(dt)
 	end
 	if self.characterdata.fallframes > 1 and self.falling and self.speedy > 0 then
 		local frames = self.characterdata.fallframes
-		if self.characterdata.fallanimationcycle then
+		if self.characterdata.fallanimationloop then
 			self.fallanimationprogress = ((self.fallanimationprogress+self.characterdata.fallanimationspeed*dt-1)%(frames))+1
 		else
 			self.fallanimationprogress = math.min(frames,self.fallanimationprogress+self.characterdata.fallanimationspeed*dt)
