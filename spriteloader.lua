@@ -1796,11 +1796,16 @@ function loadtiles(i, initial)
 		if initial then
 			smbtilecount = width*height-((height-secretstart+1)*22) --subtract secret rows of tiles
 		end
-	elseif i == "portal" then
+	elseif i == "portal" or i == "portalcustom" then
 		local imgwidth, imgheight = portaltilesimg:getWidth(), portaltilesimg:getHeight()
 		local width = math.floor(imgwidth/17)
 		local height = math.floor(imgheight/17)
-		local imgdata = love.image.newImageData("graphics/" .. graphicspack .. "/portaltiles.png")
+		local imgdata
+		if i == "portalcustom" then
+			imgdata = love.image.newImageData(mappackfolder .. "/" .. mappack .. "/custom/portaltiles.png")
+		else
+			imgdata = love.image.newImageData("graphics/" .. graphicspack .. "/portaltiles.png")
+		end
 		
 		for y = 1, height do
 			for x = 1, width do

@@ -6947,11 +6947,9 @@ end
 function savecustomimage()
 	if customtabstate == "graphics" then
 		loadcustomsprites()
-		if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/custom/smbtiles.png") then
-			loadtiles("smbcustom")
-		end
-		if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/custom/portaltiles.png") then
-			loadtiles("portalcustom")
+		for i = 1, #smbspritebatch do
+			smbspritebatch[i]:setTexture(smbtilesimg)
+			portalspritebatch[i]:setTexture(portaltilesimg)
 		end
 		collectgarbage()
 		notice.new("Updated sprites", notice.white, 2)
