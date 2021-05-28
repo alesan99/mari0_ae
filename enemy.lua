@@ -2527,7 +2527,9 @@ function enemy:globalcollide(a, b, c, d, dir)
 		end
 	end
 	
-	if self.killsenemies and a == "enemy" and not (b.resistsenemykill or b.resistseverything) then
+	if self.killsenemies and ((self.killsenemiesonsides and (dir == "left" or dir == "right")) or (self.killsenemiesonbottom and dir == "floor") or (self.killsenemiesontop and dir == "ceil") or
+		(self.killsenemiesonleft and dir == "left") or (self.killsenemiesonright and dir == "right") or (self.killsenemiesonpassive and dir == "passive"))
+		and a == "enemy" and not (b.resistsenemykill or b.resistseverything) then
 		return true
 	end
 	
