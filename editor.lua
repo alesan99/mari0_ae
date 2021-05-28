@@ -855,8 +855,18 @@ function editor_update(dt)
 								local d = mtclipboard[i][j]
 								currenttile = d[1]
 								placetile(x+(i-1 + pastecenter[1])*16*scale, y+(j-1 + pastecenter[2])*16*scale)
+								local tile1 = d[1]
+								if tile1 == 1 then
+									tile1 = false --don't paste empty space
+								end
 								if not backgroundtilemode then
-									map[tx][ty] = {d[1] or map[tx][ty][1], d[2] or map[tx][ty][2], d[3] or map[tx][ty][3], back=d["back"]}
+									if not d[3] then
+										map[tx][ty][1] = tile1 or map[tx][ty][1]
+										map[tx][ty][2] = d[2] or map[tx][ty][2]
+										map[tx][ty]["back"] = d["back"]
+									else
+										map[tx][ty] = {tile1 or map[tx][ty][1], d[2] or map[tx][ty][2], d[3] or map[tx][ty][3], back=d["back"]}
+									end
 								end
 								map[tx][ty]["gels"] = {}
 							end
@@ -4861,7 +4871,13 @@ function editor_mousepressed(x, y, button)
 										tile1 = false --don't paste empty space
 									end
 									if not backgroundtilemode then
-										map[tx][ty] = {tile1 or map[tx][ty][1], d[2] or map[tx][ty][2], d[3] or map[tx][ty][3], back=d["back"]}
+										if not d[3] then
+											map[tx][ty][1] = tile1 or map[tx][ty][1]
+											map[tx][ty][2] = d[2] or map[tx][ty][2]
+											map[tx][ty]["back"] = d["back"]
+										else
+											map[tx][ty] = {tile1 or map[tx][ty][1], d[2] or map[tx][ty][2], d[3] or map[tx][ty][3], back=d["back"]}
+										end
 									end
 									map[tx][ty]["gels"] = {}
 								end
