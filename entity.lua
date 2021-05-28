@@ -1267,7 +1267,9 @@ rightclicktype["musicchanger"] = {
 		if i == 1 then
 			local f = 1
 			local t = musictable
+			v = readlevelfilesafe(v)
 			for i = 1, #t do
+				print(v,t[i])
 				if v == t[i] then
 					f = i
 					break
@@ -1286,6 +1288,7 @@ rightclicktype["musicchanger"] = {
 		if tonumber(rightclickvalues2[1]) then
 			rightclickvalues2[1] = musictable[rightclickvalues2[1]]
 		end
+		rightclickvalues2[1] = makelevelfilesafe(rightclickvalues2[1])
 	end,
 	format = {
 		{"checkbox", 3, "visible", function(v) rightclickvalues2[3] = v; rightclickobjects[1].var = v end},

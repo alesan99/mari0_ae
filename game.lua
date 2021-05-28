@@ -9138,6 +9138,16 @@ function startlowtime()
 	queuelowtime = 7.5
 end
 
+--replace any characters that may mess with level saving
+function makelevelfilesafe(s)
+	s = s:gsub(",","ª"); s = s:gsub("%.","º"); s = s:gsub("%-","¯")
+	return s
+end
+function readlevelfilesafe(s)
+	s = s:gsub("ª",","); s = s:gsub("º","%."); s = s:gsub("¯","%-")
+	return s
+end
+
 -------------------
 --DAILY CHALLENGE--
 -------------------

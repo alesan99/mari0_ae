@@ -10,7 +10,7 @@ function musicchanger:init(x, y, r, music)
 	if music:find("|") then
 		vars = music:split("|")
 	end
-	self.m = vars[1]
+	self.m = readlevelfilesafe(vars[1] or "")
 	self.customn = vars[2] or 1
 	self.music = "none"
 	if self.m == "overworld" then
