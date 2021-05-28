@@ -2882,6 +2882,7 @@ function enemy:ceilcollide(a, b, c, d)
 	if self.ignoreceilcollide or b.ignorefloorcollide then --AE ADDITION
 		return false
 	end
+
 	
 	if self.transforms and self:gettransformtrigger("ceilcollide") and (not self.justspawned) then
 		if self:handlecollisiontransform("ceilcollide",a,b) then
