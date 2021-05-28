@@ -6048,7 +6048,9 @@ function mario:ceilcollide(a, b)
 			if self.helmet then
 				--helmet hit
 				if self.helmet == "beetle" and not b.static then
-					b.speedy = math.min(-helmetbounceforce, self.speedy)
+					if b.gravity ~= 0 then
+						b.speedy = math.min(-helmetbounceforce, self.speedy)
+					end
 					playsound(helmethitsound)
 					return true
 				elseif self.helmet == "spikey" and b.shotted then

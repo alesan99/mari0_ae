@@ -6947,6 +6947,13 @@ end
 function savecustomimage()
 	if customtabstate == "graphics" then
 		loadcustomsprites()
+		if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/custom/smbtiles.png") then
+			loadtiles("smbcustom")
+		end
+		if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/custom/portaltiles.png") then
+			loadtiles("portalcustom")
+		end
+		collectgarbage()
 		notice.new("Updated sprites", notice.white, 2)
 	elseif customtabstate == "tiles" then
 		if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/tiles.png") then
@@ -7043,7 +7050,9 @@ function test_level(x, y)
 	autoscroll = true
 	checkpointx = false
 	subleveltest = true
-	
+
+	updateplayerproperties("reset")
+	updatesizes("reset")
 	player_position = {x, y, xscroll, yscroll}
 	if mariosublevel ~= 0 then
 		startlevel(mariosublevel)
