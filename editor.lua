@@ -1670,7 +1670,7 @@ function editor_draw()
 					
 					--draw actual menu
 					love.graphics.setColor(10, 10, 10, 190)
-					love.graphics.rectangle("fill", (rightclickobjects[1].x-4)*scale, (rightclickobjects[1].y-4)*scale, rightclickobjects.width*scale, rightclickobjects.height*scale)
+					love.graphics.rectangle("fill", rightclickobjects.x*scale, rightclickobjects.y*scale, rightclickobjects.width*scale, rightclickobjects.height*scale)
 					--draw them bottom to top to make drop-downs work
 					love.graphics.setColor(255, 255, 255)
 					local ontop = {} --drop ups drawn on top
@@ -4732,7 +4732,11 @@ function editor_mousepressed(x, y, button)
 				end
 			end
 			--close
-			if button == "r" then
+			if button == "r" and (x > rightclickobjects.x*scale and x < (rightclickobjects.x+rightclickobjects.width)*scale and 
+				y > rightclickobjects.y*scale and y < (rightclickobjects.y+rightclickobjects.height)*scale) and
+				customrcopen ~= "region" and customrcopen ~= "path" and customrcopen ~= "trackpath" and customrcopen ~= "link" then
+				--don't close
+			elseif button == "r" then
 				rightclickmenuopen = false
 				allowdrag = false
 				if customrcopen == "region" then
@@ -5145,7 +5149,7 @@ function editor_mousepressed(x, y, button)
 				if #r > 1 then
 					openrightclickmenu(x, y, tileX, tileY)
 				else
-					if editorstate ~= "portalgun" then
+					if editorstate ~= "portalgun" and not customrcopen then
 						local cox, coy = getMouseTile(x, y+8*scale)
 						
 						if objects["player"][1] then
@@ -5565,6 +5569,8 @@ function openrightclickmenu(x, y, tileX, tileY)
 				obj:updatePos()
 			end
 		end
+		rightclickobjects.x = rightclickobjects[1].x-4
+		rightclickobjects.y = rightclickobjects[1].y-4
 	end
 	return true
 end

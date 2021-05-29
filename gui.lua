@@ -102,6 +102,11 @@ function guielement:init(...)
 		self.fillcolor = {0, 0, 0}
 
 		self.displayfunction = false
+
+		self.timer = 0
+		self.cursorblink = true
+		self.inputting = false
+		self.textvalue = false
 	elseif arg[1] == "input" then --input(x, y, width, enterfunc, start, maxlength, rightclick, height, extra, spacing)
 		self.type = arg[1]
 		self.x = arg[2]
@@ -143,6 +148,11 @@ end
 function guielement:update(dt)
 	if self.active then
 		if self.type == "scrollbar" then
+			self.timer = self.timer + dt
+			while self.timer > blinktime do
+				self.cursorblink = not self.cursorblink
+				self.timer = self.timer - blinktime
+			end
 			if self.dragging then
 				if self.dir == "ver" then
 					local y = (love.mouse.getY()-self.draggingy) - self.y*scale
@@ -515,7 +525,7 @@ function guielement:draw(a, offx, offy)
 			love.graphics.rectangle("fill", self.x*scale, self.y*scale, (self.xrange+self.width)*scale, self.height*scale)
 		
 			love.graphics.setColor(self.bordercolor)
-			if self.dragging or high then
+			if self.dragging or high or self.inputting then
 				love.graphics.setColor(self.bordercolorhigh)
 			end
 			
@@ -527,7 +537,16 @@ function guielement:draw(a, offx, offy)
 			if self.displayfunction then
 				love.graphics.setColor(self.bordercolorhigh)
 				local s = self.displayfunction(self.value)
+				if self.inputting then
+					s = self.textvalue
+				end
 				properprint(s, (self.x+self.xrange*self.value)*scale, (self.y+math.ceil((self.height-8)/2))*scale)
+
+				--cursor
+				if self.inputting and self.cursorblink then
+					--bookmark
+					love.graphics.rectangle("fill", (self.x+self.xrange*self.value+string.len(self.textvalue)*8)*scale, (self.y+math.ceil((self.height-8)/2)-1)*scale, 2*scale, 9*scale)
+				end
 			end
 		end
 	elseif self.type == "input" then
@@ -650,8 +669,17 @@ function guielement:click(x, y, button)
 					end
 				else
 					if self:inhighlight(x, y) then
-						self.dragging = true
-						self.draggingx = x-(self.x+self.xrange*self.value)*scale
+						if button == "r" and self.rightclickvalue and not android then
+							self.inputting = true
+							self.textvalue = self.displayfunction(self.value)
+							self.cursorblink = true
+							self.timer = 0
+						else
+							self.dragging = true
+							self.draggingx = x-(self.x+self.xrange*self.value)*scale
+						end
+					else
+						self.inputting = false
 					end
 				end
 			end
@@ -702,7 +730,41 @@ end
 
 function guielement:keypress(key)
 	if self.active then
-		if self.type == "input" then
+		if self.type == "scrollbar" then
+			--Type in number into scrollbar
+			if self.inputting then
+				if key == "escape" then
+					self.inputting = false
+					love.keyboard.setKeyRepeat(false)
+				elseif (key == "return" or key == "enter" or key == "kpenter") then
+					local newvalue = tonumber(self.textvalue)
+					if newvalue then
+						if self.rcrange then
+							local min, max = self.rcrange[1], self.rcrange[2]
+							newvalue = math.min(max, math.max(min, newvalue))
+							self.value = (newvalue-min)/(max-min)
+						end
+						if self.updatefunc then
+							self:updatefunc(self.value)
+						end
+					end
+					self.inputting = false
+					love.keyboard.setKeyRepeat(false)
+				elseif key == "backspace" then
+					self.textvalue = string.sub(self.textvalue, 1, -2)
+					self.cursorblink = true
+					self.timer = 0
+				else
+					if string.len(self.textvalue) < math.floor(self.width/8) then
+						if tonumber(key) or key == "-" or key == "." then
+							self.textvalue = self.textvalue .. key
+							self.cursorblink = true
+							self.timer = 0
+						end
+					end
+				end
+			end
+		elseif self.type == "input" then
 			if self.inputting then
 				--[[DROID]]
 				if android then
