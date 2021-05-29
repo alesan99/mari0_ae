@@ -209,7 +209,12 @@ function gel:globalcollide(a, b)
 		return true
 	end
 	if self.funnel and a == "gel" then
-		if (self.quadi < b.quadi or self.quadi == 1) and (not b.destroy) then
+		--small gel blobs get combined with others
+		if ((self.quadi < b.quadi) and (not b.destroy)) or b.destroy or b.id ~= self.id then
+			if b.destroy then
+				self.x = (self.x+b.x)/2
+				self.y = (self.y+b.y)/2
+			end
 			return true
 		end
 	end
