@@ -221,7 +221,10 @@ function box:leftcollide(a, b)
 	elseif a == "tile" then
 		if inmap(b.cox, b.coy) and map[b.cox][b.coy]["gels"] and 
 		map[b.cox][b.coy]["gels"]["right"] then
-			if map[b.cox][b.coy]["gels"]["right"] == 4 then
+			if map[b.cox][b.coy]["gels"]["right"] == 1 then
+				self.speedx = math.max(0, -self.speedx)
+				self.speedy = math.min(self.speedy, -horbouncespeedy)
+			elseif map[b.cox][b.coy]["gels"]["right"] == 4 then
 				self:purplegel("left")
 			end
 		end
@@ -248,7 +251,10 @@ function box:rightcollide(a, b)
 	elseif a == "tile" then
 		if inmap(b.cox, b.coy) and map[b.cox][b.coy]["gels"] and 
 		map[b.cox][b.coy]["gels"]["left"] then
-			if map[b.cox][b.coy]["gels"]["left"] == 4 then
+			if map[b.cox][b.coy]["gels"]["left"] == 1 then
+				self.speedx = math.min(0, -self.speedx)
+				self.speedy = math.min(self.speedy, -horbouncespeedy)
+			elseif map[b.cox][b.coy]["gels"]["left"] == 4 then
 				self:purplegel("right")
 			end
 		end
