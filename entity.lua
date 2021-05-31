@@ -762,8 +762,7 @@ rightclicktype["text"] = {
 		"text",
 		{"input", 1, "text", 14, 50, 1, function(v) rightclickvalues2[1] = v end}, --"input", var, default, width, maxlen, height, function
 		"color",
-		{"dropdown", 2, 6, function(v) rightclickobjects[4].var = v; rightclickvalues2[2] = v end,
-			{"black","blue","brown","gray","green","lime","maroon","orange","pink","purple","red","sky","white","yellow"}},
+		{"dropdown", 2, 6, nil, {"black","blue","brown","gray","green","lime","maroon","orange","pink","purple","red","sky","white","yellow"}},
 		{"checkbox", 3, "outline", default = false},
 		{"checkbox", 5, "centered", default = false},
 		{"checkbox", 6, "big", default = false},
@@ -790,7 +789,7 @@ rightclicktype["regiontrigger"] = {
 	end,
 	format = {
 		"trigger on",
-		{"dropdown", 5, 10, function(v) rightclickobjects[2].var = v; rightclickvalues2[5] = v end, {"player","enemy","everything"}},
+		{"dropdown", 5, 10, nil, {"player","enemy","everything"}},
 		{"button", 2, {"select region", startrcregion, {1, 2}}}
 	},
 }
@@ -805,11 +804,11 @@ rightclicktype["pipe"] = {
 		"direction",
 		{"dirbuttonset", 3},
 		"target sub",
-		{"dropdown", 1, 4, function(v) rightclickobjects[7].var = v; rightclickvalues2[1] = v end, maxsublevelstable},
+		{"dropdown", 1, 4, nil, maxsublevelstable},
 		"exit id:",
-		{"dropdown", 2, 4, function(v) rightclickobjects[9].var = v; rightclickvalues2[2] = v end, {1,2,3,4,5,6,7,8,9,10}},
+		{"dropdown", 2, 4, nil, {1,2,3,4,5,6,7,8,9,10}},
 		"pipe size:",
-		{"dropdown", 4, 5, function(v) rightclickobjects[11].var = v; rightclickvalues2[4] = v end, {"big","small","tiny","giant"}},
+		{"dropdown", 4, 5, nil, {"big","small","tiny","giant"}},
 		{"button", 2, {"link exit", startrclink, {"exit", "exit"}}, {"x", resetrclink, {"exit"}, textcolor = {255, 0, 0}}},
 	},
 	customoutputs = {"pipe", "pipe2", "pipespawn", "pipespawndown", "pipespawnhor"}
@@ -826,11 +825,11 @@ rightclicktype["pipespawn"] = {
 		"direction",
 		{"dirbuttonset", 3},
 		"entry sub",
-		{"dropdown", 1, 4, function(v) rightclickobjects[7].var = v; rightclickvalues2[1] = v end, maxsublevelstable},
+		{"dropdown", 1, 4, nil, maxsublevelstable},
 		"id:",
-		{"dropdown", 2, 4, function(v) rightclickobjects[9].var = v; rightclickvalues2[2] = v end, {1,2,3,4,5,6,7,8,9,10}},
+		{"dropdown", 2, 4, nil, {1,2,3,4,5,6,7,8,9,10}},
 		"pipe size:",
-		{"dropdown", 4, 5, function(v) rightclickobjects[11].var = v; rightclickvalues2[4] = v end, {"big","small","tiny","giant"}},
+		{"dropdown", 4, 5, nil, {"big","small","tiny","giant"}},
 	},
 }
 rightclicktype["pipespawndown"] = deepcopy(rightclicktype["pipespawn"])
@@ -884,7 +883,7 @@ rightclicktype["warppipe"] = {
 			end 
 		end},
 		"pipe size:",
-		{"dropdown", 4, 5, function(v) rightclickobjects[11].var = v; rightclickvalues2[4] = v end, {"big","small","tiny","giant"}},
+		{"dropdown", 4, 5, nil, {"big","small","tiny","giant"}},
 	}
 }
 rightclicktype["vine"] = {
@@ -895,7 +894,7 @@ rightclicktype["vine"] = {
 	end,
 	format = {
 		"target",
-		{"dropdown", 1, 4, function(v) rightclickobjects[2].var = v; rightclickvalues2[1] = v end, maxsublevelstable},
+		{"dropdown", 1, 4, nil, maxsublevelstable},
 	},
 }
 
@@ -1167,17 +1166,14 @@ rightclicktype["enemytool"] = {
 	end,
 	format = {
 		"enemy",
-		{"dropdown", 1, 14, function(v)
-			rightclickobjects[2].var = v
-			rightclickvalues2[1] = v
-		end, {"goomba"}},
+		{"dropdown", 1, 14, nil, {"goomba"}},
 		--{"input", 1, "goomba", 14, 20, 1, function(v) rightclickvalues2[1] = v end},
 		"velocity x:",
 		{"slider", 2, range = {-50, 50, round = 1}},
 		"velocity y:",
 		{"slider", 3, range = {-50, 50, round = 1}},
 		"animation",
-		{"dropdown", 5, 14, function(v) rightclickobjects[8].var = v; rightclickvalues2[5] = v end, {"none", "block", "cannon", "pipeup", "pipedown", "pipeleft", "piperight", "poof"}, ignorerctt=true},
+		{"dropdown", 5, 14, nil, {"none", "block", "cannon", "pipeup", "pipedown", "pipeleft", "piperight", "poof"}, ignorerctt=true},
 		{"button", 2, {"link trigger ", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
 	},
 	t = {"goomba"},
@@ -1275,7 +1271,7 @@ rightclicktype["bowser"] = {
 	default = "boss",
 	format = {
 		"type",
-		{"dropdown", 1, 4, function(v) rightclickobjects[2].var = v; rightclickvalues2[1] = v end, {"boss", "enemy"}},
+		{"dropdown", 1, 4, nil, {"boss", "enemy"}},
 	},
 }
 
@@ -1287,9 +1283,9 @@ rightclicktype["door"] = {
 	end,
 	format = {
 		"target sub",
-		{"dropdown", 1, 4, function(v) rightclickobjects[2].var = v; rightclickvalues2[1] = v end, maxsublevelstable},
+		{"dropdown", 1, 4, nil, maxsublevelstable},
 		"exit id:",
-		{"dropdown", 2, 4, function(v) rightclickobjects[4].var = v; rightclickvalues2[2] = v end, {1,2,3,4,5,6,7,8,9,10}},
+		{"dropdown", 2, 4, nil, {1,2,3,4,5,6,7,8,9,10}},
 		{"checkbox", 3, "visible"},
 		{"button", 2, {"link exit", startrclink, {"exit", "exit"}}, {"x", resetrclink, {"exit"}, textcolor = {255, 0, 0}}},
 	},
@@ -1343,7 +1339,7 @@ rightclicktype["rotodisc"] = {
 	default = "1|left",
 	format = {
 		"roto-discs",
-		{"dropdown", 1, 2, function(v) rightclickobjects[2].var = v; rightclickvalues2[1] = v end, {1, 2}},
+		{"dropdown", 1, 2, nil, {1, 2}},
 		"direction",
 		{"rotdirbuttonset", 2},
 	},
@@ -1406,7 +1402,7 @@ rightclicktype["beltswitch"] = {
 		"length",
 		{"slider", 2, range = {2, 50, round = 0}},
 		"color",
-		{"dropdown", 3, 3, function(v) rightclickobjects[6].var = v; rightclickvalues2[3] = v end, {1,2,3,4}},
+		{"dropdown", 3, 3, nil, {1,2,3,4}},
 	},
 }
 rightclicktype["animationtrigger"] = {
@@ -1431,7 +1427,7 @@ rightclicktype["collectable"] = {
 	default = "1",
 	format = {
 		"collectable type",
-		{"dropdown", 1, 4, function(v) rightclickobjects[2].var = v; rightclickvalues2[1] = v end, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
+		{"dropdown", 1, 4, nil, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
 		{"button", 2, {"link collect", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
 	},
 }
@@ -1441,7 +1437,7 @@ rightclicktype["collectablelock"] = {
 	default = "1|1",
 	format = {
 		"collectable type",
-		{"dropdown", 1, 4, function(v) rightclickobjects[2].var = v; rightclickvalues2[1] = v end, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
+		{"dropdown", 1, 4, nil, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
 		"unlock amount",
 		{"input", 2, "1", 3, 3, 1, function(v) rightclickvalues2[2] = v end},
 	},
@@ -1464,7 +1460,7 @@ rightclicktype["portal"] = {
 		"side",
 		{"dirbuttonset", 1},
 		"id",
-		{"dropdown", 2, 5, function(v) rightclickobjects[7].var = v; rightclickvalues2[2] = v end, {"1","2","3","4","5","6","7","8"}},
+		{"dropdown", 2, 5, nil, {"1","2","3","4","5","6","7","8"}},
 		{"checkbox", 3, "default on"},
 		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
 	},
@@ -1548,7 +1544,7 @@ rightclicktype["geltop"] = {
 	end,
 	format = {
 		"gel type",
-		{"dropdown", 1, 6, function(v) rightclickobjects[2].var = v; rightclickvalues2[1] = v end, {"1", "2", "3", "4", "5"}},
+		{"dropdown", 1, 6, nil, {"1", "2", "3", "4", "5"}},
 		{"checkbox", 2, "top"},
 		{"checkbox", 3, "left"},
 		{"checkbox", 4, "bottom"},
@@ -1748,7 +1744,7 @@ rightclicktype["randomizer"] = {
 	format = {
 		{"checkbox", 2, "visible"},
 		"method",
-		{"dropdown", 1, 11, function(v) rightclickobjects[3].var = v; rightclickvalues2[1] = v end, {1, 2, 3}, {"one output", "any output", "many outputs"}},
+		{"dropdown", 1, 11, nil, {1, 2, 3}, {"one output", "any output", "many outputs"}},
 		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
 	},
 }
@@ -1766,7 +1762,7 @@ rightclicktype["geldispenser"] = {
 		"direction",
 		{"dirbuttonset", 1},
 		"type",
-		{"dropdown", 2, 6, function(v) rightclickobjects[7].var = v; rightclickvalues2[2] = v end, {"1", "2", "3", "4", "5"}},
+		{"dropdown", 2, 6, nil, {"1", "2", "3", "4", "5"}},
 		{"checkbox", 3, "default off"},
 		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
 	},
@@ -1826,7 +1822,7 @@ rightclicktype["risingwater"] = {
 	format = {
 		{"button", 1, {"  set area  ", function(var, step) startrcregion(var, step) end, {1, 2}}},
 		"type:",
-		{"dropdown", 5, 11, function(v) rightclickobjects[3].var = v; rightclickvalues2[5] = v end, {"clear water", "water", "poison", "poison water", "lava", "quicksand", "quicksandtop"}},
+		{"dropdown", 5, 11, nil, {"clear water", "water", "poison", "poison water", "lava", "quicksand", "quicksandtop"}},
 		"fill:",
 		{"slider", 6, range = {0, 1, round = 5}},
 		"fill speed:",
@@ -1871,7 +1867,7 @@ rightclicktype["boomboom"] = {
 	default = "boss|false",
 	format = {
 		"type",
-		{"dropdown", 1, 5, function(v) rightclickobjects[2].var = v; rightclickvalues2[1] = v end, {"enemy", "key", "boss"}},
+		{"dropdown", 1, 5, nil, {"enemy", "key", "boss"}},
 		{"checkbox", 2, "flying"},
 	},
 }
@@ -1884,9 +1880,9 @@ rightclicktype["koopaling"] = {
 	end,
 	format = {
 		"koopaling:",
-		{"dropdown", 1, 6, function(v) rightclickobjects[2].var = v; rightclickvalues2[1] = v end, {"1","2","3","4","5","6","7"}},
+		{"dropdown", 1, 6, nil, {"1","2","3","4","5","6","7"}},
 		"type",
-		{"dropdown", 2, 5, function(v) rightclickobjects[4].var = v; rightclickvalues2[2] = v end, {"enemy", "key", "boss"}},
+		{"dropdown", 2, 5, nil, {"enemy", "key", "boss"}},
 	},
 }
 
@@ -1895,7 +1891,7 @@ rightclicktype["bowser3"] = {
 	default = "boss",
 	format = {
 		"type",
-		{"dropdown", 1, 5, function(v) rightclickobjects[2].var = v; rightclickvalues2[1] = v end, {"enemy", "key", "boss"}},
+		{"dropdown", 1, 5, nil, {"enemy", "key", "boss"}},
 	},
 }
 rightclicktype["bowserjr"] = {
@@ -1903,7 +1899,7 @@ rightclicktype["bowserjr"] = {
 	default = "boss",
 	format = {
 		"type",
-		{"dropdown", 1, 5, function(v) rightclickobjects[2].var = v; rightclickvalues2[1] = v end, {"enemy", "key", "boss"}},
+		{"dropdown", 1, 5, nil, {"enemy", "key", "boss"}},
 	},
 }
 
@@ -2006,7 +2002,7 @@ rightclicktype["turretleft"] = {
 		"direction",
 		{"hordirbuttonset", 1},
 		"type",
-		{"dropdown", 2, 8, function(v) rightclickobjects[5].var = v; rightclickvalues2[2] = v end, {"turret", "defective"}},
+		{"dropdown", 2, 8, nil, {"turret", "defective"}},
 	},
 }
 rightclicktype["turretright"] = deepcopy(rightclicktype["turretleft"])
@@ -2141,7 +2137,7 @@ rightclicktype["checkpointflag"] = {
 		"base",
 		{"dirbuttonset", 1},
 		"powerup",
-		{"dropdown", 2, 8, function(v) rightclickobjects[7].var = v; rightclickvalues2[2] = v end, powerupslistidsrc},
+		{"dropdown", 2, 8, nil, powerupslistidsrc},
 	},
 }
 
@@ -2172,9 +2168,9 @@ rightclicktype["amp"] = {
 	default = "0|fuzzy",
 	format = {
 		"type:",
-		{"dropdown", 2, 5, function(v) rightclickobjects[2].var = v; rightclickvalues2[2] = v end, {"fuzzy", "amp"}},
+		{"dropdown", 2, 5, nil, {"fuzzy", "amp"}},
 		"path:",
-		{"dropdown", 1, 2, function(v) rightclickobjects[4].var = v; rightclickvalues2[1] = v end, {"0", "1", "2", "3", "4"}},
+		{"dropdown", 1, 2, nil, {"0", "1", "2", "3", "4"}},
 	},
 }
 rightclicktype["pbutton"] = {

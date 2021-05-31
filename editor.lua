@@ -5409,7 +5409,16 @@ function openrightclickmenu(x, y, tileX, tileY)
 						end
 					end
 
-					local d = guielement:new("dropdown", rx, ry, t[3], t[4], var or 1, unpack(t[5]))
+					local func = t[4] --function called when dropdown is clicked
+					if not func then --if there is no function, make one
+						local varid, objecti = t[2], #rightclickobjects+1
+						func = function(v)
+							rightclickobjects[objecti].var = v
+							rightclickvalues2[varid] = v
+						end
+					end
+
+					local d = guielement:new("dropdown", rx, ry, t[3], func, var or 1, unpack(t[5]))
 					if t[6] then
 						d.displayentries = t[6]
 					end
