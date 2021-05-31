@@ -4232,6 +4232,11 @@ function startlevel(level, reason)
 	
 	enemiesspawned = {}
 	
+	for i = 1, #animatedtiles do
+		animatedtiles[i].timer = 0
+		animatedtiles[i].quadi = 1
+	end
+	
 	intermission = false
 	haswarpzone = false
 	underwater = false
