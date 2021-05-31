@@ -1,5 +1,4 @@
 local queuespritebatchupdate = false
---continuesublevelmusic = false
 
 function game_load(suspended)
 	scrollfactor = 0
@@ -46,6 +45,7 @@ function game_load(suspended)
 	camerasetting = 1
 	dropshadow = false
 	realtime = false
+	continuesublevelmusic = false
 	nocoinlimit = false
 	setphysics(1)
 	if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/settings.txt") and not dcplaying then
@@ -67,6 +67,8 @@ function game_load(suspended)
 				realtime = true
 			elseif s2[1] == "nocoinlimit" then
 				nocoinlimit = true
+			elseif s2[1] == "continuesublevelmusic" then
+				continuesublevelmusic = true
 			elseif s2[1] == "character" then
 				for i = 1, players do
 					setcustomplayer(s2[2], i)
@@ -4539,6 +4541,8 @@ function startlevel(level, reason)
 			end
 		end
 		if doplaymusic then
+			music:disableintromusic()
+			music:stopall()
 			stopmusic()
 		end
 	else

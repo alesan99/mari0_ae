@@ -3250,7 +3250,6 @@ function menu_filedropped(file)
 				mappacks()
 				local name = filename:sub(1,-5)
 				for i = 1, #mappacklist do
-					print(mappacklist[i],name)
 					if mappacklist[i] == name then
 						mappackselection = i
 						break

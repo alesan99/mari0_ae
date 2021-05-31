@@ -273,6 +273,7 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	guielements["cameradropdown"] = guielement:new("dropdown", 294, 130, 11, changecamerasetting, camerasetting, "default", "centered"--[[, "forward only"]])
 	guielements["dropshadowcheckbox"] = guielement:new("checkbox", 294, 143, toggledropshadow, dropshadow, TEXT["drop shadow"])
 	guielements["realtimecheckbox"] = guielement:new("checkbox", 294, 154, togglerealtime, realtime, TEXT["real time"])
+	guielements["continuemusiccheckbox"] = guielement:new("checkbox", 294, 165, togglecontinuemusic, continuesublevelmusic, TEXT["cont. music"])
 
 	--MAPS
 	guielements["savebutton2"] = guielement:new("button", 300, 196, TEXT["save level"], savelevel, 0, nil, 2.5, 94, true)
@@ -2635,6 +2636,7 @@ function editor_draw()
 
 			guielements["dropshadowcheckbox"]:draw()
 			guielements["realtimecheckbox"]:draw()
+			guielements["continuemusiccheckbox"]:draw()
 			
 			properprintF(TEXT["lives:"], 228*scale, 106*scale)
 			guielements["livesincrease"]:draw()
@@ -3286,6 +3288,7 @@ function toolstab()
 	guielements["cameradropdown"].active = true
 	guielements["dropshadowcheckbox"].active = true
 	guielements["realtimecheckbox"].active = true
+	guielements["continuemusiccheckbox"].active = true
 end
 
 function mapstab()
@@ -7239,6 +7242,9 @@ function savesettings()
 	if realtime then
 		s = s .. "realtime=t\n"
 	end
+	if continuesublevelmusic then
+		s = s .. "continuesublevelmusic=t\n"
+	end
 	
 	love.filesystem.createDirectory( mappackfolder )
 	love.filesystem.createDirectory( mappackfolder .. "/" .. mappack )
@@ -7452,6 +7458,14 @@ function togglerealtime(var)
 		realtime = not realtime
 	end
 	guielements["realtimecheckbox"].var = realtime
+end
+function togglecontinuemusic(var)
+	if var ~= nil then
+		continuesublevelmusic = var
+	else
+		continuesublevelmusic = not continuesublevelmusic
+	end
+	guielements["continuemusiccheckbox"].var = continuesublevelmusic
 end
 
 
