@@ -674,7 +674,7 @@ function guielement:click(x, y, button)
 							self.textvalue = self:displayfunction(self.value)
 							self.cursorblink = true
 							self.timer = 0
-						else
+						elseif not self.inputting then
 							self.dragging = true
 							self.draggingx = x-(self.x+self.xrange*self.value)*scale
 						end

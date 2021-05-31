@@ -2449,7 +2449,9 @@ function love.wheelmoved(x, y)
 end
 
 function love.filedropped(file)
-	if gamestate == "game" and editormode then
+	if gamestate == "menu" or gamestate == "mappackmenu" then
+		menu_filedropped(file)
+	elseif gamestate == "game" and editormode then
 		editor_filedropped(file)
 	end
 end

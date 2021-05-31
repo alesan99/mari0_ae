@@ -3221,3 +3221,47 @@ function opendlcfolder()
 		love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/alesans_entities/onlinemappacks")
 	end
 end
+
+--https://stackoverflow.com/questions/20459943/find-the-last-index-of-a-character-in-a-string/20461414
+local function lastIndexOf(haystack, needle)
+    local i, j
+    local k = 0
+    repeat
+        i = j
+        j, k = string.find(haystack, needle, k + 1, true)
+    until j == nil
+
+    return i
+end
+
+function menu_filedropped(file)
+	if gamestate == "mappackmenu" then
+		--drag and drop zip file
+		local filename = string.sub(file:getFilename(), (lastIndexOf(file:getFilename(), "\\") or -5)+1, -1)
+		local newfilepath = "alesans_entities/onlinemappacks/" .. filename
+		if filename:sub(-4,-1) == ".zip" and not love.filesystem.exists(newfilepath) then --only copy if file doesn't exist
+			local filedata = love.filesystem.newFileData(file)
+			love.filesystem.write(newfilepath, filedata) --copy file
+
+			local success = mountmappack(filename)
+			if success then
+				--reload mappack list
+				mappackhorscroll = 0
+				mappacks()
+				local name = filename:sub(1,-5)
+				for i = 1, #mappacklist do
+					print(mappacklist[i],name)
+					if mappacklist[i] == name then
+						mappackselection = i
+						break
+					end
+				end
+				updatescroll()
+				notice.new("Loaded " .. filename, notice.white, 4)
+			else
+				love.filesystem.remove(newfilepath)
+				notice.new("Could not load " .. filename, notice.red, 4)
+			end
+		end
+	end
+end
