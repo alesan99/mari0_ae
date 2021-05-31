@@ -4732,10 +4732,12 @@ function editor_mousepressed(x, y, button)
 				end
 			end
 			--close
+			local doreturn = false
 			if button == "r" and (x > rightclickobjects.x*scale and x < (rightclickobjects.x+rightclickobjects.width)*scale and 
 				y > rightclickobjects.y*scale and y < (rightclickobjects.y+rightclickobjects.height)*scale) and
 				customrcopen ~= "region" and customrcopen ~= "path" and customrcopen ~= "trackpath" and customrcopen ~= "link" then
 				--don't close
+				doreturn = true
 			elseif button == "r" then
 				rightclickmenuopen = false
 				allowdrag = false
@@ -4774,8 +4776,8 @@ function editor_mousepressed(x, y, button)
 			end
 			--click out of right click menu
 			if button == "l" and rightclickobjects and rightclickobjects[1] then
-				if not (x > (rightclickobjects[1].x-4)*scale and y > (rightclickobjects[1].y-4)*scale and 
-				x < ((rightclickobjects[1].x-4)+rightclickobjects.width)*scale and y < ((rightclickobjects[1].y-4)+rightclickobjects.height)*scale) then
+				if not ((x > rightclickobjects.x*scale and x < (rightclickobjects.x+rightclickobjects.width)*scale and 
+				y > rightclickobjects.y*scale and y < (rightclickobjects.y+rightclickobjects.height)*scale)) then
 					if customrcopen == "region" then
 					elseif customrcopen == "path" then
 					elseif customrcopen == "trackpath" then
@@ -4789,6 +4791,7 @@ function editor_mousepressed(x, y, button)
 					end
 				end
 			end
+			if doreturn then return end
 		elseif rightclickmenu then
 			rightclickmenu:click(x, y, button)
 			rightclickmenuopen = false
@@ -5350,9 +5353,9 @@ function openrightclickmenu(x, y, tileX, tileY)
 		end
 
 		--load in default values if there aren't enough
+		local defaultvalues = rct.default:split("|")
+		local numberofdefaultvalues = #defaultvalues
 		if rct.default and (not rct.fixdefault) and tostring(rct.default):find("|") and (not usingdefaultvalues) then
-			local defaultvalues = rct.default:split("|")
-			local numberofdefaultvalues = #defaultvalues
 			for i = #rightclickvalues2+1, numberofdefaultvalues do
 				if ((rct.ignoredefault and rct.ignoredefault[i])) then
 					rightclickvalues2[i] = rct.ignoredefault[i]
@@ -5499,8 +5502,16 @@ function openrightclickmenu(x, y, tileX, tileY)
 					if type(var) == "string" then
 						var = vt[t[2]] == "true"
 					end
+					local func = t[4] --function called when check box is ticked
+					if not func then --if there is no function, make one
+						local varid, objecti = t[2], #rightclickobjects+1
+						func = function(v)
+							rightclickobjects[objecti].var = v
+							rightclickvalues2[varid] = v
+						end
+					end
 
-					local d = guielement:new("checkbox", rx, ry+2, t[4], var, t[3] or "")
+					local d = guielement:new("checkbox", rx, ry+2, func, var, t[3] or "")
 					table.insert(rightclickobjects, d)
 					width = #t[3]*8+10
 					addv = 13
@@ -5509,23 +5520,45 @@ function openrightclickmenu(x, y, tileX, tileY)
 					d.backgroundcolor = {0,0,0}
 					d.scrollstep = 0
 					d.displayfunction = t[3]
+					d.rightclickvalue = t[2]
 					if t.range then
 						local v = tostring(vt[t[2]] or t.range.default or 0)
 						v = v:gsub("n", "-")
 						v = tonumber(v)
 						d.value = (v-t.range[1])/(t.range[2]-t.range[1])
-						d.rightclickvalue = t[2]
 						d.rcrange = t.range
+						--convert to value for saving
 						d.updatefunc = function(self, v)
 							local i = self.rightclickvalue
-							local min, max, rnd = self.rcrange[1], self.rcrange[2], self.rcrange.round
-							rightclickvalues2[i] = tostring(round((v*(max-min))+min, rnd or 2))
-							rightclickvalues2[i] = rightclickvalues2[i]:gsub("-", "n")
+							local min, max, rnd, step = self.rcrange[1], self.rcrange[2], self.rcrange.round, self.rcrange.step
+							local s
+							if step then
+								s = math.floor(((v*(max-min))+min) * (1/step)) /(1/step)
+							else
+								s = round((v*(max-min))+min, rnd or 2)
+							end
+							s = tostring(s)
+							rightclickvalues2[i] = s:gsub("-", "n")
+						end
+						--what's displayed in slider
+						d.displayfunction = function(self, v)
+							local min, max, rnd, step = self.rcrange[1], self.rcrange[2], self.rcrange.round, self.rcrange.step
+							local s
+							if step then
+								s = math.floor(((v*(max-min))+min) * (1/step)) /(1/step)
+							else
+								s = round((v*(max-min))+min, rnd or 2)
+							end
+							if math.floor(s) ~= s or string.len(s) <= math.floor(self.width/8)-2 then
+								return formatscrollnumber(s)
+							else
+								return s
+							end
 						end
 						d:updatefunc(d.value)
 					end
 					if not d.value then
-						d.value = t.default or 0
+						d.value = ((tonumber(defaultvalues[d.rightclickvalue]) or 0)-t.range[1])/(t.range[2]-t.range[1])
 					end
 					table.insert(rightclickobjects, d)
 					width = 100

@@ -764,10 +764,10 @@ rightclicktype["text"] = {
 		"color",
 		{"dropdown", 2, 6, function(v) rightclickobjects[4].var = v; rightclickvalues2[2] = v end,
 			{"black","blue","brown","gray","green","lime","maroon","orange","pink","purple","red","sky","white","yellow"}},
-		{"checkbox", 3, "outline", function(v) rightclickvalues2[3] = v; rightclickobjects[5].var = v end, default = false},
-		{"checkbox", 5, "centered", function(v) rightclickvalues2[5] = v; rightclickobjects[6].var = v end, default = false},
-		{"checkbox", 6, "big", function(v) rightclickvalues2[6] = v; rightclickobjects[7].var = v end, default = false},
-		{"checkbox", 4, "default off", function(v) rightclickvalues2[4] = v; rightclickobjects[8].var = v end, default = false},
+		{"checkbox", 3, "outline", default = false},
+		{"checkbox", 5, "centered", default = false},
+		{"checkbox", 6, "big", default = false},
+		{"checkbox", 4, "default off", default = false},
 		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}} --"input", var, text, function
 	}
 }
@@ -903,33 +903,17 @@ rightclicktype["vine"] = {
 rightclicktype["platformfall"] = {
 	name = "plarform fall",
 	default = "1.5",
-	varfunc = function(v, i)
-		if i == 1 then
-			return (v-1)/9
-		end
-		return v
-	end,
-	savefunc = function()
-		rightclickvalues2[1] = math.floor((rightclickobjects[2].value*9+1)*2)/2
-	end,
 	format = {
 		"width:",
-		{"slider", 1, function(v) return formatscrollnumber(math.floor((v*9+1)*2)/2) end}
+		{"slider", 1, range = {1, 10, step = 0.5}},
 	}
 }
 rightclicktype["platformbonus"] = {
 	name = "plarform bonus",
 	default = "3",
-	varfunc = function(v, i)
-		if i == 1 then return (v-1)/9 end
-		return v
-	end,
-	savefunc = function()
-		rightclickvalues2[1] = math.floor((rightclickobjects[2].value*9+1)*2)/2
-	end,
 	format = {
 		"width:",
-		{"slider", 1, function(v) return formatscrollnumber(math.floor((v*9+1)*2)/2) end}
+		{"slider", 1, range = {1, 10, step = 0.5}},
 	}
 }
 rightclicktype["platformup"] = {
@@ -948,45 +932,18 @@ rightclicktype["platformup"] = {
 					rightclickvalues2[4] = "4"
 				end
 			end
-			return (tonumber(v)-1)/9
-		elseif i == 2 then
-			local s = v:gsub("n", "-")
-			local f = tonumber(s) or 0
-			return (f+15)/30
-		elseif i == 3 then
-			local s = v:gsub("n", "-")
-			local f = tonumber(s) or 0
-			return (f+15)/30
-		elseif i == 4 then
-			return (tonumber(v)-1)/9
 		end
 		return v
 	end,
-	savefunc = function()
-		rightclickvalues2[1] = math.floor((rightclickobjects[2].value*9+1)*2)/2
-		local dx = round(rightclickobjects[4].value*30-15, 4)
-		if math.abs(dx) < 0.2 then
-			dx = 0
-		end
-		local s = tostring(dx)
-		rightclickvalues2[2] = s:gsub("-", "n")
-		local dy = round(rightclickobjects[6].value*30-15, 4)
-		if math.abs(dy) < 0.2 then
-			dx = 0
-		end
-		local s = tostring(dy)
-		rightclickvalues2[3] = s:gsub("-", "n")
-		rightclickvalues2[4] = round(rightclickobjects[8].value*9+1, 2)
-	end,
 	format = {
 		"width:",
-		{"slider", 1, function(v) return formatscrollnumber(math.floor((v*9+1)*2)/2) end},
+		{"slider", 1, range = {1, 10, step = 0.5}},
 		"distance x:",
-		{"slider", 2, function(v) return formatscrollnumber(round(v*30-15,1)) end},
+		{"slider", 2, range = {-15, 15, round = 1}},
 		"distance y:",
-		{"slider", 3, function(v) return formatscrollnumber(round(v*30-15,1)) end},
+		{"slider", 3, range = {-15, 15, round = 1}},
 		"duration:",
-		{"slider", 4, function(v) return formatscrollnumber(round(v*9+1,2)) end},
+		{"slider", 4, range = {1, 10, round = 2}},
 		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}},
 	}
 }
@@ -1004,28 +961,18 @@ rightclicktype["platformspawnerup"] = {
 				rightclickvalues2[2] = "3.5"
 				rightclickvalues2[3] = "2.18"
 			end
-			return (tonumber(v)-1)/9
-		elseif i == 2 then
-			return (tonumber(v)-.5)/(10-.5)
-		elseif i == 3 then
-			return (tonumber(v)-1)/9
 		end
 		return v
-	end,
-	savefunc = function()
-		rightclickvalues2[1] = math.floor((rightclickobjects[5].value*9+1)*2)/2
-		rightclickvalues2[2] = round(rightclickobjects[7].value*(10-.5)+.5, 2)
-		rightclickvalues2[3] = round(rightclickobjects[9].value*9+1, 2)
 	end,
 	format = {
 		"direction",
 		{"verdirbuttonset", 4},
 		"width:",
-		{"slider", 1, function(v) return formatscrollnumber(math.floor((v*9+1)*2)/2) end},
+		{"slider", 1, range = {1, 10, step = 0.5}},
 		"speed:",
-		{"slider", 2, function(v) return formatscrollnumber(round(v*(10-.5)+.5,2)) end},
+		{"slider", 2, range = {0.5, 10, round = 2}},
 		"delay:",
-		{"slider", 3, function(v) return formatscrollnumber(round(v*9+1,2)) end},
+		{"slider", 3, range = {1, 10, round = 2}},
 	}
 }
 rightclicktype["platformspawnerdown"] = deepcopy(rightclicktype["platformspawnerup"])
@@ -1037,7 +984,7 @@ rightclicktype["cannonball"] = {
 		"direction",
 		{"anglebuttonset", 1},
 		"speed",
-		{"slider", 2, function(v) return formatscrollnumber(round((v*(14-3.5))+3.5, 2)) end, range = {3.5, 14, default = cannonballspeed, round = 2}},
+		{"slider", 2, range = {3.5, 14, round = 2}},
 	},
 }
 rightclicktype["cannonballcannon"] = {
@@ -1049,14 +996,14 @@ rightclicktype["cannonballcannon"] = {
 		"base",
 		{"dirbuttonset", 3},
 		"speed",
-		{"slider", 2, function(v) return formatscrollnumber(round((v*(14-3.5))+3.5, 2)) end, range = {3.5, 14, default = cannonballspeed, round = 2}},
+		{"slider", 2, range = {3.5, 14, round = 2}},
 	},
 }
 rightclicktype["delayer"] = {
 	name = "delayer",
 	default = "1|true",
 	format = {
-		{"checkbox", 2, "visible", function(v) rightclickvalues2[2] = v; rightclickobjects[1].var = v end},
+		{"checkbox", 2, "visible"},
 		"delay",
 		{"input", 1, "1", 4, 4, 1, function(v) rightclickvalues2[1] = v end},
 		{"button", 2, {"link trigger", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
@@ -1073,15 +1020,13 @@ rightclicktype["squarewave"] = {
 		return v
 	end,
 	format = {
-		{"checkbox", 3, "visible", function(v) rightclickvalues2[3] = v; rightclickobjects[1].var = v end},
+		{"checkbox", 3, "visible"},
 		"on time:",
-		{"slider", 1, function(v) return formatscrollnumber(round((v*(10-0.01))+0.01, 2)) end, range = {0.01, 10, default = 0.5, round = 2}},
-		--{"input", 1, "0.5", 4, 4, 1, function(v) rightclickvalues2[1] = v end},
+		{"slider", 1, range = {0.01, 10, round = 2}},
 		"off time:",
-		{"slider", 2, function(v) return formatscrollnumber(round((v*(10-0.01))+0.01, 2)) end, range = {0.01, 10, default = 0.5, round = 2}},
-		--{"input", 2, "0.5", 4, 4, 1, function(v) rightclickvalues2[2] = v end},
+		{"slider", 2, range = {0.01, 10, round = 2}},
 		"wave offset:",
-		{"slider", 4, function(v) return formatscrollnumber(round((v*(1)), 2)) end, range = {0, 1, default = 0, round = 2}},
+		{"slider", 4, range = {0, 1, round = 2}},
 	}
 }
 rightclicktype["tiletool"] = {
@@ -1228,9 +1173,9 @@ rightclicktype["enemytool"] = {
 		end, {"goomba"}},
 		--{"input", 1, "goomba", 14, 20, 1, function(v) rightclickvalues2[1] = v end},
 		"velocity x:",
-		{"slider", 2, function(v) return round(v*100-50, 1) end, range = {-50, 50, default = 0, round = 1}},
+		{"slider", 2, range = {-50, 50, round = 1}},
 		"velocity y:",
-		{"slider", 3, function(v) return round(v*100-50, 1) end, range = {-50, 50, default = 0, round = 1}},
+		{"slider", 3, range = {-50, 50, round = 1}},
 		"animation",
 		{"dropdown", 5, 14, function(v) rightclickobjects[8].var = v; rightclickvalues2[5] = v end, {"none", "block", "cannon", "pipeup", "pipedown", "pipeleft", "piperight", "poof"}, ignorerctt=true},
 		{"button", 2, {"link trigger ", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
@@ -1245,16 +1190,12 @@ rightclicktype["kingbill"] = {
 	varfunc = function(v, i)
 		if i == 1 then
 			if not rightclickvalues2[2] then rightclickvalues2[2] = "right" end
-			return (tonumber(v)-3)/(9-3)
 		end
 		return v
 	end,
-	savefunc = function()
-		rightclickvalues2[1] = (rightclickobjects[2].value*(9-3)+3)
-	end,
 	format = {
 		"speed",
-		{"slider", 1, function(v) return formatscrollnumber(round(v*(9-3)+3, 1)) end},
+		{"slider", 1, range = {3, 9, round = 1}},
 		"direction",
 		{"dirbuttonset", 2},
 		{"button", 2, {"link trigger", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}},
@@ -1291,7 +1232,7 @@ rightclicktype["musicchanger"] = {
 		rightclickvalues2[1] = makelevelfilesafe(rightclickvalues2[1])
 	end,
 	format = {
-		{"checkbox", 3, "visible", function(v) rightclickvalues2[3] = v; rightclickobjects[1].var = v end},
+		{"checkbox", 3, "visible"},
 		"change music to",
 		{"dropdown", 1, 15, function(v) rightclickobjects[3].var = v; rightclickvalues2[1] = rightclicktype["musicchanger"].t[v] end, {"overworld", "underground", "castle", "underwater", "star", "custom", "none"}}, --"dropdown", var, width (in chars), func, {entries}
 		"custom music id",
@@ -1314,23 +1255,18 @@ rightclicktype["seesaw"] = {
 				rightclickvalues2[4] = seesawtype[v][4]
 				return seesawtype[v][1]
 			end
-		elseif i == 4 then
-			return (tonumber(v)-1)/9
 		end
 		return v
 	end,
-	savefunc = function()
-		rightclickvalues2[4] = math.floor((rightclickobjects[8].value*9+1)*2)/2
-	end,
 	format = {
 		"distance:",
-		{"slider", 1, function(v) return formatscrollnumber(round(v*8+1, 0)) end, range = {2, 10, default = 7, round = 0}},
+		{"slider", 1, range = {2, 10, round = 0}},
 		"left height:",
-		{"slider", 2, function(v) return formatscrollnumber(round(v*9+1, 0)) end, range = {1, 10, default = 4, round = 0}},
+		{"slider", 2, range = {1, 10, round = 0}},
 		"right height:",
-		{"slider", 3, function(v) return formatscrollnumber(round(v*9+1, 0)) end, range = {1, 10, default = 6, round = 0}},
+		{"slider", 3, range = {1, 10, round = 0}},
 		"platf. width:",
-		{"slider", 4, function(v) return formatscrollnumber(math.floor((v*9+1)*2)/2) end},
+		{"slider", 4, range = {1, 10, step = 0.5}},
 	},
 }
 
@@ -1354,7 +1290,7 @@ rightclicktype["door"] = {
 		{"dropdown", 1, 4, function(v) rightclickobjects[2].var = v; rightclickvalues2[1] = v end, maxsublevelstable},
 		"exit id:",
 		{"dropdown", 2, 4, function(v) rightclickobjects[4].var = v; rightclickvalues2[2] = v end, {1,2,3,4,5,6,7,8,9,10}},
-		{"checkbox", 3, "visible", function(v) rightclickvalues2[3] = v; rightclickobjects[5].var = v end},
+		{"checkbox", 3, "visible"},
 		{"button", 2, {"link exit", startrclink, {"exit", "exit"}}, {"x", resetrclink, {"exit"}, textcolor = {255, 0, 0}}},
 	},
 }
@@ -1389,12 +1325,12 @@ rightclicktype["castlefirecw"] = {
 	end,
 	format = {
 		"length:",
-		{"slider", 1, function(v) return formatscrollnumber(round((v*17)+1,0)) end, range = {1, 18, default = 6, round = 0}},
+		{"slider", 1, range = {1, 18, round = 0}},
 		"delay:",
-		{"slider", 2, function(v) return formatscrollnumber(round((v+0.03)/1.03, 2)) end},
+		{"slider", 2, range = {0.03, 1, round = 2}},
 		"angle:",
-		{"slider", 3, function(v) return round(v*360, 0) end, range = {0, 360, default = 0, round = 0}},
-		{"checkbox", 5, "smooth", function(v) rightclickvalues2[5] = v; rightclickobjects[7].var = v end},
+		{"slider", 3, range = {0, 360, round = 0}},
+		{"checkbox", 5, "smooth"},
 		"direction:",
 		{"rotbuttonset", 4},
 	},
@@ -1415,22 +1351,13 @@ rightclicktype["rotodisc"] = {
 rightclicktype["funnel"] = {
 	name = "excursion funnel",
 	default = tostring(funnelspeed) .. "|false|right|false",
-	varfunc = function(v, i)
-		if i == 1 then
-			return (tonumber(v) or funnelspeed)/10
-		end
-		return v
-	end,
-	savefunc = function()
-		rightclickvalues2[1] = rightclickobjects[7].value*10 or funnelspeed
-	end,
 	format = {
 		"direction",
 		{"dirbuttonset",3},
 		"speed",
-		{"slider", 1, function(v) return round(v*10, 2) end},
-		{"checkbox", 2, "reverse", function(v) rightclickvalues2[2] = v; rightclickobjects[8].var = v end},
-		{"checkbox", 4, "default off", function(v) rightclickvalues2[4] = v; rightclickobjects[9].var = v end},
+		{"slider", 1, range = {0, 10, round = 4}},
+		{"checkbox", 2, "reverse"},
+		{"checkbox", 4, "default off"},
 		{"button", 2, {"link power  ", startrclink, {"power", "power"}}, {"x", resetrclink, {"power"}, textcolor = {255, 0, 0}}},
 		{"button", 2, {"link reverse", startrclink, {"reverse", "reverse"}}, {"x", resetrclink, {"reverse"}, textcolor = {255, 0, 0}}}
 	},
@@ -1449,30 +1376,23 @@ rightclicktype["belt"] = {
 	default = "3|3",
 	varfunc = function(v, i)
 		if i == 1 then
-			local s = v:gsub("n", "-")
-			local f = tonumber(s) or 3
 			if v == "right slow" then f = 3
 			elseif v == "right fast" then f = 6
 			elseif v == "left slow" then f = -3
 			elseif v == "left fast" then f = -6
 			end
-			return (f+6)/12
+			return f
 		elseif i == 2 then
 			return tonumber(v) or 3
 		end
 		return v
 	end,
-	savefunc = function()
-		local s = tostring(rightclickobjects[2].value*12-6)
-		rightclickvalues2[1] = s:gsub("-", "n")
-		--rightclickvalues2[2] = tonumber(rightclickvalues2[2]) or 3
-	end,
 	format = {
 		"speed",
-		{"slider", 1, function(v) return round((v*12)-6, 1) end},
+		{"slider", 1, range = {-6, 6, round = 1}},
 		"length",
 		--{"input", 2, "3", 3, 2, 1, function(v) rightclickvalues2[2] = v end},
-		{"slider", 2, function(v) return formatscrollnumber(round((v*(50-2))+2, 0)) end, range = {2, 50, default = 3, round = 0}},
+		{"slider", 2, range = {2, 50, round = 0}},
 		{"button", 2, {"link power  ", startrclink, {"power", "power"}}, {"x", resetrclink, {"power"}, textcolor = {255, 0, 0}}},
 		{"button", 2, {"link reverse", startrclink, {"reverse", "reverse"}}, {"x", resetrclink, {"reverse"}, textcolor = {255, 0, 0}}}
 	}
@@ -1482,9 +1402,9 @@ rightclicktype["beltswitch"] = {
 	default = "3|3|1",
 	format = {
 		"speed",
-		{"slider", 1, function(v) return round((v*12)-6, 1) end, range = {-6, 6, default = 3, round = 1}},
+		{"slider", 1, range = {-6, 6, round = 1}},
 		"length",
-		{"slider", 2, function(v) return formatscrollnumber(round((v*(50-2))+2, 0)) end, range = {2, 50, default = 3, round = 0}},
+		{"slider", 2, range = {2, 50, round = 0}},
 		"color",
 		{"dropdown", 3, 3, function(v) rightclickobjects[6].var = v; rightclickvalues2[3] = v end, {1,2,3,4}},
 	},
@@ -1531,20 +1451,10 @@ rightclicktype["collectablelock"] = {
 rightclicktype["timer"] = {
 	name = "timer",
 	default = "1|true",
-	varfunc = function(v, i) 
-		if i == 1 then
-			local v = tonumber(v)
-			return (v-1)/19
-		end
-		return v
-	end,
-	savefunc = function()
-		rightclickvalues2[1] = rightclickobjects[3].value*19+1
-	end,
 	format = {
-		{"checkbox", 2, "visible", function(v) rightclickvalues2[2] = v; rightclickobjects[1].var = v end},
+		{"checkbox", 2, "visible"},
 		"time",
-		{"slider", 1, function(v) return formatscrollnumber(round(v*19+1, 1)) end},
+		{"slider", 1, range = {1, 20, round = 1}},
 		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
 	},
 }
@@ -1555,7 +1465,7 @@ rightclicktype["portal"] = {
 		{"dirbuttonset", 1},
 		"id",
 		{"dropdown", 2, 5, function(v) rightclickobjects[7].var = v; rightclickvalues2[2] = v end, {"1","2","3","4","5","6","7","8"}},
-		{"checkbox", 3, "default on", function(v) rightclickvalues2[3] = v; rightclickobjects[8].var = v end},
+		{"checkbox", 3, "default on"},
 		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
 	},
 }
@@ -1566,29 +1476,13 @@ rightclicktype["portal2"] = rightclicktype["portal"]
 rightclicktype["faithplate"] = {
 	name = "faithplate",
 	default = "13.3|30|false|false",
-	varfunc = function(v,i) 
-		if i == 1 then
-			v = v:gsub("n","-")
-			return (tonumber(v)+50)/100
-		elseif i == 2 then
-			v = v:gsub("n","-")
-			return (tonumber(v)-5)/45
-		end
-		return v
-	end,
-	savefunc = function()
-		rightclickvalues2[1] = tostring(rightclickobjects[2].value*100-50)
-		rightclickvalues2[2] = tostring(rightclickobjects[4].value*45+5)
-		rightclickvalues2[1] = rightclickvalues2[1]:gsub("-","n")
-		rightclickvalues2[2] = rightclickvalues2[2]:gsub("-","n")
-	end,
 	format = {
 		"x velocity:",
-		{"slider", 1, function(v) return formatscrollnumber(math.floor(v*100-50)) end, default = 0},
+		{"slider", 1, range = {-50, 50, round = 4}},
 		"y velocity:",
-		{"slider", 2, function(v) return formatscrollnumber(math.floor(v*45+1)) end, default = 0},
-		{"checkbox", 3, "snap", function(v) rightclickvalues2[3] = v; rightclickobjects[5].var = v end},
-		{"checkbox", 4, "default off", function(v) rightclickvalues2[4] = v; rightclickobjects[6].var = v end},
+		{"slider", 2, range = {1, 46, round = 4}},
+		{"checkbox", 3, "snap"},
+		{"checkbox", 4, "default off"},
 		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
 	}
 }
@@ -1609,7 +1503,7 @@ rightclicktype["animatedtiletrigger"] = {
 		rightclickvalues2[5] = y
 	end,
 	format = {
-		{"checkbox", 1, "visible", function(v) rightclickvalues2[1] = v; rightclickobjects[1].var = v end},
+		{"checkbox", 1, "visible"},
 		{"button", 1, {"select tiles", startrcregion, {2, 1}}},
 		{"button", 2, {"link trigger", startrclink, {"power"}}, {"x", resetrclink, textcolor = {255, 0, 0}}}
 	}
@@ -1618,7 +1512,7 @@ rightclicktype["orgate"] = {
 	name = "orgate",
 	default = "true",
 	format = {
-		{"checkbox", 1, "visible", function(v) rightclickvalues2[1] = tostring(v); rightclickobjects[1].var = v end},
+		{"checkbox", 1, "visible"},
 		{"button", 1, {"link power", startrclink, {"link 1", 1}}, {"x", resetrclink, {1}, textcolor = {255, 0, 0}}},
 		{"button", 1, {"link power", startrclink, {"link 2", 2}}, {"x", resetrclink, {2}, textcolor = {255, 0, 0}}},
 		{"button", 1, {"link power", startrclink, {"link 3", 3}}, {"x", resetrclink, {3}, textcolor = {255, 0, 0}}},
@@ -1629,7 +1523,7 @@ rightclicktype["andgate"] = {
 	name = "andgate",
 	default = "true",
 	format = {
-		{"checkbox", 1, "visible", function(v) rightclickvalues2[1] = v; rightclickobjects[1].var = v end},
+		{"checkbox", 1, "visible"},
 		{"button", 1, {"link power", startrclink, {"link 1", 1}}, {"x", resetrclink, {1}, textcolor = {255, 0, 0}}},
 		{"button", 1, {"link power", startrclink, {"link 2", 2}}, {"x", resetrclink, {2}, textcolor = {255, 0, 0}}},
 		{"button", 1, {"link power", startrclink, {"link 3", 3}}, {"x", resetrclink, {3}, textcolor = {255, 0, 0}}},
@@ -1640,7 +1534,7 @@ rightclicktype["rsflipflop"] = {
 	name = "rsflipflop",
 	default = "true",
 	format = {
-		{"checkbox", 1, "visible", function(v) rightclickvalues2[1] = v; rightclickobjects[1].var = v end},
+		{"checkbox", 1, "visible"},
 		{"button", 1, {"link set  ", startrclink, {"set", "set"}}, {"x", resetrclink, {"set"}, textcolor = {255, 0, 0}}},
 		{"button", 2, {"link reset", startrclink, {"reset", "reset"}}, {"x", resetrclink, {"reset"}, textcolor = {255, 0, 0}}}
 	}
@@ -1655,10 +1549,10 @@ rightclicktype["geltop"] = {
 	format = {
 		"gel type",
 		{"dropdown", 1, 6, function(v) rightclickobjects[2].var = v; rightclickvalues2[1] = v end, {"1", "2", "3", "4", "5"}},
-		{"checkbox", 2, "top", function(v) rightclickvalues2[2] = v; rightclickobjects[3].var = v end},
-		{"checkbox", 3, "left", function(v) rightclickvalues2[3] = v; rightclickobjects[4].var = v end},
-		{"checkbox", 4, "bottom", function(v) rightclickvalues2[4] = v; rightclickobjects[5].var = v end},
-		{"checkbox", 5, "right", function(v) rightclickvalues2[5] = v; rightclickobjects[6].var = v end},
+		{"checkbox", 2, "top"},
+		{"checkbox", 3, "left"},
+		{"checkbox", 4, "bottom"},
+		{"checkbox", 5, "right"},
 	},
 	tdisplay = {"blue","orange","white","purple","cleanse"},
 }
@@ -1707,9 +1601,9 @@ rightclicktype["boxtube"] = {
 	end,
 	format = {
 		"on load:",
-		{"checkbox", 1, "drop box", function(v) rightclickvalues2[1] = v; rightclickobjects[2].var = v end},
+		{"checkbox", 1, "drop box"},
 		"",
-		{"checkbox", 2, "respawn obj", function(v) rightclickvalues2[2] = v; rightclickobjects[4].var = v end},
+		{"checkbox", 2, "respawn obj"},
 		"if destroyed",
 		"",
 		"object:",
@@ -1748,8 +1642,8 @@ rightclicktype["doorver"] = {
 	format = {
 		"direction",
 		{"orientationbuttonset",2},
-		{"checkbox", 3, "start open", function(v) rightclickvalues2[3] = v; rightclickobjects[4].var = v end},
-		{"checkbox", 1, "force close", function(v) rightclickvalues2[1] = v; rightclickobjects[5].var = v end},
+		{"checkbox", 3, "start open"},
+		{"checkbox", 1, "force close"},
 		{"button", 2, {"link open ", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}},
 	}
 }
@@ -1761,7 +1655,7 @@ rightclicktype["emancever"] = {
 	format = {
 		"direction",
 		{"orientationbuttonset",1},
-		{"checkbox", 2, "default off", function(v) rightclickvalues2[2] = v; rightclickobjects[4].var = v end},
+		{"checkbox", 2, "default off"},
 		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
 	}
 }
@@ -1773,7 +1667,7 @@ rightclicktype["laserfield"] = {
 	format = {
 		"direction",
 		{"orientationbuttonset",1},
-		{"checkbox", 2, "default off", function(v) rightclickvalues2[2] = v; rightclickobjects[4].var = v end},
+		{"checkbox", 2, "default off"},
 		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
 	}
 }
@@ -1783,7 +1677,7 @@ rightclicktype["laser"] = {
 	format = {
 		"direction",
 		{"dirbuttonset",1},
-		{"checkbox", 2, "default off", function(v) rightclickvalues2[2] = v; rightclickobjects[6].var = v end},
+		{"checkbox", 2, "default off"},
 		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
 	}
 }
@@ -1801,8 +1695,8 @@ rightclicktype["laserdetectorright"] = {
 		"direction",
 		{"dirbuttonset",1},
 		"detects:",
-		{"checkbox", 2, "laser", function(v) rightclickvalues2[2] = v; rightclickobjects[7].var = v end},
-		{"checkbox", 3, "lightbridge", function(v) rightclickvalues2[3] = v; rightclickobjects[8].var = v end},
+		{"checkbox", 2, "laser"},
+		{"checkbox", 3, "lightbridge"},
 	}
 }
 rightclicktype["laserdetectordown"] = deepcopy(rightclicktype["laserdetectorright"])
@@ -1817,7 +1711,7 @@ rightclicktype["lightbridge"] = {
 	format = {
 		"direction",
 		{"dirbuttonset",1},
-		{"checkbox", 2, "default off", function(v) rightclickvalues2[2] = v; rightclickobjects[6].var = v end},
+		{"checkbox", 2, "default off"},
 		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
 	}
 }
@@ -1832,7 +1726,7 @@ rightclicktype["notgate"] = {
 	name = "notgate",
 	default = "true",
 	format = {
-		{"checkbox", 1, "visible", function(v) rightclickvalues2[1] = v; rightclickobjects[1].var = v end},
+		{"checkbox", 1, "visible"},
 		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
 	}
 }
@@ -1852,7 +1746,7 @@ rightclicktype["randomizer"] = {
 	name = "randomizer",
 	default = "1|true",
 	format = {
-		{"checkbox", 2, "visible", function(v) rightclickvalues2[2] = v; rightclickobjects[1].var = v end},
+		{"checkbox", 2, "visible"},
 		"method",
 		{"dropdown", 1, 11, function(v) rightclickobjects[3].var = v; rightclickvalues2[1] = v end, {1, 2, 3}, {"one output", "any output", "many outputs"}},
 		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
@@ -1873,7 +1767,7 @@ rightclicktype["geldispenser"] = {
 		{"dirbuttonset", 1},
 		"type",
 		{"dropdown", 2, 6, function(v) rightclickobjects[7].var = v; rightclickvalues2[2] = v end, {"1", "2", "3", "4", "5"}},
-		{"checkbox", 3, "default off", function(v) rightclickvalues2[3] = v; rightclickobjects[8].var = v end},
+		{"checkbox", 3, "default off"},
 		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
 	},
 	tdisplay = {"blue","orange","white","purple","cleanse"},
@@ -1914,8 +1808,8 @@ rightclicktype["iciclebig"] = {
 	default = "9|true",
 	format = {
 		"speed:",
-		{"slider", 1, function(v) return formatscrollnumber(round(v*(15-9)+9, 1)) end, range = {9, 15, default = 9, round = 1}},
-		{"checkbox", 2, "falls", function(v) rightclickvalues2[2] = v; rightclickobjects[3].var = v end},
+		{"slider", 1, range = {9, 15, round = 1}},
+		{"checkbox", 2, "falls"},
 	}
 }
 
@@ -1934,12 +1828,12 @@ rightclicktype["risingwater"] = {
 		"type:",
 		{"dropdown", 5, 11, function(v) rightclickobjects[3].var = v; rightclickvalues2[5] = v end, {"clear water", "water", "poison", "poison water", "lava", "quicksand", "quicksandtop"}},
 		"fill:",
-		{"slider", 6, function(v) return formatscrollnumber(round(v, 2)) end, range = {0, 1, default = 1, round = 5}},
+		{"slider", 6, range = {0, 1, round = 5}},
 		"fill speed:",
-		{"slider", 7, function(v) return formatscrollnumber(round(v*10, 1)) end, range = {0, 10, default = 3, round = 3}},
-		{"checkbox", 8, "oscillate", function(v) rightclickvalues2[8] = v; rightclickobjects[8].var = v end},
+		{"slider", 7, range = {0, 10, round = 3}},
+		{"checkbox", 8, "oscillate"},
 		"wait time:",
-		{"slider", 9, function(v) return formatscrollnumber(round(v*10, 1)) end, range = {0, 10, default = .5, round = 2}},
+		{"slider", 9, range = {0, 10, round = 2}},
 		{"button", 2, {"link power  ", startrclink, {"power", "power"}}, {"x", resetrclink, {"power"}, textcolor = {255, 0, 0}}},
 		{"button", 2, {"link reverse", startrclink, {"reverse", "reverse"}}, {"x", resetrclink, {"reverse"}, textcolor = {255, 0, 0}}}
 	},
@@ -1950,7 +1844,7 @@ rightclicktype["redseesaw"] = {
 	default = "5",
 	format = {
 		"width:",
-		{"slider", 1, function(v) return formatscrollnumber(round((v*(15-3))+3, 0)) end, range = {3, 15, default = 5, round = 0}},
+		{"slider", 1, range = {3, 15, round = 0}},
 	}
 }
 
@@ -1963,11 +1857,11 @@ rightclicktype["snakeblock"] = {
 	format = {
 		{"button", 1, {"  set path  ", function(var) startrcpath(var) end, {1}}, {"x", function() rightclickvalues2[1] = "" end, {}, textcolor = {255, 0, 0}}},
 		"length",
-		{"slider", 2, function(v) return formatscrollnumber(round((v*(20-3))+3, 0)) end, range = {3, 20, default = 3, round = 0}},
+		{"slider", 2, range = {3, 20, round = 0}},
 		"speed",
-		{"slider", 3, function(v) return formatscrollnumber(round(v*6, 2)) end, range = {0, 6, default = 2, round = 2}},
-		{"checkbox", 4, "loop", function(v) rightclickvalues2[4] = v; rightclickobjects[7].var = v end},
-		{"checkbox", 5, "respawn", function(v) rightclickvalues2[5] = v; rightclickobjects[8].var = v end},
+		{"slider", 3, range = {0, 6, round = 2}},
+		{"checkbox", 4, "loop"},
+		{"checkbox", 5, "respawn"},
 		{"button", 6, {"link power  ", startrclink, {"power", "power"}}, {"x", resetrclink, {"power"}, textcolor = {255, 0, 0}}},
 	}
 }
@@ -1978,7 +1872,7 @@ rightclicktype["boomboom"] = {
 	format = {
 		"type",
 		{"dropdown", 1, 5, function(v) rightclickobjects[2].var = v; rightclickvalues2[1] = v end, {"enemy", "key", "boss"}},
-		{"checkbox", 2, "flying", function(v) rightclickvalues2[2] = v; rightclickobjects[3].var = v end},
+		{"checkbox", 2, "flying"},
 	},
 }
 
@@ -2018,7 +1912,7 @@ rightclicktype["glados"] = {
 	default = "150",
 	format = {
 		"neurotoxin time",
-		{"slider", 1, function(v) return math.floor((v*400)+100) end, range = {100, 500, default = 150, round = 1}},
+		{"slider", 1, range = {100, 500, round = 1}},
 	},
 }
 
@@ -2036,7 +1930,7 @@ rightclicktype["thwomp"] = {
 	name = "thwomp",
 	default = "false",
 	format = {
-		{"checkbox", 1, "return to spawn", function(v) rightclickvalues2[1] = v; rightclickobjects[1].var = v end},
+		{"checkbox", 1, "return to spawn"},
 	},
 }
 rightclicktype["thwomphalf"] = deepcopy(rightclicktype["thwomp"])
@@ -2047,7 +1941,7 @@ rightclicktype["upfire"] = {
 	name = "upfire",
 	default = "true",
 	format = {
-		{"checkbox", 1, "return to spawn", function(v) rightclickvalues2[1] = v; rightclickobjects[1].var = v end},
+		{"checkbox", 1, "return to spawn"},
 	},
 }
 
@@ -2055,7 +1949,7 @@ rightclicktype["bigcloud"] = {
 	name = "bigcloud",
 	default = "false",
 	format = {
-		{"checkbox", 1, "infinite", function(v) rightclickvalues2[1] = v; rightclickobjects[1].var = v end},
+		{"checkbox", 1, "infinite"},
 	},
 }
 
@@ -2065,7 +1959,7 @@ rightclicktype["longfire"] = {
 	format = {
 		"direction",
 		{"dirbuttonset", 1},
-		{"checkbox", 2, "default on", function(v) rightclickvalues2[2] = v; rightclickobjects[6].var = v end},
+		{"checkbox", 2, "default on"},
 	},
 }
 rightclicktype["longfireoff"] = deepcopy(rightclicktype["longfire"])
@@ -2077,9 +1971,9 @@ rightclicktype["energylauncherright"] = {
 	format = {
 		"direction",
 		{"dirbuttonset", 1},
-		{"checkbox", 2, "offset", function(v) rightclickvalues2[2] = v; rightclickobjects[6].var = v end},
-		{"checkbox", 4, "green", function(v) rightclickvalues2[4] = v; rightclickobjects[7].var = v end},
-		{"checkbox", 3, "default off", function(v) rightclickvalues2[3] = v; rightclickobjects[8].var = v end},
+		{"checkbox", 2, "offset"},
+		{"checkbox", 4, "green"},
+		{"checkbox", 3, "default off"},
 		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}},
 	},
 }
@@ -2095,7 +1989,7 @@ rightclicktype["energycatcherright"] = {
 	format = {
 		"direction",
 		{"dirbuttonset", 1},
-		{"checkbox", 2, "offset", function(v) rightclickvalues2[2] = v; rightclickobjects[6].var = v end},
+		{"checkbox", 2, "offset"},
 	},
 }
 rightclicktype["energycatcherleft"] = deepcopy(rightclicktype["energycatcherright"])
@@ -2133,8 +2027,8 @@ rightclicktype["camerastop"] = {
 	end,
 	format = {
 		{"button", 1, {"select range", function(var, step) startrcregion(var, step) end, {1, 1}}},
-		{"checkbox", 5, "force push", function(v) rightclickvalues2[5] = v; rightclickobjects[2].var = v end},
-		{"checkbox", 6, "ignore if", function(v) rightclickvalues2[6] = v; rightclickobjects[3].var = v end},
+		{"checkbox", 5, "force push"},
+		{"checkbox", 6, "ignore if"},
 		"off-screen",
 		{"button", 2, {"link off", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
 	}
@@ -2149,7 +2043,7 @@ rightclicktype["clearpipe"] = {
 	format = {
 		{"button", 1, {"  set path  ", function(var) startrcpath(var) end, {{1, default={0,0}, pipe=true}}},
 		{"x", function() rightclickvalues2[1] = "" end, {}, textcolor = {255, 0, 0}}},
-		{"checkbox", 2, "intersection", function(v) rightclickvalues2[2] = v; rightclickobjects[3].var = v end},
+		{"checkbox", 2, "intersection"},
 	}
 }
 rightclicktype["pneumatictube"] = {
@@ -2161,8 +2055,8 @@ rightclicktype["pneumatictube"] = {
 	format = {
 		{"button", 1, {"  set path  ", function(var) startrcpath(var) end, {{1, default={0,0}, pipe=true}}},
 		{"x", function() rightclickvalues2[1] = "" end, {}, textcolor = {255, 0, 0}}},
-		{"checkbox", 2, "intersection", function(v) rightclickvalues2[2] = v; rightclickobjects[3].var = v end},
-		{"checkbox", 3, "suck", function(v) rightclickvalues2[3] = v; rightclickobjects[4].var = v end},
+		{"checkbox", 2, "intersection"},
+		{"checkbox", 3, "suck"},
 	}
 }
 
@@ -2175,7 +2069,7 @@ rightclicktype["plantcreeper"] = {
 	format = {
 		{"button", 1, {"  set path  ", function(var) startrcpath(var) end, {{1, default={0,0}, pipe=true}}},
 		{"x", function() rightclickvalues2[1] = "" end, {}, textcolor = {255, 0, 0}}},
-		{"checkbox", 2, "sleeping", function(v) rightclickvalues2[2] = v; rightclickobjects[3].var = v end},
+		{"checkbox", 2, "sleeping"},
 	}
 }
 
@@ -2188,7 +2082,7 @@ rightclicktype["track"] = {
 	format = {
 		{"button", 1, {"lay tracks", function(var) allowdrag = false; startrctrack(var) end, {{1}}},
 		{"x", function() rightclickvalues2[1] = "0:0:c:c:d" end, {}, textcolor = {255, 0, 0}}},
-		{"checkbox", 2, "visible", function(v) rightclickvalues2[2] = v; rightclickobjects[3].var = v end},
+		{"checkbox", 2, "visible"},
 		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}},
 	}
 }
@@ -2197,7 +2091,7 @@ rightclicktype["spawn"] = {
 	name = "spawn",
 	default = "false",
 	format = {
-		{"checkbox", 1, "spawn on tile", function(v) rightclickvalues2[1] = v; rightclickobjects[1].var = v end},
+		{"checkbox", 1, "spawn on tile"},
 	}
 }
 
@@ -2206,7 +2100,7 @@ rightclicktype["windstart"] = {
 	default = tostring(windspeed),
 	format = {
 		"wind speed",
-		{"slider", 1, function(v) return formatscrollnumber((v*(4-(-4)))-4) end, range = {-4, 4, default = 2, round = 2}},
+		{"slider", 1, range = {-4, 4, round = 2}},
 	}
 }
 
@@ -2214,7 +2108,7 @@ rightclicktype["donut"] = {
 	name = "donut",
 	default = "true",
 	format = {
-		{"checkbox", 1, "respawn", function(v) rightclickvalues2[1] = v; rightclickobjects[1].var = v end},
+		{"checkbox", 1, "respawn"},
 	},
 }
 rightclicktype["donutlast"] = deepcopy(rightclicktype["donut"])
@@ -2223,8 +2117,8 @@ rightclicktype["flag"] = {
 	name = "flag",
 	default = "true|false",
 	format = {
-		{"checkbox", 1, "border", function(v) rightclickvalues2[1] = v; rightclickobjects[1].var = v end},
-		{"checkbox", 2, "castleflag", function(v) rightclickvalues2[2] = v; rightclickobjects[2].var = v end},
+		{"checkbox", 1, "border"},
+		{"checkbox", 2, "castleflag"},
 	},
 }
 rightclicktype["checkpointflag"] = {
@@ -2269,7 +2163,7 @@ rightclicktype["mole"] = {
 	name = "mole",
 	default = "false",
 	format = {
-		{"checkbox", 1, "in ground", function(v) rightclickvalues2[1] = v; rightclickobjects[1].var = v end},
+		{"checkbox", 1, "in ground"},
 	},
 }
 
@@ -2298,13 +2192,13 @@ rightclicktype["boocircle"] = {
 		"direction",
 		{"rotbuttonset", 1},
 		"radius",
-		{"slider", 2, function(v) return formatscrollnumber(round((v*(8-2))+2, 1)) end, range = {2, 8, default = 3, round = 1}},
+		{"slider", 2, range = {2, 8, round = 1}},
 		"boos",
-		{"slider", 3, function(v) return math.floor((v*(20-2))+2) end, range = {2, 20, default = 8, round = 0}},
+		{"slider", 3, range = {2, 20, round = 0}},
 		"gap",
-		{"slider", 4, function(v) return formatscrollnumber(round((v*(10)), 1)) end, range = {0, 10, default = 1.5, round = 1}},
+		{"slider", 4, range = {0, 10, round = 1}},
 		"speed",
-		{"slider", 5, function(v) return formatscrollnumber(round((v*(1-0.1))+0.1, 1)) end, range = {0.1, 1, default = 0.333, round = 3}},
+		{"slider", 5, range = {0.1, 1, round = 3}},
 	},
 }
 
@@ -2312,7 +2206,7 @@ rightclicktype["muncher"] = {
 	name = "frozen",
 	default = "false",
 	format = {
-		{"checkbox", 1, "frozen", function(v) rightclickvalues2[1] = v; rightclickobjects[1].var = v end},
+		{"checkbox", 1, "frozen"},
 	}
 }
 

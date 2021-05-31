@@ -536,7 +536,7 @@ function guielement:draw(a, offx, offy)
 
 			if self.displayfunction then
 				love.graphics.setColor(self.bordercolorhigh)
-				local s = self.displayfunction(self.value)
+				local s = self:displayfunction(self.value)
 				if self.inputting then
 					s = self.textvalue
 				end
@@ -671,7 +671,7 @@ function guielement:click(x, y, button)
 					if self:inhighlight(x, y) then
 						if button == "r" and self.rightclickvalue and not android then
 							self.inputting = true
-							self.textvalue = self.displayfunction(self.value)
+							self.textvalue = self:displayfunction(self.value)
 							self.cursorblink = true
 							self.timer = 0
 						else
