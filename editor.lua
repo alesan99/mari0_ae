@@ -489,35 +489,35 @@ function editor_update(dt)
 				autoscroll = false
 				guielements["autoscrollcheckbox"].var = autoscroll
 				splitxscroll[1] = splitxscroll[1] - 30*gdt
-				--[[if splitxscroll[1] < 0 then
+				if splitxscroll[1] < 0 then
 					splitxscroll[1] = 0
-				end]]
+				end
 				generatespritebatch()
 			elseif (love.keyboard.isDown("right") or (android and love.keyboard.isDown(controls[1]["right"][1]) and not autoscroll)) and not brushsizetoggle then
 				autoscroll = false
 				guielements["autoscrollcheckbox"].var = autoscroll
 				splitxscroll[1] = splitxscroll[1] + 30*gdt
-				--[[if splitxscroll[1] > mapwidth-width then
+				if splitxscroll[1] > mapwidth-width then
 					splitxscroll[1] = mapwidth-width
-				end]]
+				end
 				generatespritebatch()
 			end
-			if not brushsizetoggle then
+			if mapheight ~= 15 and not brushsizetoggle then
 				if (love.keyboard.isDown("up") or (android and love.keyboard.isDown(controls[1]["up"][1]) and not autoscroll)) then
 					autoscroll = false
 					guielements["autoscrollcheckbox"].var = autoscroll
 					splityscroll[1] = splityscroll[1] - 30*gdt
-					--[[if splityscroll[1] < 0 then
+					if splityscroll[1] < 0 then
 						splityscroll[1] = 0
-					end]]
+					end
 					generatespritebatch()
 				elseif (love.keyboard.isDown("down") or (android and love.keyboard.isDown(controls[1]["down"][1]) and not autoscroll)) then
 					autoscroll = false
 					guielements["autoscrollcheckbox"].var = autoscroll
 					splityscroll[1] = splityscroll[1] + 30*gdt
-					--[[if splityscroll[1] >= mapheight-height-1 then
+					if splityscroll[1] >= mapheight-height-1 then
 						splityscroll[1] = mapheight-height-1
-					end]]
+					end
 					generatespritebatch()
 				end
 			end
