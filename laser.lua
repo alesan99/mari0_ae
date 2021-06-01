@@ -249,6 +249,18 @@ function laser:checktile(x, y, dir)
 	end
 end
 
+function laser:checktilepassable(x, y, dir)
+	local t = tilequads[map[x][y][1]]
+	if t:getproperty("collision", x, y) == false or t:getproperty("grate", x, y) or 
+		(dir == "up" and (t:getproperty("platform", x, y) or t:getproperty("platformleft", x, y) or t:getproperty("platformright", x, y)) and t:getproperty("platformdown", x, y) == false) or
+		(dir == "down" and (t:getproperty("platformdown", x, y) or t:getproperty("platformleft", x, y) or t:getproperty("platformright", x, y)) and t:getproperty("platform", x, y) == false) or
+		(dir == "right" and (t:getproperty("platformright", x, y) or t:getproperty("platform", x, y) or t:getproperty("platformdown", x, y)) and t:getproperty("platformleft", x, y) == false) or
+		(dir == "left" and (t:getproperty("platformleft", x, y) or t:getproperty("platform", x, y) or t:getproperty("platformdown", x, y)) and t:getproperty("platformright", x, y) == false) then
+		return true
+	end
+	return false
+end
+
 function laser:draw()	
 	for i = 1, #self.lasertable, 5 do
 		if self.lasertable[i] == "left" then
@@ -312,7 +324,7 @@ function laser:updaterange()
 	
 	local firstcheck = true
 	local quit = false
-	while x >= 1 and x <= mapwidth and y >= 1 and y <= mapheight and (tilequads[map[x][y][1]]:getproperty("collision", x, y) == false or tilequads[map[x][y][1]]:getproperty("grate", x, y)) and (x ~= startx or y ~= starty or dir ~= self.dir or firstcheck == true) and quit == false do
+	while x >= 1 and x <= mapwidth and y >= 1 and y <= mapheight and self:checktilepassable(x,y,dir) and (x ~= startx or y ~= starty or dir ~= self.dir or firstcheck == true) and quit == false do
 		firstcheck = false
 		
 		if dir == "right" then
