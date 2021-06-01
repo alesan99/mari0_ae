@@ -2222,54 +2222,27 @@ function editor_draw()
 					if entry and entry <= #multitileobjects-1 then
 						love.graphics.setColor(255, 255, 255, 64)
 						love.graphics.rectangle("fill", 5*scale, (38+math.floor((tile-1)/22)*17)*scale-tilesoffset, 373*scale, 16*scale)
-						
-						-- up button
-						if mtbutton == 1 then
-							love.graphics.setColor(255, 255, 255, 255)
-						else
-							love.graphics.setColor(127, 127, 127, 255)
+						--buttons
+						for i = 1, 3 do
+							if mtbutton == i then love.graphics.setColor(255, 255, 255, 255)
+							else love.graphics.setColor(127, 127, 127, 255) end
+							love.graphics.rectangle("fill", (333+15*(i-1))*scale, (39+math.floor((tile-1)/22)*17)*scale-tilesoffset, 14*scale, 14*scale)
+							love.graphics.setColor(0, 0, 0, 255)
+							love.graphics.rectangle("fill", (333+15*(i-1)+1)*scale, (39+math.floor((tile-1)/22)*17)*scale-tilesoffset+1*scale, 14*scale-2*scale, 14*scale-2*scale)
+							if mtbutton == i then if i == 3 then love.graphics.setColor(255, 0, 0, 255)
+							else love.graphics.setColor(255, 255, 255, 255) end
+							else love.graphics.setColor(127, 127, 127, 255) end
+							if i == 1 then
+								--up
+								love.graphics.draw(uparrowimg, (333+15*(i-1)+3)*scale, (38+math.floor((tile-1)/22)*17)*scale-tilesoffset+3*scale, 0, scale, scale)
+							elseif i == 2 then
+								--down
+								love.graphics.draw(downarrowimg, (333+15*(i-1)+3)*scale, (38+math.floor((tile-1)/22)*17)*scale-tilesoffset+3*scale, 0, scale, scale)
+							elseif i == 3 then
+								--delete
+								properprint("x",(333+15*(i-1)+3)*scale, (39+math.floor((tile-1)/22)*17)*scale-tilesoffset+3*scale)
+							end
 						end
-						love.graphics.rectangle("fill", 333*scale, (39+math.floor((tile-1)/22)*17)*scale-tilesoffset, 14*scale, 14*scale)
-						love.graphics.setColor(0, 0, 0, 255)
-						love.graphics.rectangle("fill", 333*scale+1*scale, (39+math.floor((tile-1)/22)*17)*scale-tilesoffset+1*scale, 14*scale-2*scale, 14*scale-2*scale)
-						if mtbutton == 1 then
-							love.graphics.setColor(255, 255, 255, 255)
-						else
-							love.graphics.setColor(127, 127, 127, 255)
-						end
-						love.graphics.draw(uparrowimg, 333*scale+3*scale, (38+math.floor((tile-1)/22)*17)*scale-tilesoffset+3*scale, 0, scale, scale)
-						
-						-- down button
-						if mtbutton == 2 then
-							love.graphics.setColor(255, 255, 255, 255)
-						else
-							love.graphics.setColor(127, 127, 127, 255)
-						end
-						love.graphics.rectangle("fill", 348*scale, (39+math.floor((tile-1)/22)*17)*scale-tilesoffset, 14*scale, 14*scale)
-						love.graphics.setColor(0, 0, 0, 255)
-						love.graphics.rectangle("fill", 348*scale+1*scale, (39+math.floor((tile-1)/22)*17)*scale-tilesoffset+1*scale, 14*scale-2*scale, 14*scale-2*scale)
-						if mtbutton == 2 then
-							love.graphics.setColor(255, 255, 255, 255)
-						else
-							love.graphics.setColor(127, 127, 127, 255)
-						end
-						love.graphics.draw(downarrowimg, 348*scale+3*scale, (41+math.floor((tile-1)/22)*17)*scale-tilesoffset+3*scale, 0, scale, scale)
-						
-						-- delete button
-						if mtbutton == 3 then
-							love.graphics.setColor(255, 255, 255, 255)
-						else
-							love.graphics.setColor(127, 127, 127, 255)
-						end
-						love.graphics.rectangle("fill", 363*scale, (39+math.floor((tile-1)/22)*17)*scale-tilesoffset, 14*scale, 14*scale)
-						love.graphics.setColor(0, 0, 0, 255)
-						love.graphics.rectangle("fill", 363*scale+1*scale, (39+math.floor((tile-1)/22)*17)*scale-tilesoffset+1*scale, 14*scale-2*scale, 14*scale-2*scale)
-						if mtbutton == 3 then
-							love.graphics.setColor(255, 32, 32, 255)
-						else
-							love.graphics.setColor(127, 127, 127, 255)
-						end
-						properprint("x",363*scale+3*scale, (39+math.floor((tile-1)/22)*17)*scale-tilesoffset+3*scale)
 					end
 
 					if guielements["mtobjectrename"].active then
