@@ -3994,8 +3994,6 @@ function mario:grow(update)
 		end
 		return
 	end
-
-	--self.fireenemy = false
 	
 	if self.size > 2 then
 		if update then
@@ -6310,34 +6308,40 @@ function mario:globalcollide(a, b)
 			return true
 		end
 	elseif a == "enemy" then
-		if b.makesmariogrow then
+		if b.marioused then
+			return true
+		elseif b.makesmariogrow then
+			local oldfireenemy = self.fireenemy
 			if tonumber(b.makesmariogrow) then
 				self:grow(b.makesmariogrow)
 			else
 				self:grow()
 			end
 			if b.makesmarioshoot and self.size == 3 then
-				if not (self.fireenemy == b.makesmarioshoot) then
+				--if not (oldfireenemy == b.makesmarioshoot) then
 					self.fireenemy = b.makesmarioshoot
 					self.dofireenemy = self.fireenemy
 					if b.makesmariocolor then
 						self.customcolors = b.makesmariocolor
 						self.basecolors = self.customcolors
+						self.colors = self.basecolors
 					else
 						self.customcolors = false
 					end
-				end
+				--end
 			end
-			
+			b.marioused = true
 			return true
 		elseif b.givesalife then
 			givelive(self.playernumber, b)
+			b.marioused = true
 			return true
 		elseif b.makesmariostar then
 			self:star()
 			if b.makesmariostarduration then
 				self.startimer = (mariostarduration-b.makesmariostarduration)
 			end
+			b.marioused = true
 			return true
 		elseif b.dontstopmario then
 			return true
