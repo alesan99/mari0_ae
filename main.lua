@@ -3772,7 +3772,7 @@ function loadnitpicks()
 		--this probably doesn't work
 		dropshadow = t.dropshadow
 		AutoAssistMode = t.assistmode
-		--also avialable in settings.txt
+		--also available in settings.txt
 		if t.fourbythree then
 			fourbythree = true
 			if fourbythree then	width = 16 else width = 25 end

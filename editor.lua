@@ -273,7 +273,8 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	guielements["cameradropdown"] = guielement:new("dropdown", 294, 130, 11, changecamerasetting, camerasetting, "default", "centered"--[[, "forward only"]])
 	guielements["dropshadowcheckbox"] = guielement:new("checkbox", 294, 143, toggledropshadow, dropshadow, TEXT["drop shadow"])
 	guielements["realtimecheckbox"] = guielement:new("checkbox", 294, 154, togglerealtime, realtime, TEXT["real time"])
-	guielements["continuemusiccheckbox"] = guielement:new("checkbox", 294, 165, togglecontinuemusic, continuesublevelmusic, TEXT["cont. music"])
+	local _, count = TEXT["real time"]:gsub("\n", '')
+	guielements["continuemusiccheckbox"] = guielement:new("checkbox", 294, guielements["realtimecheckbox"].y+11+10*count, togglecontinuemusic, continuesublevelmusic, TEXT["cont. music"])
 
 	--MAPS
 	guielements["savebutton2"] = guielement:new("button", 300, 196, TEXT["save level"], savelevel, 0, nil, 2.5, 94, true)
