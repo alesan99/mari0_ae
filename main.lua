@@ -2081,11 +2081,8 @@ function changescale(s, fullscreen)
 		
 		canvassupported = true--love.graphics.isSupported("canvas")
 		if canvassupported then
-			canvas = love.graphics.newCanvas(width*16*scale, 224*scale)
+			canvas = love.graphics.newCanvas(width*16*scale, height*16*scale)
 			canvas:setFilter("nearest", "nearest")
-			--[[if winwidth/(width*16*scale) == math.floor(winwidth/(width*16*scale)) and winheight/(224*scale) == math.floor(winheight/(224*scale)) then
-				canvas:setFilter("nearest", "nearest")
-			end]]
 		end
 		
 		if shaders then
@@ -2102,7 +2099,7 @@ function changescale(s, fullscreen)
 		end
 		
 		uispace = math.floor(width*16*scale/4)
-		love.window.setMode(width*16*scale, 224*scale, {fullscreen=fullscreen,vsync=vsync, msaa=fsaa}) --27x14 blocks (15 blocks actual height)
+		love.window.setMode(width*16*scale, height*16*scale, {fullscreen=fullscreen,vsync=vsync, msaa=fsaa}) --27x14 blocks (15 blocks actual height)
 		
 		gamewidth, gameheight = love.graphics.getDimensions()
 		winwidth, winheight = love.graphics.getDimensions()
@@ -2302,7 +2299,7 @@ function love.textinput(c)
 	end
 end
 
-function love.mousepressed(x, y, button)
+function love.mousepressed(x, y, button, istouch)
 	button = nummousebutton(button)
 	if resizable and letterboxfullscreen and canvassupported and canvas then
 		x, y = love.mouse.getPosition()
@@ -2387,7 +2384,7 @@ function love.mousepressed(x, y, button)
 	end
 end
 
-function love.mousereleased(x, y, button)
+function love.mousereleased(x, y, button, istouch)
 	button = nummousebutton(button)
 	if resizable and letterboxfullscreen and canvassupported and canvas then
 		x, y = love.mouse.getPosition()
@@ -3776,6 +3773,13 @@ function loadnitpicks()
 		if t.fourbythree then
 			fourbythree = true
 			if fourbythree then	width = 16 else width = 25 end
+			if scale == 2 and resizable then changescale(5, fullscreen)
+			else changescale(scale, fullscreen) end
+		end
+		if t.windowwidth and t.windowheight then
+			width = t.windowwidth
+			height = t.windowheight
+			maxtilespritebatchsprites = math.max(maxtilespritebatchsprites,width*height+width+height+1)
 			if scale == 2 and resizable then changescale(5, fullscreen)
 			else changescale(scale, fullscreen) end
 		end

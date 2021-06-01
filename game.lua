@@ -163,12 +163,12 @@ function game_load(suspended)
 	spritebatchX = {}
 	spritebatchY = {}
 	for i = 1, players do
-		smbspritebatch[i] = love.graphics.newSpriteBatch( smbtilesimg, 1000 )
-		portalspritebatch[i] = love.graphics.newSpriteBatch( portaltilesimg, 1000 )
+		smbspritebatch[i] = love.graphics.newSpriteBatch( smbtilesimg, maxtilespritebatchsprites )
+		portalspritebatch[i] = love.graphics.newSpriteBatch( portaltilesimg, maxtilespritebatchsprites )
 		if customtiles then
 			customspritebatch[i] = {}
 			for i2 = 1, #customtilesimg do
-				customspritebatch[i][i2] = love.graphics.newSpriteBatch( customtilesimg[i2], 1000 )
+				customspritebatch[i][i2] = love.graphics.newSpriteBatch( customtilesimg[i2], maxtilespritebatchsprites )
 			end
 		end
 		
@@ -201,7 +201,6 @@ function game_load(suspended)
 end
 
 function game_update(dt)
-
 	--------
 	--GAME--
 	--------
@@ -862,6 +861,7 @@ function game_update(dt)
 	
 	--SCROLLING
 	
+
 	--HORIZONTAL
 	
 	local oldscroll = splitxscroll[1]
@@ -2818,7 +2818,7 @@ function game_draw()
 	--pause menu
 	if pausemenuopen then
 		love.graphics.setColor(0, 0, 0, 100)
-		love.graphics.rectangle("fill", 0, 0, width*16*scale, 224*scale)
+		love.graphics.rectangle("fill", 0, 0, width*16*scale, height*16*scale)
 		
 		love.graphics.setColor(0, 0, 0)
 		love.graphics.rectangle("fill", (width*8*scale)-50*scale, (112*scale)-75*scale, 100*scale, 150*scale)
@@ -4966,50 +4966,42 @@ function updatespritebatch()
 			end
 		end
 		
-		local xtodraw
-		if mapwidth < width+1 then
-			xtodraw = math.ceil(mapwidth/#splitscreen)
-		else
-			if mapwidth > width and splitxscroll[split] < mapwidth-width then
-				xtodraw = width+1
-			else
-				xtodraw = width
-			end
-		end
-		
-		local ytodraw
-		if mapheight > height-1 and splityscroll[split] < mapheight-height-1 then
-			ytodraw = height+2
-		else
-			ytodraw = height+1
-		end
+		local xscroll, yscroll = splitxscroll[split], splityscroll[split]
+
+		local xfromdraw, xtodraw = math.floor(xscroll)+1, math.ceil(xscroll+width)
+		local yfromdraw, ytodraw = math.floor(yscroll+0.5)+1, math.ceil(yscroll+height+0.5)
+
+		local xoff = math.floor(xscroll)
+		if xscroll < 0 then xoff = xoff + 1 end
+		local yoff = math.floor(yscroll)
+		if yscroll < 0 then yoff = yoff + 1 end
 		
 		local lmap = map
 		
-		for y = 1, math.min(mapheight, ytodraw) do
-			for x = 1, math.min(mapwidth, xtodraw) do			
+		for y = math.max(1, yfromdraw), math.min(mapheight, ytodraw) do
+			for x = math.max(1, xfromdraw), math.min(mapwidth, xtodraw) do			
 				local bounceyoffset = 0
 				
 				local draw = true
-				if getblockbounce(math.floor(splitxscroll[split])+x, math.floor(splityscroll[split])+y) then
+				if getblockbounce(x, y) then
 					draw = false
 				end
 				if draw == true then
-					if (not lmap[math.floor(splitxscroll[split])+x]) then
-						print("spritebatch tile doesnt exist " .. math.floor(splitxscroll[split])+x)
+					if (not lmap[x]) then
+						print("spritebatch tile doesnt exist " .. x)
 					else
-						local t = lmap[math.floor(splitxscroll[split])+x][math.floor(splityscroll[split])+y]
+						local t = lmap[x][y]
 						
 						if t then
 							local tilenumber = t[1]
 							if tilenumber ~= 0 and tilequads[tilenumber].invisible == false and tilequads[tilenumber].coinblock == false and tilequads[tilenumber].coin == false 
 								and (not tilequads[tilenumber].foreground) and ((not _3DMODE) or tilequads[tilenumber].collision) then
 								if math.floor(tilenumber) <= smbtilecount then
-									smbmsb:add( tilequads[tilenumber].quad, (x-1)*16*scale, ((y-1)*16-8)*scale, 0, scale, scale )
+									smbmsb:add( tilequads[tilenumber].quad, (x-1-xoff)*16*scale, ((y-1-yoff)*16-8)*scale, 0, scale, scale )
 								elseif tilenumber <= smbtilecount+portaltilecount then
-									portalmsb:add( tilequads[tilenumber].quad, (x-1)*16*scale, ((y-1)*16-8)*scale, 0, scale, scale )
+									portalmsb:add( tilequads[tilenumber].quad, (x1-xoff)*16*scale, ((y-1-yoff)*16-8)*scale, 0, scale, scale )
 								elseif tilenumber <= smbtilecount+portaltilecount+customtilecount then
-									custommsb[tilequads[tilenumber].ts]:add( tilequads[tilenumber].quad, (x-1)*16*scale, ((y-1)*16-8)*scale, 0, scale, scale )
+									custommsb[tilequads[tilenumber].ts]:add( tilequads[tilenumber].quad, (x-1-xoff)*16*scale, ((y-1-yoff)*16-8)*scale, 0, scale, scale )
 								end
 							end
 						end

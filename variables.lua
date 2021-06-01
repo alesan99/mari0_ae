@@ -918,3 +918,4 @@ for k = 0, maxsublevels do
 	table.insert(maxsublevelstable, k)
 end
 
+maxtilespritebatchsprites = 1000
