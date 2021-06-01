@@ -8370,6 +8370,8 @@ function mario:firecustomenemy(i)
 			self.fireenemyride = obj
 			self.fireenemyoffsetx = gettable(f.rideoffsetx, i) or 0
 			self.fireenemyoffsety = gettable(f.rideoffsety, i) or 0
+			self.fireenemyduckingoffsetx = gettable(f.rideduckingoffsetx, i)
+			self.fireenemyduckingoffsety = gettable(f.rideduckingoffsety, i)
 			self.fireenemyactive = (gettable(f.rideactive, i) == true)
 			self.fireenemydrawable = gettable(f.ridedrawable, i)
 			if gettable(f.rideaftertransform, i) then

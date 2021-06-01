@@ -825,6 +825,14 @@ function game_update(dt)
 				if obj.x and obj.y then
 					v.x = obj.x + (v.fireenemyoffsetx or 0)
 					v.y = obj.y + (v.fireenemyoffsety or 0)
+					if v.ducking then
+						if v.fireenemyduckingoffsetx then
+							v.x = v.x + (v.fireenemyduckingoffsetx or 0)
+						end
+						if v.fireenemyduckingoffsety then
+							v.y = v.y + (v.fireenemyduckingoffsety or 0)
+						end
+					end
 					v.active = v.fireenemyactive
 					if v.active then
 						v.speedx = obj.speedx or 0
