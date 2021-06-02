@@ -1695,8 +1695,10 @@ function editor_draw()
 			end
 			
 		elseif editorstate ~= "linktool" and editorstate ~= "portalgun" and editorstate ~= "selectiontool" and editorstate ~= "powerline" then
-			local x, y = getMouseTile(love.mouse.getX(), love.mouse.getY()-8*scale)
+			local x, y = getMouseTile(love.mouse.getX(), love.mouse.getY()-8*screenzoom*scale)
 			
+			love.graphics.push()
+			love.graphics.scale(screenzoom,screenzoom)
 			if inmap(x, y+1) then
 				if pastingtiles then
 					-- draw mtclipboard
@@ -1736,7 +1738,7 @@ function editor_draw()
 					x2, y2 = math.min(xscroll+width+1, x2), math.min(yscroll+height+1, y2)
 					local sx, sy, sw, sh = x1-1, y1-1, x2-x1+1, y2-y1+1
 					love.graphics.setColor(0, 131, 255, 45)
-					love.graphics.rectangle("fill", ((sx-xscroll)*16)*scale,((sy-yscroll)*16-8)*scale, sw*16*scale, sh*16*scale)
+					love.graphics.rectangle("fill", ((sx-xscroll)*16*screenzoom)*scale,((sy-yscroll)*16-8)*screenzoom*scale, sw*16*screenzoom*scale, sh*16*screenzoom*scale)
 					love.graphics.setColor(255,255,255)
 					love.graphics.stencil(function() 
 						love.graphics.setLineWidth(scale)
@@ -1881,6 +1883,7 @@ function editor_draw()
 					end
 				end
 			end
+			love.graphics.pop()
 		end
 		
 		if assistmode and not editormenuopen then --quickmenu
@@ -4126,7 +4129,7 @@ function tilesobjects()
 end
 
 function placetile(x, y, tilei)
-	local cox, coy = getMouseTile(x, y+8*scale)
+	local cox, coy = getMouseTile(x, y+8*screenzoom*scale)
 	if inmap(cox, coy) == false then
 		return
 	end
@@ -4882,7 +4885,7 @@ function editor_mousepressed(x, y, button)
 						end
 					elseif editentities == false and love.keyboard.isDown("e") and not android then
 						--replace tiles
-						local tx, ty = getMouseTile(x, y+8*scale)
+						local tx, ty = getMouseTile(x, y+8*screenzoom*scale)
 						if inmap(tx, ty) then
 							local ontile = map[tx][ty][1]
 							if backgroundtilemode then
@@ -4904,7 +4907,7 @@ function editor_mousepressed(x, y, button)
 						end
 					elseif editentities == false and love.keyboard.isDown("f") and not android then
 						--replace tiles
-						local tx, ty = getMouseTile(x, y+8*scale)
+						local tx, ty = getMouseTile(x, y+8*screenzoom*scale)
 						if inmap(tx, ty) then
 							local ontile = map[tx][ty][1]
 							if backgroundtilemode then
@@ -5021,7 +5024,7 @@ function editor_mousepressed(x, y, button)
 			end
 		end
 	elseif button == "m" then
-		local cox, coy = getMouseTile(x, y+8*scale)
+		local cox, coy = getMouseTile(x, y+8*screenzoom*scale)
 		if pastingtiles then
 			pastingtiles = false
 		end
@@ -5048,7 +5051,21 @@ function editor_mousepressed(x, y, button)
 	elseif button == "wu" then
 		if editormenuopen then
 		else
-			if editentities then
+			if EditorZoom and ctrlpressed then
+				local dy = 1
+				local r1, r2 = love.mouse.getX()/(width*16*scale), love.mouse.getY()/(height*16*scale)
+				local zoom1 = screenzoom
+				local centerx, centery = xscroll+(width*(1/screenzoom))*r1, yscroll+(height*(1/screenzoom))*r2
+				screenzoom = math.min(1,math.max(0.05, screenzoom + (screenzoom/(dy*5))))
+				if zoom1 ~= screenzoom then
+					xscroll = centerx - (width*(1/screenzoom))*r1
+					yscroll = centery - (height*(1/screenzoom))*r2
+					splitxscroll[1] = xscroll
+					splityscroll[1] = yscroll
+				end
+				autoscroll = false
+				return
+			elseif editentities then
 					local dobreak = false
 					for formi, form in pairs(entitiesform) do
 						for count = 1, #form do
@@ -5077,7 +5094,21 @@ function editor_mousepressed(x, y, button)
 	elseif button == "wd" then
 		if editormenuopen then
 		else
-			if editentities then
+			if EditorZoom and ctrlpressed then
+				local dy = -1
+				local r1, r2 = love.mouse.getX()/(width*16*scale), love.mouse.getY()/(height*16*scale)
+				local zoom1 = screenzoom
+				local centerx, centery = xscroll+(width*(1/screenzoom))*r1, yscroll+(height*(1/screenzoom))*r2
+				screenzoom = math.min(1,math.max(0.05, screenzoom + (screenzoom/(dy*5))))
+				if zoom1 ~= screenzoom then
+					xscroll = centerx - (width*(1/screenzoom))*r1
+					yscroll = centery - (height*(1/screenzoom))*r2
+					splitxscroll[1] = xscroll
+					splityscroll[1] = yscroll
+				end
+				autoscroll = false
+				return
+			elseif editentities then
 				local dobreak = false
 				for formi, form in pairs(entitiesform) do
 					for count = 1, #form do
@@ -5110,7 +5141,7 @@ function editor_mousepressed(x, y, button)
 		
 	elseif button == "r" then
 		if editormenuopen == false and editorstate ~= "powerline" then
-			local tileX, tileY = getMouseTile(x, y+8*scale)
+			local tileX, tileY = getMouseTile(x, y+8*screenzoom*scale)
 			if inmap(tileX, tileY) == false then
 				return
 			end
@@ -5130,7 +5161,7 @@ function editor_mousepressed(x, y, button)
 					openrightclickmenu(x, y, tileX, tileY)
 				else
 					if editorstate ~= "portalgun" and not customrcopen then
-						local cox, coy = getMouseTile(x, y+8*scale)
+						local cox, coy = getMouseTile(x, y+8*screenzoom*scale)
 						
 						if objects["player"][1] then
 							local p = objects["player"][1]

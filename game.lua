@@ -1507,7 +1507,9 @@ local clearpipesegmentdrawqueue = {}
 
 function game_draw()
 	for split = 1, #splitscreen do
+		love.graphics.push()
 		love.graphics.translate((split-1)*width*16*scale/#splitscreen, yoffset*scale)
+		love.graphics.scale(screenzoom,screenzoom)
 		
 		--This is just silly
 		if earthquake > 0 and sonicrainboom and #objects["glados"] == 0 then
@@ -1541,26 +1543,19 @@ function game_draw()
 		love.graphics.setScissor(unpack(currentscissor))
 		xscroll = splitxscroll[split]
 		yscroll = splityscroll[split]
+		if screenzoom ~= 1 then
+			xscroll = math.floor(xscroll*16)/16
+			yscroll = math.floor(yscroll*16)/16
+		end
 	
 		love.graphics.setColor(255, 255, 255, 255)
 		
-		local xtodraw
-		if mapwidth < width+1 then
-			xtodraw = math.ceil(mapwidth/#splitscreen)
-		else
-			if mapwidth > width and xscroll < mapwidth-width then
-				xtodraw = width+1
-			else
-				xtodraw = width
-			end
-		end
-		
-		local ytodraw
-		if mapheight > height-1 and yscroll < mapheight-height-1 then
-			ytodraw = height+2
-		else
-			ytodraw = height+1
-		end
+		local xfromdraw, xtodraw = math.max(1, math.floor(xscroll)+1), math.min(mapwidth, math.floor(xscroll+width*(1/screenzoom))+1)
+		local yfromdraw, ytodraw = math.max(1, math.floor(yscroll-0.5)+1), math.min(mapheight, math.floor(yscroll+height*(1/screenzoom)+1-0.5)+1)
+		local xoff = math.floor(xscroll)-math.fmod(xscroll, 1)
+		if xscroll < 0 then xoff = xoff + 1 end
+		local yoff = math.floor(yscroll)-math.fmod(yscroll, 1)
+		if yscroll < 0 then yoff = yoff + 1 end
 		
 		--custom background
 		rendercustombackground(xscroll, yscroll, scrollfactor, scrollfactory)
@@ -1572,11 +1567,11 @@ function game_draw()
 			else
 				love.graphics.setColor(255,255,255,255)
 			end
-			for y = 1, ytodraw do
-				for x = 1, xtodraw do
-					local backgroundtile = bmapt(math.floor(xscroll)+x, math.floor(yscroll)+y, 1)
+			for y = xfromdraw, ytodraw do
+				for x = xfromdraw, xtodraw do
+					local backgroundtile = bmapt(x, y, 1)
 					if backgroundtile and tilequads[backgroundtile] and not tilequads[backgroundtile].invisible then
-						love.graphics.draw(tilequads[backgroundtile].image, tilequads[backgroundtile].quad, math.floor((x-1-math.fmod(xscroll, 1))*16*scale), math.floor(((y-1-math.fmod(yscroll, 1))*16-8)*scale), 0, scale, scale)
+						love.graphics.draw(tilequads[backgroundtile].image, tilequads[backgroundtile].quad, math.floor((x-1-xoff)*16*scale), math.floor(((y-1-yoff)*16-8)*scale), 0, scale, scale)
 					end
 				end
 			end
@@ -1595,7 +1590,7 @@ function game_draw()
 					love.graphics.draw(customspritebatch[split][i], math.floor((-math.fmod(xscroll, 1)*16)*scale), math.floor((-math.fmod(yscroll, 1)*16)*scale))
 				end
 			end
-			drawmaptiles("dropshadow", xscroll, yscroll, xtodraw, ytodraw)
+			drawmaptiles("dropshadow", xscroll, yscroll)
 			
 			--OBJECTS
 			for j, w in pairs(objects["tilemoving"]) do
@@ -1728,7 +1723,7 @@ function game_draw()
 			end
 
 			local lmap = map
-			drawmaptiles("main", xscroll, yscroll, xtodraw, ytodraw)
+			drawmaptiles("main", xscroll, yscroll)
 		end
 
 		--Moving Tiles (tilemoving)
@@ -1800,9 +1795,11 @@ function game_draw()
 		
 		---UI
 		if ((not darkmode and not lightsout) or editormode) and not hudsimple then
+			love.graphics.scale(1/screenzoom,1/screenzoom)
 			if hudvisible then
 				drawHUD()
 			end
+			love.graphics.scale(screenzoom,screenzoom)
 		end
 		
 		love.graphics.setColor(255, 255, 255)
@@ -2132,9 +2129,9 @@ function game_draw()
 					end
 				end
 				if i > 8 then
-					drawmaptiles("dropshadow", xscroll, yscroll, xtodraw, ytodraw)
+					drawmaptiles("dropshadow", xscroll, yscroll)
 				else
-					drawmaptiles("collision", xscroll, yscroll, xtodraw, ytodraw)
+					drawmaptiles("collision", xscroll, yscroll)
 				end
 				
 				--OBJECTS
@@ -2506,7 +2503,7 @@ function game_draw()
 		end
 		
 		--Foreground tiles
-		drawmaptiles("foreground", xscroll, yscroll, xtodraw, ytodraw)
+		drawmaptiles("foreground", xscroll, yscroll)
 		
 		love.graphics.setColor(255, 255, 255)
 		--Poofs
@@ -2518,6 +2515,7 @@ function game_draw()
 		rendercustomforeground(xscroll, yscroll, scrollfactor2, scrollfactor2y)
 		
 		--UI over everything
+		love.graphics.scale(1/screenzoom,1/screenzoom)
 		if hudsimple and ((not darkmode and not lightsout) or editormode) then
 			if hudvisible then
 				drawHUD()
@@ -2689,7 +2687,7 @@ function game_draw()
 			end
 		end
 		
-		love.graphics.translate(-(split-1)*width*16*scale/#splitscreen, 0)
+		love.graphics.pop()
 	end
 	love.graphics.setScissor()
 	if lightsout and not editormode then
@@ -2988,7 +2986,7 @@ function drawentity(j, w, i, v, currentscissor)
 			if v.invertedscissor then
 			
 			else
-				love.graphics.setScissor(math.floor((v.customscissor[1]-xscroll)*16*scale), math.floor((v.customscissor[2]-.5-yscroll)*16*scale), v.customscissor[3]*16*scale, v.customscissor[4]*16*scale)
+				love.graphics.setScissor(math.floor((v.customscissor[1]-xscroll)*16*screenzoom*scale), math.floor((v.customscissor[2]-.5-yscroll)*16*screenzoom*scale), v.customscissor[3]*16*screenzoom*scale, v.customscissor[4]*16*screenzoom*scale)
 			end
 		elseif portal ~= false and (v.active or v.portaloverride) then
 			if portaly == 1 then
@@ -3000,19 +2998,19 @@ function drawentity(j, w, i, v, currentscissor)
 			end
 			
 			if entryfacing == "right" then
-				love.graphics.setScissor(math.floor((entryX-xscroll)*16*scale), math.floor(((entryY-3.5-yscroll)*16)*scale), 64*scale, 96*scale)
+				love.graphics.setScissor(math.floor((entryX-xscroll)*16*screenzoom*scale), math.floor(((entryY-3.5-yscroll)*16*screenzoom)*scale), 64*screenzoom*scale, 96*screenzoom*scale)
 			elseif entryfacing == "left" then
-				love.graphics.setScissor(math.floor((entryX-xscroll-5)*16*scale), math.floor(((entryY-4.5-yscroll)*16)*scale), 64*scale, 96*scale)
+				love.graphics.setScissor(math.floor((entryX-xscroll-5)*16*screenzoom*scale), math.floor(((entryY-4.5-yscroll)*16*screenzoom)*scale), 64*screenzoom*scale, 96*screenzoom*scale)
 			elseif entryfacing == "up" then
-				love.graphics.setScissor(math.floor((entryX-xscroll-3)*16*scale), math.floor(((entryY-5.5-yscroll)*16)*scale), 96*scale, 64*scale)
+				love.graphics.setScissor(math.floor((entryX-xscroll-3)*16*screenzoom*scale), math.floor(((entryY-5.5-yscroll)*16*screenzoom)*scale), 96*screenzoom*scale, 64*screenzoom*scale)
 			elseif entryfacing == "down" then
-				love.graphics.setScissor(math.floor((entryX-xscroll-4)*16*scale), math.floor(((entryY-0.5-yscroll)*16)*scale), 96*scale, 64*scale)
+				love.graphics.setScissor(math.floor((entryX-xscroll-4)*16*screenzoom*scale), math.floor(((entryY-0.5-yscroll)*16*screenzoom)*scale), 96*screenzoom*scale, 64*screenzoom*scale)
 			end
 		end
 	end
 	
 	if v.customscissor2 then
-		love.graphics.setScissor(math.floor((v.customscissor2[1]-xscroll)*16*scale), math.floor((v.customscissor2[2]-.5-yscroll)*16*scale), v.customscissor2[3]*16*scale, v.customscissor2[4]*16*scale)
+		love.graphics.setScissor(math.floor((v.customscissor2[1]-xscroll)*16*screenzoom*scale), math.floor((v.customscissor2[2]-.5-yscroll)*16*screenzoom*scale), v.customscissor2[3]*16*screenzoom*scale, v.customscissor2[4]*16*screenzoom*scale)
 	end
 	
 	if type(v.graphic) == "table" then
@@ -3053,13 +3051,13 @@ function drawentity(j, w, i, v, currentscissor)
 			end
 			
 			if exitfacing == "right" then
-				love.graphics.setScissor(math.floor((exitX-xscroll)*16*scale), math.floor(((exitY-3.5-yscroll)*16)*scale), 64*scale, 96*scale)
+				love.graphics.setScissor(math.floor((exitX-xscroll)*16*screenzoom*scale), math.floor(((exitY-3.5-yscroll)*16*screenzoom)*scale), 64*screenzoom*scale, 96*screenzoom*scale)
 			elseif exitfacing == "left" then
-				love.graphics.setScissor(math.floor((exitX-xscroll-5)*16*scale), math.floor(((exitY-4.5-yscroll)*16)*scale), 64*scale, 96*scale)
+				love.graphics.setScissor(math.floor((exitX-xscroll-5)*16*screenzoom*scale), math.floor(((exitY-4.5-yscroll)*16*screenzoom)*scale), 64*screenzoom*scale, 96*screenzoom*scale)
 			elseif exitfacing == "up" then
-				love.graphics.setScissor(math.floor((exitX-xscroll-3)*16*scale), math.floor(((exitY-5.5-yscroll)*16)*scale), 96*scale, 64*scale)
+				love.graphics.setScissor(math.floor((exitX-xscroll-3)*16*screenzoom*scale), math.floor(((exitY-5.5-yscroll)*16*screenzoom)*scale), 96*screenzoom*scale, 64*screenzoom*scale)
 			elseif exitfacing == "down" then
-				love.graphics.setScissor(math.floor((exitX-xscroll-4)*16*scale), math.floor(((exitY-0.5-yscroll)*16)*scale), 96*scale, 64*scale)
+				love.graphics.setScissor(math.floor((exitX-xscroll-4)*16*screenzoom*scale), math.floor(((exitY-0.5-yscroll)*16*screenzoom)*scale), 96*screenzoom*scale, 64*screenzoom*scale)
 			end
 			
 			if type(v.graphic) == "table" then
@@ -4232,6 +4230,7 @@ function startlevel(level, reason)
 	
 	splitxscroll = {0}
 	splityscroll = {0}
+	screenzoom = 1
 	
 	startx = 3
 	starty = 13
@@ -4968,9 +4967,8 @@ function updatespritebatch()
 		
 		local xscroll, yscroll = splitxscroll[split], splityscroll[split]
 
-		local xfromdraw, xtodraw = math.floor(xscroll)+1, math.ceil(xscroll+width)
-		local yfromdraw, ytodraw = math.floor(yscroll+0.5)+1, math.ceil(yscroll+height+0.5)
-
+		local xfromdraw, xtodraw = math.max(1, math.floor(xscroll)+1), math.min(mapwidth, math.floor(xscroll+width*(1/screenzoom))+1)
+		local yfromdraw, ytodraw = math.max(1, math.floor(yscroll-0.5)+1), math.min(mapheight, math.floor(yscroll+height*(1/screenzoom)+1-0.5)+1)
 		local xoff = math.floor(xscroll)
 		if xscroll < 0 then xoff = xoff + 1 end
 		local yoff = math.floor(yscroll)
@@ -4978,8 +4976,8 @@ function updatespritebatch()
 		
 		local lmap = map
 		
-		for y = math.max(1, yfromdraw), math.min(mapheight, ytodraw) do
-			for x = math.max(1, xfromdraw), math.min(mapwidth, xtodraw) do			
+		for y = yfromdraw, ytodraw do
+			for x = xfromdraw, xtodraw do
 				local bounceyoffset = 0
 				
 				local draw = true
@@ -4999,7 +4997,7 @@ function updatespritebatch()
 								if math.floor(tilenumber) <= smbtilecount then
 									smbmsb:add( tilequads[tilenumber].quad, (x-1-xoff)*16*scale, ((y-1-yoff)*16-8)*scale, 0, scale, scale )
 								elseif tilenumber <= smbtilecount+portaltilecount then
-									portalmsb:add( tilequads[tilenumber].quad, (x1-xoff)*16*scale, ((y-1-yoff)*16-8)*scale, 0, scale, scale )
+									portalmsb:add( tilequads[tilenumber].quad, (x-1-xoff)*16*scale, ((y-1-yoff)*16-8)*scale, 0, scale, scale )
 								elseif tilenumber <= smbtilecount+portaltilecount+customtilecount then
 									custommsb[tilequads[tilenumber].ts]:add( tilequads[tilenumber].quad, (x-1-xoff)*16*scale, ((y-1-yoff)*16-8)*scale, 0, scale, scale )
 								end
@@ -6083,8 +6081,8 @@ function game_mousereleased(x, y, button)
 end
 
 function getMouseTile(x, y)
-	local xout = math.floor((x+xscroll*16*scale)/(16*scale))+1
-	local yout = math.floor((y+yscroll*16*scale)/(16*scale))+1
+	local xout = math.floor((x+xscroll*screenzoom*16*scale)/(16*screenzoom*scale))+1
+	local yout = math.floor((y+yscroll*screenzoom*16*scale)/(16*screenzoom*scale))+1
 	return xout, yout
 end
 
@@ -8860,32 +8858,39 @@ function tilemap(x, y)
 	end
 end
 
-function drawmaptiles(drawtype, xscroll, yscroll, xtodraw, ytodraw)
+function drawmaptiles(drawtype, xscroll, yscroll)
 	local fore = (drawtype == "foreground")
 	local drop = (drawtype == "dropshadow") or (drawtype == "menudropshadow")
 	local menudraw = (drawtype == "menu") or (drawtype == "menudropshadow")
 	local collision = (drawtype == "collision")
 	local lmap = map
+
+	local xfromdraw, xtodraw = math.max(1, math.floor(xscroll)+1), math.min(mapwidth, math.floor(xscroll+width*(1/screenzoom))+1)
+	local yfromdraw, ytodraw = math.max(1, math.floor(yscroll-0.5)+1), math.min(mapheight, math.floor(yscroll+height*(1/screenzoom)+1-0.5)+1)
+	local xoff = math.floor(xscroll)+math.fmod(xscroll, 1)
+	if xscroll < 0 then xoff = xoff + 1 end
+	local yoff = math.floor(yscroll)+math.fmod(yscroll, 1)
+	if yscroll < 0 then yoff = yoff + 1 end
 		
-	for y = 1, ytodraw do
-		for x = 1, xtodraw do
+	for y = yfromdraw, ytodraw do
+		for x = xfromdraw, xtodraw do
 			--actual tile
-			if (not lmap[math.floor(xscroll)+x]) then
+			if (not lmap[x]) then
 				if fore then
-					print("foreground tile doesnt exist " .. math.floor(xscroll)+x)
+					print("foreground tile doesnt exist " .. x)
 				else
-					print("drawable tile doesnt exist " .. math.floor(xscroll)+x)
+					print("drawable tile doesnt exist " .. x)
 				end
 				break
 			end
-			local t = lmap[math.floor(xscroll)+x][math.floor(yscroll)+y]
+			local t = lmap[x][y]
 			if not t then
 				break
 			end
 
 			if (not fore) then--fore or drop then
 				--clear pipes
-				local coord = tilemap(math.floor(xscroll)+x, math.floor(yscroll)+y)
+				local coord = tilemap(x, y)
 				if objects and objects["clearpipesegment"][coord] then
 					if drop then
 						objects["clearpipesegment"][coord]:draw(drop)
@@ -8907,11 +8912,11 @@ function drawmaptiles(drawtype, xscroll, yscroll, xtodraw, ytodraw)
 			if menudraw then
 				tilenumber = tonumber(tilenumber) or 1
 			end
-			local cox, coy = math.floor(xscroll)+x, math.floor(yscroll)+y
+			local cox, coy = x, y
 
 			local bounceyoffset = 0
 			if blockbounce then
-				local blockbouncet = getblockbounce(math.floor(xscroll)+x, math.floor(yscroll)+y)
+				local blockbouncet = getblockbounce(x, y)
 				if blockbouncet then
 					local v = blockbouncet
 					local timer = math.abs(v.timer)
@@ -8929,25 +8934,25 @@ function drawmaptiles(drawtype, xscroll, yscroll, xtodraw, ytodraw)
 			if fore or drop or menudraw then
 				if tilequads[tilenumber]:getproperty("foreground", cox, coy) then
 					if tilenumber > 90000 then
-						love.graphics.draw(tilequads[tilenumber].image, tilequads[tilenumber]:getquad(math.floor(xscroll)+x, math.floor(yscroll)+y), math.floor((x-1-math.fmod(xscroll, 1))*16*scale), math.floor(((y-1-math.fmod(yscroll, 1)-bounceyoffset)*16-8)*scale), 0, scale, scale)
+						love.graphics.draw(tilequads[tilenumber].image, tilequads[tilenumber]:getquad(cox, coy), math.floor((x-1-xoff)*16*scale), math.floor(((y-1-yoff-bounceyoffset)*16-8)*scale), 0, scale, scale)
 					else
-						love.graphics.draw(tilequads[tilenumber].image, tilequads[tilenumber].quad, math.floor((x-1-math.fmod(xscroll, 1))*16*scale), math.floor(((y-1-math.fmod(yscroll, 1)-bounceyoffset)*16-8)*scale), 0, scale, scale)
+						love.graphics.draw(tilequads[tilenumber].image, tilequads[tilenumber].quad, math.floor((x-1-xoff)*16*scale), math.floor(((y-1-yoff-bounceyoffset)*16-8)*scale), 0, scale, scale)
 					end
 				end
 			end
 			if (not fore) or drop or menudraw then
 				if not tilequads[tilenumber]:getproperty("foreground", cox, coy) then
 					if tilequads[tilenumber].coinblock and tilenumber < 90000 and not tilequads[tilenumber].invisible then --coinblock
-						love.graphics.draw(coinblockimage, coinblockquads[spriteset][coinframe], math.floor((x-1-math.fmod(xscroll, 1))*16*scale), math.floor(((y-1-math.fmod(yscroll, 1)-bounceyoffset)*16-8)*scale), 0, scale, scale)
+						love.graphics.draw(coinblockimage, coinblockquads[spriteset][coinframe], math.floor((x-1-xoff)*16*scale), math.floor(((y-1-yoff-bounceyoffset)*16-8)*scale), 0, scale, scale)
 					elseif (tilequads[tilenumber].coin and tilenumber < 90000) or (menudraw and t[2] == "187") then --coin
-						love.graphics.draw(coinimage, coinquads[spriteset][coinframe], math.floor((x-1-math.fmod(xscroll, 1))*16*scale), math.floor(((y-1-math.fmod(yscroll, 1)-bounceyoffset)*16-8)*scale), 0, scale, scale)
+						love.graphics.draw(coinimage, coinquads[spriteset][coinframe], math.floor((x-1-xoff)*16*scale), math.floor(((y-1-yoff-bounceyoffset)*16-8)*scale), 0, scale, scale)
 					elseif tilenumber > 90000 then --same as below, but keeps animated tiles on grid
 						if not tilequads[tilenumber].invisible then
-							love.graphics.draw(tilequads[tilenumber].image, tilequads[tilenumber]:getquad(math.floor(xscroll)+x, math.floor(yscroll)+y), math.floor((x-1-math.fmod(xscroll, 1))*16*scale), math.floor(((y-1-math.fmod(yscroll, 1)-bounceyoffset)*16-8)*scale), 0, scale, scale)
+							love.graphics.draw(tilequads[tilenumber].image, tilequads[tilenumber]:getquad(cox, coy), math.floor((x-1-xoff)*16*scale), math.floor(((y-1-yoff-bounceyoffset)*16-8)*scale), 0, scale, scale)
 						end
 					elseif bounceyoffset ~= 0 or menudraw or (_3DMODE and (((not collision) and (not tilequads[tilenumber].collision))) or ((collision and tilequads[tilenumber].collision and bounceyoffset ~= 0))) then
 						if not tilequads[tilenumber].invisible then
-							love.graphics.draw(tilequads[tilenumber].image, tilequads[tilenumber].quad, math.floor((x-1-math.fmod(xscroll, 1))*16*scale), ((y-1-math.fmod(yscroll, 1)-bounceyoffset)*16-8)*scale, 0, scale, scale)
+							love.graphics.draw(tilequads[tilenumber].image, tilequads[tilenumber].quad, math.floor((x-1-xoff)*16*scale), ((y-1-yoff-bounceyoffset)*16-8)*scale, 0, scale, scale)
 						end
 					end
 				end
@@ -8973,13 +8978,13 @@ function drawmaptiles(drawtype, xscroll, yscroll, xtodraw, ytodraw)
 					end
 					
 					if t["gels"][dir] == 1 then
-						love.graphics.draw(gel1ground, math.floor((x-.5-math.fmod(xscroll, 1))*16*scale), math.floor(((y-1-math.fmod(yscroll, 1)-bounceyoffset)*16)*scale), r, scale, scale, 8, 8)
+						love.graphics.draw(gel1ground, math.floor((x-.5-xoff)*16*scale), math.floor(((y-1-yoff-bounceyoffset)*16)*scale), r, scale, scale, 8, 8)
 					elseif t["gels"][dir] == 2 then
-						love.graphics.draw(gel2ground, math.floor((x-.5-math.fmod(xscroll, 1))*16*scale), math.floor(((y-1-math.fmod(yscroll, 1)-bounceyoffset)*16)*scale), r, scale, scale, 8, 8)
+						love.graphics.draw(gel2ground, math.floor((x-.5-xoff)*16*scale), math.floor(((y-1-yoff-bounceyoffset)*16)*scale), r, scale, scale, 8, 8)
 					elseif t["gels"][dir] == 3 then
-						love.graphics.draw(gel3ground, math.floor((x-.5-math.fmod(xscroll, 1))*16*scale), math.floor(((y-1-math.fmod(yscroll, 1)-bounceyoffset)*16)*scale), r, scale, scale, 8, 8)
+						love.graphics.draw(gel3ground, math.floor((x-.5-xoff)*16*scale), math.floor(((y-1-yoff-bounceyoffset)*16)*scale), r, scale, scale, 8, 8)
 					elseif t["gels"][dir] == 4 then
-						love.graphics.draw(gel4ground, math.floor((x-.5-math.fmod(xscroll, 1))*16*scale), math.floor(((y-1-math.fmod(yscroll, 1)-bounceyoffset)*16)*scale), r, scale, scale, 8, 8)
+						love.graphics.draw(gel4ground, math.floor((x-.5-xoff)*16*scale), math.floor(((y-1-yoff-bounceyoffset)*16)*scale), r, scale, scale, 8, 8)
 					end
 				end
 			end
@@ -8999,28 +9004,28 @@ function drawmaptiles(drawtype, xscroll, yscroll, xtodraw, ytodraw)
 			
 			if editormode and (((not fore) and not tilequads[tilenumber].foreground) or (fore and tilequads[tilenumber].foreground)) and (not drop) then
 				if tilequads[t[1]].invisible and t[1] ~= 1 then
-					love.graphics.draw(tilequads[t[1]].image, tilequads[t[1]].quad, math.floor((x-1-math.fmod(xscroll, 1))*16*scale), ((y-1-math.fmod(yscroll, 1))*16-8)*scale, 0, scale, scale)
+					love.graphics.draw(tilequads[t[1]].image, tilequads[t[1]].quad, math.floor((x-1-xoff)*16*scale), ((y-1-yoff)*16-8)*scale, 0, scale, scale)
 				end
 				
 				if #t > 1 and t[2] ~= "link" then
 					tilenumber = t[2]
 					if tablecontains(customenemies, tilenumber) and enemiesdata[tilenumber] and (enemiesdata[tilenumber].width and enemiesdata[tilenumber].height) then --ENEMY PREVIEW THING
 						local v = enemiesdata[tilenumber]
-						local xoff, yoff = ((0.5-v.width/2+(v.spawnoffsetx or 0))*16 + v.offsetX - v.quadcenterX)*scale, (((v.spawnoffsety or 0)-v.height+1)*16-v.offsetY - v.quadcenterY)*scale
+						local exoff, eyoff = ((0.5-v.width/2+(v.spawnoffsetx or 0))*16 + v.offsetX - v.quadcenterX)*scale, (((v.spawnoffsety or 0)-v.height+1)*16-v.offsetY - v.quadcenterY)*scale
 						
 						local mx, my = getMouseTile(love.mouse.getX(), love.mouse.getY()+8*scale)
 						local alpha = 150
-						if math.floor(xscroll)+x == mx and math.floor(yscroll)+y == my then
+						if cox == mx and coy == my then
 							alpha = 255
 						end
 						
 						love.graphics.setColor(255, 0, 0, alpha)
-						love.graphics.rectangle("fill", math.floor((x-1-math.fmod(xscroll, 1))*16*scale), math.floor(((y-1-math.fmod(yscroll, 1))*16-8)*scale), 16*scale, 16*scale)
+						love.graphics.rectangle("fill", math.floor((x-1-xoff)*16*scale), math.floor(((y-1-yoff)*16-8)*scale), 16*scale, 16*scale)
 						love.graphics.setColor(255, 255, 255, alpha)
-						love.graphics.draw(v.graphic, v.quad, math.floor((x-1-math.fmod(xscroll, 1))*16*scale+xoff), math.floor(((y-1-math.fmod(yscroll, 1))*16)*scale+yoff), 0, scale, scale)
+						love.graphics.draw(v.graphic, v.quad, math.floor((x-1-xoff)*16*scale+exoff), math.floor(((y-1-yoff)*16)*scale+eyoff), 0, (v.animationscalex or 1)*scale, (v.animationscaley or 1)*scale)
 						if t["argument"] and t["argument"] == "b" then --supersize
 							love.graphics.setColor(255, 255, 255, 200)
-							love.graphics.draw(entityquads[313].image, entityquads[313].quad, math.floor((x-1-math.fmod(xscroll, 1))*16*scale), ((y-1-math.fmod(yscroll, 1))*16-8)*scale, 0, (v.animationscalex or 1)*scale, (v.animationscaley or 1)*scale)
+							love.graphics.draw(entityquads[313].image, entityquads[313].quad, math.floor((x-1-xoff)*16*scale), ((y-1-yoff)*16-8)*scale, 0, scale, scale)
 						end
 					elseif entityquads[tilenumber] and entityquads[tilenumber].t then
 						local i = entityquads[tilenumber].t
@@ -9037,27 +9042,27 @@ function drawmaptiles(drawtype, xscroll, yscroll, xtodraw, ytodraw)
 								local s = t[3]:split("|")
 								if s[3] then
 									local dir = s[3] or "down"
-									love.graphics.draw(pipesimg, pipesquad[qs][dir], math.floor((x-1-math.fmod(xscroll, 1))*16*scale), ((y-1-math.fmod(yscroll, 1))*16-8)*scale, 0, scale, scale)
+									love.graphics.draw(pipesimg, pipesquad[qs][dir], math.floor((x-1-xoff)*16*scale), ((y-1-yoff)*16-8)*scale, 0, scale, scale)
 								else
-									love.graphics.draw(pipesimg, pipesquad[qs]["default"], math.floor((x-1-math.fmod(xscroll, 1))*16*scale), ((y-1-math.fmod(yscroll, 1))*16-8)*scale, 0, scale, scale)
+									love.graphics.draw(pipesimg, pipesquad[qs]["default"], math.floor((x-1-xoff)*16*scale), ((y-1-yoff)*16-8)*scale, 0, scale, scale)
 								end
 							else
-								love.graphics.draw(pipesimg, pipesquad[qs]["default"], math.floor((x-1-math.fmod(xscroll, 1))*16*scale), ((y-1-math.fmod(yscroll, 1))*16-8)*scale, 0, scale, scale)
+								love.graphics.draw(pipesimg, pipesquad[qs]["default"], math.floor((x-1-xoff)*16*scale), ((y-1-yoff)*16-8)*scale, 0, scale, scale)
 							end
 						else
 							local offsetx = 0
 							if t["argument"] and t["argument"] == "o" then --offset
 								offsetx = .5
-								love.graphics.setScissor(math.floor((x-1-math.fmod(xscroll, 1))*16*scale), math.floor(((y-1-math.fmod(yscroll, 1))*16-8)*scale), 16*scale, 16*scale)
+								love.graphics.setScissor(math.floor((x-1-xoff)*16*screenzoom*scale), math.floor(((y-1-yoff)*16-8)*screenzoom*scale), 16*screenzoom*scale, 16*screenzoom*scale)
 							end
 							love.graphics.setColor(255, 255, 255, 150)
-							love.graphics.draw(entityquads[tilenumber].image, entityquads[tilenumber].quad, math.floor((x-1-math.fmod(xscroll, 1)+offsetx)*16*scale), ((y-1-math.fmod(yscroll, 1))*16-8)*scale, 0, scale, scale)
+							love.graphics.draw(entityquads[tilenumber].image, entityquads[tilenumber].quad, math.floor((x-1-xoff+offsetx)*16*scale), ((y-1-yoff)*16-8)*scale, 0, scale, scale)
 							if offsetx > 0 then
 								love.graphics.setScissor()
 							end
 							if t["argument"] and t["argument"] == "b" then --supersize
 								love.graphics.setColor(255, 255, 255, 200)
-								love.graphics.draw(entityquads[313].image, entityquads[313].quad, math.floor((x-1-math.fmod(xscroll, 1)+offsetx)*16*scale), ((y-1-math.fmod(yscroll, 1))*16-8)*scale, 0, scale, scale)
+								love.graphics.draw(entityquads[313].image, entityquads[313].quad, math.floor((x-1-xoff+offsetx)*16*scale), ((y-1-yoff)*16-8)*scale, 0, scale, scale)
 							end
 							if entityquads[tilenumber].t == "track" and not trackpreviews then
 								generatetrackpreviews()

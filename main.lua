@@ -3817,6 +3817,7 @@ function loadnitpicks()
 		SlowBackgrounds = t.slowbackgrounds
 		NoCharacterZipNotices = t.nocharacterzipnotices
 		NoMusic = t.nomusic
+		EditorZoom = t.editorzoom
 		_3DMODE = t.render3d
 		HITBOXDEBUG = t.viewhitboxes
 	end
