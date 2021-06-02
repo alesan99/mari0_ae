@@ -5546,6 +5546,10 @@ function mario:rightcollide(a, b, passive)
 			return false
 		end
 	end
+
+	if self.gravitydir == "right" and a ~= "tile" then
+		self.gravitydir = "down"
+	end
 	
 	if (self.gravitydir == "down" or self.gravitydir == "up") and (not self.fence) then
 		if self.falling == false and self.jumping == false then
@@ -5919,6 +5923,10 @@ function mario:leftcollide(a, b)
 			return false
 		end
 	end
+
+	if self.gravitydir == "left" and a ~= "tile" then
+		self.gravitydir = "down"
+	end
 	
 	if (self.gravitydir == "down" or self.gravitydir == "up") and (not self.fence) then
 		if self.falling == false and self.jumping == false then
@@ -6270,6 +6278,8 @@ function mario:ceilcollide(a, b)
 		self.jumping = false
 		self.falling = true
 		self.speedy = headforce
+	elseif a ~= "tile" then
+		self.gravitydir = "down"
 	end
 end
 
