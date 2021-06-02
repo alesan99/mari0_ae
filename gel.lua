@@ -77,17 +77,14 @@ function gel:leftcollide(a, b)
 	if a == "tile" then
 		local x, y = b.cox, b.coy
 		
-		if (inmap(x+1, y) and tilequads[map[x+1][y][1]].collision) or (inmap(x, y) and (tilequads[map[x][y][1]].collision == false or tilequads[map[x][y][1]].invisible)) then
+		if (inmap(x+1, y) and self:geltilecheck(x+1, y)) or (inmap(x, y) and not self:geltilecheck(x, y)) then
 			return
 		end
 		
 		--see if adjsajcjet tile is a better fit
 		if math.floor(self.y+self.height/2)+1 ~= y then
-			if inmap(x, math.floor(self.y+self.height/2)+1) then
-				local t = map[x][math.floor(self.y+self.height/2)+1][1]
-				if tilequads[t].collision and (not (tilequads[t]:getproperty("invisible", x, y) or tilequads[t].grate)) then
-					y = math.floor(self.y+self.height/2)+1
-				end
+			if inmap(x, math.floor(self.y+self.height/2)+1) and self:geltilecheck(x, math.floor(self.y+self.height/2)+1) then
+				y = math.floor(self.y+self.height/2)+1
 			end
 		end
 		
@@ -107,17 +104,14 @@ function gel:rightcollide(a, b)
 	if a == "tile" then
 		local x, y = b.cox, b.coy
 		
-		if (inmap(x-1, y) and tilequads[map[x-1][y][1]].collision) or (inmap(x, y) and (tilequads[map[x][y][1]].collision == false or tilequads[map[x][y][1]].invisible)) then
+		if (inmap(x-1, y) and self:geltilecheck(x-1, y)) or (inmap(x, y) and not self:geltilecheck(x, y)) then
 			return
 		end
 		
 		--see if adjsajcjet tile is a better fit
 		if math.floor(self.y+self.height/2)+1 ~= y then
-			if inmap(x, math.floor(self.y+self.height/2)+1) then
-				local t = map[x][math.floor(self.y+self.height/2)+1][1]
-				if tilequads[t].collision and (not (tilequads[t]:getproperty("invisible", x, y) or tilequads[t].grate)) then
-					y = math.floor(self.y+self.height/2)+1
-				end
+			if inmap(x, math.floor(self.y+self.height/2)+1) and self:geltilecheck(x, math.floor(self.y+self.height/2)+1) then
+				y = math.floor(self.y+self.height/2)+1
 			end
 		end
 		
@@ -137,15 +131,14 @@ function gel:floorcollide(a, b)
 	if a == "tile" then
 		local x, y = b.cox, b.coy
 		
-		if (inmap(x, y-1) and tilequads[map[x][y-1][1]].collision) or (inmap(x, y) and (tilequads[map[x][y][1]].collision == false or tilequads[map[x][y][1]].invisible)) then
+		if (inmap(x, y-1) and self:geltilecheck(x, y-1)) or (inmap(x, y) and not self:geltilecheck(x, y)) then
 			return
 		end
 		
 		--see if adjsajcjet tile is a better fit
 		if math.floor(self.x+self.width/2)+1 ~= x then
 			if inmap(math.floor(self.x+self.width/2)+1, y) then
-				local t = map[math.floor(self.x+self.width/2)+1][y][1]
-				if tilequads[t].collision and (not (tilequads[t]:getproperty("invisible", x, y) or tilequads[t].grate)) then
+				if self:geltilecheck(math.floor(self.x+self.width/2)+1, y) then
 					x = math.floor(self.x+self.width/2)+1
 				end
 			end
@@ -155,7 +148,7 @@ function gel:floorcollide(a, b)
 			if map[x][y]["gels"]["top"] == self.id or (self.id == 5 and not map[x][y]["gels"]["top"]) then
 				if self.speedx > 0 then
 					for cox = x+1, x+self.speedx*0.2 do
-						if inmap(cox, y-1) and tilequads[map[cox][y][1]].collision == true and tilequads[map[cox][y-1][1]].collision == false then
+						if inmap(cox, y-1) and self:geltilecheck(cox, y) and not self:geltilecheck(cox, y) then
 							if self:applygel("top", cox, y) then
 								break
 							end
@@ -165,7 +158,7 @@ function gel:floorcollide(a, b)
 					end
 				elseif self.speedx < 0 then
 					for cox = x-1, x+self.speedx*0.2, -1 do
-						if inmap(cox, y-1) and tilequads[map[cox][y][1]].collision and tilequads[map[cox][y-1][1]].collision == false then
+						if inmap(cox, y-1) and self:geltilecheck(cox, y) and not self:geltilecheck(cox, y-1) then
 							if self:applygel("top", cox, y) then
 								break
 							end
@@ -192,7 +185,7 @@ function gel:ceilcollide(a, b)
 	self.destroy = true
 	if a == "tile" then
 		local x, y = b.cox, b.coy
-		if not inmap(x, y+1) or (tilequads[map[x][y+1][1]].collision == false or tilequads[map[x][y+1][1]].invisible) then
+		if not inmap(x, y+1) or (not self:geltilecheck(x,y)) then
 			local x, y = b.cox, b.coy
 			self:applygel("bottom", x, y)
 		end
@@ -220,7 +213,7 @@ function gel:globalcollide(a, b)
 	end
 	if a == "tile" then
 		local x, y = b.cox, b.coy
-		if tilequads[map[x][y][1]]:getproperty("invisible", x, y) or tilequads[map[x][y][1]].grate then
+		if not self:geltilecheck(x,y) then
 			return true
 		end
 	end
@@ -260,6 +253,11 @@ function gel:applygel(side, x, y)
 		end
 	end
 	return false
+end
+
+function gel:geltilecheck(x,y)
+	local t = tilequads[map[x][y][1]]
+	return t:getproperty("collision", x, y) and t:getproperty("invisible", x, y) == false and t:getproperty("grate", x, y) == false and t.leftslant == false and t.rightslant == false
 end
 
 function gel:callback()
