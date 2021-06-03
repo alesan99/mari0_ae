@@ -7406,7 +7406,7 @@ function mario:emancipate(a)
 	local delete = {}
 	
 	for i, v in pairs(portalprojectiles) do
-		if v.payload[1] == self.playernumber then
+		if v.plnumber and v.plnumber == self.playernumber then
 			table.insert(delete, i)
 		end
 	end
@@ -8415,10 +8415,6 @@ end
 
 function mario:fire()
 	if (not noupdate) and self.controlsenabled and self.ducking == false and (not self.statue) and (not self.groundpounding) and (not self.clearpipe) then
-		if self.cappy and (not UseButtonCappy) then
-			self.cappy:trigger(self.animationdirection, "run")
-		end
-		
 		if self.yoshi then
 			if upkey(self.playernumber) then
 				if not self.jumping and not self.falling then
@@ -8480,6 +8476,10 @@ function mario:fire()
 				net_action(self.playernumber, "fire")
 			end
 			return
+		end
+
+		if self.cappy and (not UseButtonCappy) then
+			self.cappy:trigger(self.animationdirection, "run")
 		end
 
 		if self.shoe then

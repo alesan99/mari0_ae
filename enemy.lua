@@ -2588,6 +2588,7 @@ function enemy:globalcollide(a, b, c, d, dir)
 
 		if b.enemykillsinstantly then
 			self.instantdelete = true
+			self.output()
 		end
 		
 		addpoints((firepoints[self.t] or 200), self.x, self.y)
@@ -3231,10 +3232,11 @@ function enemy:autodeleted()
 end
 
 function enemy:output(transformed)
-	if (not self.outtable) then
+	if (not self.outtable) or self.outputted then
 		--for some reason the enemy hasn't spawned correctly
 		return false
 	end
+	self.outputted = true
 	for i = 1, #self.outtable do
 		if self.outtable[i][1].input then
 			self.outtable[i][1]:input("toggle", self.outtable[i][2])

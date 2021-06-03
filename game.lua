@@ -5364,7 +5364,7 @@ function shootportal(plnumber, i, sourcex, sourcey, direction, mirrored)
 	
 	objects["player"][plnumber].lastportal = i
 	
-	table.insert(portalprojectiles, portalprojectile:new(sourcex, sourcey, x, y, color, true, {objects["player"][plnumber].portal, i, cox, coy, side, tendency, x, y}, mirror, mirrored))
+	table.insert(portalprojectiles, portalprojectile:new(sourcex, sourcey, x, y, color, true, {objects["player"][plnumber].portal, i, cox, coy, side, tendency, x, y}, mirror, mirrored, plnumber))
 end
 
 function game_mousepressed(x, y, button)

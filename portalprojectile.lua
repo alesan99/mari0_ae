@@ -1,6 +1,6 @@
 portalprojectile = class:new()
 
-function portalprojectile:init(x, y, tx, ty, color, hit, payload, mirror, mirrored)
+function portalprojectile:init(x, y, tx, ty, color, hit, payload, mirror, mirrored, plnumber)
 	self.x = x
 	self.y = y
 	
@@ -16,6 +16,8 @@ function portalprojectile:init(x, y, tx, ty, color, hit, payload, mirror, mirror
 	
 	self.payload = payload
 	self.payloaddelivered = false
+
+	self.plnumber = plnumber
 	
 	self.sinestart = math.random(math.pi*10)/10
 	if mirrored then
