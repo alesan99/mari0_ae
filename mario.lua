@@ -1098,26 +1098,35 @@ function mario:update(dt)
 	
 	self.passivemoved = false
 	--rotate back to 0 (portals)
-	if self.gravitydir ~= "left" and self.gravitydir ~= "right" then
-		self.rotation = math.fmod(self.rotation, math.pi*2)
-		
-		if self.rotation < -math.pi then
-			self.rotation = self.rotation + math.pi*2
-		elseif self.rotation > math.pi then
-			self.rotation = self.rotation - math.pi*2
+	if self.gravitydir == "left" then
+		self.rotation = self.rotation - math.pi*0.5
+	elseif self.gravitydir == "right" then
+		self.rotation = self.rotation + math.pi*0.5
+	end
+	self.rotation = math.fmod(self.rotation, math.pi*2)
+	
+	if self.rotation < -math.pi then
+		self.rotation = self.rotation + math.pi*2
+	elseif self.rotation > math.pi then
+		self.rotation = self.rotation - math.pi*2
+	end
+	
+	if self.rotation > 0 then
+		self.rotation = self.rotation - portalrotationalignmentspeed*dt
+		if self.rotation < 0 then
+			self.rotation = 0
 		end
-		
+	elseif self.rotation < 0 then
+		self.rotation = self.rotation + portalrotationalignmentspeed*dt
 		if self.rotation > 0 then
-			self.rotation = self.rotation - portalrotationalignmentspeed*dt
-			if self.rotation < 0 then
-				self.rotation = 0
-			end
-		elseif self.rotation < 0 then
-			self.rotation = self.rotation + portalrotationalignmentspeed*dt
-			if self.rotation > 0 then
-				self.rotation = 0
-			end
+			self.rotation = 0
 		end
+	end
+
+	if self.gravitydir == "left" then
+		self.rotation = self.rotation + math.pi*0.5
+	elseif self.gravitydir == "right" then
+		self.rotation = self.rotation - math.pi*0.5
 	end
 	
 	if self.startimer < mariostarduration and not self.dead then
@@ -4808,9 +4817,12 @@ function mario:floorcollide(a, b)
 		self:stopjump()
 		playsound(blockhitsound)
 		return true
-	elseif (a == "lightbridgebody" or a == "tilemoving") and b.gels.top == 1 then
-		if self:bluegel("top") then
+	elseif (a == "lightbridgebody" or a == "tilemoving") then
+		if b.gels.top == 1 and self:bluegel("top") then
 			return false
+		elseif b.gels.top == 4 and a == "lightbridgebody" then
+			self:purplegel("down")
+			return true
 		end
 	elseif (a == "belt") then
 		if self.groundpounding then
@@ -4903,6 +4915,12 @@ function mario:bluegel(dir)
 			end
 		end
 	end
+end
+
+function mario:purplegel(dir)
+	self.gravitydir = dir
+	self.falling = false
+	self.jumping = false
 end
 
 function mario:stompenemy(a, b)
@@ -5541,13 +5559,16 @@ function mario:rightcollide(a, b, passive)
 			self.speedy = 0
 		end
 		return false
-	elseif (a == "lightbridgebody" or a == "tilemoving") and b.gels.left == 1 then
-		if self:bluegel("left") then
+	elseif (a == "lightbridgebody" or a == "tilemoving") then
+		if b.gels.left == 1 and self:bluegel("left") then
 			return false
+		elseif b.gels.left == 4 and a == "lightbridgebody" then
+			self:purplegel("right")
+			return true
 		end
 	end
 
-	if self.gravitydir == "right" and a ~= "tile" then
+	if self.gravitydir == "right" and a ~= "tile" and a ~= "portaltile" then
 		self.gravitydir = "down"
 	end
 	
@@ -5918,13 +5939,16 @@ function mario:leftcollide(a, b)
 			self.speedy = 0
 		end
 		return false
-	elseif (a == "lightbridgebody" or a == "tilemoving") and b.gels.right == 1 then
-		if self:bluegel("right") then
+	elseif (a == "lightbridgebody" or a == "tilemoving") then
+		if b.gels.right == 1 and self:bluegel("right") then
 			return false
+		elseif b.gels.right == 4 and a == "lightbridgebody" then
+			self:purplegel("left")
+			return true
 		end
 	end
 
-	if self.gravitydir == "left" and a ~= "tile" then
+	if self.gravitydir == "left" and a ~= "tile" and a ~= "portaltile" then
 		self.gravitydir = "down"
 	end
 	
@@ -6272,13 +6296,18 @@ function mario:ceilcollide(a, b)
 	elseif (a == "belt") and b:getgel(math.floor(self.x+self.width/2)+1) == 4 then
 		self.gravitydir = "up"
 		self.falling = false
+	elseif (a == "lightbridgebody" or a == "tilemoving") then
+		if b.gels.bottom == 4 and a == "lightbridgebody" then
+			self:purplegel("up")
+			return true
+		end
 	end
 	
 	if self.gravitydir ~= "up" then
 		self.jumping = false
 		self.falling = true
 		self.speedy = headforce
-	elseif a ~= "tile" then
+	elseif a ~= "tile" and a ~= "portaltile" then
 		self.gravitydir = "down"
 	end
 end

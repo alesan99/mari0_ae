@@ -4713,7 +4713,7 @@ function editor_mousepressed(x, y, button)
 			end
 			--close
 			local doreturn = false
-			if button == "r" and (x > rightclickobjects.x*scale and x < (rightclickobjects.x+rightclickobjects.width)*scale and 
+			if button == "r" and rightclickobjects and rightclickobjects[1] and (x > rightclickobjects.x*scale and x < (rightclickobjects.x+rightclickobjects.width)*scale and 
 				y > rightclickobjects.y*scale and y < (rightclickobjects.y+rightclickobjects.height)*scale) and
 				customrcopen ~= "region" and customrcopen ~= "path" and customrcopen ~= "trackpath" and customrcopen ~= "link" then
 				--don't close
