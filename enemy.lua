@@ -2280,6 +2280,9 @@ function enemy:shotted(dir, cause, high, fireball, star)
 			self.active = false
 		end
 	else
+		if self.shotframe then
+			self.quad = self.quadgroup[self.shotframe]
+		end
 		self.shot = true
 		self.active = false
 	end
