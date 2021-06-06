@@ -2515,7 +2515,9 @@ if android then
 
 		local button = getandroidbutton(x, y)
 		if button == "jump" and ((not editormode) or ((not editormenuopen) and (not HIDEANDROIDBUTTONS))) then --a
-			love.keypressed(controls[1]["jump"][1])
+			if not touchkey[controls[1]["jump"][1]] then
+				love.keypressed(controls[1]["jump"][1])
+			end
 			touchkey[controls[1]["jump"][1]] = id
 			return true
 		elseif button == "run" and ((not editormode) or ((not editormenuopen) and (not HIDEANDROIDBUTTONS))) then--b

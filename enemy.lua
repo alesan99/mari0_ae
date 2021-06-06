@@ -2123,6 +2123,8 @@ function enemy:update(dt)
 					end
 				end
 			end
+		end
+		if self.userect then
 			self.userect.x, self.userect.y = self.x+self.carryrange[1], self.y+self.carryrange[2]
 		end
 	end
@@ -3253,7 +3255,7 @@ function enemy:output(transformed)
 		self.userect.delete = true
 		self.destroying = true
 	end
-	if self.userect and not self.userect.delete then
+	if self.userect then
 		self.userect.delete = true
 	end
 	if self.blockportaltile and not self.dontremoveblockportaltileondeath then

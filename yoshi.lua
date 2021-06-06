@@ -118,6 +118,9 @@ function yoshi:update(dt)
 					if (not v.shot) and v.width and aabb(x, y, w, h, v.x, v.y, v.width, v.height) then
 						addpoints(firepoints[obj], v.x, v.y)
 						v:shotted(self.animationdirection)
+						if v.output then
+							v:output()
+						end
 						v.instantdelete = true
 						self.toungeenemy = {graphic=v.graphic, quad=v.quad}
 						local dobreak = true

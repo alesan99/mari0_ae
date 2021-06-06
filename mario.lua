@@ -655,6 +655,9 @@ function mario:update(dt)
 									self.yoshitoungeenemy = {graphic=v.graphic,quad=v.quad,width=v.width,height=v.height,
 										offsetX=v.offsetX or 0,offsetY=v.offsetY or 0,quadcenterX=v.quadcenterX or 0,quadcenterY=v.quadcenterY or 0,
 										animationscalex=v.animationscalex, animationscaley=v.animationscaley}
+									if v.output then
+										v:output()
+									end
 									v.instantdelete = true
 								end
 								local dobreak = true
@@ -8081,6 +8084,7 @@ function mario:flag()
 	--kill shit
 	for i, v in pairs(objects["enemy"]) do
 		if v.deleteonflagpole then
+			v:output()
 			v.instantdelete = true
 		end
 	end

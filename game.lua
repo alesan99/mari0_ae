@@ -2359,6 +2359,11 @@ function game_draw()
 					end
 				end
 			end
+			
+			for j, w in pairs(userects) do
+				love.graphics.setColor(0, 255, 255, 150)
+				love.graphics.rectangle("line", math.floor((w.x-xscroll)*16*scale)+.5, math.floor((w.y-yscroll-.5)*16*scale)+.5, w.width*16*scale-1, w.height*16*scale-1)
+			end
 			love.graphics.setLineWidth(lw)
 
 			--animation numbers
