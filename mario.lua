@@ -3750,8 +3750,23 @@ function mario:jump(force)
 					--high blue gel jump
 					if portalphysics then
 						if self.gravitydir == "down" and inmap(math.floor(self.x+1+self.width/2), math.floor(self.y+self.height+20/16)) then
-							local cox, coy = math.floor(self.x+1+self.width/2), math.floor(self.y+self.height+20/16)
-							if map[cox][coy] and map[cox][coy]["gels"] and map[cox][coy]["gels"]["top"] and map[cox][coy]["gels"]["top"] == 1 then
+							local coy = math.floor(self.y+self.height+20/16)
+							local t1, t2
+							local cox1 = math.floor(self.x)+1
+							local cox2 = math.floor(self.x+self.width)+1
+							if (self.size == 8 or self.size == 16) then
+								cox2 = math.floor(self.x+self.width/2)+1
+							end
+							if inmap(cox1, coy) then t1 = map[cox1][coy] end
+							if inmap(cox2, coy) then t2 = map[cox2][coy] end
+							local onlightbridge = false
+							for j, w in pairs(objects["lightbridgebody"]) do
+								if (cox1 == w.cox or cox2 == w.cox) and coy == w.coy and w.dir == "hor" and w.gels.top and w.gels.top == 1 then
+									onlightbridge = true
+									break
+								end
+							end
+							if ((t1 and t1["gels"]["top"] == 1) or (t2 and t2["gels"]["top"] == 1)) or onlightbridge then
 								self.speedy = -portalphysicsbluegelminforce
 								self:stopjump()
 							end
@@ -4580,7 +4595,15 @@ function mario:floorcollide(a, b)
 		end
 		
 		if map[x][y]["gels"] then
-			if map[x][y]["gels"]["top"] == 1 and self:bluegel("top") then
+			local t1, t2
+			local cox1 = math.floor(self.x)+1
+			local cox2 = math.floor(self.x+self.width)+1
+			if (self.size == 8 or self.size == 16) then
+				cox2 = math.floor(self.x+self.width/2)+1
+			end
+			if inmap(cox1, y) then t1 = map[cox1][y] end
+			if inmap(cox2, y) then t2 = map[cox2][y] end
+			if ((t1 and t1["gels"]["top"] == 1) or (t2 and t2["gels"]["top"] == 1)) and self:bluegel("top") then
 				return false
 			end
 		end

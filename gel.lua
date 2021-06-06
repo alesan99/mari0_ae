@@ -185,7 +185,7 @@ function gel:ceilcollide(a, b)
 	self.destroy = true
 	if a == "tile" then
 		local x, y = b.cox, b.coy
-		if not inmap(x, y+1) or (not self:geltilecheck(x,y)) then
+		if not inmap(x, y+1) or (not self:geltilecheck(x,y+1)) then
 			local x, y = b.cox, b.coy
 			self:applygel("bottom", x, y)
 		end
