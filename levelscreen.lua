@@ -176,7 +176,7 @@ function levelscreen_update(dt)
 		levelscreentimer = levelscreentimer + dt
 	end
 	
-	if CLIENT and levelscreentimer > blacktime+5 and love.keyboard.isDown("escape") then --netplay
+	if CLIENT and levelscreentimer > blacktime+5 and (love.keyboard.isDown("escape") or (android and jumpkey(1))) then --netplay
 		net_quit()
 	end
 	

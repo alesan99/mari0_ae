@@ -42,11 +42,12 @@
 	-HansAgain for new portal sprites, new mario sprites, and pneumatic tubes
 	-Subpixel for bowser3, rotodiscs, ninji, and splunkin sprites
 	-Critfish for overgrown portal sprites
-	-Aidan for general bugtesting
+	-Aidan for general bugtesting and misc. contributions on github
 	-MadNyle for propeller sound effect and mega mushroom
 	-fußmatte for helping create a TON of new characters for the font and Esperanto Translation
 	-HugoBDesigner for Portugese-Br translation
 	-Los for Russian Translation
+	-William for contributions on github
 	-----------------------------------------------------------------------------
 ]]
 
@@ -58,8 +59,8 @@ local debugGraphs = false
 VERSION = 13.0118
 VERSIONSTRING = "13c"
 
-android = (love.system.getOS() == "Android" or love.system.getOS() == "iOS") --[DROID]
-androidtest = false--testing android on pc
+android = true--(love.system.getOS() == "Android" or love.system.getOS() == "iOS") --[DROID]
+androidtest = true--testing android on pc
 local touchkey = {}
 local touchrunlock = false
 local antiandroidkeyrepeat = false --fucking stupid android keyboards
@@ -1029,13 +1030,8 @@ function love.load()
 
 	--android buttons
 	if android then
-		aeditorbuttonsimg = love.graphics.newImage("graphics/GUI/androideditorbuttons.png")
-		aeditorbuttonsq = {}
-		for i = 1, math.floor(aeditorbuttonsimg:getWidth()/aeditorbuttonsimg:getHeight()) do
-			aeditorbuttonsq[i] = love.graphics.newQuad(aeditorbuttonsimg:getHeight()*(i-1),0,
-			aeditorbuttonsimg:getHeight(),aeditorbuttonsimg:getHeight(),
-			aeditorbuttonsimg:getWidth(),aeditorbuttonsimg:getHeight())
-		end
+		require "android"
+		androidLoad()
 	end
 
 	--debug graphs
@@ -1134,6 +1130,10 @@ function love.update(dt)
 		memGraph:update(dt)
 		drawGraph:update(dt, drawGraph.drawcalls)
 	end
+
+	if android then
+		androidUpdate(dt)
+	end
 	
 	notice.update(dt)
 end
@@ -1162,6 +1162,10 @@ function love.draw()
 			else
 				love.graphics.setColor(255, 255, 255)
 				love.graphics.draw(canvas, 0, 0, 0, winwidth/(width*16*scale), winheight/(224*scale))
+			end
+
+			if android then
+				androidDraw()
 			end
 		else
 			love.graphics.scale(winwidth/(width*16*scale), winheight/(224*scale))
@@ -1209,123 +1213,6 @@ function lovedraw()
 	if showfps then
 		love.graphics.setColor(255, 255, 255, 180)
 		properprintfast(love.timer.getFPS(), 2*scale, 2*scale)
-	end
-	
-	if android and not androidHIDE then
-		local b = androidbuttons
-		if ((not editormode) or ((not editormenuopen) and (not HIDEANDROIDBUTTONS))) then --[DROID]
-			love.graphics.setLineWidth(1)
-			--a
-			if love.keyboard.isDown(controls[1]["jump"][1]) then
-				love.graphics.setColor(100, 100, 100, 140)
-			else
-				love.graphics.setColor(30, 30, 30, 80)
-			end
-			local x, y, r = (b["jump"][1]+b["jump"][3])/2, (b["jump"][2]+b["jump"][4])/2, (b["jump"][3]-b["jump"][1])/2
-			love.graphics.circle("fill", x, y, r, 8)
-			love.graphics.setColor(255, 255, 255, 140)
-			love.graphics.circle("line", x, y, r, 8)
-			
-			--b
-			if (touchrunlock and gamestate == "game") or love.keyboard.isDown(controls[1]["run"][1]) then
-				love.graphics.setColor(100, 100, 100, 140)
-			else
-				love.graphics.setColor(30, 30, 30, 80)
-			end
-			local x, y, r = (b["run"][1]+b["run"][3])/2, (b["run"][2]+b["run"][4])/2, (b["run"][3]-b["run"][1])/2
-			love.graphics.circle("fill", x, y, r, 8)
-			love.graphics.setColor(255, 255, 255, 140)
-			love.graphics.circle("line", x, y, r, 8)
-			
-			--b+
-			if gamestate == "game" then
-				if touchrunlock then
-					love.graphics.setColor(100, 100, 100, 140)
-				else
-					love.graphics.setColor(30, 30, 30, 80)
-				end
-				local x, y, r = (b["runlock"][1]+b["runlock"][3])/2, (b["runlock"][2]+b["runlock"][4])/2, (b["runlock"][3]-b["runlock"][1])/2
-				love.graphics.circle("fill", x, y, r, 8)
-				love.graphics.setColor(255, 255, 255, 140)
-				love.graphics.circle("line", x, y, r, 8)
-			end
-
-			--directions
-			local directions = {"left", "right", "up", "down"}
-			for i = 1, #directions do
-				local dir = directions[i]
-				if love.keyboard.isDown(controls[1][dir][1]) then
-					love.graphics.setColor(100, 100, 100, 140)
-				else
-					love.graphics.setColor(30, 30, 30, 80)
-				end
-				local x, y, w, h = b[dir][1], b[dir][2], b[dir][3]-b[dir][1], b[dir][4]-b[dir][2]
-				love.graphics.rectangle("fill", x, y, w, h)
-				love.graphics.setColor(255, 255, 255, 100)
-				love.graphics.rectangle("line", x+.5, y+.5, w, h)
-			end
-			
-			if gamestate == "game" and (not editormode) and objects and objects["player"][1] and objects["player"][1].portalgun then
-				for i = 1, 3 do
-					if i == 1 then
-						love.graphics.setColor(30, 30, 30, 80)
-						love.graphics.circle("fill", 19, 85+27*(i-1), 12.5, 8)
-						love.graphics.setColor(255, 255, 255)
-						properprint("r", 15, 81+27*(i-1))
-					elseif i == 2 then
-						love.graphics.setColor(232, 130, 30, 100)
-						love.graphics.circle("fill", 19, 85+27*(i-1), 12.5, 8)
-						love.graphics.setColor(255, 255, 255)
-						properprint("2", 15, 81+27*(i-1))
-					elseif i == 3 then
-						love.graphics.setColor(60, 188, 252, 100)
-						love.graphics.circle("fill", 19, 85+27*(i-1), 12.5, 8)
-						love.graphics.setColor(255, 255, 255)
-						properprint("1", 15, 81+27*(i-1))
-					end
-				end
-			end
-			
-			love.graphics.setColor(255, 255, 255)
-			properprint("a", 366, 190)
-			properprint("b", 313, 190)
-			if gamestate == "game" then
-				properprint("+", 276, 202)
-			end
-		end
-
-		if editormode and (not editormenuopen) then
-			local i2 = #aeditorbuttons
-			local bx, by = 2, 2
-			if HIDEANDROIDBUTTONS then i2 = 1 end
-			for i = 1, i2 do
-				if i == 4 and ANDROIDRIGHTCLICK then
-					love.graphics.setColor(80, 80, 80, 200)
-				else
-					love.graphics.setColor(20, 20, 20, 200)
-				end
-				love.graphics.rectangle("fill", bx, by, aeditorbuttonsw, aeditorbuttonsw)
-				love.graphics.setColor(255, 255, 255, 100)
-				love.graphics.rectangle("line", bx+.5, by+.5, aeditorbuttonsw, aeditorbuttonsw)
-				love.graphics.setColor(255, 255, 255)
-				love.graphics.draw(aeditorbuttonsimg, aeditorbuttonsq[i], bx, by)
-
-				bx = bx + aeditorbuttonsw + 2
-			end
-		end
-		
-		--start
-		if touchkey["return"] or touchkey["escape"] then
-			love.graphics.setColor(100, 100, 100, 140)
-		else
-			love.graphics.setColor(30, 30, 30, 80)
-		end
-		local x, y, w, h = b["start"][1], b["start"][2], b["start"][3]-b["start"][1], b["start"][4]-b["start"][2]
-		love.graphics.rectangle("fill", x, y, w, h)
-		love.graphics.setColor(255, 255, 255, 100)
-		love.graphics.rectangle("line", x+.5, y+.5, w, h)
-		love.graphics.setColor(255, 255, 255)
-		properprint("start", 354, 9)
 	end
 
 	if jsonerrorwindow.opened then
@@ -2144,6 +2031,10 @@ end
 
 lmx = love.mouse.getX
 function love.mouse.getX()
+	if android then
+		local x,y = androidGetMouse()
+		return x
+	end
 	local x = lmx()
 	if resizable and letterboxfullscreen and canvassupported and canvas then
 		local cw, ch = canvas:getWidth(), canvas:getHeight()--current size
@@ -2159,6 +2050,10 @@ function love.mouse.getX()
 end
 lmy = love.mouse.getY
 function love.mouse.getY()
+	if android then
+		local x,y = androidGetMouse()
+		return y
+	end
 	local y = lmy()
 	if resizable and letterboxfullscreen and canvassupported and canvas then
 		local cw, ch = canvas:getWidth(), canvas:getHeight()--current size
@@ -2173,6 +2068,9 @@ function love.mouse.getY()
 	return y
 end
 function love.mouse.getPosition()
+	if android then
+		return androidGetMouse()
+	end
 	local x, y = love.mouse.getX(), love.mouse.getY()
 	return x, y
 end
@@ -2294,16 +2192,28 @@ function love.keyreleased(key, unicode)
 end
 
 function love.textinput(c)
-	if debugconsole and debuginputon then
-		debuginput = debuginput .. c
+	if android and not androidtest then --[[DROID]]
+		love.keypressed(c)
+	else
+		if debugconsole and debuginputon then
+			debuginput = debuginput .. c
+		end
 	end
 end
 
 function love.mousepressed(x, y, button, istouch)
 	button = nummousebutton(button)
-	if resizable and letterboxfullscreen and canvassupported and canvas then
+	if android then
+		if istouch == true then
+			return false
+		elseif androidtest and istouch ~= "simulated" then
+			love.touchpressed(1,x,y)
+			return false
+		end
+		x, y = x/(winwidth/gamewidth), y/(winheight/gameheight)
+	elseif resizable and letterboxfullscreen and canvassupported and canvas then
 		x, y = love.mouse.getPosition()
-	elseif android or resizable then
+	elseif resizable then
 		x, y = x/(winwidth/gamewidth), y/(winheight/gameheight)
 	end
 
@@ -2315,22 +2225,7 @@ function love.mousepressed(x, y, button, istouch)
 	if gamestate == "menu" or gamestate == "mappackmenu" or gamestate == "onlinemenu" or gamestate == "lobby" or gamestate == "options" then
 		menu_mousepressed(x, y, button)
 	elseif gamestate == "game" then
-		if (not android) or editormode then
-			local pass = true
-			if android and editormode then
-				--only register "click" if not touching controls
-				if getandroidbutton(x, y) then
-					pass = false
-				end
-				if button ~= "r" and  (not editormenuopen) and (not rightclickmenuopen) and ANDROIDRIGHTCLICK then
-					pass = false
-				end
-			end
-
-			if pass then
-				game_mousepressed(x, y, button)
-			end
-		end
+		game_mousepressed(x, y, button)
 	elseif gamestate == "intro" then
 		intro_mousepressed()
 	end
@@ -2386,9 +2281,17 @@ end
 
 function love.mousereleased(x, y, button, istouch)
 	button = nummousebutton(button)
-	if resizable and letterboxfullscreen and canvassupported and canvas then
+	if android then
+		if istouch == true then
+			return false
+		elseif androidtest and istouch ~= "simulated" then
+			love.touchreleased(1,x,y)
+			return false
+		end
+		x, y = x/(winwidth/gamewidth), y/(winheight/gameheight)
+	elseif resizable and letterboxfullscreen and canvassupported and canvas then
 		x, y = love.mouse.getPosition()
-	elseif android or resizable then
+	elseif resizable then
 		x, y = x/(winwidth/gamewidth), y/(winheight/gameheight)
 	end
 
@@ -2415,7 +2318,17 @@ function love.mousereleased(x, y, button, istouch)
 	end
 end
 
-function love.mousemoved(x, y, dx, dy)
+function love.mousemoved(x, y, dx, dy, istouch)
+	if android then
+		if istouch == true then
+			return false
+		elseif androidtest and istouch ~= "simulated" then
+			if love.mouse.isDown("l","notAndroid") then
+				love.touchmoved(1,x,y,dx,dy)
+			end
+			return false
+		end
+	end
 	if resizable and letterboxfullscreen and canvassupported and canvas then
 		x, y = love.mouse.getPosition()
 		local cw, ch = canvas:getWidth(), canvas:getHeight()--current size
@@ -2453,240 +2366,14 @@ function love.filedropped(file)
 	end
 end
 
---[DROID]
---ANDROID STUFF
-local mousetx = 0
-local mousety = 0
-local mouseid = false
-
-if android then
-	androidbuttons = {
-		["jump"] = {346, 169, 395, 219},
-		["run"] = {292, 169, 342, 219},
-		["start"] = {352, 5, 395, 21},
-		["left"] = {5+5, 159, 35+5, 189},
-		["right"] = {65+5, 159, 95+5, 189},
-		["up"] = {35+5, 129, 65+5, 159},
-		["down"] = {35+5, 189, 65+5, 219},
-		["runlock"] = {267, 194, 267+25, 194+25}
-	}
-	aeditorbuttonsw = 24
-	aeditorbuttons = {
-		{function() HIDEANDROIDBUTTONS = not HIDEANDROIDBUTTONS end},
-		{function() editentities = false
-			currenttile = 1 end},
-		{function() editentities = true
-			currenttile = 1 end},
-		{function() ANDROIDRIGHTCLICK = not ANDROIDRIGHTCLICK end},
-		{function() backgroundtilemode = not backgroundtilemode end},
-	}
-
-	function getandroidbutton(x, y)
-		for i, b in pairs(androidbuttons) do
-			if x > b[1] and y > b[2] and x < b[3] and y < b[4] then
-				return i
-			end
-		end
-		if editormode and (not editormenuopen) then
-			local i2 = #aeditorbuttons
-			local bx, by = 2, 2
-			if HIDEANDROIDBUTTONS then i2 = 1 end
-			for i = 1, i2 do
-				if x > bx and x < bx+aeditorbuttonsw and y > by and y < by+aeditorbuttonsw then
-					return i
-				end
-				bx = bx + aeditorbuttonsw + 2
-			end
-		end
-		return false
-	end
-
-	function love.keyboard.isDown(k)
-		if k == "space" then k = " " end
-		if k == controls[1]["run"][1] and touchrunlock then
-			return true
-		end
-		return touchkey[k] or false
-	end
-	
-	function love.touchpressed(id, x, y, dx, dy, pressure)
-		local ox, oy = x, y
-		x, y = x/(winwidth/gamewidth), y/(winheight/gameheight)
-
-		local button = getandroidbutton(x, y)
-		if button == "jump" and ((not editormode) or ((not editormenuopen) and (not HIDEANDROIDBUTTONS))) then --a
-			if not touchkey[controls[1]["jump"][1]] then
-				love.keypressed(controls[1]["jump"][1])
-			end
-			touchkey[controls[1]["jump"][1]] = id
-			return true
-		elseif button == "run" and ((not editormode) or ((not editormenuopen) and (not HIDEANDROIDBUTTONS))) then--b
-			love.keypressed(controls[1]["run"][1])
-			touchkey[controls[1]["run"][1]] = id
-			if gamestate == "game" then
-				love.keypressed(controls[1]["use"][1])
-				touchkey[controls[1]["use"][1]] = id
-			end
-			return true
-		elseif button == "start" then--start
-			if gamestate == "game" or gamestate == "options" or gamestate == "mappackmenu" or gamestate == "onlinemenu" then
-				love.keypressed("escape")
-				touchkey["escape"] = id
-			else
-				love.keypressed("return")
-				touchkey["return"] = id
-			end
-			return true
-		end
-		if button == "left" and ((not editormode) or ((not editormenuopen) and (not HIDEANDROIDBUTTONS))) then--left
-			love.keypressed(controls[1]["left"][1])
-			touchkey[controls[1]["left"][1]] = id
-			return true
-		elseif button == "right" and ((not editormode) or ((not editormenuopen) and (not HIDEANDROIDBUTTONS))) then--right
-			love.keypressed(controls[1]["right"][1])
-			touchkey[controls[1]["right"][1]] = id
-			return true
-		elseif button == "up" and ((not editormode) or ((not editormenuopen) and (not HIDEANDROIDBUTTONS))) then--up
-			love.keypressed(controls[1]["up"][1])
-			touchkey[controls[1]["up"][1]] = id
-			return true
-		elseif button == "down" and ((not editormode) or ((not editormenuopen) and (not HIDEANDROIDBUTTONS))) then --down
-			love.keypressed(controls[1]["down"][1])
-			touchkey[controls[1]["down"][1]] = id
-			return true
-		end
-		if gamestate == "game" and (not editormode) and objects and objects["player"][1] and objects["player"][1].portalgun then
-			for i = 1, 3 do
-				if x > 6 and y > 73+27*(i-1) and x < 6+25 and y < 73+25+27*(i-1) then --shoot portal
-					if i == 1 then
-						love.keypressed(controls[1]["reload"][1])
-						touchkey[controls[1]["reload"][1]] = id
-					elseif i == 2 then
-						game_mousepressed(x, y, "r")
-					elseif i == 3 then
-						game_mousepressed(x, y, "l")
-					end
-					return true
-				end
-			end
-		end
-		if gamestate == "game" and button == "runlock" then
-			touchrunlock = not touchrunlock
-			return true
-		end
-		if editormode and (not editormenuopen) then
-			local i2 = #aeditorbuttons
-			local bx, by = 2, 2
-			if HIDEANDROIDBUTTONS then i2 = 1 end
-			for i = 1, i2 do
-				if x > bx and x < bx+aeditorbuttonsw and y > by and y < by+aeditorbuttonsw then
-					aeditorbuttons[i][1]()
-					return true
-				end
-				bx = bx + aeditorbuttonsw + 2
-			end
-		end
-		
-		--rightclick
-		if editormode and (not editormenuopen) and ((not rightclickmenuopen) or (customrcopen and customrcopen == "trackpath")) and ANDROIDRIGHTCLICK then--love.keyboard.isDown(controls[1]["run"][1]) then
-			mousetx = ox
-			mousety = oy
-			editor_mousepressed(x, y, "r")
-			return true
-		end
-		
-		mousetx = ox
-		mousety = oy
-		mouseid = id
-	end
-
-	function love.touchmoved(id, x, y, dx, dy, pressure)
-		if mouseid == id then
-			mousetx = x
-			mousety = y
-		end
-		--slide finger to different button
-		local ax, ay = x/(winwidth/gamewidth), y/(winheight/gameheight)
-		local but = getandroidbutton(ax, ay)
-		if but and controls[1][but] and not touchkey[controls[1][but][1]] then
-			love.touchreleased(id, x, y, dx, dy, pressure)
-			love.touchpressed(id, x, y, dx, dy, pressure)
-		end
-	end
-
-	function love.touchreleased(id, x, y, dx, dy, pressure)
-		--find and release button
-		for key, touchid in pairs(touchkey) do
-			if id == touchid then
-				love.keyreleased(key)
-				touchkey[key] = false
-				if key == controls[1]["run"][1] and gamestate == "game" then
-					love.keypressed(controls[1]["use"][1])
-					touchkey[controls[1]["use"][1]] = false
-				end
-				return true
-			end
-		end
-		if mouseid == id then
-			mousetx = x
-			mousety = y
-			mouseid = false
-		end
-	end
-
-	if (not androidtest) then
-		--these may be causing issues with touching, TODO?
-		lmx = love.mouse.getX
-		function love.mouse.getX()
-			if resizable and letterboxfullscreen then
-				local cw, ch = gamewidth, gameheight--current size
-				local tw, th = winwidth, winheight--target size
-				local s
-				if cw/tw > ch/th then s = tw/cw
-				else s = th/ch end
-				return math.max(0, math.min(cw*s, mousetx - ((tw*0.5)-(cw*s*0.5))))/s
-			else
-				return mousetx/(winwidth/gamewidth)
-			end
-		end
-		lmy = love.mouse.getY
-		function love.mouse.getY()
-			if resizable and letterboxfullscreen then
-				local cw, ch = gamewidth, gameheight--current size
-				local tw, th = winwidth, winheight--target size
-				local s
-				if cw/tw > ch/th then s = tw/cw
-				else s = th/ch end
-				return math.max(0, math.min(ch*s, mousety - ((th*0.5)-(ch*s*0.5))))/s
-			else
-				return mousety/(winheight/gameheight)
-			end
-		end
-
-		function love.mouse.isDown(button)
-			local target = "l"
-			if ANDROIDRIGHTCLICK then--love.keyboard.isDown(controls[1]["run"][1]) then
-				target = "r"
-			end
-			return (button == target and mouseid)
-		end
-		function love.mouse.getPosition()
-			local x, y = love.mouse.getX(), love.mouse.getY()
-			return x, y
-		end
-	end
-	function love.textinput(c)
-		love.keypressed(c)
-	end
-end
-
 --really lazy 0.10.0 conversion
 local oldmouse_isDown = love.mouse.isDown
-if not android then
-	function love.mouse.isDown(b)
-		b = mousebuttonnum(b)
-		return oldmouse_isDown(b)
+function love.mouse.isDown(b,notAndroid)
+	b = mousebuttonnum(b)
+	if android and not notAndroid then
+		return androidMouseDown(b)
 	end
+	return oldmouse_isDown(b)
 end
 
 local nummousebuttont = {"l", "r", "m", "x1", "x2", l = 1, r = 2, m = 3, x1 = 4, x2 = 5}

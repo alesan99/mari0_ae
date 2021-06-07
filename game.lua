@@ -7796,44 +7796,44 @@ end
 
 function runkey(i)
 	local s = controls[i]["run"]
-	return checkkey(s)
+	return checkkey(s,i,"run")
 end
 
 function rightkey(i)
 	local s = controls[i]["right"]
-	return checkkey(s)
+	return checkkey(s,i,"right")
 end
 
 function leftkey(i)
 	local s = controls[i]["left"]
-	return checkkey(s)
+	return checkkey(s,i,"left")
 end
 
 function downkey(i)
 	local s = controls[i]["down"]
-	return checkkey(s)
+	return checkkey(s,i,"down")
 end
 
 function upkey(i)
 	local s = controls[i]["up"]
-	return checkkey(s)
+	return checkkey(s,i,"up")
 end
 
 function jumpkey(i)
 	local t = {}
 	local s = controls[i]["jump"]
-	return checkkey(s)
+	return checkkey(s,i,"jump")
 end
 
 function usekey(i)
 	local s = controls[i]["use"]
-	return checkkey(s)
+	return checkkey(s,i,"use")
 end
 
 function reloadkey(i)
 	local t = {}
 	local s = controls[i]["reload"]
-	return checkkey(s)
+	return checkkey(s,i,"reload")
 end
 
 function keydown(s, i)
@@ -7857,7 +7857,7 @@ function keydown(s, i)
 	return false
 end
 
-function checkkey(s)
+function checkkey(s,i,n)
 	if s[1] == "joy" then
 		if s[3] == "hat" then
 			if string.match(love.joystick.getHat(s[2], s[4]), s[5]) then
@@ -7886,6 +7886,8 @@ function checkkey(s)
 				end
 			end
 		end
+	elseif s[1] and android then
+		return androidButtonDown(i,n)
 	elseif s[1] then
 		if love.keyboard.isDown(s[1]) then
 			return true

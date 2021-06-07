@@ -1,5 +1,5 @@
 --i figured i should start using local functions despite 1.6 using like none
-local undo_clear, undo_store, undo_stopstore, undo_undo
+local undo_clear, undo_store, undo_stopstore--[[, undo_undo]]
 local meta_data, promptedmetadatasave
 local updatetilesscrollbar, updatelevelscrollbar
 local worldscrollbarheight, levelscrollbarheight
@@ -485,7 +485,7 @@ function editor_update(dt)
 	if editormenuopen == false or minimapmoving then
 		--key scroll
 		if (not rightclickmenuopen) or customrcopen == "region" or customrcopen == "link" or customrcopen == "path" or customrcopen == "trackpath" or minimapmoving then
-			if (love.keyboard.isDown("left") or (android and love.keyboard.isDown(controls[1]["left"][1]) and not autoscroll)) and not brushsizetoggle then
+			if (love.keyboard.isDown("left") or (android and leftkey(1) and not autoscroll)) and not brushsizetoggle then
 				autoscroll = false
 				guielements["autoscrollcheckbox"].var = autoscroll
 				splitxscroll[1] = splitxscroll[1] - 30*gdt
@@ -493,7 +493,7 @@ function editor_update(dt)
 					splitxscroll[1] = 0
 				end
 				generatespritebatch()
-			elseif (love.keyboard.isDown("right") or (android and love.keyboard.isDown(controls[1]["right"][1]) and not autoscroll)) and not brushsizetoggle then
+			elseif (love.keyboard.isDown("right") or (android and rightkey(1) and not autoscroll)) and not brushsizetoggle then
 				autoscroll = false
 				guielements["autoscrollcheckbox"].var = autoscroll
 				splitxscroll[1] = splitxscroll[1] + 30*gdt
@@ -503,7 +503,7 @@ function editor_update(dt)
 				generatespritebatch()
 			end
 			if mapheight ~= 15 and not brushsizetoggle then
-				if (love.keyboard.isDown("up") or (android and love.keyboard.isDown(controls[1]["up"][1]) and not autoscroll)) then
+				if (love.keyboard.isDown("up") or (android and upkey(1) and not autoscroll)) then
 					autoscroll = false
 					guielements["autoscrollcheckbox"].var = autoscroll
 					splityscroll[1] = splityscroll[1] - 30*gdt
@@ -511,7 +511,7 @@ function editor_update(dt)
 						splityscroll[1] = 0
 					end
 					generatespritebatch()
-				elseif (love.keyboard.isDown("down") or (android and love.keyboard.isDown(controls[1]["down"][1]) and not autoscroll)) then
+				elseif (love.keyboard.isDown("down") or (android and downkey(1) and not autoscroll)) then
 					autoscroll = false
 					guielements["autoscrollcheckbox"].var = autoscroll
 					splityscroll[1] = splityscroll[1] + 30*gdt
@@ -1143,7 +1143,7 @@ function editor_draw()
 		elseif tileselection and tileselection.finished then
 			love.graphics.setColor(255, 255, 255, 200)
 			properprintF(TEXT["move:left click\ncopy:ctrl+c\npaste:ctrl+v\ncut:ctrl+x\ndelete:backspace/delete\nsave as object:ctrl+s"], 1*scale, (height*16-6*10)*scale)
-		elseif ctrlpressed and not love.mouse.isDown("left") then
+		elseif ctrlpressed and not love.mouse.isDown("l") then
 			love.graphics.setColor(255, 255, 255, 200)
 			properprintF(TEXT["undo:ctrl+z\ntile selection:left click\nentity selection:ctrl+e\nselect entire map:ctrl+a"], 1*scale, (height*16-4*10)*scale)
 		elseif backgroundtilemode or assistmode or editorstate == "linktool" or editorstate == "portalgun" or editorstate == "selectiontool" or editorstate == "powerline" then
@@ -1295,7 +1295,8 @@ function editor_draw()
 						local platwidth = math.floor((rightclickobjects[2].value*9+1)*2)/2
 						local dx, dy = 0, 0
 						if customrcopen ~= "platformfall" then
-							dx, dy = round(rightclickobjects[4].value*30-15, 4), round(rightclickobjects[6].value*30-15, 4)
+							dx = round(rightclickobjects[4].value*(rightclickobjects[4].rcrange[2]-rightclickobjects[4].rcrange[1])+rightclickobjects[4].rcrange[1], 4)
+							dy = round(rightclickobjects[6].value*(rightclickobjects[6].rcrange[2]-rightclickobjects[6].rcrange[1])+rightclickobjects[6].rcrange[1], 4)
 						end
 						local x, y = rightclickmenucox, rightclickmenucoy
 						local offx, offy = 0, 0
@@ -4986,7 +4987,7 @@ function editor_mousepressed(x, y, button)
 						currenttile = entitiesform[list][tile]
 						editorclose()
 						allowdrag = false
-					elseif list and not android then --a little funky on android
+					elseif list then --a little funky on android
 						if not entitiesform[list].hidden then --hide
 							entitiesform[list].hidden = true
 							entitiesform[list].h = 0
@@ -5879,6 +5880,9 @@ function startrctrack(var) --track path
 	closecustomrc(true)
 	rightclickobjects = {}
 	customrcopen = "trackpath"
+	if android then
+		ANDROIDRIGHTCLICK = false
+	end
 	rightclickmenuopen = true
 end
 
@@ -6421,7 +6425,7 @@ function editor_keypressed(key)
 end
 
 function editor_mousemoved(x, y, dx, dy)
-	if love.mouse.isDown("1") then
+	if love.mouse.isDown("l") then
 		if minimapmoving then
 			local w = width*16-52
 			local h = height*16-52

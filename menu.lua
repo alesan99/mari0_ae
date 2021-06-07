@@ -1,4 +1,5 @@
 local languagemenuopen = false
+local menu_updatemouseselection
 function menu_load()
 	love.audio.stop()
 	editormode = false
@@ -224,12 +225,12 @@ function menu_update(dt)
 		if characters.data[mariocharacter[skinningplayer]].colorables and optionsselection > 5 and optionsselection < 9 then
 			local colorRGB = optionsselection-5
 			
-			if (love.keyboard.isDown("right") or love.keyboard.isDown("d")) and mariocolors[skinningplayer][colorsetedit][colorRGB] < 255 then
+			if (love.keyboard.isDown("right") or rightkey(1)) and mariocolors[skinningplayer][colorsetedit][colorRGB] < 255 then
 				mariocolors[skinningplayer][colorsetedit][colorRGB] = mariocolors[skinningplayer][colorsetedit][colorRGB] + RGBchangespeed*dt
 				if mariocolors[skinningplayer][colorsetedit][colorRGB] > 255 then
 					mariocolors[skinningplayer][colorsetedit][colorRGB] = 255
 				end
-			elseif (love.keyboard.isDown("left") or love.keyboard.isDown("a")) and mariocolors[skinningplayer][colorsetedit][colorRGB] > 0 then
+			elseif (love.keyboard.isDown("left") or leftkey(1)) and mariocolors[skinningplayer][colorsetedit][colorRGB] > 0 then
 				mariocolors[skinningplayer][colorsetedit][colorRGB] = mariocolors[skinningplayer][colorsetedit][colorRGB] - RGBchangespeed*dt
 				if mariocolors[skinningplayer][colorsetedit][colorRGB] < 0 then
 					mariocolors[skinningplayer][colorsetedit][colorRGB] = 0
@@ -237,14 +238,14 @@ function menu_update(dt)
 			end
 			
 		elseif (characters.data[mariocharacter[skinningplayer]].colorables and optionsselection == 9) or (not characters.data[mariocharacter[skinningplayer]].colorables and optionsselection == 5) then
-			if (love.keyboard.isDown("right") or love.keyboard.isDown("d")) and portalhues[skinningplayer][1] < 1 then
+			if (love.keyboard.isDown("right") or rightkey(1)) and portalhues[skinningplayer][1] < 1 then
 				portalhues[skinningplayer][1] = portalhues[skinningplayer][1] + huechangespeed*dt
 				if portalhues[skinningplayer][1] > 1 then
 					portalhues[skinningplayer][1] = 1
 				end
 				portalcolor[skinningplayer][1] = getrainbowcolor(portalhues[skinningplayer][1])
 				
-			elseif (love.keyboard.isDown("left") or love.keyboard.isDown("a")) and portalhues[skinningplayer][1] > 0 then
+			elseif (love.keyboard.isDown("left") or leftkey(1)) and portalhues[skinningplayer][1] > 0 then
 				portalhues[skinningplayer][1] = portalhues[skinningplayer][1] - huechangespeed*dt
 				if portalhues[skinningplayer][1] < 0 then
 					portalhues[skinningplayer][1] = 0
@@ -253,14 +254,14 @@ function menu_update(dt)
 			end
 			
 		elseif (characters.data[mariocharacter[skinningplayer]].colorables and optionsselection == 10) or (not characters.data[mariocharacter[skinningplayer]].colorables and optionsselection == 6) then
-			if (love.keyboard.isDown("right") or love.keyboard.isDown("d")) and portalhues[skinningplayer][2] < 1 then
+			if (love.keyboard.isDown("right") or rightkey(1)) and portalhues[skinningplayer][2] < 1 then
 				portalhues[skinningplayer][2] = portalhues[skinningplayer][2] + huechangespeed*dt
 				if portalhues[skinningplayer][2] > 1 then
 					portalhues[skinningplayer][2] = 1
 				end
 				portalcolor[skinningplayer][2] = getrainbowcolor(portalhues[skinningplayer][2])
 				
-			elseif (love.keyboard.isDown("left") or love.keyboard.isDown("a")) and portalhues[skinningplayer][2] > 0 then
+			elseif (love.keyboard.isDown("left") or leftkey(1)) and portalhues[skinningplayer][2] > 0 then
 				portalhues[skinningplayer][2] = portalhues[skinningplayer][2] - huechangespeed*dt
 				if portalhues[skinningplayer][2] < 0 then
 					portalhues[skinningplayer][2] = 0
@@ -288,54 +289,7 @@ function menu_update(dt)
 	--use mouse to select
 	local x, y = love.mouse.getPosition()
 	if (x ~= oldmouse[1] or y ~= oldmouse[2]) and gamestate == "menu" and (not DisableMouseInMainMenu) and (not languagemenuopen) then
-		if selectworldopen then
-			local x, y = x/scale, y/scale
-			local sc = selectworldcursor
-			local v = math.ceil(sc/8)*8-7
-			
-			local i2 = 1
-			for i = v, v+7 do
-				local world = i
-				if hudworldletter and i > 9 and i <= 9+#alphabet then
-					world = alphabet:sub(i-9, i-9)
-				end
-				if reachedworlds[mappack][i] and x > (54+(i2-1)*20) and x < (54+(i2-1)*20)+12 and y > 128 and y < 140 then
-					selectworldcursor = i
-					break
-				end
-				i2 = i2 + 1
-			end
-		else
-			mouseonselect = false
-			local x, y = x/scale, y/scale
-			--continue game
-			if continueavailable then
-				if x > (143-(math.ceil(utf8.len(TEXT["continue game"])/2)*8)) and y > 122 and x < (143+(math.ceil(utf8.len(TEXT["continue game"])/2)*8)) and y < 122+8 then
-					selection = 0
-					mouseonselect = 0
-				end
-			end
-			--player game
-			if x > (143-(math.ceil((utf8.len(TEXT["player game"])+2)/2)*8)) and y > 138 and x < (143+(math.ceil((utf8.len(TEXT["player game"])+2)/2)*8)) and y < 138+8 then
-				selection = 1
-				mouseonselect = 1
-			end
-			--level editor
-			if x > (143-(math.ceil(utf8.len(TEXT["level editor"])/2)*8)) and y > 154 and x < (143+(math.ceil(utf8.len(TEXT["level editor"])/2)*8)) and y < 154+8 then
-				selection = 2
-				mouseonselect = 2
-			end
-			--select mappack
-			if x > (143-(math.ceil(utf8.len(TEXT["select mappack"])/2)*8)) and y > 170 and x < (143+(math.ceil(utf8.len(TEXT["select mappack"])/2)*8)) and y < 170+8 then
-				selection = 3
-				mouseonselect = 3
-			end
-			--options
-			if x > (143-(math.ceil(utf8.len(TEXT["options"])/2)*8)) and y > 186 and x < (143+(math.ceil(utf8.len(TEXT["options"])/2)*8)) and y < 186+8 then
-				selection = 4
-				mouseonselect = 4
-			end
-		end
+		menu_updatemouseselection(x,y)
 	end
 	oldmouse = {x, y}
 	
@@ -2813,6 +2767,7 @@ function menu_mousepressed(x, y, button)
 		return
 	end
 	if gamestate == "menu" then
+		menu_updatemouseselection(x,y)
 		if mouseonselect then
 			if selectworldopen then
 				local x, y = x/scale, y/scale
@@ -3262,6 +3217,57 @@ function menu_filedropped(file)
 				love.filesystem.remove(newfilepath)
 				notice.new("Could not load " .. filename, notice.red, 4)
 			end
+		end
+	end
+end
+
+function menu_updatemouseselection(x,y)
+	if selectworldopen then
+		local x, y = x/scale, y/scale
+		local sc = selectworldcursor
+		local v = math.ceil(sc/8)*8-7
+		
+		local i2 = 1
+		for i = v, v+7 do
+			local world = i
+			if hudworldletter and i > 9 and i <= 9+#alphabet then
+				world = alphabet:sub(i-9, i-9)
+			end
+			if reachedworlds[mappack][i] and x > (54+(i2-1)*20) and x < (54+(i2-1)*20)+12 and y > 128 and y < 140 then
+				selectworldcursor = i
+				break
+			end
+			i2 = i2 + 1
+		end
+	else
+		mouseonselect = false
+		local x, y = x/scale, y/scale
+		--continue game
+		if continueavailable then
+			if x > (143-(math.ceil(utf8.len(TEXT["continue game"])/2)*8)) and y > 122 and x < (143+(math.ceil(utf8.len(TEXT["continue game"])/2)*8)) and y < 122+8 then
+				selection = 0
+				mouseonselect = 0
+			end
+		end
+		--player game
+		if x > (143-(math.ceil((utf8.len(TEXT["player game"])+2)/2)*8)) and y > 138 and x < (143+(math.ceil((utf8.len(TEXT["player game"])+2)/2)*8)) and y < 138+8 then
+			selection = 1
+			mouseonselect = 1
+		end
+		--level editor
+		if x > (143-(math.ceil(utf8.len(TEXT["level editor"])/2)*8)) and y > 154 and x < (143+(math.ceil(utf8.len(TEXT["level editor"])/2)*8)) and y < 154+8 then
+			selection = 2
+			mouseonselect = 2
+		end
+		--select mappack
+		if x > (143-(math.ceil(utf8.len(TEXT["select mappack"])/2)*8)) and y > 170 and x < (143+(math.ceil(utf8.len(TEXT["select mappack"])/2)*8)) and y < 170+8 then
+			selection = 3
+			mouseonselect = 3
+		end
+		--options
+		if x > (143-(math.ceil(utf8.len(TEXT["options"])/2)*8)) and y > 186 and x < (143+(math.ceil(utf8.len(TEXT["options"])/2)*8)) and y < 186+8 then
+			selection = 4
+			mouseonselect = 4
 		end
 	end
 end

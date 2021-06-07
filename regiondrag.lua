@@ -10,6 +10,11 @@ function regiondrag:init(width, height, x, y)
 	self.grabbed = {corner1=false, corner2=false, corner3=false, corner4=false, center=false}
 	self.over = {corner1=false, corner2=false, corner3=false, corner4=false, center=false}
 
+	self.nubsize = 6
+	if android then
+		self.nubsize = 12
+	end
+
 	self.step = 16/8--how many fraction of tiles will
 	--i think i had a stroke when i wrote that
 	--change it to 16 if you want it to be smooth
@@ -33,13 +38,13 @@ function regiondrag:draw()
 			love.graphics.setColor(255, 106, 0, 100)
 		end
 		if i == 1 then
-			love.graphics.rectangle("fill", ((((self.x)*16)-xscroll*16)-3)*scale, (((self.y-(8/16)-yscroll)*16)-3)*scale, 6*scale, 6*scale)
+			love.graphics.rectangle("fill", ((((self.x)*16)-xscroll*16)-(self.nubsize*.5))*scale, (((self.y-(8/16)-yscroll)*16)-(self.nubsize*.5))*scale, self.nubsize*scale, self.nubsize*scale)
 		elseif i == 2 then
-			love.graphics.rectangle("fill", ((((self.x+self.width)*16)-xscroll*16)-3)*scale, ((((self.y)-(8/16)-yscroll)*16)-3)*scale, 6*scale, 6*scale)
+			love.graphics.rectangle("fill", ((((self.x+self.width)*16)-xscroll*16)-(self.nubsize*.5))*scale, ((((self.y)-(8/16)-yscroll)*16)-(self.nubsize*.5))*scale, self.nubsize*scale, self.nubsize*scale)
 		elseif i == 3 then
-			love.graphics.rectangle("fill", ((((self.x)*16)-xscroll*16)-3)*scale, ((((self.y+self.height)-(8/16)-yscroll)*16)-3)*scale, 6*scale, 6*scale)
+			love.graphics.rectangle("fill", ((((self.x)*16)-xscroll*16)-(self.nubsize*.5))*scale, ((((self.y+self.height)-(8/16)-yscroll)*16)-(self.nubsize*.5))*scale, self.nubsize*scale, self.nubsize*scale)
 		elseif i == 4 then
-			love.graphics.rectangle("fill", ((((self.x+self.width)*16)-xscroll*16)-3)*scale, ((((self.y+self.height)-(8/16)-yscroll)*16)-3)*scale, 6*scale, 6*scale)
+			love.graphics.rectangle("fill", ((((self.x+self.width)*16)-xscroll*16)-(self.nubsize*.5))*scale, ((((self.y+self.height)-(8/16)-yscroll)*16)-(self.nubsize*.5))*scale, self.nubsize*scale, self.nubsize*scale)
 		end
 	end
 	love.graphics.setColor(255, 255, 255, 255)
@@ -49,25 +54,25 @@ function regiondrag:update(dt)
 	local x, y = love.mouse.getPosition()
 	x, y = x+((xscroll*16)*scale), y+((yscroll*16)*scale)
 	--corner 1
-	if x/scale > (self.x*16)-3 and (y/scale)+8 > (self.y*16)-3 and x/scale < (self.x*16)+3 and (y/scale)+8 < (self.y*16)+3 then
+	if x/scale > (self.x*16)-(self.nubsize*.5) and (y/scale)+8 > (self.y*16)-(self.nubsize*.5) and x/scale < (self.x*16)+(self.nubsize*.5) and (y/scale)+8 < (self.y*16)+(self.nubsize*.5) then
 		self.over.corner1 = true
 	else
 		self.over.corner1 = false
 	end
 	--corner 2
-	if x/scale > ((self.x+self.width)*16)-3 and (y/scale)+8 > (self.y*16)-3 and x/scale < ((self.x+self.width)*16)+3 and (y/scale)+8 < (self.y*16)+3 then
+	if x/scale > ((self.x+self.width)*16)-(self.nubsize*.5) and (y/scale)+8 > (self.y*16)-(self.nubsize*.5) and x/scale < ((self.x+self.width)*16)+(self.nubsize*.5) and (y/scale)+8 < (self.y*16)+(self.nubsize*.5) then
 		self.over.corner2 = true
 	else
 		self.over.corner2 = false
 	end
 	--corner 3
-	if x/scale > (self.x*16)-3 and (y/scale)+8 > ((self.y+self.height)*16)-3 and x/scale < (self.x*16)+3 and (y/scale)+8 < ((self.y+self.height)*16)+3 then
+	if x/scale > (self.x*16)-(self.nubsize*.5) and (y/scale)+8 > ((self.y+self.height)*16)-(self.nubsize*.5) and x/scale < (self.x*16)+(self.nubsize*.5) and (y/scale)+8 < ((self.y+self.height)*16)+(self.nubsize*.5) then
 		self.over.corner3 = true
 	else
 		self.over.corner3 = false
 	end
 	--corner 4
-	if x/scale > ((self.x+self.width)*16)-3 and (y/scale)+8 > ((self.y+self.height)*16)-3 and x/scale < ((self.x+self.width)*16)+3 and (y/scale)+8 < ((self.y+self.height)*16)+3 then
+	if x/scale > ((self.x+self.width)*16)-(self.nubsize*.5) and (y/scale)+8 > ((self.y+self.height)*16)-(self.nubsize*.5) and x/scale < ((self.x+self.width)*16)+(self.nubsize*.5) and (y/scale)+8 < ((self.y+self.height)*16)+(self.nubsize*.5) then
 		self.over.corner4 = true
 	else
 		self.over.corner4 = false

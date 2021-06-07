@@ -942,7 +942,7 @@ rightclicktype["platformup"] = {
 		"distance y:",
 		{"slider", 3, range = {-15, 15, round = 1}},
 		"duration:",
-		{"slider", 4, range = {1, 10, round = 2}},
+		{"slider", 4, range = {1, 20, round = 2}},
 		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}},
 	}
 }
