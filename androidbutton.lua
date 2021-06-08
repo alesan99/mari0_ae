@@ -65,10 +65,10 @@ function touchButton:draw()
 			love.graphics.rectangle("line", x+.5, y+.5, w, h)
 		end
 
+		love.graphics.setColor(255, 255, 255)
 		if self.text then
 			properprintfast(self.text, math.floor(self.x+self.w/2-string.len(self.text)*4), math.floor(self.y+self.h/2-4))
 		elseif self.img then
-			love.graphics.setColor(255, 255, 255)
 			love.graphics.draw(self.img,self.q,self.x,self.y)
 		end
 	end
@@ -90,6 +90,7 @@ function touchButton:update(dt)
 		self.active = (gamestate == "game") and ((not editormode) or (not editormenuopen) and (autoscroll and (not HIDEANDROIDBUTTONS)))
 	else
 		self.active = ((not editormode) or ((not editormenuopen) and (not (self.autoscrollGone and (not autoscroll))) and (not HIDEANDROIDBUTTONS)) or self.i == "start")
+			and (not (self.gameOnly and gamestate ~= "game"))
 	end
 end
 

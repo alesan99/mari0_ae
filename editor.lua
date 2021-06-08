@@ -5362,9 +5362,10 @@ function openrightclickmenu(x, y, tileX, tileY)
 		end
 
 		--load in default values if there aren't enough
-		local defaultvalues = rct.default:split("|")
-		local numberofdefaultvalues = #defaultvalues
+		local defaultvalues
 		if rct.default and (not rct.fixdefault) and tostring(rct.default):find("|") and (not usingdefaultvalues) then
+			defaultvalues = rct.default:split("|")
+			local numberofdefaultvalues = #defaultvalues
 			for i = #rightclickvalues2+1, numberofdefaultvalues do
 				if ((rct.ignoredefault and rct.ignoredefault[i])) then
 					rightclickvalues2[i] = rct.ignoredefault[i]
@@ -5575,7 +5576,7 @@ function openrightclickmenu(x, y, tileX, tileY)
 						end
 						d:updatefunc(d.value)
 					end
-					if not d.value then
+					if (not d.value) and defaultvalues then
 						d.value = ((tonumber(defaultvalues[d.rightclickvalue]) or 0)-t.range[1])/(t.range[2]-t.range[1])
 					end
 					table.insert(rightclickobjects, d)

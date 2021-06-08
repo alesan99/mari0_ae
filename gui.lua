@@ -728,7 +728,7 @@ function guielement:click(x, y, button)
 	end
 end
 
-function guielement:keypress(key)
+function guielement:keypress(key,textinput)
 	if self.active then
 		if self.type == "scrollbar" then
 			--Type in number into scrollbar
@@ -766,13 +766,13 @@ function guielement:keypress(key)
 			end
 		elseif self.type == "input" then
 			if self.inputting then
-				--[[DROID]]
+				--[[DROID
 				if android then
 					if android_key_repeat == key then
 						return
 					end
 					android_key_repeat = key
-				end
+				end]]
 
 				if key == ":" or key == ";" then
 					return
@@ -846,6 +846,11 @@ function guielement:keypress(key)
 					self.cursorblink = true
 					self.timer = 0
 				else
+					if android then
+						if (not textinput) then
+							return false
+						end
+					end
 					if string.len(self.value) < self.maxlength or self.maxlength == 0 then
 						local found = false
 						local targetkey = key

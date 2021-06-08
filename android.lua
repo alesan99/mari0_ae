@@ -3,8 +3,8 @@ buttons = {}
 
 local controllingPlayer = 1
 
-local aeditorbuttonsw = 24
-local aeditorbuttons = {
+local editorButtonsSize = 24
+local editorButtons = {
 	{function() HIDEANDROIDBUTTONS = not HIDEANDROIDBUTTONS end, function() return HIDEANDROIDBUTTONS end},
 	{function() editentities = false; currenttile = 1 end},
 	{function() editentities = true; currenttile = 1 end},
@@ -15,7 +15,7 @@ local aeditorbuttons = {
 
 function androidLoad()
 	--Game controls
-	buttons["jump"] = touchButton:new("jump", "A", 346, 169, 50, 50, "round")
+	buttons["jump"] = touchButton:new("jump", "A", 346, 159, 50, 50, "round")
 	buttons["jump"].autoscrollGone = true
 	buttons["run"] = touchButton:new("run", "B", 292, 169, 50, 50, "round")
 	buttons["run"].autoscrollGone = true
@@ -25,6 +25,7 @@ function androidLoad()
 	buttons["runlock"].highlightFunc = buttons["run"].highlightFunc
 	buttons["use"] = touchButton:new("use", "U", 267, 169, 25, 25, "round")
 	buttons["use"].autoscrollGone = true
+	buttons["use"].gameOnly = true
 
 	buttons["left"] = touchButton:new("left", "", 5+5, 159, 30, 30)
 	buttons["right"] = touchButton:new("right", "", 65+5, 159, 30, 30)
@@ -41,25 +42,30 @@ function androidLoad()
 	buttons["portal2"].color = {232, 130, 30}
 	buttons["reload"] = touchButton:new("reload", "R", 6, 73+27*2, 25, 25, "round")
 	buttons["reload"].autoscrollGone = true
+	buttons["reload"].gameOnly = true
 
 	--Level Editor
-	aeditorbuttonsimg = love.graphics.newImage("graphics/GUI/androideditorbuttons.png")
-	aeditorbuttonsq = {}
-	for i = 1, math.floor(aeditorbuttonsimg:getWidth()/aeditorbuttonsimg:getHeight()) do
-		aeditorbuttonsq[i] = love.graphics.newQuad(aeditorbuttonsimg:getHeight()*(i-1),0,
-		aeditorbuttonsimg:getHeight(),aeditorbuttonsimg:getHeight(),
-		aeditorbuttonsimg:getWidth(),aeditorbuttonsimg:getHeight())
+	local editorButtonsimg = love.graphics.newImage("graphics/GUI/androideditorbuttons.png")
+	local editorButtonsq = {}
+	for i = 1, math.floor(editorButtonsimg:getWidth()/editorButtonsimg:getHeight()) do
+		editorButtonsq[i] = love.graphics.newQuad(editorButtonsimg:getHeight()*(i-1),0,
+		editorButtonsimg:getHeight(),editorButtonsimg:getHeight(),
+		editorButtonsimg:getWidth(),editorButtonsimg:getHeight())
 	end
 	local bx, by = 2, 2
-	for i = 1, #aeditorbuttons do
-		buttons["editor" .. i] = touchButton:new(aeditorbuttons[i][1], {aeditorbuttonsimg,aeditorbuttonsq[i]}, bx+(aeditorbuttonsw+2)*(i-1), by, aeditorbuttonsw, aeditorbuttonsw)
+	for i = 1, #editorButtons do
+		buttons["editor" .. i] = touchButton:new(editorButtons[i][1], {editorButtonsimg,editorButtonsq[i]}, bx+(editorButtonsSize+2)*(i-1), by, editorButtonsSize, editorButtonsSize)
 		buttons["editor" .. i].editor = true
 		if i == 1 then
 			buttons["editor" .. i].hideButton = true
 		end
-		if aeditorbuttons[i][2] then
-			buttons["editor" .. i].highlightFunc = aeditorbuttons[i][2]
+		if editorButtons[i][2] then
+			buttons["editor" .. i].highlightFunc = editorButtons[i][2]
 		end
+	end
+
+	for _, b in pairs(buttons) do
+
 	end
 end
 

@@ -59,11 +59,11 @@ local debugGraphs = false
 VERSION = 13.0118
 VERSIONSTRING = "13c"
 
-android = true--(love.system.getOS() == "Android" or love.system.getOS() == "iOS") --[DROID]
-androidtest = true--testing android on pc
+android = (love.system.getOS() == "Android" or love.system.getOS() == "iOS") --[DROID]
+androidtest = false--testing android on pc
 local touchkey = {}
 local touchrunlock = false
-local antiandroidkeyrepeat = false --fucking stupid android keyboards
+--local antiandroidkeyrepeat = false --fucking stupid android keyboards
 local androidbuttons, aeditorbuttons, aeditorbuttonsw, aeditorbuttonsimg, aeditorbuttonsq
 local getandroidbutton
 
@@ -1089,9 +1089,9 @@ function love.update(dt)
 		frameadvance = 1
 	end
 	
-	if android then
+	--[[if android then
 		antiandroidkeyrepeat = false
-	end
+	end]]
 
 	if jsonerrorwindow.opened and jsonerrorwindow:update(dt) then
 		
@@ -2077,7 +2077,7 @@ end
 
 ----------------
 
-function love.keypressed(key, unicode, isrepeat)
+function love.keypressed(key, scancode, isrepeat, textinput)
 	if key == "space" then key = " " end
 	if debugconsole then
 		if key == "backspace" and debuginputon then
@@ -2104,12 +2104,12 @@ function love.keypressed(key, unicode, isrepeat)
 		end
 	end
 	
-	if android then 
+	--[[if android then 
 		if key == antiandroidkeyrepeat then
 			--return (this is prevented in the gui)
 		end
 		antiandroidkeyrepeat = key
-	end
+	end]]
 
 	if jsonerrorwindow.opened then
 		jsonerrorwindow:keypressed(key)
@@ -2122,7 +2122,7 @@ function love.keypressed(key, unicode, isrepeat)
 	end
 
 	for i, v in pairs(guielements) do
-		if v:keypress(key) then
+		if v:keypress(key,textinput) then
 			return
 		end
 	end
@@ -2193,7 +2193,7 @@ end
 
 function love.textinput(c)
 	if android and not androidtest then --[[DROID]]
-		love.keypressed(c)
+		love.keypressed(c,nil,nil,"textinput")
 	else
 		if debugconsole and debuginputon then
 			debuginput = debuginput .. c
