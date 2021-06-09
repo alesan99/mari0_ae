@@ -238,10 +238,6 @@ function guielement:update(dt)
 					self.y = self.multiy[1]
 				end
 			end
-			--[DROID]
-			if self.timer and self.timer > 0 then
-				self.timer = self.timer - dt
-			end
 		end
 	end
 end
@@ -615,9 +611,8 @@ function guielement:click(x, y, button)
 					if self.scrollbar then
 						self.scrollbar.active = true
 					end
-					self.timer = 0.1--[DROID]
 				end
-			elseif (not android) or self.timer <= 0 then--[DROID]
+			else
 				if self.scrollbar then
 					self.scrollbar:click(x, y, button)
 					if x > (self.x+(13+self.width*8))*scale and x < (self.x+(13+self.width*8)+8)*scale then

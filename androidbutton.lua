@@ -41,32 +41,63 @@ function touchButton:init(i,t,x,y,w,h,round)
 	self.alwaysactive = false
 end
 
-function touchButton:draw()
+function touchButton:draw(spriteBatch, quad)
 	if self.active then
-		love.graphics.setLineWidth(1)
-		if self.held then
-			love.graphics.setColor(100, 100, 100, 140)
-		elseif self.highlightFunc and self.highlightFunc() then
-			love.graphics.setColor(90, 90, 90, 140)
-		elseif self.color then
-			love.graphics.setColor(self.color[1], self.color[2], self.color[3], 80)
+		local highlight = (self.highlightFunc and self.highlightFunc())
+		--Skin
+		if spriteBatch then
+			local x, y, w, h = quad[1]:getViewport()
+			if self.held then
+				spriteBatch:add(quad[2], self.x, self.y, 0, self.w/w, self.h/h)
+			else
+				spriteBatch:add(quad[1], self.x, self.y, 0, self.w/w, self.h/h)
+			end
+			
+			if highlight then
+				spriteBatch:add(quad[3], self.x, self.y, 0, self.w/w, self.h/h)
+			end
+		--No Skin, use realtime shapes
 		else
-			love.graphics.setColor(30, 30, 30, 80)
-		end
-		if self.round then
-			local x, y, r = self.x+self.w/2, self.y+self.h/2,self.r
-			love.graphics.circle("fill", x, y, r, 8)
-			love.graphics.setColor(255, 255, 255, 140)
-			love.graphics.circle("line", x, y, r, 8)
-		else
-			local x, y, w, h = self.x, self.y, self.w, self.h
-			love.graphics.rectangle("fill", x, y, w, h)
-			love.graphics.setColor(255, 255, 255, 100)
-			love.graphics.rectangle("line", x+.5, y+.5, w, h)
-		end
+			if highlight then
+				love.graphics.setLineWidth(2)
+			else
+				love.graphics.setLineWidth(1)
+			end
+			if self.held then
+				love.graphics.setColor(100, 100, 100, 140)
+			elseif highlight then
+				love.graphics.setColor(90, 90, 90, 140)
+			elseif self.color then
+				love.graphics.setColor(self.color[1], self.color[2], self.color[3], 80)
+			else
+				love.graphics.setColor(30, 30, 30, 80)
+			end
+			if self.round then
+				local x, y, r = self.x+self.w/2, self.y+self.h/2,self.r
+				love.graphics.circle("fill", x, y, r, 8)
+				love.graphics.setColor(255, 255, 255, 140)
+				love.graphics.circle("line", x, y, r, 8)
+			else
+				local x, y, w, h = self.x, self.y, self.w, self.h
+				love.graphics.rectangle("fill", x, y, w, h)
+				love.graphics.setColor(255, 255, 255, 140)
+				love.graphics.rectangle("line", x+.5, y+.5, w, h)
+			end
 
-		love.graphics.setColor(255, 255, 255)
-		if self.text then
+			love.graphics.setColor(255, 255, 255)
+			if self.text then
+				properprintfast(self.text, math.floor(self.x+self.w/2-string.len(self.text)*4), math.floor(self.y+self.h/2-4))
+			elseif self.img then
+				love.graphics.draw(self.img,self.q,self.x,self.y)
+			end
+		end
+	end
+end
+
+function touchButton:postDraw()
+	if self.active then
+		--Skin
+		if self.text and self.drawText then
 			properprintfast(self.text, math.floor(self.x+self.w/2-string.len(self.text)*4), math.floor(self.y+self.h/2-4))
 		elseif self.img then
 			love.graphics.draw(self.img,self.q,self.x,self.y)
@@ -90,7 +121,7 @@ function touchButton:update(dt)
 		self.active = (gamestate == "game") and ((not editormode) or (not editormenuopen) and (autoscroll and (not HIDEANDROIDBUTTONS)))
 	else
 		self.active = ((not editormode) or ((not editormenuopen) and (not (self.autoscrollGone and (not autoscroll))) and (not HIDEANDROIDBUTTONS)) or self.i == "start")
-			and (not (self.gameOnly and gamestate ~= "game"))
+			and (not (self.gameOnly and gamestate ~= "game")) and (not (self.multiplayerOnly and players <= 1))
 	end
 end
 
@@ -129,12 +160,17 @@ function touchButton:press(id,x,y)
 					touchRunLock = not touchRunLock
 				end
 			else
-				love.keypressed(controls[self.player][self.i][1])
+				--[[if controls[self.player][self.i][1] == "joy" then
+					local c = controls[self.player][self.i]
+					game_joystickpressed(c[2],c[4])
+				else]]
+					love.keypressed(controls[self.player][self.i][1])
+				--end
 			end
 		end
 		if self.mousebut then
 			local x,y = androidGetCoords(mouseTouchX,mouseTouchY)
-			love.mousepressed(x,y,self.i,"simulated")
+			love.mousepressed(mouseTouchX,mouseTouchY,self.i,"simulated")
 		end
 		if self.func then
 			self.i()
@@ -163,7 +199,7 @@ function touchButton:release(id,x,y)
 		end
 		if self.mousebut then
 			local x,y = androidGetCoords(mouseTouchX,mouseTouchY)
-			love.mousereleased(x,y,self.i,"simulated")
+			love.mousereleased(mouseTouchX,mouseTouchY,self.i,"simulated")
 		end
 	end
 end

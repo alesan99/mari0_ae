@@ -1,9 +1,9 @@
 require "androidbutton"
-buttons = {}
+local buttons = {}
 
 local controllingPlayer = 1
+local androidSetPlayer
 
-local editorButtonsSize = 24
 local editorButtons = {
 	{function() HIDEANDROIDBUTTONS = not HIDEANDROIDBUTTONS end, function() return HIDEANDROIDBUTTONS end},
 	{function() editentities = false; currenttile = 1 end},
@@ -13,36 +13,70 @@ local editorButtons = {
 	{function() undo_undo() end}
 }
 
+
+local skin, skinImg, skinSpriteBatch
+androidLowRes = false
+
 function androidLoad()
+	--Skin
+	local skinjsonfile = "android/skin.json"
+	local skinimgfile = "android/skin.png"
+	if love.filesystem.exists("alesans_entites/skin.json") then
+		skinjsonfile = "alesans_entites/skin.json"
+	end
+	if love.filesystem.exists("alesans_entites/skin.png") then
+		skinimgfile = "alesans_entites/skin.png"
+	end
+	local s = love.filesystem.read(skinjsonfile)
+	local t = JSON:decode(s)
+	if t.image then
+		skin = {}
+		skinImg = love.graphics.newImage(skinimgfile,{mipmaps=t.mipmaps})
+		skinImg:setFilter("linear","linear")
+		skinButtonCount = 0
+		local offset = t.offset or skinImg:getHeight()/3
+		for name, data in pairs(t) do
+			if type(data) == "table" then
+				skinButtonCount = skinButtonCount + 1
+				skin[name] = {}
+				for i = 1, 3 do
+					skin[name][i] = love.graphics.newQuad(data[5],data[6]+offset*(i-1),data[7],data[8],skinImg:getWidth(),skinImg:getHeight())
+				end
+			end
+		end
+		skinSpriteBatch = love.graphics.newSpriteBatch(skinImg, skinButtonCount*2)
+	end
+	androidLowRes = t.lowres
+
 	--Game controls
-	buttons["jump"] = touchButton:new("jump", "A", 346, 159, 50, 50, "round")
+	buttons["jump"] = touchButton:new("jump", "A", t["jump"][1],t["jump"][2],t["jump"][3],t["jump"][4], "round")
 	buttons["jump"].autoscrollGone = true
-	buttons["run"] = touchButton:new("run", "B", 292, 169, 50, 50, "round")
+	buttons["run"] = touchButton:new("run", "B", t["run"][1],t["run"][2],t["run"][3],t["run"][4], "round")
 	buttons["run"].autoscrollGone = true
 	buttons["run"].highlightFunc = function() return touchRunLock end
-	buttons["runlock"] = touchButton:new("runlock", "+", 267, 194, 25, 25, "round")
+	buttons["runlock"] = touchButton:new("runlock", "+", t["runlock"][1],t["runlock"][2],t["runlock"][3],t["runlock"][4], "round")
 	buttons["runlock"].autoscrollGone = true
 	buttons["runlock"].highlightFunc = buttons["run"].highlightFunc
-	buttons["use"] = touchButton:new("use", "U", 267, 169, 25, 25, "round")
+	buttons["use"] = touchButton:new("use", "U", t["use"][1],t["use"][2],t["use"][3],t["use"][4], "round")
 	buttons["use"].autoscrollGone = true
 	buttons["use"].gameOnly = true
 
-	buttons["left"] = touchButton:new("left", "", 5+5, 159, 30, 30)
-	buttons["right"] = touchButton:new("right", "", 65+5, 159, 30, 30)
-	buttons["up"] = touchButton:new("up", "", 35+5, 129, 30, 30)
-	buttons["down"] = touchButton:new("down", "", 35+5, 189, 30, 30)
+	buttons["left"] = touchButton:new("left", "", t["left"][1],t["left"][2],t["left"][3],t["left"][4])
+	buttons["right"] = touchButton:new("right", "", t["right"][1],t["right"][2],t["right"][3],t["right"][4])
+	buttons["up"] = touchButton:new("up", "", t["up"][1],t["up"][2],t["up"][3],t["up"][4])
+	buttons["down"] = touchButton:new("down", "", t["down"][1],t["down"][2],t["down"][3],t["down"][4])
 
-	buttons["start"] = touchButton:new("start", "START", 352, 5, 43, 16)
+	buttons["start"] = touchButton:new("start", "START", t["start"][1],t["start"][2],t["start"][3],t["start"][4])
 
-	buttons["portal1"] = touchButton:new("l", "1", 6, 73, 25, 25, "round")
+	buttons["reload"] = touchButton:new("reload", "R", t["reload"][1],t["reload"][2],t["reload"][3],t["reload"][4], "round")
+	buttons["reload"].autoscrollGone = true
+	buttons["reload"].gameOnly = true
+	buttons["portal1"] = touchButton:new("l", "1", t["portal1"][1],t["portal1"][2],t["portal1"][3],t["portal1"][4], "round")
 	buttons["portal1"].portal = true
-	buttons["portal2"] = touchButton:new("r", "2", 6, 73+27*1, 25, 25, "round")
+	buttons["portal2"] = touchButton:new("r", "2", t["portal2"][1],t["portal2"][2],t["portal2"][3],t["portal2"][4], "round")
 	buttons["portal2"].portal = true
 	buttons["portal1"].color = {60, 188, 252}
 	buttons["portal2"].color = {232, 130, 30}
-	buttons["reload"] = touchButton:new("reload", "R", 6, 73+27*2, 25, 25, "round")
-	buttons["reload"].autoscrollGone = true
-	buttons["reload"].gameOnly = true
 
 	--Level Editor
 	local editorButtonsimg = love.graphics.newImage("graphics/GUI/androideditorbuttons.png")
@@ -52,9 +86,9 @@ function androidLoad()
 		editorButtonsimg:getHeight(),editorButtonsimg:getHeight(),
 		editorButtonsimg:getWidth(),editorButtonsimg:getHeight())
 	end
-	local bx, by = 2, 2
+	local bx, by, bw, bh = t["editor"][1],t["editor"][2],t["editor"][3],t["editor"][4]
 	for i = 1, #editorButtons do
-		buttons["editor" .. i] = touchButton:new(editorButtons[i][1], {editorButtonsimg,editorButtonsq[i]}, bx+(editorButtonsSize+2)*(i-1), by, editorButtonsSize, editorButtonsSize)
+		buttons["editor" .. i] = touchButton:new(editorButtons[i][1], {editorButtonsimg,editorButtonsq[i]}, bx+(bw+2)*(i-1), by, bw, bh)
 		buttons["editor" .. i].editor = true
 		if i == 1 then
 			buttons["editor" .. i].hideButton = true
@@ -64,9 +98,15 @@ function androidLoad()
 		end
 	end
 
-	for _, b in pairs(buttons) do
-
-	end
+	--[[Multiplayer
+	for i = 1, 4 do
+		buttons["player" .. i] = touchButton:new(function() androidSetPlayer(i) end, i, bx+(bw+1)*(i-1), by, bw, bh)
+		buttons["player" .. i].playeri = i
+		buttons["player" .. i].highlightFunc = function() if controllingPlayer == i then return true end end
+		buttons["player" .. i].drawText = true
+		buttons["player" .. i].multiplayerOnly = true
+		buttons["player" .. i].gameOnly = true
+	end]]
 end
 
 function androidUpdate(dt)
@@ -84,15 +124,48 @@ end
 local lastTouchX, lastTouchY = 0,0
 local lastReleaseX, lastReleaseY = 0,0
 function androidDraw()
-	love.graphics.push()
-	love.graphics.scale(winwidth/gamewidth,winheight/gameheight)
-
-	for i, b in pairs(buttons) do
-		b:draw()
+	if not androidLowRes then
+		love.graphics.push()
+		if resizable and letterboxfullscreen then
+			local cw, ch = canvas:getWidth(), canvas:getHeight()--current size
+			local tw, th = winwidth, winheight--target size
+			local s
+			if cw/tw > ch/th then s = tw/cw
+			else s = th/ch end
+			local tx, ty = 0, 0
+			love.graphics.translate(-(tx - ((tw*0.5)-(cw*s*0.5))),-(ty - ((th*0.5)-(ch*s*0.5))))
+			love.graphics.scale(s,s)
+			
+		else
+			love.graphics.scale(winwidth/gamewidth,winheight/gameheight)
+		end
 	end
 
-	--[[
-	--touch debug
+	--Draw skin
+	if skin then
+		skinSpriteBatch:clear()
+		for name, b in pairs(buttons) do
+			if b.drawText then
+				b:draw(skinSpriteBatch,skin["editor"])
+			elseif b.editor then
+				b:draw(skinSpriteBatch,skin["editor"])
+			else
+				b:draw(skinSpriteBatch,skin[name])
+			end
+		end
+		love.graphics.setColor(255,255,255)
+		love.graphics.draw(skinSpriteBatch,0,0)
+		for name, b in pairs(buttons) do
+			b:postDraw()
+		end
+	else
+	--No skin
+		for name, b in pairs(buttons) do
+			b:draw()
+		end
+	end
+	
+	--[[touch debug
 	love.graphics.setColor(255,0,0)
 	local mx,my= androidGetCoords(mouseTouchX,mouseTouchY)
 	love.graphics.circle("fill",mx,my,2)
@@ -101,7 +174,9 @@ function androidDraw()
 	love.graphics.setColor(0,255,255)
 	love.graphics.circle("fill",lastReleaseX,lastReleaseY,1)]]
 
-	love.graphics.pop()
+	if not androidLowRes then
+		love.graphics.pop()
+	end
 end
 
 mouseTouchX = gamewidth/2
@@ -123,8 +198,21 @@ local function getButton(id, x, y)
 	return false
 end
 
-function androidGetCoords(tx,ty)
-	return tx/(winwidth/gamewidth), ty/(winheight/gameheight)
+function androidGetCoords(tx,ty,delta)
+	if resizable and letterboxfullscreen then
+		local cw, ch = canvas:getWidth(), canvas:getHeight()--current size
+		local tw, th = winwidth, winheight--target size
+		local s
+		if cw/tw > ch/th then s = tw/cw
+		else s = th/ch end
+		if delta then
+			return tx/(s), ty/(s)
+		else
+			return math.max(0, math.min(cw*s, tx - ((tw*0.5)-(cw*s*0.5))))/s, math.max(0, math.min(ch*s, ty - ((th*0.5)-(ch*s*0.5))))/s
+		end
+	else
+		return tx/(winwidth/gamewidth), ty/(winheight/gameheight)
+	end
 end
 
 function love.touchpressed(id, x, y, dx, dy, pressure)
@@ -161,18 +249,21 @@ function love.touchpressed(id, x, y, dx, dy, pressure)
 		for i, v in pairs(guielements) do
 			v:update(0)
 		end
-		love.mousepressed(ox,oy,1,"simulated")
-		lastTouchX, lastTouchY = x,y
+
+		love.mousepressed(x,y,1,"simulated")
+		--lastTouchX, lastTouchY = x,y
 	end
 end
 
 function love.touchmoved(id, x, y, dx, dy, pressure)
 	local ox, oy = x, y
 	local x, y = androidGetCoords(x,y)
+	local realdx, realdy = androidGetCoords(dx,dy,"delta")
 
 	if mouseTouchId == id and ((not touches[id]) or touchesStillDrag[id]) then
 		mouseTouchX = ox
 		mouseTouchY = oy
+		love.mousemoved(x,y,realdx,realdy,"simulated")
 	end
 
 	--Slide finger to different button
@@ -218,8 +309,8 @@ function love.touchreleased(id, x, y, dx, dy, pressure)
 		mouseTouchX = ox
 		mouseTouchY = oy
 		mouseTouchId = false
-		love.mousereleased(ox,oy,1,"simulated")
-		lastReleaseX, lastReleaseY = x,y
+		love.mousereleased(x,y,1,"simulated")
+		--lastReleaseX, lastReleaseY = x,y
 	end
 end
 
@@ -227,7 +318,7 @@ function androidButtonDown(i,n)
 	if n == "run" and touchRunLock then
 		return true
 	end
-	if buttons[n] and buttons[n].held then
+	if buttons[n] and buttons[n].player == i and buttons[n].held then
 		return true
 	end
 	return false
@@ -254,5 +345,12 @@ function androidGetMouse()
 		return math.max(0, math.min(cw*s, mouseTouchX - ((tw*0.5)-(cw*s*0.5))))/s, math.max(0, math.min(ch*s, mouseTouchY - ((th*0.5)-(ch*s*0.5))))/s
 	else
 		return mouseTouchX/(winwidth/gamewidth), mouseTouchY/(winheight/gameheight)
+	end
+end
+
+function androidSetPlayer(i)
+	controllingPlayer = i
+	for n, b in pairs(buttons) do
+		b.player = controllingPlayer
 	end
 end

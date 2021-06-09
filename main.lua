@@ -59,8 +59,8 @@ local debugGraphs = false
 VERSION = 13.0118
 VERSIONSTRING = "13c"
 
-android = (love.system.getOS() == "Android" or love.system.getOS() == "iOS") --[DROID]
-androidtest = false--testing android on pc
+android = true--(love.system.getOS() == "Android" or love.system.getOS() == "iOS") --[DROID]
+androidtest = true--testing android on pc
 local touchkey = {}
 local touchrunlock = false
 --local antiandroidkeyrepeat = false --fucking stupid android keyboards
@@ -1164,7 +1164,7 @@ function love.draw()
 				love.graphics.draw(canvas, 0, 0, 0, winwidth/(width*16*scale), winheight/(224*scale))
 			end
 
-			if android then
+			if android and not androidLowRes then
 				androidDraw()
 			end
 		else
@@ -1217,6 +1217,10 @@ function lovedraw()
 
 	if jsonerrorwindow.opened then
 		jsonerrorwindow:draw()
+	end
+
+	if android and androidLowRes then
+		androidDraw()
 	end
 	
 	shaders:postdraw()
@@ -2210,7 +2214,6 @@ function love.mousepressed(x, y, button, istouch)
 			love.touchpressed(1,x,y)
 			return false
 		end
-		x, y = x/(winwidth/gamewidth), y/(winheight/gameheight)
 	elseif resizable and letterboxfullscreen and canvassupported and canvas then
 		x, y = love.mouse.getPosition()
 	elseif resizable then
@@ -2288,7 +2291,6 @@ function love.mousereleased(x, y, button, istouch)
 			love.touchreleased(1,x,y)
 			return false
 		end
-		x, y = x/(winwidth/gamewidth), y/(winheight/gameheight)
 	elseif resizable and letterboxfullscreen and canvassupported and canvas then
 		x, y = love.mouse.getPosition()
 	elseif resizable then
@@ -2328,8 +2330,7 @@ function love.mousemoved(x, y, dx, dy, istouch)
 			end
 			return false
 		end
-	end
-	if resizable and letterboxfullscreen and canvassupported and canvas then
+	elseif resizable and letterboxfullscreen and canvassupported and canvas then
 		x, y = love.mouse.getPosition()
 		local cw, ch = canvas:getWidth(), canvas:getHeight()--current size
 		local tw, th = winwidth, winheight--target size
