@@ -856,7 +856,7 @@ function editor_update(dt)
 							if ismaptile(tx, ty) then
 								local d = mtclipboard[i][j]
 								currenttile = d[1]
-								placetile(x+(i-1 + pastecenter[1])*16*scale, y+(j-1 + pastecenter[2])*16*scale)
+								--[[placetile(x+(i-1 + pastecenter[1])*16*scale, y+(j-1 + pastecenter[2])*16*scale)
 								local tile1 = d[1]
 								if tile1 == 1 then
 									tile1 = false --don't paste empty space
@@ -870,7 +870,7 @@ function editor_update(dt)
 										map[tx][ty] = {tile1 or map[tx][ty][1], d[2] or map[tx][ty][2], d[3] or map[tx][ty][3], back=d["back"]}
 									end
 								end
-								map[tx][ty]["gels"] = {}
+								map[tx][ty]["gels"] = {}]]
 							end
 						end
 					end
@@ -4863,8 +4863,11 @@ function editor_mousepressed(x, y, button)
 											map[tx][ty][1] = tile1 or map[tx][ty][1]
 											map[tx][ty][2] = d[2] or map[tx][ty][2]
 											map[tx][ty]["back"] = d["back"]
+											if map[tx][ty][2] then
+												map[tx][ty]["argument"] = d["argument"]
+											end
 										else
-											map[tx][ty] = {tile1 or map[tx][ty][1], d[2] or map[tx][ty][2], d[3] or map[tx][ty][3], back=d["back"]}
+											map[tx][ty] = {tile1 or map[tx][ty][1], d[2] or map[tx][ty][2], d[3] or map[tx][ty][3], back=d["back"],argument=d["argument"]}
 										end
 									end
 									map[tx][ty]["gels"] = {}
@@ -6562,7 +6565,21 @@ function loadmtobjects()
 					for u = 1, #split4 do
 						--finally get tile, entity, and rightclickvalues
 						local split5 = split4[u]:split("-")
-						table.insert(ox, {tonumber(split5[1]),tonumber(split5[2]) or split5[2],split5[3]})
+						local tile = tonumber(split5[1])
+						local back
+						if not tile then --background tiles
+							local s = split5[1]:split("╚")
+							tile = tonumber(s[1])
+							back = tonumber(s[2])
+						end
+						local entity = split5[2]
+						local argument
+						if entity and (not tonumber(entity)) and entity:find("╔") then --entity arguments
+							local s = split5[2]:split("╔")
+							entity = s[1]
+							argument = s[2]
+						end
+						table.insert(ox, {tile,tonumber(entity) or entity,split5[3],back=back,argument=argument})
 					end
 					table.insert(oo, ox)
 				end
@@ -7289,7 +7306,14 @@ function savemtobject(objecttable, name)
 					--TODO: Change delimeters?
 					break
 				end
-				data = data .. s[j][layer] .. "-"
+				
+				if layer == 1 and s[j]["back"] then --╚ instead of ~
+					data = data .. s[j][layer] .. "╚" .. s[j]["back"] ..  "-"
+				elseif layer == 2 and s[j]["argument"] then --╔ instead of :
+					data = data .. s[j][layer] .. "╔" .. s[j]["argument"] .. "-"
+				else
+					data = data .. s[j][layer] .. "-"
+				end
 			end
 			data = string.sub(data, 1, -2)
 			data = data .. ","

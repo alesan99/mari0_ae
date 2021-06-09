@@ -1552,9 +1552,9 @@ function game_draw()
 		
 		local xfromdraw, xtodraw = math.max(1, math.floor(xscroll)+1), math.min(mapwidth, math.floor(xscroll+width*(1/screenzoom))+1)
 		local yfromdraw, ytodraw = math.max(1, math.floor(yscroll-0.5)+1), math.min(mapheight, math.floor(yscroll+height*(1/screenzoom)+1-0.5)+1)
-		local xoff = math.floor(xscroll)-math.fmod(xscroll, 1)
+		local xoff = math.floor(xscroll)+math.fmod(xscroll, 1)
 		if xscroll < 0 then xoff = xoff + 1 end
-		local yoff = math.floor(yscroll)-math.fmod(yscroll, 1)
+		local yoff = math.floor(yscroll)+math.fmod(yscroll, 1)
 		if yscroll < 0 then yoff = yoff + 1 end
 		
 		--custom background
@@ -1567,7 +1567,7 @@ function game_draw()
 			else
 				love.graphics.setColor(255,255,255,255)
 			end
-			for y = xfromdraw, ytodraw do
+			for y = yfromdraw, ytodraw do
 				for x = xfromdraw, xtodraw do
 					local backgroundtile = bmapt(x, y, 1)
 					if backgroundtile and tilequads[backgroundtile] and not tilequads[backgroundtile].invisible then
