@@ -61,11 +61,7 @@ VERSIONSTRING = "13d"
 
 android = (love.system.getOS() == "Android" or love.system.getOS() == "iOS") --[DROID]
 androidtest = false--testing android on pc
-local touchkey = {}
-local touchrunlock = false
 --local antiandroidkeyrepeat = false --fucking stupid android keyboards
-local androidbuttons, aeditorbuttons, aeditorbuttonsw, aeditorbuttonsimg, aeditorbuttonsq
-local getandroidbutton
 
 local updatesoundlist
 

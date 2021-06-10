@@ -21,11 +21,11 @@ function androidLoad()
 	--Skin
 	local skinjsonfile = "android/skin.json"
 	local skinimgfile = "android/skin.png"
-	if love.filesystem.exists("alesans_entites/skin.json") then
-		skinjsonfile = "alesans_entites/skin.json"
+	if love.filesystem.exists("alesans_entities/skin.json") then
+		skinjsonfile = "alesans_entities/skin.json"
 	end
-	if love.filesystem.exists("alesans_entites/skin.png") then
-		skinimgfile = "alesans_entites/skin.png"
+	if love.filesystem.exists("alesans_entities/skin.png") then
+		skinimgfile = "alesans_entities/skin.png"
 	end
 	local s = love.filesystem.read(skinjsonfile)
 	local t = JSON:decode(s)
