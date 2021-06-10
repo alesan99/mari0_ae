@@ -2553,7 +2553,7 @@ function game_draw()
 				properprint("x:" .. objects["player"][1].x, 2*scale, 65*scale)
 				properprint("y:" .. objects["player"][1].y, 2*scale, 75*scale)
 
-				properprint(mariolives[1] .. " lives", 2*scale, 95*scale)
+				properprint(tostring(mariolives[1]) .. " lives", 2*scale, 95*scale)
 			end
 		end
 
