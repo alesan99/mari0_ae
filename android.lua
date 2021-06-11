@@ -244,7 +244,7 @@ function love.touchpressed(id, x, y, dx, dy, pressure)
 	mouseTouchX = ox
 	mouseTouchY = oy
 	mouseTouchId = id
-	if (gamestate ~= "game") or editormode then
+	if not (gamestate == "game" and (not editormode) and objects and objects["player"][controllingPlayer].portalgun) then
 		--make sure buttons are aware of the change before "clicking"
 		for i, v in pairs(guielements) do
 			v:update(0)
@@ -305,7 +305,7 @@ function love.touchreleased(id, x, y, dx, dy, pressure)
 		end
 	end
 
-	if ((gamestate ~= "game") or editormode) and mouseTouchId == id then
+	if mouseTouchId == id then
 		mouseTouchX = ox
 		mouseTouchY = oy
 		mouseTouchId = false

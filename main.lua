@@ -54,7 +54,7 @@
 local debugconsole = false --debug
 if debugconsole then debuginputon = true; debuginput = "print()"; print("DEBUG ON") end
 local debugGraph,fpsGraph,memGraph,drawGraph
-local debugGraphs = false
+local debugGraphs = true
 
 VERSION = 13.0118
 VERSIONSTRING = "13d"
@@ -3506,6 +3506,13 @@ function loadnitpicks()
 		EditorZoom = t.editorzoom
 		_3DMODE = t.render3d
 		HITBOXDEBUG = t.viewhitboxes
+		if t.pcversion then
+			android = false
+		end
+		if t.androidversion then
+			android = t.androidversion
+			androidtest = true
+		end
 	end
 end
 
