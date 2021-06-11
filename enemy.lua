@@ -3130,6 +3130,17 @@ function enemy:stomp(x, b)
 			b.y = self.y - b.height-1/16
 		end
 
+		if b and b.groundpounding then
+			if self.transforms then
+				if self:gettransformtrigger("groundpound") then
+					self:transform(self:gettransformsinto("groundpound"))
+					return
+				end
+			elseif self.resistsgroundpound then
+				return false
+			end
+		end
+
 		if self.stomphealth then
 			if self.stomphealth > 1 then
 				self.stomphealth = self.stomphealth - 1
