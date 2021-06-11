@@ -130,10 +130,12 @@ function bomb:update(dt)
 		return false
 		
 	elseif self.stomped then
-		if self.speedx > 0 then
-			self.speedx = math.max(0, self.speedx - friction*dt)
-		elseif self.speedx < 0 then
-			self.speedx = math.min(0, self.speedx + friction*dt)
+		if not self.falling then
+			if self.speedx > 0 then
+				self.speedx = math.max(0, self.speedx - friction*dt)
+			elseif self.speedx < 0 then
+				self.speedx = math.min(0, self.speedx + friction*dt)
+			end
 		end
 	else
 		self.animationtimer = self.animationtimer + dt
@@ -266,6 +268,19 @@ function bomb:shotted2(dir)
 	end
 end
 
+function bomb:hitbelow(dir)
+	if not self.stomped then
+		self:stomp()
+	end
+	self.falling = true
+	self.speedy = -mushroomjumpforce
+	if dir == "left" then
+		self.speedx = -shotspeedx
+	else
+		self.speedx = shotspeedx
+	end
+end
+
 function bomb:freeze()
 	if not self.explosion then
 		self.speedx = 0
@@ -375,6 +390,7 @@ function bomb:floorcollide(a, b)
 	if self:globalcollide(a, b) then
 		return false
 	end
+	self.falling = false
 end
 
 function bomb:passivecollide(a, b)

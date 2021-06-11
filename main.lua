@@ -54,7 +54,7 @@
 local debugconsole = false --debug
 if debugconsole then debuginputon = true; debuginput = "print()"; print("DEBUG ON") end
 local debugGraph,fpsGraph,memGraph,drawGraph
-local debugGraphs = true
+local debugGraphs = false
 
 VERSION = 13.0118
 VERSIONSTRING = "13d"
