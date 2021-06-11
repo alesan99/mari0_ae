@@ -15,7 +15,7 @@ function funnel:init(x, y, dir, r)
 	self.timer = 0
 	self.timer2 = 0
 	
-	self.objtable = {"player", "goomba", "box", "koopa", "spikeball", "gel", "turret", "enemy", "ice"}
+	self.objtable = {"player", "goomba", "box", "koopa", "spikeball", "gel", "turret", "enemy", "ice", "energyball"}
 	
 	table.remove(self.r, 1)
 	table.remove(self.r, 1)
