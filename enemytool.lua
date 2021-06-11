@@ -8,8 +8,9 @@ function enemytool:init(x, y, r, e)
 	self.r = r
 	self.customenemy = true
 	self.animation = false
+	self.spawnonlyonscreen = false
 	if e:find("|") then
-		local v = convertr(e, {"string", "num", "num", "bool", "string"}, true)
+		local v = convertr(e, {"string", "num", "num", "bool", "string", "bool"}, true)
 		self.enemy = v[1]
 		self.xvel = v[2]
 		self.yvel = v[3]
@@ -25,6 +26,9 @@ function enemytool:init(x, y, r, e)
 		end
 		if v[5] and v[5] ~= "none" then
 			self.animation = v[5]
+		end
+		if v[6] ~= nil then
+			self.spawnonlyonscreen = v[6]
 		end
 	else
 		self.enemy = e or "goomba"
@@ -142,6 +146,9 @@ function enemytool:spawn()
 	--end
 	
 	if i == nil then
+		return false
+	end
+	if self.spawnonlyonscreen and not onscreen(self.x-2, self.y-2, 4, 4) then
 		return false
 	end
 
