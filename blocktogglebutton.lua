@@ -322,7 +322,7 @@ function blocktogglebutton:ceilcollide(a, b)
 end
 
 function blocktogglebutton:press(a, b)
-	if a == "player" or a == "thwomp" or a == "skewer" or (a == "fireball" and b.t == "superball") or a == "icicle" or a == "spikeball" or a == "muncher" or (a == "enemy" and b.activateswitches) then
+	if a == "player" or a == "thwomp" or a == "skewer" or (a == "fireball" and b.t == "superball") or a == "icicle" or a == "spikeball" or a == "muncher" or (a == "enemy" and (b.activateswitches or b.small)) or (a == "koopa" and b.small) then
 		if self.t == "big" then
 			self.quad = bigblockquad[self.color][3]
 		elseif self.t == "p" then

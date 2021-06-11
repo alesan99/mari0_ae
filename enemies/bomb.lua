@@ -183,6 +183,7 @@ function bomb:explode()
 	self.explosion = true
 	self.stompbounce = false
 	self.freezable = false
+	self.trackable = false
 	
 	local oldw, oldh = self.width, self.height
 	self.width = 2

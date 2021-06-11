@@ -43,7 +43,7 @@ function redseesaw:init(x, y, size)
 	self.rotation = math.pi*.5
 	self.restrotation = math.pi*.5
 
-	self.checktable = {"player", "enemy", "mushroom", "oneup", "star", "box", "smallspring", "powblock", "thwomp", "fireball", "pbutton", "levelball", "plantfire", "ice"}
+	self.checktable = {"player", "enemy", "mushroom", "oneup", "star", "box", "smallspring", "powblock", "thwomp", "fireball", "pbutton", "levelball", "plantfire", "ice", "cannonballcannon"}
 	for i, v in pairs(enemies) do
 		if objects[v] then
 			table.insert(self.checktable, v)

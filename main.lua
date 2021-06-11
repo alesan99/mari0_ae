@@ -130,7 +130,7 @@ function love.load()
 	currentshaderi1 = 1
 	currentshaderi2 = 1
 	
-	if android then
+	if android and not androidtest then
 		love.filesystem.setIdentity("mari0_android") --[DROID]
 	else
 		love.filesystem.setIdentity("mari0")
