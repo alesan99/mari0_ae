@@ -64,17 +64,19 @@ function button:update(dt)
 	
 	local colls = checkrect(x, y, width, height, self.checktable)
 	
-	if self.t > 1 then
-		local delete = {}
-		for j = 1, #colls, 2 do
-			local rem = false
-			local obj = objects[colls[j]][colls[j+1]]
-			if (self.t == 2 and (obj.t ~= "box1" and obj.t ~= "box2")) or (self.t == 3 and obj.t ~= "edgeless") then
-				table.insert(delete, j)
-				table.insert(delete, j+1)
-			end
+	--ignore certain entities (needed for cube and sphere buttons for example)
+	local delete
+	for j = 1, #colls, 2 do
+		local rem = false
+		local obj = objects[colls[j]][colls[j+1]]
+		if (self.t == 2 and (obj.t ~= "box1" and obj.t ~= "box2")) or (self.t == 3 and obj.t ~= "edgeless") or obj.doesntpressbuttons then
+			if not delete then delete = {} end
+			table.insert(delete, j)
+			table.insert(delete, j+1)
 		end
-		
+	end
+	
+	if delete then
 		table.sort(delete, function(a,b) return a>b end)
 		
 		for i, v in pairs(delete) do
@@ -82,6 +84,7 @@ function button:update(dt)
 		end
 	end
 	
+	--update lights on cubes
 	for j = 1, #colls, 2 do
 		local add = true
 		for i, v in pairs(self.pressings) do
@@ -98,9 +101,7 @@ function button:update(dt)
 		end
 	end
 	
-	
-	local delete = {}
-	
+	local delete
 	for i, v in pairs(self.pressings) do
 		local rem = true
 		for j = 1, #colls, 2 do
@@ -110,19 +111,21 @@ function button:update(dt)
 		end
 		
 		if rem then
+			if not delete then delete = {} end
 			table.insert(delete, i)
 		end
 	end
-	
-	table.sort(delete, function(a,b) return a>b end)
-	
-	for i, v in pairs(delete) do
-		if self.pressings[v].onbutton then
-			self.pressings[v]:onbutton(false)
+	if delete then
+		table.sort(delete, function(a,b) return a>b end)
+		for i, v in pairs(delete) do
+			if self.pressings[v].onbutton then
+				self.pressings[v]:onbutton(false)
+			end
+			table.remove(self.pressings, v)
 		end
-		table.remove(self.pressings, v)
 	end
 	
+	--send out put if being pressed
 	if (#colls > 0) ~= self.out then
 		self.out = not self.out
 		for i = 1, #self.outtable do
