@@ -2186,6 +2186,14 @@ function enemy:update(dt)
 			end
 		end
 	end
+	
+	if self.checkif then
+
+		for i = 1, #self.checkif do
+
+			self:ifstatement(self.checkif[i][1], self.checkif[i][2], self.checkif[i][3], self.checkif[i][4], self.checkif[i][5])
+		end
+	end
 end
 
 function enemy:addoutput(a, t)
@@ -2385,6 +2393,12 @@ function enemy:customtimeraction(action, arg)
 				self.spawnsenemy = self.spawnsenemyrandoms[math.random(#self.spawnsenemyrandoms)]
 			end
 			self:spawnenemy(self.spawnsenemy)
+		elseif action == "if" then
+
+			self:ifstatement(arg[1],arg[2],arg[3],arg[4],arg[5])
+			--                   first;  Symb; Second;     Action;     Arg;
+			--EXAMPLE: [0,"if",["speedx",">=","speedy",["set","speedy"],25]
+		end
 		elseif string.sub(action, 0, 7) == "reverse" then
 			local parameter = string.sub(action, 8, string.len(action))
 			self[parameter] = -self[parameter]
@@ -2399,6 +2413,42 @@ function enemy:customtimeraction(action, arg)
 		elseif string.sub(action, 0, 3) == "set" then
 			self[string.sub(action, 4, string.len(action))] = arg
 		end
+	end
+end
+
+function enemy:ifstatement(first, symbol, second, action, arg, t)
+
+	--EXAMPLE: ["speedx","==","speedy",["set","speedy"],10]
+
+
+	if self[first] then
+		first = self[first]
+	end	
+	if self[second] then
+		second = self[second]
+	end	
+	
+	local pass = false
+    if (symbol == "=" or symbol == "==") and (first == second) then
+		pass = true
+    elseif symbol == ">" and (first > second) then
+        pass = true
+    elseif symbol == "<" and (first < second) then
+		pass = true
+    elseif symbol == ">=" and (first >= second) then
+        pass = true
+    elseif symbol == "<=" and (first <= second) then
+        pass = true
+    elseif symbol == "~=" and (first ~= second) then
+        pass = true
+	elseif symbol == "*" and self[first] then --Exists
+        pass = true
+	elseif symbol == "!" and (not self[first]) then --Not exists
+        pass = true
+    end
+
+	if pass then
+		self:customtimeraction(action, arg, t)
 	end
 end
 
