@@ -6843,7 +6843,7 @@ function hitblock(x, y, t, v)
 			size = 2
 		end
 	end
-	if t and (t.funnel or t.breaksblocks) then
+	if t and (t.funnel or t.nohitsound) then
 		hitsound = false
 	end
 	
