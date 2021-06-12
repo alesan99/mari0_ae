@@ -2172,10 +2172,11 @@ function enemy:update(dt)
 	end
 	
 	if self.customtimer then
+		--[delay, [action, parameter], argument]
 		self.customtimertimer = self.customtimertimer + dt
 		while self.customtimertimer > self.customtimer[self.currentcustomtimerstage][1] do
 			self.customtimertimer = self.customtimertimer - self.customtimer[self.currentcustomtimerstage][1]
-			self:customtimeraction(self.customtimer[self.currentcustomtimerstage][2], self.customtimer[self.currentcustomtimerstage][3], self.customtimer[self.currentcustomtimerstage][4])
+			self:customtimeraction(self.customtimer[self.currentcustomtimerstage][2], self.customtimer[self.currentcustomtimerstage][3])
 			self.currentcustomtimerstage = self.currentcustomtimerstage + 1
 			if self.currentcustomtimerstage > #self.customtimer then
 				self.currentcustomtimerstage = 1
@@ -2186,12 +2187,10 @@ function enemy:update(dt)
 			end
 		end
 	end
-	
-	if self.checkif then
-
-		for i = 1, #self.checkif do
-
-			self:ifstatement(self.checkif[i][1], self.checkif[i][2], self.checkif[i][3], self.checkif[i][4], self.checkif[i][5])
+	if false and self.customtrigger then --disabled until finished
+		--[property1,comparison,property2, [action, parameter],argument]
+		for i = 1, #self.customtrigger do
+			self:ifstatement(self.customtrigger[i][1], self.customtrigger[i][2], self.customtrigger[i][3], self.customtrigger[i][4], self.customtrigger[i][5])
 		end
 	end
 end
@@ -2378,6 +2377,10 @@ function enemy:customtimeraction(action, arg)
 			self[p] = tonumber(self[p])
 		elseif a == "tostring" then
 			self[p] = tostring(self[p])
+		elseif a == "if" then
+			self:ifstatement(ogarg[1],ogarg[2],ogarg[3],ogarg[4],ogarg[5])
+			--                   first;  Symb; Second;     Action;     Arg;
+			--EXAMPLE: [0,"if",["speedx",">=","speedy",["set","speedy"],25]
 		end
 	else --backwards compatibility
 		if action == "bounce" then
@@ -2393,11 +2396,6 @@ function enemy:customtimeraction(action, arg)
 				self.spawnsenemy = self.spawnsenemyrandoms[math.random(#self.spawnsenemyrandoms)]
 			end
 			self:spawnenemy(self.spawnsenemy)
-		elseif action == "if" then
-
-			self:ifstatement(arg[1],arg[2],arg[3],arg[4],arg[5])
-			--                   first;  Symb; Second;     Action;     Arg;
-			--EXAMPLE: [0,"if",["speedx",">=","speedy",["set","speedy"],25]
 		end
 		elseif string.sub(action, 0, 7) == "reverse" then
 			local parameter = string.sub(action, 8, string.len(action))
@@ -2416,39 +2414,37 @@ function enemy:customtimeraction(action, arg)
 	end
 end
 
-function enemy:ifstatement(first, symbol, second, action, arg, t)
-
+function enemy:ifstatement(propName1, comparison, propName2, action, arg)
 	--EXAMPLE: ["speedx","==","speedy",["set","speedy"],10]
-
-
-	if self[first] then
-		first = self[first]
+	local prop1,prop2
+	if self[propName1] then
+		first = self[propName1]
 	end	
-	if self[second] then
-		second = self[second]
+	if self[propName2] then
+		second = self[prop2]
 	end	
 	
 	local pass = false
-    if (symbol == "=" or symbol == "==") and (first == second) then
+    if comparison == "equal" and (prop1 == prop2) then
 		pass = true
-    elseif symbol == ">" and (first > second) then
+    elseif comparison == "greater" and (prop1 > prop2) then
         pass = true
-    elseif symbol == "<" and (first < second) then
+    elseif comparison == "less" and (prop1 < prop2) then
 		pass = true
-    elseif symbol == ">=" and (first >= second) then
+    elseif comparison == "greaterequal" and (prop1 >= prop2) then
         pass = true
-    elseif symbol == "<=" and (first <= second) then
+    elseif comparison == "lessequal" and (prop1 <= prop2) then
         pass = true
-    elseif symbol == "~=" and (first ~= second) then
+    elseif comparison == "notequal" and (prop1 ~= prop2) then
         pass = true
-	elseif symbol == "*" and self[first] then --Exists
+	elseif comparison == "exists" and prop1 ~= nil then
         pass = true
-	elseif symbol == "!" and (not self[first]) then --Not exists
+	elseif comparison == "notexists" and prop1 == nil then
         pass = true
     end
 
 	if pass then
-		self:customtimeraction(action, arg, t)
+		self:customtimeraction(action, arg)
 	end
 end
 
