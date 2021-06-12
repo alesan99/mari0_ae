@@ -24,7 +24,7 @@
 	"down": 
 		[40, 188, 30, 30,
 		132, 208, 120, 120],
-	"center": 
+	"center_DISABLED": 
 		[40, 159, 30, 30,
 		120, 120, 120, 120],
 
@@ -49,5 +49,6 @@
 	"image": true,
 	"offset": 336,
 	"mipmaps": true,
-	"lowres": false
+	"lowres": false,
+	"highlightonpress": true
 }

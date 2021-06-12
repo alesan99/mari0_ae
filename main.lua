@@ -47,7 +47,7 @@
 	-fußmatte for helping create a TON of new characters for the font and Esperanto Translation
 	-HugoBDesigner for Portugese-Br translation
 	-Los for Russian Translation
-	-William for contributions on github
+	-William and Kant for contributions on github
 	-----------------------------------------------------------------------------
 ]]
 

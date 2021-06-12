@@ -19,7 +19,7 @@ function clearpipe:init(x, y, r, t)
 		self.suck = true
 		self.suckspeed = 14 --owo
 		self.sucklen = 4
-		self.sucktable = {"player","box","turret"}
+		self.sucktable = {"player","box","core","turret"}
 
 		self.suckentranceportalx = false
 		self.suckentranceportaly = false
