@@ -2397,7 +2397,7 @@ function enemy:customtimeraction(action, arg)
 			end
 			self:spawnenemy(self.spawnsenemy)
 		end
-		elseif string.sub(action, 0, 7) == "reverse" then
+		if string.sub(action, 0, 7) == "reverse" then
 			local parameter = string.sub(action, 8, string.len(action))
 			self[parameter] = -self[parameter]
 		elseif string.sub(action, 0, 3) == "add" then
@@ -2650,7 +2650,7 @@ function enemy:globalcollide(a, b, c, d, dir)
 		if (self.breakblockside == nil or self.breakblockside == "global") then
 			if a == "tile" then
 				if self.breakshardblocks and (tilequads[map[b.cox][b.coy][1]].coinblock or (tilequads[map[b.cox][b.coy][1]].debris and blockdebrisquads[tilequads[map[b.cox][b.coy][1]].debris])) then -- hard block
-					destroyblock(b.cox, b.coy)
+					destroyblock(b.cox, b.coy, "nopoints")
 				else
 					hitblock(b.cox, b.coy, self, true)
 				end
@@ -2736,7 +2736,7 @@ function enemy:leftcollide(a, b, c, d)
 		if (self.breakblockside == "sides" or self.breakblockside == "left") then
 			if a == "tile" then
 				if self.breakshardblocks and (tilequads[map[b.cox][b.coy][1]].coinblock or (tilequads[map[b.cox][b.coy][1]].debris and blockdebrisquads[tilequads[map[b.cox][b.coy][1]].debris])) then -- hard block
-					destroyblock(b.cox, b.coy)
+					destroyblock(b.cox, b.coy, "nopoints")
 				else
 					hitblock(b.cox, b.coy, self, true)
 				end
@@ -2865,7 +2865,7 @@ function enemy:rightcollide(a, b, c, d)
 		if (self.breakblockside == "sides" or self.breakblockside == "right") then
 			if a == "tile" then
 				if self.breakshardblocks and (tilequads[map[b.cox][b.coy][1]].coinblock or (tilequads[map[b.cox][b.coy][1]].debris and blockdebrisquads[tilequads[map[b.cox][b.coy][1]].debris])) then -- hard block
-					destroyblock(b.cox, b.coy)
+					destroyblock(b.cox, b.coy, "nopoints")
 				else
 					hitblock(b.cox, b.coy, self, true)
 				end
@@ -2982,7 +2982,7 @@ function enemy:ceilcollide(a, b, c, d)
 		if self.breakblockside == "ceil" then
 			if a == "tile" then
 				if self.breakshardblocks and (tilequads[map[b.cox][b.coy][1]].coinblock or (tilequads[map[b.cox][b.coy][1]].debris and blockdebrisquads[tilequads[map[b.cox][b.coy][1]].debris])) then -- hard block
-					destroyblock(b.cox, b.coy)
+					destroyblock(b.cox, b.coy, "nopoints")
 				else
 					hitblock(b.cox, b.coy, self, true)
 				end
@@ -3098,7 +3098,7 @@ function enemy:floorcollide(a, b, c, d)
 		if self.breakblockside == "floor" then
 			if a == "tile" then
 				if self.breakshardblocks and (tilequads[map[b.cox][b.coy][1]].coinblock or (tilequads[map[b.cox][b.coy][1]].debris and blockdebrisquads[tilequads[map[b.cox][b.coy][1]].debris])) then -- hard block
-					destroyblock(b.cox, b.coy)
+					destroyblock(b.cox, b.coy, "nopoints")
 				else
 					hitblock(b.cox, b.coy, self, true)
 				end
