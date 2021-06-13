@@ -30,6 +30,9 @@ function regiontrigger:init(x, y, vars, r)
 			elseif s == "enemy" then
 				self.checktable = deepcopy(enemies)
 				table.insert(self.checktable, "enemy")
+			elseif s == "cube" then
+				self.checktable = {"player","box","core"}
+				self.cubecheck = true
 
 			elseif s == "everything" then
 				self.checktable = deepcopy(enemies)
@@ -39,6 +42,8 @@ function regiontrigger:init(x, y, vars, r)
 				table.insert(self.checktable, "mushroom")
 				table.insert(self.checktable, "oneup")
 				table.insert(self.checktable, "poisonmush")
+			elseif s:find("A") then
+				self.checktable = s:split("A")
 			else
 				self.checktable = {s}
 			end
@@ -68,6 +73,21 @@ end
 
 function regiontrigger:update(dt)
 	local col = checkrect(self.rx, self.ry, self.rw, self.rh, self.checktable, nil, "regiontrigger")
+	if self.cubecheck then
+		--check for players carrying boxes
+		local delete
+		for j = 1, #col, 2 do
+			local obj = objects[col[j]][col[j+1]]
+			if col[j] == "player" and not (obj.pickup and obj.pickup.boxframe) then
+				if not delete then delete = {} end
+				table.insert(delete, j) table.insert(delete, j+1)
+			end
+		end
+		if delete then
+			table.sort(delete, function(a,b) return a>b end)
+			for i, v in pairs(delete) do table.remove(col, v) end
+		end
+	end
 	if self.out == "off" and #col > 0 then
 		self.out = "on"
 		for i = 1, #self.outtable do
