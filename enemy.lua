@@ -393,6 +393,10 @@ function enemy:init(x, y, t, a, properties)
 		self.lifetimer = self.lifetime
 	end
 	
+	if self.flickertime then
+		self.flickertimer = 0
+	end
+	
 	if self.jumps then
 		self.jumptimer = 0
 	end
@@ -534,6 +538,14 @@ function enemy:update(dt)
 			self.dead = true
 			
 			return true
+		end
+	end
+	
+	if self.flickertime and self.flickertimer then
+		self.flickertimer = self.flickertimer + dt
+		while self.flickertimer > self.flickertime do
+			self.flickertimer = self.flickertimer - self.flickertime
+			self.drawable = not self.drawable
 		end
 	end
 	
