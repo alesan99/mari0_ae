@@ -950,7 +950,7 @@ function game_update(dt)
 				else
 					--splitxscroll[split] = splitxscroll[split] + 1.5*dt
 				end
-				
+
 				--just force that shit
 				if not levelfinished and not (autoscrollingx and not editormode) then
 					if fastestplayer.x > splitxscroll[split] + width - scrollingcomplete then
@@ -1235,12 +1235,12 @@ function game_update(dt)
 		spritebatchX[1] = math.floor(splitxscroll[1])
 		
 		if editormode == false and splitxscroll[1] < mapwidth-width then
-			local x1, x2 = math.ceil(oldscroll)+width+1, math.floor(splitxscroll[1])+width+1
+			local x1, x2 = math.ceil(oldscroll)+width*screenzoom2+1, math.floor(splitxscroll[1])+width*screenzoom2+1
 			if oldscroll > splitxscroll[1] then --spawn enemies in both directions
 				x1, x2 = math.floor(splitxscroll[1])+1, math.floor(oldscroll)+1
 			end
 			for x = x1, x2 do
-				for y = math.floor(splityscroll[1])+1, math.min(mapheight, math.ceil(splityscroll[1])+height+1+2) do
+				for y = math.floor(splityscroll[1])+1, math.min(mapheight, math.ceil(splityscroll[1])+height*screenzoom2+1+2) do
 					spawnenemyentity(x, y)
 				end
 				if goombaattack then
@@ -1278,10 +1278,10 @@ function game_update(dt)
 		generatespritebatch()
 		spritebatchY[1] = math.floor(splityscroll[1])
 		if editormode == false then
-			for x = math.floor(splitxscroll[1])+1, math.ceil(splitxscroll[1])+width+1 do
+			for x = math.floor(splitxscroll[1])+1, math.ceil(splitxscroll[1])+width*screenzoom2+1 do
 				local y1, y2 = math.floor(splityscroll[1])+1, math.floor(oldscrolly)+1
 				if oldscrolly < splityscroll[1] then
-					y1, y2 = math.floor(oldscrolly)+1+height+2, math.floor(splityscroll[1])+1+height+2
+					y1, y2 = math.floor(oldscrolly)+1+height*screenzoom2+2, math.floor(splityscroll[1])+1+height*screenzoom2+2
 				end
 				for y = y1, y2 do
 					spawnenemyentity(x, y)
@@ -2969,8 +2969,7 @@ function drawentity(j, w, i, v, currentscissor)
 	
 	--SCISSOR FOR ENTRY
 	if v.customscissor and (v.invertedscissor or (v.t and enemiesdata[v.t])) and v.portalable ~= false then --portable custom enemies
-		local t = "stencil"
-		love.graphics[t](function() love.graphics.rectangle("fill", math.floor((v.customscissor[1]-xscroll)*16*scale), math.floor((v.customscissor[2]-.5-yscroll)*16*scale), v.customscissor[3]*16*scale, v.customscissor[4]*16*scale) end, "increment")
+		love.graphics.stencil(function() love.graphics.rectangle("fill", math.floor((v.customscissor[1]-xscroll)*16*scale), math.floor((v.customscissor[2]-.5-yscroll)*16*scale), v.customscissor[3]*16*scale, v.customscissor[4]*16*scale) end, "increment")
 		if v.invertedscissor then
 			love.graphics.setStencilTest("less", 1)
 		else
@@ -2978,11 +2977,10 @@ function drawentity(j, w, i, v, currentscissor)
 		end
 	elseif v.static or (v.portalable == false) then --static or non portable entities
 		if v.invertedscissor then
-			local t = "stencil"
-			love.graphics[t](function() love.graphics.rectangle("fill", math.floor((v.customscissor[1]-xscroll)*16*scale), math.floor((v.customscissor[2]-.5-yscroll)*16*scale), v.customscissor[3]*16*scale, v.customscissor[4]*16*scale) end, "increment")
+			love.graphics.stencil(function() love.graphics.rectangle("fill", math.floor((v.customscissor[1]-xscroll)*16*scale), math.floor((v.customscissor[2]-.5-yscroll)*16*scale), v.customscissor[3]*16*scale, v.customscissor[4]*16*scale) end, "increment")
 			love.graphics.setStencilTest("less", 1)
 		elseif v.customscissor then
-			love.graphics.setScissor(math.floor((v.customscissor[1]-xscroll)*16*scale), math.floor((v.customscissor[2]-.5-yscroll)*16*scale), v.customscissor[3]*16*scale, v.customscissor[4]*16*scale)
+			love.graphics.setScissor(math.floor((v.customscissor[1]-xscroll)*16*screenzoom*scale), math.floor((v.customscissor[2]-.5-yscroll)*16*screenzoom*scale), v.customscissor[3]*16*screenzoom*scale, v.customscissor[4]*16*screenzoom*scale)
 		end
 	end
 		
@@ -4236,6 +4234,7 @@ function startlevel(level, reason)
 	splitxscroll = {0}
 	splityscroll = {0}
 	screenzoom = 1
+	screenzoom2 = 1/screenzoom
 	
 	startx = 3
 	starty = 13
@@ -4532,12 +4531,12 @@ function startlevel(level, reason)
 		
 	--ADD ENEMIES ON START SCREEN
 	if editormode == false then
-		local xtodo = width+1
-		if mapwidth < width+1 then
+		local xtodo = width*screenzoom2+1
+		if mapwidth < width*screenzoom2+1 then
 			xtodo = mapwidth
 		end
 		for x = math.floor(splitxscroll[1]), math.floor(splitxscroll[1])+xtodo do
-			for y = math.floor(splityscroll[1]), math.floor(splityscroll[1])+height+2 do
+			for y = math.floor(splityscroll[1]), math.floor(splityscroll[1])+height*screenzoom2+2 do
 				spawnenemyentity(x, y)
 			end
 		end
@@ -8405,8 +8404,8 @@ function camerasnap(targetx, targety, anim)
 	end
 
 	if not (editormode and not testlevel) then
-		for x = math.max(1, math.floor(xscroll)), math.min(mapwidth, math.ceil(xscroll+width)) do
-			for y = math.max(1, math.floor(yscroll)), math.min(mapheight, math.ceil(yscroll+height+1)) do
+		for x = math.max(1, math.floor(xscroll)), math.min(mapwidth, math.ceil(xscroll+width*screenzoom2)) do
+			for y = math.max(1, math.floor(yscroll)), math.min(mapheight, math.ceil(yscroll+height*screenzoom2+1)) do
 				spawnenemyentity(x,y)
 			end
 		end
@@ -8549,9 +8548,9 @@ end
 
 function onscreen(x, y, w, h)
 	if w and h then
-		return (x+w >= xscroll and y+h-.5 >= yscroll and x <= xscroll+width and y-.5 <= yscroll+height)
+		return (x+w >= xscroll and y+h-.5 >= yscroll and x <= xscroll+width*screenzoom2 and y-.5 <= yscroll+height*(1/screenzoom))
 	else
-		return (x >= xscroll and y-.5 >= yscroll and x <= xscroll+width and y-.5 <= yscroll+height)
+		return (x >= xscroll and y-.5 >= yscroll and x <= xscroll+width*screenzoom2 and y-.5 <= yscroll+height*(1/screenzoom))
 	end
 end
 
@@ -8743,7 +8742,7 @@ function rendercustombackground(xscroll, yscroll, scrollfactor, scrollfactory)
 			if custombackgroundquad[i] and not SlowBackgrounds then --optimized static background
 				local x1, y1 = math.floor(xscroll*16*scale)/scale, math.floor(yscroll*16*scale)/scale
 				local qx, qy, qw, qh, sw, sh = custombackgroundquad[i]:getViewport()
-				custombackgroundquad[i]:setViewport( x1, y1, qw, qh, sw, sh )
+				custombackgroundquad[i]:setViewport( x1, y1, width*16*screenzoom2, height*16*screenzoom2, sw, sh )
 				love.graphics.draw(custombackgroundimg[i], custombackgroundquad[i], 0, 0, 0, scale, scale)
 			else
 				for y = min, math.ceil(height/custombackgroundheight[i])+1 do

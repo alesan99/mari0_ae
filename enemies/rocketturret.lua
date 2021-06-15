@@ -405,32 +405,46 @@ function turretrocket:emancipate()
 	end
 end
 
+function turretrocket:globalcollide(a, b)
+	return false
+end
+
 function turretrocket:leftcollide(a, b)
+	if self:globalcollide(a, b) then
+		return false
+	end
 	self:hit(a, b, "right")
 	return false
 end
 
 function turretrocket:rightcollide(a, b)
+	if self:globalcollide(a, b) then
+		return false
+	end
 	self:hit(a, b, "left")
 	return false
 end
 
-function turretrocket:globalcollide(a, b)
-	self:hit(a, b)
-	return false
-end
-
 function turretrocket:floorcollide(a, b)
+	if self:globalcollide(a, b) then
+		return false
+	end
 	self:hit(a, b, "top")
 	return false
 end
 
 function turretrocket:ceilcollide(a, b)
+	if self:globalcollide(a, b) then
+		return false
+	end
 	self:hit(a, b, "bottom")
 	return false
 end
 
 function turretrocket:passivecollide(a, b)
+	if self:globalcollide(a, b) then
+		return false
+	end
 	self:hit(a, b)
 	return false
 end

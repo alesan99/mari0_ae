@@ -1736,10 +1736,10 @@ function editor_draw()
 						x2, y2 = x+pastecenter[1]+#mtclipboard-1, y+pastecenter[2]+#mtclipboard[1]
 					end
 					x1, y1 = math.max(xscroll-1, x1), math.max(yscroll-1, y1)
-					x2, y2 = math.min(xscroll+width+1, x2), math.min(yscroll+height+1, y2)
+					x2, y2 = math.min(xscroll+width*screenzoom2+1, x2), math.min(yscroll+height*screenzoom2+1, y2)
 					local sx, sy, sw, sh = x1-1, y1-1, x2-x1+1, y2-y1+1
 					love.graphics.setColor(0, 131, 255, 45)
-					love.graphics.rectangle("fill", ((sx-xscroll)*16*screenzoom)*scale,((sy-yscroll)*16-8)*screenzoom*scale, sw*16*screenzoom*scale, sh*16*screenzoom*scale)
+					love.graphics.rectangle("fill", ((sx-xscroll)*16)*scale,((sy-yscroll)*16-8)*scale, sw*16*scale, sh*16*scale)
 					love.graphics.setColor(255,255,255)
 					love.graphics.stencil(function() 
 						love.graphics.setLineWidth(scale)
@@ -5061,6 +5061,7 @@ function editor_mousepressed(x, y, button)
 				local zoom1 = screenzoom
 				local centerx, centery = xscroll+(width*(1/screenzoom))*r1, yscroll+(height*(1/screenzoom))*r2
 				screenzoom = math.min(1,math.max(0.05, screenzoom + (screenzoom/(dy*5))))
+				screenzoom2 = 1/screenzoom
 				if zoom1 ~= screenzoom then
 					xscroll = centerx - (width*(1/screenzoom))*r1
 					yscroll = centery - (height*(1/screenzoom))*r2
@@ -5104,6 +5105,7 @@ function editor_mousepressed(x, y, button)
 				local zoom1 = screenzoom
 				local centerx, centery = xscroll+(width*(1/screenzoom))*r1, yscroll+(height*(1/screenzoom))*r2
 				screenzoom = math.min(1,math.max(0.05, screenzoom + (screenzoom/(dy*5))))
+				screenzoom2 = 1/screenzoom
 				if zoom1 ~= screenzoom then
 					xscroll = centerx - (width*(1/screenzoom))*r1
 					yscroll = centery - (height*(1/screenzoom))*r2

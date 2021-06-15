@@ -27,6 +27,7 @@ function menu_load()
 	opendlcbutton = guielement:new("button", 241, 190, "open dlc folder", opendlcfolder, nil, 0, 2.5, 147, true)
 	opendlcbutton.active = false
 	screenzoom = 1
+	screenzoom2 = 1/screenzoom
 
 	downloadedmappacks = {}
 	mappackhorscroll = 0
