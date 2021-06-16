@@ -4705,9 +4705,6 @@ function mario:floorcollide(a, b)
 			return false
 		elseif b.kills or b.killsontop then
 			if self.invincible then
-				self.jumping = jump
-				self.falling = fall
-				self.animationstate = anim
 				if b.solidkill then
 					return true
 				else
@@ -6562,8 +6559,8 @@ function mario:starcollide(a, b)
 	if a == "enemy" then
 		if b:shotted("right", nil, nil, false, true) then
 			addpoints(firepoints[b.t] or 100, self.x, self.y)
+			return true
 		end
-		return true
 	elseif (a == "goomba" or a == "koopa" or a == "plant" or a == "bowser" or a == "squid" or a == "cheep" or a == "hammerbro" or a == "lakito" or a == "bulletbill" or a == "flyingfish" or a == "downplant" or a == "bigbill" or a == "cannonball" or (a == "kingbill" and not (levelfinished and not self.controlsenabled)) or a == "sidestepper" or a == "barrel" or a == "icicle" or a == "angrysun"
 		or a == "splunkin" or a == "biggoomba" or a == "bigkoopa" or a == "fishbone" or a == "drybones" or a == "meteor" or a == "ninji" or a == "boo" or a == "mole" or a == "bomb" or a == "fireplant" or a == "downfireplant" or a == "plantfire" or a == "torpedoted" or a == "torpedolauncher" or a == "parabeetle" or a == "pokey" or a == "chainchomp" or a == "rockywrench" or a == "magikoopa" or a == "spike" or a == "spikeball" or a == "plantcreeper" or a == "fuzzy")
 		and (not b.resistsstar) then

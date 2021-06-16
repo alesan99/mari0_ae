@@ -27,6 +27,7 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	collectableslist = {{},{},{},{},{},{},{},{},{},{}}
 	collectablescount = {0,0,0,0,0,0,0,0,0,0}
 	animationnumbers = {}
+	autosave = false
 	
 	subleveltest = false
 	
@@ -277,7 +278,8 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	guielements["continuemusiccheckbox"] = guielement:new("checkbox", 294, guielements["realtimecheckbox"].y+11+10*count, togglecontinuemusic, continuesublevelmusic, TEXT["cont. music"])
 
 	--MAPS
-	guielements["savebutton2"] = guielement:new("button", 300, 196, TEXT["save level"], savelevel, 0, nil, 2.5, 94, true)
+	guielements["savebutton2"] = guielement:new("button", 300, 196, TEXT["save level"], guielements["savebutton"].func, 0, nil, 2.5, 94, true)
+	--guielements["autosavecheckbox"] = guielement:new("checkbox", 300, guielements["savebutton2"].y+16, function() autosave = not autosave; guielements["autosavecheckbox"].var = autosave end, autosave, TEXT["autosave"])
 	guielements["savebutton2"].bordercolor = {255, 0, 0}
 	guielements["savebutton2"].bordercolorhigh = {255, 127, 127}
 	
@@ -2585,6 +2587,7 @@ function editor_draw()
 			love.graphics.setColor(255, 255, 255)
 			properprintF(TEXT["do not forget to save\nyour current level!"], 108*scale, 200*scale)
 			guielements["savebutton2"]:draw()
+			--guielements["autosavecheckbox"]:draw()
 			
 			if levelrightclickmenu.active then
 				levelrightclickmenu:draw()
@@ -3302,6 +3305,7 @@ function mapstab()
 	end
 	guielements["newworld"].active = true
 	guielements["savebutton2"].active = true
+	--guielements["autosavecheckbox"].active = true
 	
 	switchworldselection(marioworld)
 	updatelevelscrollbar()
@@ -4431,6 +4435,9 @@ function mapnumberclick(i, j, k)
 			--save editor meta data
 			saveeditormetadata()
 			promptedmetadatasave = false
+		end
+		if levelmodified and autosave then
+			guielements["savebutton2"].func()
 		end
 
 		marioworld = i
@@ -6316,6 +6323,9 @@ function editor_keypressed(key)
 					loadmtobjects()
 					tilesobjects()
 					notice.new("Selection saved", notice.white, 3)
+				elseif not tileseletion then
+					--save level
+					savelevel(); levelmodified = false
 				end
 			elseif key == "c" or key == "x" then
 				if tileselection and tileselection.finished then
