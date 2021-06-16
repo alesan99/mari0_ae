@@ -278,7 +278,7 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	guielements["continuemusiccheckbox"] = guielement:new("checkbox", 294, guielements["realtimecheckbox"].y+11+10*count, togglecontinuemusic, continuesublevelmusic, TEXT["cont. music"])
 
 	--MAPS
-	guielements["savebutton2"] = guielement:new("button", 300, 196, TEXT["save level"], guielements["savebutton"].func, 0, nil, 2.5, 94, true)
+	guielements["savebutton2"] = guielement:new("button", 300, 196, TEXT["save level"], guielements["savebutton"].func, 0, nil, 2.4, 94, true)
 	--guielements["autosavecheckbox"] = guielement:new("checkbox", 300, guielements["savebutton2"].y+16, function() autosave = not autosave; guielements["autosavecheckbox"].var = autosave end, autosave, TEXT["autosave"])
 	guielements["savebutton2"].bordercolor = {255, 0, 0}
 	guielements["savebutton2"].bordercolorhigh = {255, 127, 127}
