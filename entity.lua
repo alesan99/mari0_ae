@@ -1378,7 +1378,7 @@ rightclicktype["belt"] = {
 			elseif v == "left slow" then f = -3
 			elseif v == "left fast" then f = -6
 			end
-			return f
+			return f or 3
 		elseif i == 2 then
 			return tonumber(v) or 3
 		end
