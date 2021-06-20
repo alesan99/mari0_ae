@@ -5176,10 +5176,10 @@ function mario:stompbounce(a, b) --bounce off of enemy (koopaling in shell for e
 	
 	local bouncespeed = math.sqrt(multiplier*grav*bounceheight)
 	if (not stompbouncex) and a ~= "yoshi" and mariomakerphysics and (not portalphysics) then
-		bouncespeed = math.sqrt(2*grav*bounceheighthigh)
+		bouncespeed = math.sqrt(2*grav*(b.stompbouncenojump or bounceheighthigh))
 		self.jumping = true
 		if not jumpkey(self.playernumber) then --bounce higher in mario maker physics
-			bouncespeed = math.sqrt(2*grav*bounceheightmaker)
+			bouncespeed = math.sqrt(2*grav*(b.stompbouncejump or bounceheightmaker))
 			self:stopjump()
 		end
 	end
