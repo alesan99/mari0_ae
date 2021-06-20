@@ -1816,8 +1816,12 @@ function editor_draw()
 				elseif not pastingtiles then 
 					if not tilequads[currenttile] and enemiesdata[currenttile] then --custom enemy
 						local v = enemiesdata[currenttile]
-						local xoff, yoff = ((0.5-v.width/2+(v.spawnoffsetx or 0))*16 + v.offsetX - v.quadcenterX)*scale, (((v.spawnoffsety or 0)-v.height+1)*16-v.offsetY - v.quadcenterY)*scale
-						love.graphics.draw(v.graphic, v.quad, math.floor((x-xscroll-1)*16*scale+xoff), math.floor(((y-yscroll)*16)*scale+yoff), 0, scale, scale)
+						if v.showicononeditor and v.icongraphic then
+							love.graphics.draw(v.icongraphic, math.floor((x-xscroll-1)*16*scale), math.floor(((y-yscroll-0.5)*16)*scale), 0, scale, scale)
+						else
+							local xoff, yoff = ((0.5-v.width/2+(v.spawnoffsetx or 0))*16 + v.offsetX - v.quadcenterX)*scale, (((v.spawnoffsety or 0)-v.height+1)*16-v.offsetY - v.quadcenterY)*scale
+							love.graphics.draw(v.graphic, v.quad, math.floor((x-xscroll-1)*16*scale+xoff), math.floor(((y-yscroll)*16)*scale+yoff), 0, scale, scale)
+						end
 					else
 						--offset enemy
 						local offsetx = 0
@@ -1875,8 +1879,12 @@ function editor_draw()
 								if yl == 1 and xl == 1 then 
 								elseif not tilequads[currenttile] and enemiesdata[currenttile] then --custom enemy
 									local v = enemiesdata[currenttile]
-									local xoff, yoff = ((0.5-v.width/2+(v.spawnoffsetx or 0))*16 + v.offsetX - v.quadcenterX)*scale, (((v.spawnoffsety or 0)-v.height+1)*16-v.offsetY - v.quadcenterY)*scale
-									love.graphics.draw(v.graphic, v.quad, math.floor((x-splitxscroll[1]-1+xl-1)*16*scale+xoff), math.floor(((y-splityscroll[1]-1+yl-1)*16+16)*scale+yoff), 0, scale, scale)
+									if v.showicononeditor and v.icongraphic then
+										love.graphics.draw(v.icongraphic, math.floor((x-splitxscroll[1]-1+xl-1)*16*scale), math.floor(((y-splityscroll[1]-0.5+yl-1)*16)*scale), 0, scale, scale)
+									else
+										local xoff, yoff = ((0.5-v.width/2+(v.spawnoffsetx or 0))*16 + v.offsetX - v.quadcenterX)*scale, (((v.spawnoffsety or 0)-v.height+1)*16-v.offsetY - v.quadcenterY)*scale
+										love.graphics.draw(v.graphic, v.quad, math.floor((x-splitxscroll[1]-1+xl-1)*16*scale+xoff), math.floor(((y-splityscroll[1]-1+yl-1)*16+16)*scale+yoff), 0, scale, scale)
+									end
 								else
 									love.graphics.setColor(255, 255, 255, 200)	
 									love.graphics.draw(entityquads[currenttile].image, entityquads[currenttile].quad, math.floor((x-splitxscroll[1]-1+xl-1)*16*scale), math.floor(((y-splityscroll[1]-1+yl-1)*16+8)*scale), 0, scale, scale)
