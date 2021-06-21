@@ -3324,7 +3324,7 @@ function enemy:output(transformed)
 		if self.givecoinondeath then --AE ADDITION
 			collectcoin(nil, nil, tonumber(self.givecoinondeath) or 1)
 		end
-		if self.givekeyondeath then --AE ADDITIONlocal closestplayer = 1
+		if self.givekeyondeath then --AE ADDITION
 			local closestdist = math.huge
 			local closestplayer = 1
 			for i = 2, #objects["player"] do
@@ -3335,7 +3335,11 @@ function enemy:output(transformed)
 					closestplayer = i
 				end
 			end
-			objects["player"][closestplayer].key = objects["player"][closestplayer].key+1
+			if objects["player"][closestplayer].key then
+				objects["player"][closestplayer].key = objects["player"][closestplayer].key + 1
+			else
+				objects["player"][closestplayer].key = 1
+			end
 		end
 		if self.deathsound then --AE ADDITION
 			if self.sound and self.deathsound == self.t then
