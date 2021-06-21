@@ -569,6 +569,7 @@ function animation:update(dt)
 				love.audio.stop()
 				
 				--why do sublevels suck so much
+				local oldsub = mariosublevel
 				marioworld = tonumber(v[2]) or marioworld
 				mariolevel = tonumber(v[3]) or mariolevel
 				mariosublevel = tonumber(v[4]) or mariosublevel
@@ -579,6 +580,7 @@ function animation:update(dt)
 				levelscreen_load("animation")
 				if v[5] then --Edit ID
 					pipeexitid = tonumber(v[5])
+					animationprevsublevel = oldsub --dumb work around
 				end
 				mariosublevel = tonumber(v[4]) or mariosublevel
 				actualsublevel = mariosublevel

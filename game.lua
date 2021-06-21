@@ -1539,8 +1539,9 @@ function game_draw()
 			love.graphics.translate(round(tremorx), round(tremory))
 		end
 		
-		local currentscissor = {(split-1)*width*16*scale/#splitscreen, 0, width*16*scale/#splitscreen, height*16*scale}
-		love.graphics.setScissor(unpack(currentscissor))
+		--[[local currentscissor = {(split-1)*width*16*scale/#splitscreen, 0, width*16*scale/#splitscreen, height*16*scale}
+		love.graphics.setScissor(unpack(currentscissor))]]
+		currentscissor = {}
 		xscroll = splitxscroll[split]
 		yscroll = splityscroll[split]
 		if screenzoom ~= 1 then
@@ -1550,12 +1551,7 @@ function game_draw()
 	
 		love.graphics.setColor(255, 255, 255, 255)
 		
-		local xfromdraw, xtodraw = math.max(1, math.floor(xscroll)+1), math.min(mapwidth, math.floor(xscroll+width*(1/screenzoom))+1)
-		local yfromdraw, ytodraw = math.max(1, math.floor(yscroll-0.5)+1), math.min(mapheight, math.floor(yscroll+height*(1/screenzoom)+1-0.5)+1)
-		local xoff = math.floor(xscroll)+math.fmod(xscroll, 1)
-		if xscroll < 0 then xoff = xoff + 1 end
-		local yoff = math.floor(yscroll)+math.fmod(yscroll, 1)
-		if yscroll < 0 then yoff = yoff + 1 end
+		local xfromdraw,xtodraw, yfromdraw,ytodraw, xoff,yoff = getdrawrange(xscroll,yscroll)
 		
 		--custom background
 		rendercustombackground(xscroll, yscroll, scrollfactor, scrollfactory)
@@ -1583,11 +1579,11 @@ function game_draw()
 			love.graphics.push()
 			love.graphics.translate(3*scale, 3*scale)
 			love.graphics.setColor(dropshadowcolor)
-			love.graphics.draw(smbspritebatch[split], math.floor((-math.fmod(xscroll, 1)*16)*scale), math.floor((-math.fmod(yscroll, 1)*16)*scale))
-			love.graphics.draw(portalspritebatch[split], math.floor((-math.fmod(xscroll, 1)*16)*scale), math.floor((-math.fmod(yscroll, 1)*16)*scale))
+			love.graphics.draw(smbspritebatch[split], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
+			love.graphics.draw(portalspritebatch[split], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
 			if customtiles then
 				for i = 1, #customspritebatch[split] do
-					love.graphics.draw(customspritebatch[split][i], math.floor((-math.fmod(xscroll, 1)*16)*scale), math.floor((-math.fmod(yscroll, 1)*16)*scale))
+					love.graphics.draw(customspritebatch[split][i], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
 				end
 			end
 			drawmaptiles("dropshadow", xscroll, yscroll)
@@ -1714,11 +1710,11 @@ function game_draw()
 		
 		--TILES
 		if not _3DMODE then
-			love.graphics.draw(smbspritebatch[split], math.floor(-math.fmod(xscroll, 1)*16*scale), math.floor(-math.fmod(yscroll, 1)*16*scale))
-			love.graphics.draw(portalspritebatch[split], math.floor(-math.fmod(xscroll, 1)*16*scale), math.floor(-math.fmod(yscroll, 1)*16*scale))
+			love.graphics.draw(smbspritebatch[split], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
+			love.graphics.draw(portalspritebatch[split], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
 			if customtiles then
 				for i = 1, #customspritebatch[split] do
-					love.graphics.draw(customspritebatch[split][i], math.floor(-math.fmod(xscroll, 1)*16*scale), math.floor(-math.fmod(yscroll, 1)*16*scale))
+					love.graphics.draw(customspritebatch[split][i], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
 				end
 			end
 
@@ -3946,6 +3942,11 @@ function startlevel(level, reason)
 		end
 		dcplaying = false
 	end
+	--dumb stupid work around
+	if animationprevsublevel then
+		prevsublevel = animationprevsublevel
+		animationprevsublevel = false
+	end
 	
 	--MISC VARS
 	everyonedead = false
@@ -4971,12 +4972,7 @@ function updatespritebatch()
 		
 		local xscroll, yscroll = splitxscroll[split], splityscroll[split]
 
-		local xfromdraw, xtodraw = math.max(1, math.floor(xscroll)+1), math.min(mapwidth, math.floor(xscroll+width*(1/screenzoom))+1)
-		local yfromdraw, ytodraw = math.max(1, math.floor(yscroll-0.5)+1), math.min(mapheight, math.floor(yscroll+height*(1/screenzoom)+1-0.5)+1)
-		local xoff = math.floor(xscroll)
-		if xscroll < 0 then xoff = xoff + 1 end
-		local yoff = math.floor(yscroll)
-		if yscroll < 0 then yoff = yoff + 1 end
+		local xfromdraw,xtodraw, yfromdraw,ytodraw, xoff,yoff = getdrawrange(xscroll,yscroll,"spritebatch")
 		
 		local lmap = map
 		
@@ -8871,12 +8867,7 @@ function drawmaptiles(drawtype, xscroll, yscroll)
 	local collision = (drawtype == "collision")
 	local lmap = map
 
-	local xfromdraw, xtodraw = math.max(1, math.floor(xscroll)+1), math.min(mapwidth, math.floor(xscroll+width*(1/screenzoom))+1)
-	local yfromdraw, ytodraw = math.max(1, math.floor(yscroll-0.5)+1), math.min(mapheight, math.floor(yscroll+height*(1/screenzoom)+1-0.5)+1)
-	local xoff = math.floor(xscroll)+math.fmod(xscroll, 1)
-	if xscroll < 0 then xoff = xoff + 1 end
-	local yoff = math.floor(yscroll)+math.fmod(yscroll, 1)
-	if yscroll < 0 then yoff = yoff + 1 end
+	local xfromdraw,xtodraw, yfromdraw,ytodraw, xoff,yoff = getdrawrange(xscroll,yscroll)
 		
 	for y = yfromdraw, ytodraw do
 		for x = xfromdraw, xtodraw do
@@ -9168,6 +9159,25 @@ function readlevelfilesafe(s)
 	return s
 end
 
+function getdrawrange(xscroll,yscroll,spritebatch)
+	local xfromdraw, xtodraw = math.max(1, math.floor(xscroll)+1), math.min(mapwidth, math.floor(xscroll+width*(1/screenzoom))+1)
+	local yfromdraw, ytodraw = math.max(1, math.floor(yscroll+0.5)+1), math.min(mapheight, math.floor(yscroll+height*(1/screenzoom)+1+0.5)+1)
+	local xoff = math.floor(xscroll)
+	if not spritebatch then
+		xoff = xoff+math.fmod(xscroll, 1)
+		if xscroll < 0 then
+			xoff = math.ceil(xscroll)+math.fmod(xscroll, 1)
+		end
+	end
+	local yoff = math.floor(yscroll)
+	if not spritebatch then
+		yoff = yoff+math.fmod(yscroll, 1)
+		if yscroll < 0 then
+			yoff = math.ceil(yscroll)+math.fmod(yscroll, 1)
+		end
+	end
+	return xfromdraw,xtodraw, yfromdraw,ytodraw, xoff,yoff
+end
 -------------------
 --DAILY CHALLENGE--
 -------------------
