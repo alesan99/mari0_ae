@@ -9019,7 +9019,11 @@ function drawmaptiles(drawtype, xscroll, yscroll)
 						love.graphics.setColor(255, 0, 0, alpha)
 						love.graphics.rectangle("fill", math.floor((x-1-xoff)*16*scale), math.floor(((y-1-yoff)*16-8)*scale), 16*scale, 16*scale)
 						love.graphics.setColor(255, 255, 255, alpha)
-						love.graphics.draw(v.graphic, v.quad, math.floor((x-1-xoff)*16*scale+exoff), math.floor(((y-1-yoff)*16)*scale+eyoff), 0, (v.animationscalex or 1)*scale, (v.animationscaley or 1)*scale)
+						if v.showicononeditor and v.icongraphic then
+							love.graphics.draw(v.icongraphic, math.floor((x-1-xoff)*16*scale), ((y-1-yoff)*16-8)*scale, 0, scale, scale)
+						else
+							love.graphics.draw(v.graphic, v.quad, math.floor((x-1-xoff)*16*scale+exoff), math.floor(((y-1-yoff)*16)*scale+eyoff), 0, (v.animationscalex or 1)*scale, (v.animationscaley or 1)*scale)
+						end
 						if t["argument"] and t["argument"] == "b" then --supersize
 							love.graphics.setColor(255, 255, 255, 200)
 							love.graphics.draw(entityquads[313].image, entityquads[313].quad, math.floor((x-1-xoff)*16*scale), ((y-1-yoff)*16-8)*scale, 0, scale, scale)
