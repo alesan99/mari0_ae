@@ -443,6 +443,9 @@ function enemy:init(x, y, t, a, properties)
 				if self.spawnchildrenparent then
 					temp.parent = self
 				end
+				if self.supersizechildren then
+					supersizeentity(temp)
+				end
 				table.insert(objects["enemy"], temp)
 			end
 		end
