@@ -432,14 +432,16 @@ scrollingstartv = 12 --when the scrolling begins to set in (Both of these take t
 scrollingcompletev = 10 --when the scrolling will be as fast as mario can run
 scrollingleftstartv = 6 --See above, but for scrolling left, and it takes the player on the right-estest.
 scrollingleftcompletev = 4
+seektime = 0.6 --time it takes to hold the up or down key to look
+seekspeed = 13
+seekrange = 5
+
 blockbouncetime = 0.2
 blockbounceheight = 0.4
 coinblocktime = 0.3
 coinblockdelay = 0.5/30
 
 portaldotstimer = 0 --this is changed in game.lua for some reason
-
-seektime = 0.6--time it takes to hold the up or down key to look
 
 idleanimationspeed = 8
 runanimationspeed = 10

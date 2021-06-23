@@ -419,7 +419,7 @@ function game_update(dt)
 	--userects
 	local delete
 	for i, v in pairs(userects) do
-		if v.delete == true or v.callback.delete then
+		if v.delete == true then
 			if not delete then delete = {} end
 			table.insert(delete, i)
 		end
@@ -862,6 +862,7 @@ function game_update(dt)
 	
 	--SCROLLING
 	
+
 	--HORIZONTAL
 	
 	local oldscroll = splitxscroll[1]
@@ -953,11 +954,12 @@ function game_update(dt)
 					end
 				end
 
-
+				--CLAMP
 				if splitxscroll[split] > mapwidth-width then
 					splitxscroll[split] = math.max(0, mapwidth-width)
 					hitrightside()
 				end
+
 				if (axex and splitxscroll[split] > axex-width and axex >= width) then
 					splitxscroll[split] = axex-width
 					hitrightside()
@@ -996,11 +998,11 @@ function game_update(dt)
 			end
 			if mapheight ~= 15 and objects["player"][fastestplayer] then
 				if not (autoscrollingy and not editormode) then
-					local py = objects["player"][fastestplayer].y
+					local px, py = objects["player"][fastestplayer].x, objects["player"][fastestplayer].y
 					if objects["player"][fastestplayer].height > 2 then
 						py = objects["player"][fastestplayer].y+objects["player"][fastestplayer].height/2
 					end
-					local sy = py-yscroll--position on screen
+					local sx, sy = px-xscroll, py-yscroll--position on screen
 					yscrolltarget = yscrolltarget or splityscroll[split]
 
 					local upbound = 9
@@ -1021,11 +1023,11 @@ function game_update(dt)
 					local yscrolltarget = math.min(math.max(0, mapheight-height-1), math.max(0, yscrolltarget))
 					if objects["player"][fastestplayer].animationstate == "idle" then
 						if objects["player"][fastestplayer].upkeytimer > seektime then
-							yscrolltarget = yscrolltarget - 5
+							yscrolltarget = yscrolltarget - seekrange
 							yscrolltarget = math.min(math.max(0, mapheight-height-1), math.max(0, yscrolltarget))
 							seeking = true
 						elseif objects["player"][fastestplayer].downkeytimer > seektime then
-							yscrolltarget = yscrolltarget + 5
+							yscrolltarget = yscrolltarget + seekrange
 							yscrolltarget = math.min(math.max(0, mapheight-height-1), math.max(0, yscrolltarget))
 							seeking = true
 						end
@@ -1033,19 +1035,19 @@ function game_update(dt)
 					
 					local diff = math.abs(splityscroll[split]-yscrolltarget)
 					local speed = math.abs(objects["player"][fastestplayer].speedy)--scrollrate*(diff/1.5)+0.5 --math.min(superscrollrate)?
-					if speed == 0 then--not objects["player"][1].jumping and not objects["player"][1].falling then
-							speed = scrollrate*15
+					if seeking then	
+						speed = seekspeed
+					elseif speed == 0 then--not objects["player"][1].jumping and not objects["player"][1].falling then
+						if diff > 2.5 then
+							speed = superscrollrate
+						else
+							speed = scrollrate
+						end
 					end
-					if seeking then
-						speed = 17
-					end
-					if yscrolltarget < splityscroll[split] then
-						speed = -speed
-					end
-
-					splityscroll[split] = splityscroll[split] + speed*dt --bookmark
-					if (speed < 0 and splityscroll[split] < yscrolltarget) or (speed > 0 and splityscroll[split] > yscrolltarget) then
-						splityscroll[split] = yscrolltarget
+					if yscrolltarget > splityscroll[split] then
+						splityscroll[split] = math.min(yscrolltarget, splityscroll[split] + speed*dt)
+					elseif yscrolltarget < splityscroll[split] then
+						splityscroll[split] = math.max(yscrolltarget, splityscroll[split] - speed*dt)
 					end
 
 					if splityscroll[split] > mapheight-height-1 then
@@ -1235,9 +1237,6 @@ function game_update(dt)
 			local x1, x2 = math.ceil(prevxscroll)+width*screenzoom2+1, math.floor(splitxscroll[1])+width*screenzoom2+1
 			if prevxscroll > splitxscroll[1] then --spawn enemies in both directions
 				x1, x2 = math.floor(splitxscroll[1])+1, math.floor(prevxscroll)+1
-			local x1, x2 = math.ceil(oldscroll)+width*screenzoom2+1, math.floor(splitxscroll[1])+width*screenzoom2+1
-			if oldscroll > splitxscroll[1] then --spawn enemies in both directions
-				x1, x2 = math.floor(splitxscroll[1])+1, math.floor(oldscroll)+1
 			end
 			for x = x1, x2 do
 				for y = math.floor(splityscroll[1])+1, math.min(mapheight, math.ceil(splityscroll[1])+height*screenzoom2+1+2) do
@@ -1290,9 +1289,6 @@ function game_update(dt)
 		end
 	end
 
-	prevxscroll = splitxscroll[1]
-	prevyscroll = splityscroll[1]
-	
 	--portal update
 	for i, v in pairs(portals) do
 		v:update(dt)
@@ -2523,114 +2519,6 @@ function game_draw()
 		if hudsimple and ((not darkmode and not lightsout) or editormode) then
 			if hudvisible then
 				drawHUD()
-			end
-		end
-
-		--draw collision (debug)
-		if HITBOXDEBUG then
-			local lw = love.graphics.getLineWidth()
-			love.graphics.setLineWidth(1)
-			for i, v in pairs(objects) do
-				if i ~= "pixeltile" then
-				for j, k in pairs(v) do
-					if k.width then
-						if xscroll >= k.x-width and k.x+k.width > xscroll then
-							if k.hitboxcolor then
-								love.graphics.setColor(unpack(k.hitboxcolor))
-							elseif k.active then
-								love.graphics.setColor(255, 255, 255)
-								if i == "player" then
-									love.graphics.setColor(0, 255, 0)
-								end
-							else
-								love.graphics.setColor(255, 0, 0)
-							end
-							if k.width <= 1/16 then
-								love.graphics.rectangle("fill", math.floor((k.x-xscroll)*16*scale), math.floor((k.y-yscroll-.5)*16*scale), k.width*16*scale, k.height*16*scale)
-							elseif incognito then
-								love.graphics.rectangle("fill", math.floor((k.x-xscroll)*16*scale)+.5, math.floor((k.y-yscroll-.5)*16*scale)+.5, k.width*16*scale-1, k.height*16*scale-1)
-							else
-								love.graphics.rectangle("line", math.floor((k.x-xscroll)*16*scale)+.5, math.floor((k.y-yscroll-.5)*16*scale)+.5, k.width*16*scale-1, k.height*16*scale-1)
-							end
-							if k.killzonex then
-								love.graphics.circle("line", math.floor((k.x+k.killzonex-xscroll)*16*scale)+.5, math.floor((k.y+k.killzoney-yscroll-.5)*16*scale)+.5, (math.sqrt(k.killzoner))*16*scale)
-							end
-							if k.playerneardist and type(k.playerneardist) == "table" and #k.playerneardist == 4 then
-								love.graphics.setColor(0, 255, 255)
-								love.graphics.rectangle("line", math.floor((k.x+k.playerneardist[1]-xscroll)*16*scale)+.5, math.floor((k.y+k.playerneardist[2]-yscroll-.5)*16*scale)+.5, k.playerneardist[3]*16*scale-1, k.playerneardist[4]*16*scale-1)
-							end
-							if k.movementpath then
-								love.graphics.setColor(0, 255, 33)
-								local t = {}
-								for i = 1, #k.movementpath do
-									table.insert(t, math.floor((k.startx+k.movementpath[i][1]-xscroll)*16*scale)+.5)
-									table.insert(t, math.floor((k.starty+k.movementpath[i][2]-yscroll-.5)*16*scale)+.5)
-								end
-								if not k.movementpathturnaround then
-									table.insert(t, math.floor((k.startx+k.movementpath[1][1]-xscroll)*16*scale)+.5)
-									table.insert(t, math.floor((k.starty+k.movementpath[1][2]-yscroll-.5)*16*scale)+.5)
-								end
-								love.graphics.line(t)
-							end
-							if k.carryrange then
-								love.graphics.setColor(0, 255, 255)
-								love.graphics.rectangle("line", math.floor((k.x+k.carryrange[1]-xscroll)*16*scale)+.5, math.floor((k.y+k.carryrange[2]-yscroll-.5)*16*scale)+.5, k.carryrange[3]*16*scale-1, k.carryrange[4]*16*scale-1)
-							end
-							if k.circleradius and k.movement == "circle" then
-								love.graphics.setColor(255, 0, 0)
-								love.graphics.line(math.floor((k.x-xscroll)*16*scale), math.floor((k.y-yscroll-.5)*16*scale), math.floor((k.startx-xscroll)*16*scale), math.floor((k.starty-yscroll-.5)*16*scale))
-								love.graphics.ellipse("line",math.floor((k.startx-xscroll)*16*scale), math.floor((k.starty-yscroll-.5)*16*scale),math.floor((k.circleradiusx or k.circleradius)*16*scale),math.floor((k.circleradiusy or k.circleradius)*16*scale))
-							end
-							if k.blowrange then
-								love.graphics.setColor(100, 255, 255)
-								love.graphics.rectangle("line", math.floor((k.x+k.blowrange[1]-xscroll)*16*scale)+.5, math.floor((k.y+k.blowrange[2]-yscroll-.5)*16*scale)+.5, k.blowrange[3]*16*scale-1, k.blowrange[4]*16*scale-1)
-							end
-							if k.rx and k.ry and k.rw and k.rh then
-								love.graphics.setColor(100, 255, 255)
-								love.graphics.rectangle("line", math.floor((k.rx-xscroll)*16*scale)+.5, math.floor((k.ry-yscroll-.5)*16*scale)+.5, k.rw*16*scale-1, k.rh*16*scale-1)
-							end
-
-							if k.pointingangle then
-								local xcenter = k.x + 6/16 - math.sin(k.pointingangle)*userange
-								local ycenter = k.y + 6/16 - math.cos(k.pointingangle)*userange
-							
-								love.graphics.setColor(0, 255, 255)
-								love.graphics.rectangle("line", math.floor((xcenter-usesquaresize/2-xscroll)*16*scale)+.5, math.floor((ycenter-usesquaresize/2-yscroll-.5)*16*scale)+.5, usesquaresize*16*scale-1, usesquaresize*16*scale-1)
-							end
-						end
-					end
-				end
-				end
-			end
-			love.graphics.setLineWidth(lw)
-
-			--animation numbers
-			if love.keyboard.isDown("0") then
-				love.graphics.setColor(255, 255, 255, 150)
-				local y = 0
-				for i, n in pairs(animationnumbers) do
-					properprint(i .. ":" .. n, (2+math.floor(y/20)*130)*scale, (((y%20)*10)+24)*scale)
-					y = y + 1
-				end
-			else
-				love.graphics.setColor(255, 255, 255)
-				properprint("speedx:" .. objects["player"][1].speedx, 2*scale, 25*scale)
-				properprint("speedy:" .. objects["player"][1].speedy, 2*scale, 35*scale)
-				if objects["player"][1].falling then
-					properprint("falling: true", 2*scale, 45*scale)
-				else
-					properprint("falling: false", 2*scale, 45*scale)
-				end
-				if objects["player"][1].jumping then
-					properprint("jumping: true", 2*scale, 55*scale)
-				else
-					properprint("jumping: false", 2*scale, 55*scale)
-				end
-				properprint(#objects["enemy"], 2*scale, 85*scale)
-				properprint("x:" .. objects["player"][1].x, 2*scale, 65*scale)
-				properprint("y:" .. objects["player"][1].y, 2*scale, 75*scale)
-
-				properprint(tostring(mariolives[1]) .. " lives", 2*scale, 95*scale)
 			end
 		end
 
@@ -4106,6 +3994,8 @@ function startlevel(level, reason)
 	noupdate = false
 	xscroll = 0
 	yscroll = 0
+	prevxscroll = 0
+	prevyscroll = 0
 	xpan = false
 	ypan = false
 	splitscreen = {{}}
@@ -4993,6 +4883,7 @@ function loadmap(filename)
 		for y = 1, 13 do
 			map[x][y] = {1}
 		end
+
 		for y = 14, mapheight do
 			map[x][y] = {2}
 			objects["tile"][tilemap(x, y)] = tile:new(x-1, y-1, 1, 1, true)
@@ -9278,7 +9169,7 @@ end
 
 function getdrawrange(xscroll,yscroll,spritebatch)
 	local xfromdraw, xtodraw = math.max(1, math.floor(xscroll)+1), math.min(mapwidth, math.floor(xscroll+width*(1/screenzoom))+1)
-	local yfromdraw, ytodraw = math.max(1, math.floor(yscroll+0.5)+1), math.min(mapheight, math.floor(yscroll+height*(1/screenzoom)+1+0.5)+1)
+	local yfromdraw, ytodraw = math.max(1, math.floor(yscroll)+1), math.min(mapheight, math.floor(yscroll+height*(1/screenzoom)+1+0.5)+1)
 	local xoff = math.floor(xscroll)
 	if not spritebatch then
 		xoff = xoff+math.fmod(xscroll, 1)
