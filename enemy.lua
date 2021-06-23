@@ -443,6 +443,9 @@ function enemy:init(x, y, t, a, properties)
 				if self.spawnchildrenparent then
 					temp.parent = self
 				end
+				if self.supersizechildren and self.supersized then
+					supersizeentity(temp)
+				end
 				table.insert(objects["enemy"], temp)
 			end
 		end
@@ -2123,6 +2126,8 @@ function enemy:update(dt)
 					end
 				end
 			end
+		end
+		if self.userect then
 			self.userect.x, self.userect.y = self.x+self.carryrange[1], self.y+self.carryrange[2]
 		end
 	end
@@ -2170,10 +2175,11 @@ function enemy:update(dt)
 	end
 	
 	if self.customtimer then
+		--[delay, [action, parameter], argument]
 		self.customtimertimer = self.customtimertimer + dt
 		while self.customtimertimer > self.customtimer[self.currentcustomtimerstage][1] do
 			self.customtimertimer = self.customtimertimer - self.customtimer[self.currentcustomtimerstage][1]
-			self:customtimeraction(self.customtimer[self.currentcustomtimerstage][2], self.customtimer[self.currentcustomtimerstage][3], self.customtimer[self.currentcustomtimerstage][4])
+			self:customtimeraction(self.customtimer[self.currentcustomtimerstage][2], self.customtimer[self.currentcustomtimerstage][3])
 			self.currentcustomtimerstage = self.currentcustomtimerstage + 1
 			if self.currentcustomtimerstage > #self.customtimer then
 				self.currentcustomtimerstage = 1
@@ -2182,6 +2188,12 @@ function enemy:update(dt)
 					break
 				end
 			end
+		end
+	end
+	if false and self.customtrigger then --disabled until finished
+		--[property1,comparison,property2, [action, parameter],argument]
+		for i = 1, #self.customtrigger do
+			self:ifstatement(self.customtrigger[i][1], self.customtrigger[i][2], self.customtrigger[i][3], self.customtrigger[i][4], self.customtrigger[i][5])
 		end
 	end
 end
@@ -2280,6 +2292,9 @@ function enemy:shotted(dir, cause, high, fireball, star)
 			self.active = false
 		end
 	else
+		if self.shotframe then
+			self.quad = self.quadgroup[self.shotframe]
+		end
 		self.shot = true
 		self.active = false
 	end
@@ -2365,6 +2380,10 @@ function enemy:customtimeraction(action, arg)
 			self[p] = tonumber(self[p])
 		elseif a == "tostring" then
 			self[p] = tostring(self[p])
+		elseif a == "if" then
+			self:ifstatement(ogarg[1],ogarg[2],ogarg[3],ogarg[4],ogarg[5])
+			--                   first;  Symb; Second;     Action;     Arg;
+			--EXAMPLE: [0,"if",["speedx",">=","speedy",["set","speedy"],25]
 		end
 	else --backwards compatibility
 		if action == "bounce" then
@@ -2380,7 +2399,8 @@ function enemy:customtimeraction(action, arg)
 				self.spawnsenemy = self.spawnsenemyrandoms[math.random(#self.spawnsenemyrandoms)]
 			end
 			self:spawnenemy(self.spawnsenemy)
-		elseif string.sub(action, 0, 7) == "reverse" then
+		end
+		if string.sub(action, 0, 7) == "reverse" then
 			local parameter = string.sub(action, 8, string.len(action))
 			self[parameter] = -self[parameter]
 		elseif string.sub(action, 0, 3) == "add" then
@@ -2394,6 +2414,40 @@ function enemy:customtimeraction(action, arg)
 		elseif string.sub(action, 0, 3) == "set" then
 			self[string.sub(action, 4, string.len(action))] = arg
 		end
+	end
+end
+
+function enemy:ifstatement(propName1, comparison, propName2, action, arg)
+	--EXAMPLE: ["speedx","==","speedy",["set","speedy"],10]
+	local prop1,prop2
+	if self[propName1] then
+		first = self[propName1]
+	end	
+	if self[propName2] then
+		second = self[prop2]
+	end	
+	
+	local pass = false
+    if comparison == "equal" and (prop1 == prop2) then
+		pass = true
+    elseif comparison == "greater" and (prop1 > prop2) then
+        pass = true
+    elseif comparison == "less" and (prop1 < prop2) then
+		pass = true
+    elseif comparison == "greaterequal" and (prop1 >= prop2) then
+        pass = true
+    elseif comparison == "lessequal" and (prop1 <= prop2) then
+        pass = true
+    elseif comparison == "notequal" and (prop1 ~= prop2) then
+        pass = true
+	elseif comparison == "exists" and prop1 ~= nil then
+        pass = true
+	elseif comparison == "notexists" and prop1 == nil then
+        pass = true
+    end
+
+	if pass then
+		self:customtimeraction(action, arg)
 	end
 end
 
@@ -2599,7 +2653,7 @@ function enemy:globalcollide(a, b, c, d, dir)
 		if (self.breakblockside == nil or self.breakblockside == "global") then
 			if a == "tile" then
 				if self.breakshardblocks and (tilequads[map[b.cox][b.coy][1]].coinblock or (tilequads[map[b.cox][b.coy][1]].debris and blockdebrisquads[tilequads[map[b.cox][b.coy][1]].debris])) then -- hard block
-					destroyblock(b.cox, b.coy)
+					destroyblock(b.cox, b.coy, "nopoints")
 				else
 					hitblock(b.cox, b.coy, self, true)
 				end
@@ -2685,7 +2739,7 @@ function enemy:leftcollide(a, b, c, d)
 		if (self.breakblockside == "sides" or self.breakblockside == "left") then
 			if a == "tile" then
 				if self.breakshardblocks and (tilequads[map[b.cox][b.coy][1]].coinblock or (tilequads[map[b.cox][b.coy][1]].debris and blockdebrisquads[tilequads[map[b.cox][b.coy][1]].debris])) then -- hard block
-					destroyblock(b.cox, b.coy)
+					destroyblock(b.cox, b.coy, "nopoints")
 				else
 					hitblock(b.cox, b.coy, self, true)
 				end
@@ -2814,7 +2868,7 @@ function enemy:rightcollide(a, b, c, d)
 		if (self.breakblockside == "sides" or self.breakblockside == "right") then
 			if a == "tile" then
 				if self.breakshardblocks and (tilequads[map[b.cox][b.coy][1]].coinblock or (tilequads[map[b.cox][b.coy][1]].debris and blockdebrisquads[tilequads[map[b.cox][b.coy][1]].debris])) then -- hard block
-					destroyblock(b.cox, b.coy)
+					destroyblock(b.cox, b.coy, "nopoints")
 				else
 					hitblock(b.cox, b.coy, self, true)
 				end
@@ -2931,7 +2985,7 @@ function enemy:ceilcollide(a, b, c, d)
 		if self.breakblockside == "ceil" then
 			if a == "tile" then
 				if self.breakshardblocks and (tilequads[map[b.cox][b.coy][1]].coinblock or (tilequads[map[b.cox][b.coy][1]].debris and blockdebrisquads[tilequads[map[b.cox][b.coy][1]].debris])) then -- hard block
-					destroyblock(b.cox, b.coy)
+					destroyblock(b.cox, b.coy, "nopoints")
 				else
 					hitblock(b.cox, b.coy, self, true)
 				end
@@ -3047,7 +3101,7 @@ function enemy:floorcollide(a, b, c, d)
 		if self.breakblockside == "floor" then
 			if a == "tile" then
 				if self.breakshardblocks and (tilequads[map[b.cox][b.coy][1]].coinblock or (tilequads[map[b.cox][b.coy][1]].debris and blockdebrisquads[tilequads[map[b.cox][b.coy][1]].debris])) then -- hard block
-					destroyblock(b.cox, b.coy)
+					destroyblock(b.cox, b.coy, "nopoints")
 				else
 					hitblock(b.cox, b.coy, self, true)
 				end
@@ -3123,6 +3177,17 @@ function enemy:stomp(x, b)
 	if self.stompable or (self.shellanimal and self.small) then
 		if self.pushmariowhenstomped and b then
 			b.y = self.y - b.height-1/16
+		end
+
+		if b and b.groundpounding then
+			if self.transforms then
+				if self:gettransformtrigger("groundpound") then
+					self:transform(self:gettransformsinto("groundpound"))
+					return
+				end
+			elseif self.resistsgroundpound then
+				return false
+			end
 		end
 
 		if self.stomphealth then
@@ -3250,7 +3315,7 @@ function enemy:output(transformed)
 		self.userect.delete = true
 		self.destroying = true
 	end
-	if self.userect and not self.userect.delete then
+	if self.userect then
 		self.userect.delete = true
 	end
 	if self.blockportaltile and not self.dontremoveblockportaltileondeath then
@@ -3262,7 +3327,7 @@ function enemy:output(transformed)
 		if self.givecoinondeath then --AE ADDITION
 			collectcoin(nil, nil, tonumber(self.givecoinondeath) or 1)
 		end
-		if self.givekeyondeath then --AE ADDITIONlocal closestplayer = 1
+		if self.givekeyondeath then --AE ADDITION
 			local closestdist = math.huge
 			local closestplayer = 1
 			for i = 2, #objects["player"] do
@@ -3273,7 +3338,11 @@ function enemy:output(transformed)
 					closestplayer = i
 				end
 			end
-			objects["player"][closestplayer].key = objects["player"][closestplayer].key+1
+			if objects["player"][closestplayer].key then
+				objects["player"][closestplayer].key = objects["player"][closestplayer].key + 1
+			else
+				objects["player"][closestplayer].key = 1
+			end
 		end
 		if self.deathsound then --AE ADDITION
 			if self.sound and self.deathsound == self.t then

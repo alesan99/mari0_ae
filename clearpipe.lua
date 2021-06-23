@@ -19,7 +19,14 @@ function clearpipe:init(x, y, r, t)
 		self.suck = true
 		self.suckspeed = 14 --owo
 		self.sucklen = 4
-		self.sucktable = {"player","box","turret"}
+		self.sucktable = {"player","box","core","turret"}
+
+		self.suckentranceportalx = false
+		self.suckentranceportaly = false
+		self.suckentranceportalfacing = false
+		self.suckexitportalx = false
+		self.suckexitportaly = false
+		self.suckexitportalfacing = false
 	end
 	
 	if #self.r > 0 and self.r[1] ~= "link" then
@@ -249,48 +256,115 @@ function clearpipe:update(dt)
 		end
 
 		if self.suck then
+			--Search portals
+			if not self.intersectentrance then
+				self.suckentranceportalx = false
+				self.suckentranceportaly = false
+				self.suckentranceportalfacing = false
+				local dir = self.entrance
+				local cx, cy = self.path[1][1]-1, self.path[1][2]-1
+				local cx, cy, cw, ch, dx, dy = self:getsuck(dir,"entrance",cx,cy)
+				for x = cx+1, cx+cw do
+					for y = cy+1, cy+ch do
+						local portalx, portaly, portalfacing, infacing = getPortal(x, y, dir)
+						if portalx then
+							if portalfacing == "left" then
+								portalfacing = "right"
+								if infacing == "up" then
+									portaly = portaly
+								else portaly = portaly+1
+								end
+							elseif portalfacing == "right" then
+								portalfacing = "left"
+								if infacing == "down" then
+									portalx,portaly = portalx+1,portaly
+								else portalx,portaly = portalx+1,portaly+1
+								end
+							elseif portalfacing == "up" then
+								portalfacing = "down"
+								if infacing == "left" then
+									portalx,portaly = portalx+1,portaly
+								end
+							else
+								portalfacing = "up"
+								if infacing == "right" then
+									portalx,portaly = portalx+1,portaly+1
+								else portalx,portaly = portalx,portaly+1
+								end
+							end
+							self.suckentranceportalx = portalx
+							self.suckentranceportaly = portaly
+							self.suckentranceportalfacing = portalfacing
+							break
+						end
+					end
+				end
+			end
+			if not self.intersectexit then
+				self.suckexitportalx = false
+				self.suckexitportaly = false
+				self.suckexitportalfacing = false
+				local dir = self.exit
+				local cx, cy = self.path[#self.path][1]-1, self.path[#self.path][2]-1
+				local cx, cy, cw, ch, dx, dy = self:getsuck(dir,"exit",cx,cy)
+				if dir == "left" then dir = "right"
+				elseif dir == "right" then dir = "left"
+				elseif dir == "up" then dir = "down"
+				else dir = "up" end
+				local portalx, portaly, portalfacing, infacing
+				for x = cx+1, cx+cw do
+					for y = cy+1, cy+ch do
+						portalx, portaly, portalfacing, infacing = getPortal(x, y, dir)
+						if portalx then
+							if portalfacing == "left" then
+								if infacing == "up" then
+									portaly = portaly
+								else portaly = portaly+1
+								end
+							elseif portalfacing == "right" then
+								if infacing == "down" then
+									portalx,portaly = portalx+1,portaly
+								else portalx,portaly = portalx+1,portaly+1
+								end
+							elseif portalfacing == "up" then
+								if infacing == "left" then
+									portalx,portaly = portalx+1,portaly
+								end
+							else
+								if infacing == "right" then
+									portalx,portaly = portalx+1,portaly+1
+								else portalx,portaly = portalx,portaly+1
+								end
+							end
+							self.suckexitportalx = portalx
+							self.suckexitportaly = portaly
+							self.suckexitportalfacing = portalfacing
+							break
+						end
+					end
+				end
+			end
+
 			--Suck in entities
 			for j, w in pairs(self.sucktable) do
 				for i, v in pairs(objects[w]) do
 					if v.active then
 						if not self.intersectentrance then
 							local dir = self.entrance
-							local dx, dy = 0, 0
-							local intensity = 4
 							local cx, cy = self.path[1][1]-1, self.path[1][2]-1
-							local cw, ch = 2, 2
-							if dir == "right" then
-								cx = cx-self.sucklen; cy = cy-1; dx = 1; cw = self.sucklen
-							elseif dir == "left" then
-								dx = -1; cw = self.sucklen
-							elseif dir == "up" then
-								cx = cx - 1; dy = -1; ch = self.sucklen; intensity = 9
-							else
-								dy = 1; ch = self.sucklen
-							end
-							if inrange(v.x, cx, cx+cw) and inrange(v.y, cy, cy+ch) then
-								v.speedx = v.speedx + self.suckspeed*intensity*dx*dt
-								v.speedy = v.speedy + self.suckspeed*intensity*dy*dt
+							self:suckrange(dir,"entrance",cx,cy,v,dt)
+							if self.suckentranceportalx then
+								local cx, cy = self.suckentranceportalx-1, self.suckentranceportaly-1
+								self:suckrange(self.suckentranceportalfacing,"entrance",cx,cy,v,dt)
 							end
 						end
 						if not self.intersectexit then
 							local dir = self.exit
-							local dx, dy = 0, 0
-							local intensity = 4
 							local cx, cy = self.path[#self.path][1]-1, self.path[#self.path][2]-1
-							local cw, ch = 2, 2
-							if dir == "right" then
-								cx = cx; cy = cy-1; dx = 1; cw = self.sucklen
-							elseif dir == "left" then
-								cx = cx-self.sucklen; dx = -1; cy = cy-1; cw = self.sucklen
-							elseif dir == "up" then
-								cx = cx-1; dy = -1; ch = self.sucklen; intensity = 9
-							else
-								cx = cx-1; dy = 1; ch = self.sucklen
-							end
-							if inrange(v.x, cx, cx+cw) and inrange(v.y, cy, cy+ch) then
-								v.speedx = v.speedx + self.suckspeed*intensity*dx*dt
-								v.speedy = v.speedy + self.suckspeed*intensity*dy*dt
+							self:suckrange(dir,"exit",cx,cy,v,dt)
+							if self.suckexitportalx then
+								local cx, cy = self.suckexitportalx-1, self.suckexitportaly-1
+								self:suckrange(self.suckentranceportalfacing,"exit",cx,cy,v,dt)
 							end
 						end
 					end
@@ -693,39 +767,75 @@ function clearpipe:draw()
 			local t = self.dusttable[i]
 			if not self.intersectentrance then
 				local dir = self.entrance
-				local dx, dy = t[1], t[2]
-				local v = 0
-				local ox, oy = -2, -2
-				if dir == "right" then
-					dx, dy = t[2], t[1]; ox = -1-self.sucklen; v = dx/self.sucklen
-				elseif dir == "left" then
-					dx, dy = -t[2], t[1]; ox = self.sucklen-1; v = -(dx/self.sucklen)
-				elseif dir == "up" then
-					dy = -dy; oy = -1+self.sucklen; v = -dy/self.sucklen
-				else
-					oy = -1-self.sucklen; v = dy/self.sucklen
+				local cx, cy = self.path[1][1]-1, self.path[1][2]-1
+				local x, y, cw, ch, dx, dy = self:getsuck(dir,"entrance",cx,cy)
+				local ox, oy = t[1], t[2]*dy+self.sucklen*math.max(0,-dy)
+				if dir == "left" or dir == "right" then
+					ox, oy = t[2]*dx+self.sucklen*math.max(0,-dx), t[1]
 				end
+				local v = (t[2]/self.sucklen)
 				love.graphics.setColor(255,255,255,255*v)
-				love.graphics.draw(dustimg, dustquad[t[5]], (self.path[1][1]+ox+dx-xscroll)*16*scale, (self.path[1][2]+oy+dy-.5-yscroll)*16*scale, t[3], scale, scale, 8, 8)
+				love.graphics.draw(dustimg, dustquad[t[5]], (x+ox-xscroll)*16*scale, (y+oy-.5-yscroll)*16*scale, t[3], scale, scale, 8, 8)
+				if self.suckentranceportalx then
+					local dir = self.suckentranceportalfacing
+					local cx, cy = self.suckentranceportalx-1, self.suckentranceportaly-1
+					local x, y, cw, ch, dx, dy = self:getsuck(dir,"entrance",cx,cy)
+					local ox, oy = t[1], t[2]*dy+self.sucklen*math.max(0,-dy)
+					if dir == "left" or dir == "right" then
+						ox, oy = t[2]*dx+self.sucklen*math.max(0,-dx), t[1]
+					end
+					local v = (t[2]/self.sucklen)
+					love.graphics.setColor(255,255,255,255*v)
+					love.graphics.draw(dustimg, dustquad[t[5]], (x+ox-xscroll)*16*scale, (y+oy-.5-yscroll)*16*scale, t[3], scale, scale, 8, 8)
+				end
 			end
 			if not self.intersectexit then
 				local dir = self.exit
-				local dx, dy = -t[1], -t[2]
-				local v = 0
-				local ox, oy = 0, 0
-				if dir == "right" then
-					dx, dy = t[2], -t[1]; ox = -1; v = 1-(dx/self.sucklen)
-				elseif dir == "left" then
-					dx, dy = -t[2], -t[1]; ox = -1; v = 1-(-dx/self.sucklen)
-				elseif dir == "up" then
-					oy = -1; v = 1-(-dy/self.sucklen)
-				else
-					dy = -dy; oy = -1; v = 1-(dy/self.sucklen)
+				local cx, cy = self.path[#self.path][1]-1, self.path[#self.path][2]-1
+				local x, y, cw, ch, dx, dy = self:getsuck(dir,"exit",cx,cy)
+				local ox, oy = t[1], t[2]*dy+self.sucklen*math.max(0,-dy)
+				if dir == "left" or dir == "right" then
+					ox, oy = t[2]*dx+self.sucklen*math.max(0,-dx), t[1]
 				end
+				local v = 1-(t[2]/self.sucklen)
 				love.graphics.setColor(255,255,255,255*v)
-				love.graphics.draw(dustimg, dustquad[t[5]], (self.path[#self.path][1]+ox+dx-xscroll)*16*scale, (self.path[#self.path][2]+oy+dy-.5-yscroll)*16*scale, t[3], scale, scale, 8, 8)
+				love.graphics.draw(dustimg, dustquad[t[5]], (x+ox-xscroll)*16*scale, (y+oy-.5-yscroll)*16*scale, t[3], scale, scale, 8, 8)
+				if self.suckexitportalx then
+					local dir = self.suckexitportalfacing
+					local cx, cy = self.suckexitportalx-1, self.suckexitportaly-1
+					local x, y, cw, ch, dx, dy = self:getsuck(dir,"exit",cx,cy)
+					local ox, oy = t[1], t[2]*dy+self.sucklen*math.max(0,-dy)
+					if dir == "left" or dir == "right" then
+						ox, oy = t[2]*dx+self.sucklen*math.max(0,-dx), t[1]
+					end
+					local v = 1-(t[2]/self.sucklen)
+					love.graphics.setColor(255,255,255,255*v)
+					love.graphics.draw(dustimg, dustquad[t[5]], (x+ox-xscroll)*16*scale, (y+oy-.5-yscroll)*16*scale, t[3], scale, scale, 8, 8)
+				end
 			end
 		end
+		--[[SUCK DEBUG
+		love.graphics.setLineWidth(2*scale)
+		local dir = self.entrance
+		local cx, cy = self.path[1][1]-1, self.path[1][2]-1
+		local cx, cy, cw, ch, dx, dy = self:getsuck(dir,"entrance",cx,cy)
+		love.graphics.setColor(255,255,255,180) if self.suckentranceportalx then love.graphics.setColor(255,0,0,180) end
+		love.graphics.rectangle("line",(cx-xscroll)*16*scale, (cy-0.5-yscroll)*16*scale, cw*16*scale, ch*16*scale)
+		if self.suckentranceportalx then
+			local cx, cy = self.suckentranceportalx-1, self.suckentranceportaly-1
+			local cx, cy, cw, ch, dx, dy = self:getsuck(self.suckentranceportalfacing,"entrance",cx,cy)
+			love.graphics.rectangle("line",(cx-xscroll)*16*scale, (cy-0.5-yscroll)*16*scale, cw*16*scale, ch*16*scale)
+		end
+		local dir = self.exit
+		local cx, cy = self.path[#self.path][1]-1, self.path[#self.path][2]-1
+		local cx, cy, cw, ch, dx, dy = self:getsuck(dir,"exit",cx,cy)
+		love.graphics.setColor(255,255,255,180) if self.suckexitportalx then love.graphics.setColor(255,0,0,180) end
+		love.graphics.rectangle("line",(cx-xscroll)*16*scale, (cy-0.5-yscroll)*16*scale, cw*16*scale, ch*16*scale)
+		if self.suckexitportalx then
+			local cx, cy = self.suckexitportalx-1, self.suckexitportaly-1
+			local cx, cy, cw, ch, dx, dy = self:getsuck(self.suckexitportalfacing,"exit",cx,cy)
+			love.graphics.rectangle("line",(cx-xscroll)*16*scale, (cy-0.5-yscroll)*16*scale, cw*16*scale, ch*16*scale)
+		end]]
 	end
 
 	--[[DEBUG
@@ -874,6 +984,56 @@ function clearpipe:createintersection()
 		addsegment(tx-1, ty, self, tiles[3], i, "intersection", false, false, self.graphic)
 		addsegment(tx, ty, self, tiles[4], i, "intersection", false, false, self.graphic)
 		self.path = {{self.x, self.y, dir = "right"}}
+	end
+end
+
+function clearpipe:getsuck(dir,tubeend,cx,cy)
+	local dx, dy = 0, 0
+	local cw, ch = 2, 2
+	
+	if dir == "right" then
+		dx = 1
+		cw = self.sucklen
+		cy = cy-1
+	elseif dir == "left" then
+		dx = -1
+		cw = self.sucklen
+		cy = cy-1
+	elseif dir == "up" then
+		dy = -1
+		ch = self.sucklen
+		intensity = 9
+		cx = cx-1
+	else
+		dy = 1
+		ch = self.sucklen
+		cx = cx-1
+	end
+	if tubeend == "entrance" then
+		if dir == "right" then
+			cx = cx-self.sucklen
+		elseif dir == "down" then
+			cy = cy-self.sucklen
+		end
+	else
+		if dir == "left" then
+			cx = cx-self.sucklen
+		elseif dir == "up" then
+			cy = cy-self.sucklen
+		end
+	end
+	return cx, cy, cw, ch, dx, dy
+end
+
+function clearpipe:suckrange(dir,tubeend,cx,cy,v,dt)
+	local cx, cy, cw, ch, dx, dy = self:getsuck(dir,tubeend,cx,cy)
+	local intensity = 4
+	if dir == "up" then
+		intensity = 9
+	end
+	if inrange(v.x, cx, cx+cw) and inrange(v.y, cy, cy+ch) then
+		v.speedx = v.speedx + self.suckspeed*intensity*dx*dt
+		v.speedy = v.speedy + self.suckspeed*intensity*dy*dt
 	end
 end
 ----------------------------------------------------------------------------------------------

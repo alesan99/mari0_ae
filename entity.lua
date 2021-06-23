@@ -789,7 +789,7 @@ rightclicktype["regiontrigger"] = {
 	end,
 	format = {
 		"trigger on",
-		{"dropdown", 5, 10, nil, {"player","enemy","everything"}},
+		{"dropdown", 5, 10, nil, {"player","enemy","cube","everything"}},
 		{"button", 2, {"select region", startrcregion, {1, 2}}}
 	},
 }
@@ -942,7 +942,7 @@ rightclicktype["platformup"] = {
 		"distance y:",
 		{"slider", 3, range = {-15, 15, round = 1}},
 		"duration:",
-		{"slider", 4, range = {1, 10, round = 2}},
+		{"slider", 4, range = {1, 20, round = 2}},
 		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}},
 	}
 }
@@ -1110,7 +1110,7 @@ rightclicktype["tiletool"] = {
 }
 rightclicktype["enemytool"] = {
 	name = "spawner",
-	default = "goomba|0|0|false|none",
+	default = "goomba|0|0|false|none|false",
 	ignoredefault = {false,false,false,"missing",false},
 	varfunc = function(v, i)
 		if i == 1 then
@@ -1174,7 +1174,8 @@ rightclicktype["enemytool"] = {
 		{"slider", 3, range = {-50, 50, round = 1}},
 		"animation",
 		{"dropdown", 5, 14, nil, {"none", "block", "cannon", "pipeup", "pipedown", "pipeleft", "piperight", "poof"}, ignorerctt=true},
-		{"button", 2, {"link trigger ", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
+		{"checkbox", 6, "only on screen"},
+		{"button", 2, {"link trigger ", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}},
 	},
 	t = {"goomba"},
 	entitylistlength = 1,

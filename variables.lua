@@ -609,8 +609,8 @@ frenzytime = 1.5
 turretshotduration = 0.1
 turrethitdelay = 0.05
 
-refillhitstime = 0.5
-maxhitpoints = 16
+refillhitstime = 0.8
+maxhitpoints = 12
 
 --plants
 plantintime = 1.8

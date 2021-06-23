@@ -238,10 +238,6 @@ function guielement:update(dt)
 					self.y = self.multiy[1]
 				end
 			end
-			--[DROID]
-			if self.timer and self.timer > 0 then
-				self.timer = self.timer - dt
-			end
 		end
 	end
 end
@@ -615,9 +611,8 @@ function guielement:click(x, y, button)
 					if self.scrollbar then
 						self.scrollbar.active = true
 					end
-					self.timer = 0.1--[DROID]
 				end
-			elseif (not android) or self.timer <= 0 then--[DROID]
+			else
 				if self.scrollbar then
 					self.scrollbar:click(x, y, button)
 					if x > (self.x+(13+self.width*8))*scale and x < (self.x+(13+self.width*8)+8)*scale then
@@ -728,7 +723,7 @@ function guielement:click(x, y, button)
 	end
 end
 
-function guielement:keypress(key)
+function guielement:keypress(key,textinput)
 	if self.active then
 		if self.type == "scrollbar" then
 			--Type in number into scrollbar
@@ -766,13 +761,13 @@ function guielement:keypress(key)
 			end
 		elseif self.type == "input" then
 			if self.inputting then
-				--[[DROID]]
+				--[[DROID
 				if android then
 					if android_key_repeat == key then
 						return
 					end
 					android_key_repeat = key
-				end
+				end]]
 
 				if key == ":" or key == ";" then
 					return
@@ -846,6 +841,11 @@ function guielement:keypress(key)
 					self.cursorblink = true
 					self.timer = 0
 				else
+					if android then
+						if (not textinput) then
+							return false
+						end
+					end
 					if string.len(self.value) < self.maxlength or self.maxlength == 0 then
 						local found = false
 						local targetkey = key

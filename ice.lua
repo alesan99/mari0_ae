@@ -286,8 +286,10 @@ function ice:meltice(destroy)
 			if a ~= "bowser" then
 				addpoints(firepoints[a], self.x, self.y)
 			end
-		elseif self.a == "enemy" and (not b.resistsiceblock) and (not b.resistsenemykill) and (not b.resistseverything) and (not b.resistseverything) and b:shotted("right", nil, nil, false, true) then
-			addpoints(firepoints[b.t] or 100, self.x, self.y)
+		elseif self.a == "enemy" then
+			if (not b.resistsiceblock) and (not b.resistsenemykill) and (not b.resistseverything) and (not b.resistseverything) and b:shotted("right", nil, nil, false, true) then
+				addpoints(firepoints[b.t] or 100, self.x, self.y)
+			end
 		else
 			b.instantdelete = true
 		end

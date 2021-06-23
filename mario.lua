@@ -655,6 +655,9 @@ function mario:update(dt)
 									self.yoshitoungeenemy = {graphic=v.graphic,quad=v.quad,width=v.width,height=v.height,
 										offsetX=v.offsetX or 0,offsetY=v.offsetY or 0,quadcenterX=v.quadcenterX or 0,quadcenterY=v.quadcenterY or 0,
 										animationscalex=v.animationscalex, animationscaley=v.animationscaley}
+									if v.output then
+										v:output()
+									end
 									v.instantdelete = true
 								end
 								local dobreak = true
@@ -3750,8 +3753,23 @@ function mario:jump(force)
 					--high blue gel jump
 					if portalphysics then
 						if self.gravitydir == "down" and inmap(math.floor(self.x+1+self.width/2), math.floor(self.y+self.height+20/16)) then
-							local cox, coy = math.floor(self.x+1+self.width/2), math.floor(self.y+self.height+20/16)
-							if map[cox][coy] and map[cox][coy]["gels"] and map[cox][coy]["gels"]["top"] and map[cox][coy]["gels"]["top"] == 1 then
+							local coy = math.floor(self.y+self.height+20/16)
+							local t1, t2
+							local cox1 = math.floor(self.x)+1
+							local cox2 = math.floor(self.x+self.width)+1
+							if (self.size == 8 or self.size == 16) then
+								cox2 = math.floor(self.x+self.width/2)+1
+							end
+							if inmap(cox1, coy) then t1 = map[cox1][coy] end
+							if inmap(cox2, coy) then t2 = map[cox2][coy] end
+							local onlightbridge = false
+							for j, w in pairs(objects["lightbridgebody"]) do
+								if (cox1 == w.cox or cox2 == w.cox) and coy == w.coy and w.dir == "hor" and w.gels.top and w.gels.top == 1 then
+									onlightbridge = true
+									break
+								end
+							end
+							if ((t1 and t1["gels"]["top"] == 1) or (t2 and t2["gels"]["top"] == 1)) or onlightbridge then
 								self.speedy = -portalphysicsbluegelminforce
 								self:stopjump()
 							end
@@ -4580,7 +4598,15 @@ function mario:floorcollide(a, b)
 		end
 		
 		if map[x][y]["gels"] then
-			if map[x][y]["gels"]["top"] == 1 and self:bluegel("top") then
+			local t1, t2
+			local cox1 = math.floor(self.x)+1
+			local cox2 = math.floor(self.x+self.width)+1
+			if (self.size == 8 or self.size == 16) then
+				cox2 = math.floor(self.x+self.width/2)+1
+			end
+			if inmap(cox1, y) then t1 = map[cox1][y] end
+			if inmap(cox2, y) then t2 = map[cox2][y] end
+			if ((t1 and t1["gels"]["top"] == 1) or (t2 and t2["gels"]["top"] == 1)) and self:bluegel("top") then
 				return false
 			end
 		end
@@ -4679,9 +4705,6 @@ function mario:floorcollide(a, b)
 			return false
 		elseif b.kills or b.killsontop then
 			if self.invincible then
-				self.jumping = jump
-				self.falling = fall
-				self.animationstate = anim
 				if b.solidkill then
 					return true
 				else
@@ -5153,10 +5176,10 @@ function mario:stompbounce(a, b) --bounce off of enemy (koopaling in shell for e
 	
 	local bouncespeed = math.sqrt(multiplier*grav*bounceheight)
 	if (not stompbouncex) and a ~= "yoshi" and mariomakerphysics and (not portalphysics) then
-		bouncespeed = math.sqrt(2*grav*bounceheighthigh)
+		bouncespeed = math.sqrt(2*grav*(b.stompbouncejump or bounceheighthigh))
 		self.jumping = true
 		if not jumpkey(self.playernumber) then --bounce higher in mario maker physics
-			bouncespeed = math.sqrt(2*grav*bounceheightmaker)
+			bouncespeed = math.sqrt(2*grav*(b.stompbouncenojump or bounceheightmaker))
 			self:stopjump()
 		end
 	end
@@ -6536,8 +6559,8 @@ function mario:starcollide(a, b)
 	if a == "enemy" then
 		if b:shotted("right", nil, nil, false, true) then
 			addpoints(firepoints[b.t] or 100, self.x, self.y)
+			return true
 		end
-		return true
 	elseif (a == "goomba" or a == "koopa" or a == "plant" or a == "bowser" or a == "squid" or a == "cheep" or a == "hammerbro" or a == "lakito" or a == "bulletbill" or a == "flyingfish" or a == "downplant" or a == "bigbill" or a == "cannonball" or (a == "kingbill" and not (levelfinished and not self.controlsenabled)) or a == "sidestepper" or a == "barrel" or a == "icicle" or a == "angrysun"
 		or a == "splunkin" or a == "biggoomba" or a == "bigkoopa" or a == "fishbone" or a == "drybones" or a == "meteor" or a == "ninji" or a == "boo" or a == "mole" or a == "bomb" or a == "fireplant" or a == "downfireplant" or a == "plantfire" or a == "torpedoted" or a == "torpedolauncher" or a == "parabeetle" or a == "pokey" or a == "chainchomp" or a == "rockywrench" or a == "magikoopa" or a == "spike" or a == "spikeball" or a == "plantcreeper" or a == "fuzzy")
 		and (not b.resistsstar) then
@@ -6817,7 +6840,7 @@ function hitblock(x, y, t, v)
 			size = 2
 		end
 	end
-	if t and t.funnel then
+	if t and (t.funnel or t.nohitsound) then
 		hitsound = false
 	end
 	
@@ -8058,6 +8081,7 @@ function mario:flag()
 	--kill shit
 	for i, v in pairs(objects["enemy"]) do
 		if v.deleteonflagpole then
+			v:output()
 			v.instantdelete = true
 		end
 	end

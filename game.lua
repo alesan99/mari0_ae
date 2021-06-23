@@ -937,7 +937,7 @@ function game_update(dt)
 						objects["screenboundary"]["left"].x = xscroll
 					end
 				end
-				
+
 				--just force that shit
 				if not levelfinished and not (autoscrollingx and not editormode) then
 					if fastestplayer.x > splitxscroll[split] + width - scrollingcomplete then
@@ -1232,12 +1232,15 @@ function game_update(dt)
 		spritebatchX[1] = math.floor(splitxscroll[1])
 		
 		if editormode == false and splitxscroll[1] < mapwidth-width then
-			local x1, x2 = math.ceil(prevxscroll)+width+1, math.floor(splitxscroll[1])+width+1
+			local x1, x2 = math.ceil(prevxscroll)+width*screenzoom2+1, math.floor(splitxscroll[1])+width*screenzoom2+1
 			if prevxscroll > splitxscroll[1] then --spawn enemies in both directions
 				x1, x2 = math.floor(splitxscroll[1])+1, math.floor(prevxscroll)+1
+			local x1, x2 = math.ceil(oldscroll)+width*screenzoom2+1, math.floor(splitxscroll[1])+width*screenzoom2+1
+			if oldscroll > splitxscroll[1] then --spawn enemies in both directions
+				x1, x2 = math.floor(splitxscroll[1])+1, math.floor(oldscroll)+1
 			end
 			for x = x1, x2 do
-				for y = math.floor(splityscroll[1])+1, math.min(mapheight, math.ceil(splityscroll[1])+height+1+2) do
+				for y = math.floor(splityscroll[1])+1, math.min(mapheight, math.ceil(splityscroll[1])+height*screenzoom2+1+2) do
 					spawnenemyentity(x, y)
 				end
 				if goombaattack then
@@ -1275,10 +1278,10 @@ function game_update(dt)
 		generatespritebatch()
 		spritebatchY[1] = math.floor(splityscroll[1])
 		if editormode == false then
-			for x = math.floor(splitxscroll[1])+1, math.ceil(splitxscroll[1])+width+1 do
+			for x = math.floor(splitxscroll[1])+1, math.ceil(splitxscroll[1])+width*screenzoom2+1 do
 				local y1, y2 = math.floor(splityscroll[1])+1, math.floor(prevyscroll)+1
 				if prevyscroll < splityscroll[1] then
-					y1, y2 = math.floor(prevyscroll)+1+height+2, math.floor(splityscroll[1])+1+height+2
+					y1, y2 = math.floor(prevyscroll)+1+height*screenzoom2+2, math.floor(splityscroll[1])+1+height*screenzoom2+2
 				end
 				for y = y1, y2 do
 					spawnenemyentity(x, y)
@@ -1539,8 +1542,9 @@ function game_draw()
 			love.graphics.translate(round(tremorx), round(tremory))
 		end
 		
-		local currentscissor = {(split-1)*width*16*scale/#splitscreen, 0, width*16*scale/#splitscreen, height*16*scale}
-		love.graphics.setScissor(unpack(currentscissor))
+		--[[local currentscissor = {(split-1)*width*16*scale/#splitscreen, 0, width*16*scale/#splitscreen, height*16*scale}
+		love.graphics.setScissor(unpack(currentscissor))]]
+		currentscissor = {}
 		xscroll = splitxscroll[split]
 		yscroll = splityscroll[split]
 		if screenzoom ~= 1 then
@@ -1550,12 +1554,7 @@ function game_draw()
 	
 		love.graphics.setColor(255, 255, 255, 255)
 		
-		local xfromdraw, xtodraw = math.max(1, math.floor(xscroll)+1), math.min(mapwidth, math.floor(xscroll+width*(1/screenzoom))+1)
-		local yfromdraw, ytodraw = math.max(1, math.floor(yscroll-0.5)+1), math.min(mapheight, math.floor(yscroll+height*(1/screenzoom)+1-0.5)+1)
-		local xoff = math.floor(xscroll)-math.fmod(xscroll, 1)
-		if xscroll < 0 then xoff = xoff + 1 end
-		local yoff = math.floor(yscroll)-math.fmod(yscroll, 1)
-		if yscroll < 0 then yoff = yoff + 1 end
+		local xfromdraw,xtodraw, yfromdraw,ytodraw, xoff,yoff = getdrawrange(xscroll,yscroll)
 		
 		--custom background
 		rendercustombackground(xscroll, yscroll, scrollfactor, scrollfactory)
@@ -1567,7 +1566,7 @@ function game_draw()
 			else
 				love.graphics.setColor(255,255,255,255)
 			end
-			for y = xfromdraw, ytodraw do
+			for y = yfromdraw, ytodraw do
 				for x = xfromdraw, xtodraw do
 					local backgroundtile = bmapt(x, y, 1)
 					if backgroundtile and tilequads[backgroundtile] and not tilequads[backgroundtile].invisible then
@@ -1583,11 +1582,11 @@ function game_draw()
 			love.graphics.push()
 			love.graphics.translate(3*scale, 3*scale)
 			love.graphics.setColor(dropshadowcolor)
-			love.graphics.draw(smbspritebatch[split], math.floor((-math.fmod(xscroll, 1)*16)*scale), math.floor((-math.fmod(yscroll, 1)*16)*scale))
-			love.graphics.draw(portalspritebatch[split], math.floor((-math.fmod(xscroll, 1)*16)*scale), math.floor((-math.fmod(yscroll, 1)*16)*scale))
+			love.graphics.draw(smbspritebatch[split], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
+			love.graphics.draw(portalspritebatch[split], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
 			if customtiles then
 				for i = 1, #customspritebatch[split] do
-					love.graphics.draw(customspritebatch[split][i], math.floor((-math.fmod(xscroll, 1)*16)*scale), math.floor((-math.fmod(yscroll, 1)*16)*scale))
+					love.graphics.draw(customspritebatch[split][i], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
 				end
 			end
 			drawmaptiles("dropshadow", xscroll, yscroll)
@@ -1714,11 +1713,11 @@ function game_draw()
 		
 		--TILES
 		if not _3DMODE then
-			love.graphics.draw(smbspritebatch[split], math.floor(-math.fmod(xscroll, 1)*16*scale), math.floor(-math.fmod(yscroll, 1)*16*scale))
-			love.graphics.draw(portalspritebatch[split], math.floor(-math.fmod(xscroll, 1)*16*scale), math.floor(-math.fmod(yscroll, 1)*16*scale))
+			love.graphics.draw(smbspritebatch[split], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
+			love.graphics.draw(portalspritebatch[split], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
 			if customtiles then
 				for i = 1, #customspritebatch[split] do
-					love.graphics.draw(customspritebatch[split][i], math.floor(-math.fmod(xscroll, 1)*16*scale), math.floor(-math.fmod(yscroll, 1)*16*scale))
+					love.graphics.draw(customspritebatch[split][i], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
 				end
 			end
 
@@ -2297,6 +2296,84 @@ function game_draw()
 		--cappy
 		for j, w in pairs(objects["cappy"]) do
 			w:draw()
+		end
+		
+		--draw collision (debug)
+		if HITBOXDEBUG and (editormode or testlevel) then
+			local lw = love.graphics.getLineWidth()
+			love.graphics.setLineWidth(.5*scale)
+			for i, v in pairs(objects) do
+				for j, k in pairs(v) do
+					if k.width then
+						if xscroll >= k.x-width and k.x+k.width > xscroll then
+							if k.active then
+								love.graphics.setColor(255, 255, 255)
+							else
+								love.graphics.setColor(255, 0, 0)
+							end
+							if k.width <= 1/16 then
+								love.graphics.rectangle("fill", math.floor((k.x-xscroll)*16*scale), math.floor((k.y-yscroll-.5)*16*scale), k.width*16*scale, k.height*16*scale)
+							elseif incognito then
+								love.graphics.rectangle("fill", math.floor((k.x-xscroll)*16*scale)+.5, math.floor((k.y-yscroll-.5)*16*scale)+.5, k.width*16*scale-1, k.height*16*scale-1)
+							else
+								love.graphics.rectangle("line", math.floor((k.x-xscroll)*16*scale)+.5, math.floor((k.y-yscroll-.5)*16*scale)+.5, k.width*16*scale-1, k.height*16*scale-1)
+							end
+							if k.killzonex then
+								love.graphics.circle("line", math.floor((k.x+k.killzonex-xscroll)*16*scale)+.5, math.floor((k.y+k.killzoney-yscroll-.5)*16*scale)+.5, (math.sqrt(k.killzoner))*16*scale)
+							end
+							if k.playerneardist and type(k.playerneardist) == "table" and #k.playerneardist == 4 then
+								love.graphics.setColor(0, 255, 255)
+								love.graphics.rectangle("line", math.floor((k.x+k.playerneardist[1]-xscroll)*16*scale)+.5, math.floor((k.y+k.playerneardist[2]-yscroll-.5)*16*scale)+.5, k.playerneardist[3]*16*scale-1, k.playerneardist[4]*16*scale-1)
+							end
+							if k.movementpath then
+								love.graphics.setColor(0, 255, 33)
+								local t = {}
+								for i = 1, #k.movementpath do
+									table.insert(t, math.floor((k.startx+k.movementpath[i][1]-xscroll)*16*scale)+.5)
+									table.insert(t, math.floor((k.starty+k.movementpath[i][2]-yscroll-.5)*16*scale)+.5)
+								end
+								if not k.movementpathturnaround then
+									table.insert(t, math.floor((k.startx+k.movementpath[1][1]-xscroll)*16*scale)+.5)
+									table.insert(t, math.floor((k.starty+k.movementpath[1][2]-yscroll-.5)*16*scale)+.5)
+								end
+								love.graphics.line(t)
+							end
+							if k.carryrange then
+								love.graphics.setColor(0, 255, 255)
+								love.graphics.rectangle("line", math.floor((k.x+k.carryrange[1]-xscroll)*16*scale)+.5, math.floor((k.y+k.carryrange[2]-yscroll-.5)*16*scale)+.5, k.carryrange[3]*16*scale-1, k.carryrange[4]*16*scale-1)
+							end
+							if k.blowrange then
+								love.graphics.setColor(100, 255, 255)
+								love.graphics.rectangle("line", math.floor((k.x+k.blowrange[1]-xscroll)*16*scale)+.5, math.floor((k.y+k.blowrange[2]-yscroll-.5)*16*scale)+.5, k.blowrange[3]*16*scale-1, k.blowrange[4]*16*scale-1)
+							end
+
+							--[[if k.pointingangle then
+								local xcenter = k.x + 6/16 - math.sin(k.pointingangle)*userange
+								local ycenter = k.y + 6/16 - math.cos(k.pointingangle)*userange
+							
+								love.graphics.setColor(0, 255, 255)
+								love.graphics.rectangle("line", math.floor((xcenter-usesquaresize/2-xscroll)*16*scale)+.5, math.floor((ycenter-usesquaresize/2-yscroll-.5)*16*scale)+.5, usesquaresize*16*scale-1, usesquaresize*16*scale-1)
+							end]]
+						end
+					end
+				end
+			end
+			
+			for j, w in pairs(userects) do
+				love.graphics.setColor(0, 255, 255, 150)
+				love.graphics.rectangle("line", math.floor((w.x-xscroll)*16*scale)+.5, math.floor((w.y-yscroll-.5)*16*scale)+.5, w.width*16*scale-1, w.height*16*scale-1)
+			end
+			love.graphics.setLineWidth(lw)
+
+			--animation numbers
+			if love.keyboard.isDown("0") then
+				love.graphics.setColor(255, 255, 255, 150)
+				local y = 2
+				for i, n in pairs(animationnumbers) do
+					properprint(i .. ": " .. n, 2*scale, y*scale)
+					y = y + 10
+				end
+			end
 		end
 
 		--portalwalldebug
@@ -2999,8 +3076,7 @@ function drawentity(j, w, i, v, currentscissor)
 	
 	--SCISSOR FOR ENTRY
 	if v.customscissor and (v.invertedscissor or (v.t and enemiesdata[v.t])) and v.portalable ~= false then --portable custom enemies
-		local t = "stencil"
-		love.graphics[t](function() love.graphics.rectangle("fill", math.floor((v.customscissor[1]-xscroll)*16*scale), math.floor((v.customscissor[2]-.5-yscroll)*16*scale), v.customscissor[3]*16*scale, v.customscissor[4]*16*scale) end, "increment")
+		love.graphics.stencil(function() love.graphics.rectangle("fill", math.floor((v.customscissor[1]-xscroll)*16*scale), math.floor((v.customscissor[2]-.5-yscroll)*16*scale), v.customscissor[3]*16*scale, v.customscissor[4]*16*scale) end, "increment")
 		if v.invertedscissor then
 			love.graphics.setStencilTest("less", 1)
 		else
@@ -3008,11 +3084,10 @@ function drawentity(j, w, i, v, currentscissor)
 		end
 	elseif v.static or (v.portalable == false) then --static or non portable entities
 		if v.invertedscissor then
-			local t = "stencil"
-			love.graphics[t](function() love.graphics.rectangle("fill", math.floor((v.customscissor[1]-xscroll)*16*scale), math.floor((v.customscissor[2]-.5-yscroll)*16*scale), v.customscissor[3]*16*scale, v.customscissor[4]*16*scale) end, "increment")
+			love.graphics.stencil(function() love.graphics.rectangle("fill", math.floor((v.customscissor[1]-xscroll)*16*scale), math.floor((v.customscissor[2]-.5-yscroll)*16*scale), v.customscissor[3]*16*scale, v.customscissor[4]*16*scale) end, "increment")
 			love.graphics.setStencilTest("less", 1)
 		elseif v.customscissor then
-			love.graphics.setScissor(math.floor((v.customscissor[1]-xscroll)*16*scale), math.floor((v.customscissor[2]-.5-yscroll)*16*scale), v.customscissor[3]*16*scale, v.customscissor[4]*16*scale)
+			love.graphics.setScissor(math.floor((v.customscissor[1]-xscroll)*16*screenzoom*scale), math.floor((v.customscissor[2]-.5-yscroll)*16*screenzoom*scale), v.customscissor[3]*16*screenzoom*scale, v.customscissor[4]*16*screenzoom*scale)
 		end
 	end
 		
@@ -3978,6 +4053,11 @@ function startlevel(level, reason)
 		end
 		dcplaying = false
 	end
+	--dumb stupid work around
+	if animationprevsublevel then
+		prevsublevel = animationprevsublevel
+		animationprevsublevel = false
+	end
 	
 	--MISC VARS
 	everyonedead = false
@@ -4266,6 +4346,7 @@ function startlevel(level, reason)
 	splitxscroll = {0}
 	splityscroll = {0}
 	screenzoom = 1
+	screenzoom2 = 1/screenzoom
 	
 	startx = 3
 	starty = 13
@@ -4562,12 +4643,12 @@ function startlevel(level, reason)
 		
 	--ADD ENEMIES ON START SCREEN
 	if editormode == false then
-		local xtodo = width+1
-		if mapwidth < width+1 then
+		local xtodo = width*screenzoom2+1
+		if mapwidth < width*screenzoom2+1 then
 			xtodo = mapwidth
 		end
 		for x = math.floor(splitxscroll[1]), math.floor(splitxscroll[1])+xtodo do
-			for y = math.floor(splityscroll[1]), math.floor(splityscroll[1])+height+2 do
+			for y = math.floor(splityscroll[1]), math.floor(splityscroll[1])+height*screenzoom2+2 do
 				spawnenemyentity(x, y)
 			end
 		end
@@ -5004,12 +5085,7 @@ function updatespritebatch()
 		
 		local xscroll, yscroll = splitxscroll[split], splityscroll[split]
 
-		local xfromdraw, xtodraw = math.max(1, math.floor(xscroll)+1), math.min(mapwidth, math.floor(xscroll+width*(1/screenzoom))+1)
-		local yfromdraw, ytodraw = math.max(1, math.floor(yscroll-0.5)+1), math.min(mapheight, math.floor(yscroll+height*(1/screenzoom)+1-0.5)+1)
-		local xoff = math.floor(xscroll)
-		if xscroll < 0 then xoff = xoff + 1 end
-		local yoff = math.floor(yscroll)
-		if yscroll < 0 then yoff = yoff + 1 end
+		local xfromdraw,xtodraw, yfromdraw,ytodraw, xoff,yoff = getdrawrange(xscroll,yscroll,"spritebatch")
 		
 		local lmap = map
 		
@@ -7828,44 +7904,44 @@ end
 
 function runkey(i)
 	local s = controls[i]["run"]
-	return checkkey(s)
+	return checkkey(s,i,"run")
 end
 
 function rightkey(i)
 	local s = controls[i]["right"]
-	return checkkey(s)
+	return checkkey(s,i,"right")
 end
 
 function leftkey(i)
 	local s = controls[i]["left"]
-	return checkkey(s)
+	return checkkey(s,i,"left")
 end
 
 function downkey(i)
 	local s = controls[i]["down"]
-	return checkkey(s)
+	return checkkey(s,i,"down")
 end
 
 function upkey(i)
 	local s = controls[i]["up"]
-	return checkkey(s)
+	return checkkey(s,i,"up")
 end
 
 function jumpkey(i)
 	local t = {}
 	local s = controls[i]["jump"]
-	return checkkey(s)
+	return checkkey(s,i,"jump")
 end
 
 function usekey(i)
 	local s = controls[i]["use"]
-	return checkkey(s)
+	return checkkey(s,i,"use")
 end
 
 function reloadkey(i)
 	local t = {}
 	local s = controls[i]["reload"]
-	return checkkey(s)
+	return checkkey(s,i,"reload")
 end
 
 function keydown(s, i)
@@ -7889,7 +7965,7 @@ function keydown(s, i)
 	return false
 end
 
-function checkkey(s)
+function checkkey(s,i,n)
 	if s[1] == "joy" then
 		if s[3] == "hat" then
 			if string.match(love.joystick.getHat(s[2], s[4]), s[5]) then
@@ -7918,6 +7994,8 @@ function checkkey(s)
 				end
 			end
 		end
+	elseif s[1] and android then
+		return androidButtonDown(i,n)
 	elseif s[1] then
 		if love.keyboard.isDown(s[1]) then
 			return true
@@ -8435,8 +8513,8 @@ function camerasnap(targetx, targety, anim)
 	end
 
 	if not (editormode and not testlevel) then
-		for x = math.max(1, math.floor(xscroll)), math.min(mapwidth, math.ceil(xscroll+width)) do
-			for y = math.max(1, math.floor(yscroll)), math.min(mapheight, math.ceil(yscroll+height+1)) do
+		for x = math.max(1, math.floor(xscroll)), math.min(mapwidth, math.ceil(xscroll+width*screenzoom2)) do
+			for y = math.max(1, math.floor(yscroll)), math.min(mapheight, math.ceil(yscroll+height*screenzoom2+1)) do
 				spawnenemyentity(x,y)
 			end
 		end
@@ -8579,9 +8657,9 @@ end
 
 function onscreen(x, y, w, h)
 	if w and h then
-		return (x+w >= xscroll and y+h-.5 >= yscroll and x <= xscroll+width and y-.5 <= yscroll+height)
+		return (x+w >= xscroll and y+h-.5 >= yscroll and x <= xscroll+width*screenzoom2 and y-.5 <= yscroll+height*(1/screenzoom))
 	else
-		return (x >= xscroll and y-.5 >= yscroll and x <= xscroll+width and y-.5 <= yscroll+height)
+		return (x >= xscroll and y-.5 >= yscroll and x <= xscroll+width*screenzoom2 and y-.5 <= yscroll+height*(1/screenzoom))
 	end
 end
 
@@ -8773,7 +8851,7 @@ function rendercustombackground(xscroll, yscroll, scrollfactor, scrollfactory)
 			if custombackgroundquad[i] and not SlowBackgrounds then --optimized static background
 				local x1, y1 = math.floor(xscroll*16*scale)/scale, math.floor(yscroll*16*scale)/scale
 				local qx, qy, qw, qh, sw, sh = custombackgroundquad[i]:getViewport()
-				custombackgroundquad[i]:setViewport( x1, y1, qw, qh, sw, sh )
+				custombackgroundquad[i]:setViewport( x1, y1, width*16*screenzoom2, height*16*screenzoom2, sw, sh )
 				love.graphics.draw(custombackgroundimg[i], custombackgroundquad[i], 0, 0, 0, scale, scale)
 			else
 				for y = min, math.ceil(height/custombackgroundheight[i])+1 do
@@ -8902,12 +8980,7 @@ function drawmaptiles(drawtype, xscroll, yscroll)
 	local collision = (drawtype == "collision")
 	local lmap = map
 
-	local xfromdraw, xtodraw = math.max(1, math.floor(xscroll)+1), math.min(mapwidth, math.floor(xscroll+width*(1/screenzoom))+1)
-	local yfromdraw, ytodraw = math.max(1, math.floor(yscroll-0.5)+1), math.min(mapheight, math.floor(yscroll+height*(1/screenzoom)+1-0.5)+1)
-	local xoff = math.floor(xscroll)+math.fmod(xscroll, 1)
-	if xscroll < 0 then xoff = xoff + 1 end
-	local yoff = math.floor(yscroll)+math.fmod(yscroll, 1)
-	if yscroll < 0 then yoff = yoff + 1 end
+	local xfromdraw,xtodraw, yfromdraw,ytodraw, xoff,yoff = getdrawrange(xscroll,yscroll)
 		
 	for y = yfromdraw, ytodraw do
 		for x = xfromdraw, xtodraw do
@@ -9059,7 +9132,11 @@ function drawmaptiles(drawtype, xscroll, yscroll)
 						love.graphics.setColor(255, 0, 0, alpha)
 						love.graphics.rectangle("fill", math.floor((x-1-xoff)*16*scale), math.floor(((y-1-yoff)*16-8)*scale), 16*scale, 16*scale)
 						love.graphics.setColor(255, 255, 255, alpha)
-						love.graphics.draw(v.graphic, v.quad, math.floor((x-1-xoff)*16*scale+exoff), math.floor(((y-1-yoff)*16)*scale+eyoff), 0, (v.animationscalex or 1)*scale, (v.animationscaley or 1)*scale)
+						if v.showicononeditor and v.icongraphic then
+							love.graphics.draw(v.icongraphic, math.floor((x-1-xoff)*16*scale), ((y-1-yoff)*16-8)*scale, 0, scale, scale)
+						else
+							love.graphics.draw(v.graphic, v.quad, math.floor((x-1-xoff)*16*scale+exoff), math.floor(((y-1-yoff)*16)*scale+eyoff), 0, (v.animationscalex or 1)*scale, (v.animationscaley or 1)*scale)
+						end
 						if t["argument"] and t["argument"] == "b" then --supersize
 							love.graphics.setColor(255, 255, 255, 200)
 							love.graphics.draw(entityquads[313].image, entityquads[313].quad, math.floor((x-1-xoff)*16*scale), ((y-1-yoff)*16-8)*scale, 0, scale, scale)
@@ -9199,6 +9276,25 @@ function readlevelfilesafe(s)
 	return s
 end
 
+function getdrawrange(xscroll,yscroll,spritebatch)
+	local xfromdraw, xtodraw = math.max(1, math.floor(xscroll)+1), math.min(mapwidth, math.floor(xscroll+width*(1/screenzoom))+1)
+	local yfromdraw, ytodraw = math.max(1, math.floor(yscroll+0.5)+1), math.min(mapheight, math.floor(yscroll+height*(1/screenzoom)+1+0.5)+1)
+	local xoff = math.floor(xscroll)
+	if not spritebatch then
+		xoff = xoff+math.fmod(xscroll, 1)
+		if xscroll < 0 then
+			xoff = math.ceil(xscroll)+math.fmod(xscroll, 1)
+		end
+	end
+	local yoff = math.floor(yscroll)
+	if not spritebatch then
+		yoff = yoff+math.fmod(yscroll, 1)
+		if yscroll < 0 then
+			yoff = math.ceil(yscroll)+math.fmod(yscroll, 1)
+		end
+	end
+	return xfromdraw,xtodraw, yfromdraw,ytodraw, xoff,yoff
+end
 -------------------
 --DAILY CHALLENGE--
 -------------------

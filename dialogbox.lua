@@ -13,9 +13,14 @@ function dialogbox:init(text, speaker, color)
 	
 	self.lifetime = 5
 	self.chardelay = 0.05
+
+	--insert special phrases
+	self.speaker = self.speaker:gsub("%%player%%",playername)
+	self.text = self.text:gsub("%%player%%",playername)
 	
 	--initialize colors
 	local curcolor = {255, 255, 255}
+	local newcolor = true
 	local i = 1
 	self.textcolors = {}
 	while i <= #self.text do
@@ -25,12 +30,24 @@ function dialogbox:init(text, speaker, color)
 				j = j + 1
 			until string.sub(self.text, j, j) == "%" or j > #self.text
 			
-			curcolor = string.sub(self.text, i+1, j-1):split(",")
+			local colorstring = string.sub(self.text, i+1, j-1)
+			local comma = colorstring:find(",")
+			if comma then
+				--color
+				curcolor = colorstring:split(",")
+				newcolor = true
+			else
+				i = i + 1
+				j = i-1
+			end
 			
 			--take out that string
 			self.text = string.sub(self.text, 1, i-1) .. string.sub(self.text, j+1)
 		else
-			self.textcolors[i] = {tonumber(curcolor[1]), tonumber(curcolor[2]), tonumber(curcolor[3])}
+			if newcolor then
+				self.textcolors[i] = {tonumber(curcolor[1]), tonumber(curcolor[2]), tonumber(curcolor[3])}
+				newcolor = false
+			end
 			i = i + 1
 		end
 	end
@@ -71,7 +88,9 @@ function dialogbox:draw()
 		local y = math.ceil(i/charsx)
 		
 		if y <= charsy then
-			love.graphics.setColor(self.textcolors[i])
+			if self.textcolors[i] then
+				love.graphics.setColor(self.textcolors[i])
+			end
 			properprint(string.sub(self.text, i, i), (7+(x-1)*8)*scale, (height*16-boxheight-margin+4+(y-1)*lineheight)*scale)
 		else
 			--abort!

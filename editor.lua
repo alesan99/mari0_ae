@@ -1,5 +1,5 @@
 --i figured i should start using local functions despite 1.6 using like none
-local undo_clear, undo_store, undo_stopstore, undo_undo
+local undo_clear, undo_store, undo_stopstore--[[, undo_undo]]
 local meta_data, promptedmetadatasave
 local updatetilesscrollbar, updatelevelscrollbar
 local worldscrollbarheight, levelscrollbarheight
@@ -27,6 +27,7 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	collectableslist = {{},{},{},{},{},{},{},{},{},{}}
 	collectablescount = {0,0,0,0,0,0,0,0,0,0}
 	animationnumbers = {}
+	autosave = false
 	
 	subleveltest = false
 	
@@ -277,7 +278,8 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	guielements["continuemusiccheckbox"] = guielement:new("checkbox", 294, guielements["realtimecheckbox"].y+11+10*count, togglecontinuemusic, continuesublevelmusic, TEXT["cont. music"])
 
 	--MAPS
-	guielements["savebutton2"] = guielement:new("button", 300, 196, TEXT["save level"], savelevel, 0, nil, 2.5, 94, true)
+	guielements["savebutton2"] = guielement:new("button", 300, 196, TEXT["save level"], guielements["savebutton"].func, 0, nil, 2.4, 94, true)
+	--guielements["autosavecheckbox"] = guielement:new("checkbox", 300, guielements["savebutton2"].y+16, function() autosave = not autosave; guielements["autosavecheckbox"].var = autosave end, autosave, TEXT["autosave"])
 	guielements["savebutton2"].bordercolor = {255, 0, 0}
 	guielements["savebutton2"].bordercolorhigh = {255, 127, 127}
 	
@@ -485,7 +487,7 @@ function editor_update(dt)
 	if editormenuopen == false or minimapmoving then
 		--key scroll
 		if (not rightclickmenuopen) or customrcopen == "region" or customrcopen == "link" or customrcopen == "path" or customrcopen == "trackpath" or minimapmoving then
-			if (love.keyboard.isDown("left") or (android and love.keyboard.isDown(controls[1]["left"][1]) and not autoscroll)) and not brushsizetoggle then
+			if (love.keyboard.isDown("left") or (android and leftkey(1) and not autoscroll)) and not brushsizetoggle then
 				autoscroll = false
 				guielements["autoscrollcheckbox"].var = autoscroll
 				splitxscroll[1] = splitxscroll[1] - 30*gdt
@@ -493,7 +495,7 @@ function editor_update(dt)
 					splitxscroll[1] = 0
 				end
 				generatespritebatch()
-			elseif (love.keyboard.isDown("right") or (android and love.keyboard.isDown(controls[1]["right"][1]) and not autoscroll)) and not brushsizetoggle then
+			elseif (love.keyboard.isDown("right") or (android and rightkey(1) and not autoscroll)) and not brushsizetoggle then
 				autoscroll = false
 				guielements["autoscrollcheckbox"].var = autoscroll
 				splitxscroll[1] = splitxscroll[1] + 30*gdt
@@ -503,7 +505,7 @@ function editor_update(dt)
 				generatespritebatch()
 			end
 			if mapheight ~= 15 and not brushsizetoggle then
-				if (love.keyboard.isDown("up") or (android and love.keyboard.isDown(controls[1]["up"][1]) and not autoscroll)) then
+				if (love.keyboard.isDown("up") or (android and upkey(1) and not autoscroll)) then
 					autoscroll = false
 					guielements["autoscrollcheckbox"].var = autoscroll
 					splityscroll[1] = splityscroll[1] - 30*gdt
@@ -511,7 +513,7 @@ function editor_update(dt)
 						splityscroll[1] = 0
 					end
 					generatespritebatch()
-				elseif (love.keyboard.isDown("down") or (android and love.keyboard.isDown(controls[1]["down"][1]) and not autoscroll)) then
+				elseif (love.keyboard.isDown("down") or (android and downkey(1) and not autoscroll)) then
 					autoscroll = false
 					guielements["autoscrollcheckbox"].var = autoscroll
 					splityscroll[1] = splityscroll[1] + 30*gdt
@@ -856,7 +858,7 @@ function editor_update(dt)
 							if ismaptile(tx, ty) then
 								local d = mtclipboard[i][j]
 								currenttile = d[1]
-								placetile(x+(i-1 + pastecenter[1])*16*scale, y+(j-1 + pastecenter[2])*16*scale)
+								--[[placetile(x+(i-1 + pastecenter[1])*16*scale, y+(j-1 + pastecenter[2])*16*scale)
 								local tile1 = d[1]
 								if tile1 == 1 then
 									tile1 = false --don't paste empty space
@@ -870,7 +872,7 @@ function editor_update(dt)
 										map[tx][ty] = {tile1 or map[tx][ty][1], d[2] or map[tx][ty][2], d[3] or map[tx][ty][3], back=d["back"]}
 									end
 								end
-								map[tx][ty]["gels"] = {}
+								map[tx][ty]["gels"] = {}]]
 							end
 						end
 					end
@@ -1143,7 +1145,7 @@ function editor_draw()
 		elseif tileselection and tileselection.finished then
 			love.graphics.setColor(255, 255, 255, 200)
 			properprintF(TEXT["move:left click\ncopy:ctrl+c\npaste:ctrl+v\ncut:ctrl+x\ndelete:backspace/delete\nsave as object:ctrl+s"], 1*scale, (height*16-6*10)*scale)
-		elseif ctrlpressed and not love.mouse.isDown("left") then
+		elseif ctrlpressed and not love.mouse.isDown("l") then
 			love.graphics.setColor(255, 255, 255, 200)
 			properprintF(TEXT["undo:ctrl+z\ntile selection:left click\nentity selection:ctrl+e\nselect entire map:ctrl+a"], 1*scale, (height*16-4*10)*scale)
 		elseif backgroundtilemode or assistmode or editorstate == "linktool" or editorstate == "portalgun" or editorstate == "selectiontool" or editorstate == "powerline" then
@@ -1295,7 +1297,8 @@ function editor_draw()
 						local platwidth = math.floor((rightclickobjects[2].value*9+1)*2)/2
 						local dx, dy = 0, 0
 						if customrcopen ~= "platformfall" then
-							dx, dy = round(rightclickobjects[4].value*30-15, 4), round(rightclickobjects[6].value*30-15, 4)
+							dx = round(rightclickobjects[4].value*(rightclickobjects[4].rcrange[2]-rightclickobjects[4].rcrange[1])+rightclickobjects[4].rcrange[1], 4)
+							dy = round(rightclickobjects[6].value*(rightclickobjects[6].rcrange[2]-rightclickobjects[6].rcrange[1])+rightclickobjects[6].rcrange[1], 4)
 						end
 						local x, y = rightclickmenucox, rightclickmenucoy
 						local offx, offy = 0, 0
@@ -1735,10 +1738,10 @@ function editor_draw()
 						x2, y2 = x+pastecenter[1]+#mtclipboard-1, y+pastecenter[2]+#mtclipboard[1]
 					end
 					x1, y1 = math.max(xscroll-1, x1), math.max(yscroll-1, y1)
-					x2, y2 = math.min(xscroll+width+1, x2), math.min(yscroll+height+1, y2)
+					x2, y2 = math.min(xscroll+width*screenzoom2+1, x2), math.min(yscroll+height*screenzoom2+1, y2)
 					local sx, sy, sw, sh = x1-1, y1-1, x2-x1+1, y2-y1+1
 					love.graphics.setColor(0, 131, 255, 45)
-					love.graphics.rectangle("fill", ((sx-xscroll)*16*screenzoom)*scale,((sy-yscroll)*16-8)*screenzoom*scale, sw*16*screenzoom*scale, sh*16*screenzoom*scale)
+					love.graphics.rectangle("fill", ((sx-xscroll)*16)*scale,((sy-yscroll)*16-8)*scale, sw*16*scale, sh*16*scale)
 					love.graphics.setColor(255,255,255)
 					love.graphics.stencil(function() 
 						love.graphics.setLineWidth(scale)
@@ -1813,8 +1816,12 @@ function editor_draw()
 				elseif not pastingtiles then 
 					if not tilequads[currenttile] and enemiesdata[currenttile] then --custom enemy
 						local v = enemiesdata[currenttile]
-						local xoff, yoff = ((0.5-v.width/2+(v.spawnoffsetx or 0))*16 + v.offsetX - v.quadcenterX)*scale, (((v.spawnoffsety or 0)-v.height+1)*16-v.offsetY - v.quadcenterY)*scale
-						love.graphics.draw(v.graphic, v.quad, math.floor((x-xscroll-1)*16*scale+xoff), math.floor(((y-yscroll)*16)*scale+yoff), 0, scale, scale)
+						if v.showicononeditor and v.icongraphic then
+							love.graphics.draw(v.icongraphic, math.floor((x-xscroll-1)*16*scale), math.floor(((y-yscroll-0.5)*16)*scale), 0, scale, scale)
+						else
+							local xoff, yoff = ((0.5-v.width/2+(v.spawnoffsetx or 0))*16 + v.offsetX - v.quadcenterX)*scale, (((v.spawnoffsety or 0)-v.height+1)*16-v.offsetY - v.quadcenterY)*scale
+							love.graphics.draw(v.graphic, v.quad, math.floor((x-xscroll-1)*16*scale+xoff), math.floor(((y-yscroll)*16)*scale+yoff), 0, scale, scale)
+						end
 					else
 						--offset enemy
 						local offsetx = 0
@@ -1872,8 +1879,12 @@ function editor_draw()
 								if yl == 1 and xl == 1 then 
 								elseif not tilequads[currenttile] and enemiesdata[currenttile] then --custom enemy
 									local v = enemiesdata[currenttile]
-									local xoff, yoff = ((0.5-v.width/2+(v.spawnoffsetx or 0))*16 + v.offsetX - v.quadcenterX)*scale, (((v.spawnoffsety or 0)-v.height+1)*16-v.offsetY - v.quadcenterY)*scale
-									love.graphics.draw(v.graphic, v.quad, math.floor((x-splitxscroll[1]-1+xl-1)*16*scale+xoff), math.floor(((y-splityscroll[1]-1+yl-1)*16+16)*scale+yoff), 0, scale, scale)
+									if v.showicononeditor and v.icongraphic then
+										love.graphics.draw(v.icongraphic, math.floor((x-splitxscroll[1]-1+xl-1)*16*scale), math.floor(((y-splityscroll[1]-0.5+yl-1)*16)*scale), 0, scale, scale)
+									else
+										local xoff, yoff = ((0.5-v.width/2+(v.spawnoffsetx or 0))*16 + v.offsetX - v.quadcenterX)*scale, (((v.spawnoffsety or 0)-v.height+1)*16-v.offsetY - v.quadcenterY)*scale
+										love.graphics.draw(v.graphic, v.quad, math.floor((x-splitxscroll[1]-1+xl-1)*16*scale+xoff), math.floor(((y-splityscroll[1]-1+yl-1)*16+16)*scale+yoff), 0, scale, scale)
+									end
 								else
 									love.graphics.setColor(255, 255, 255, 200)	
 									love.graphics.draw(entityquads[currenttile].image, entityquads[currenttile].quad, math.floor((x-splitxscroll[1]-1+xl-1)*16*scale), math.floor(((y-splityscroll[1]-1+yl-1)*16+8)*scale), 0, scale, scale)
@@ -2584,6 +2595,7 @@ function editor_draw()
 			love.graphics.setColor(255, 255, 255)
 			properprintF(TEXT["do not forget to save\nyour current level!"], 108*scale, 200*scale)
 			guielements["savebutton2"]:draw()
+			--guielements["autosavecheckbox"]:draw()
 			
 			if levelrightclickmenu.active then
 				levelrightclickmenu:draw()
@@ -3301,6 +3313,7 @@ function mapstab()
 	end
 	guielements["newworld"].active = true
 	guielements["savebutton2"].active = true
+	--guielements["autosavecheckbox"].active = true
 	
 	switchworldselection(marioworld)
 	updatelevelscrollbar()
@@ -4431,6 +4444,9 @@ function mapnumberclick(i, j, k)
 			saveeditormetadata()
 			promptedmetadatasave = false
 		end
+		if levelmodified and autosave then
+			guielements["savebutton2"].func()
+		end
 
 		marioworld = i
 		mariolevel = j
@@ -4862,8 +4878,11 @@ function editor_mousepressed(x, y, button)
 											map[tx][ty][1] = tile1 or map[tx][ty][1]
 											map[tx][ty][2] = d[2] or map[tx][ty][2]
 											map[tx][ty]["back"] = d["back"]
+											if map[tx][ty][2] then
+												map[tx][ty]["argument"] = d["argument"]
+											end
 										else
-											map[tx][ty] = {tile1 or map[tx][ty][1], d[2] or map[tx][ty][2], d[3] or map[tx][ty][3], back=d["back"]}
+											map[tx][ty] = {tile1 or map[tx][ty][1], d[2] or map[tx][ty][2], d[3] or map[tx][ty][3], back=d["back"],argument=d["argument"]}
 										end
 									end
 									map[tx][ty]["gels"] = {}
@@ -4986,7 +5005,7 @@ function editor_mousepressed(x, y, button)
 						currenttile = entitiesform[list][tile]
 						editorclose()
 						allowdrag = false
-					elseif list and not android then --a little funky on android
+					elseif list then --a little funky on android
 						if not entitiesform[list].hidden then --hide
 							entitiesform[list].hidden = true
 							entitiesform[list].h = 0
@@ -5057,6 +5076,7 @@ function editor_mousepressed(x, y, button)
 				local zoom1 = screenzoom
 				local centerx, centery = xscroll+(width*(1/screenzoom))*r1, yscroll+(height*(1/screenzoom))*r2
 				screenzoom = math.min(1,math.max(0.05, screenzoom + (screenzoom/(dy*5))))
+				screenzoom2 = 1/screenzoom
 				if zoom1 ~= screenzoom then
 					xscroll = centerx - (width*(1/screenzoom))*r1
 					yscroll = centery - (height*(1/screenzoom))*r2
@@ -5100,6 +5120,7 @@ function editor_mousepressed(x, y, button)
 				local zoom1 = screenzoom
 				local centerx, centery = xscroll+(width*(1/screenzoom))*r1, yscroll+(height*(1/screenzoom))*r2
 				screenzoom = math.min(1,math.max(0.05, screenzoom + (screenzoom/(dy*5))))
+				screenzoom2 = 1/screenzoom
 				if zoom1 ~= screenzoom then
 					xscroll = centerx - (width*(1/screenzoom))*r1
 					yscroll = centery - (height*(1/screenzoom))*r2
@@ -5361,9 +5382,10 @@ function openrightclickmenu(x, y, tileX, tileY)
 		end
 
 		--load in default values if there aren't enough
-		local defaultvalues = rct.default:split("|")
-		local numberofdefaultvalues = #defaultvalues
+		local defaultvalues
 		if rct.default and (not rct.fixdefault) and tostring(rct.default):find("|") and (not usingdefaultvalues) then
+			defaultvalues = rct.default:split("|")
+			local numberofdefaultvalues = #defaultvalues
 			for i = #rightclickvalues2+1, numberofdefaultvalues do
 				if ((rct.ignoredefault and rct.ignoredefault[i])) then
 					rightclickvalues2[i] = rct.ignoredefault[i]
@@ -5574,7 +5596,7 @@ function openrightclickmenu(x, y, tileX, tileY)
 						end
 						d:updatefunc(d.value)
 					end
-					if not d.value then
+					if (not d.value) and defaultvalues then
 						d.value = ((tonumber(defaultvalues[d.rightclickvalue]) or 0)-t.range[1])/(t.range[2]-t.range[1])
 					end
 					table.insert(rightclickobjects, d)
@@ -5879,6 +5901,9 @@ function startrctrack(var) --track path
 	closecustomrc(true)
 	rightclickobjects = {}
 	customrcopen = "trackpath"
+	if android then
+		ANDROIDRIGHTCLICK = false
+	end
 	rightclickmenuopen = true
 end
 
@@ -6306,6 +6331,9 @@ function editor_keypressed(key)
 					loadmtobjects()
 					tilesobjects()
 					notice.new("Selection saved", notice.white, 3)
+				elseif not tileseletion then
+					--save level
+					savelevel(); levelmodified = false
 				end
 			elseif key == "c" or key == "x" then
 				if tileselection and tileselection.finished then
@@ -6421,7 +6449,7 @@ function editor_keypressed(key)
 end
 
 function editor_mousemoved(x, y, dx, dy)
-	if love.mouse.isDown("1") then
+	if love.mouse.isDown("l") then
 		if minimapmoving then
 			local w = width*16-52
 			local h = height*16-52
@@ -6557,7 +6585,21 @@ function loadmtobjects()
 					for u = 1, #split4 do
 						--finally get tile, entity, and rightclickvalues
 						local split5 = split4[u]:split("-")
-						table.insert(ox, {tonumber(split5[1]),tonumber(split5[2]) or split5[2],split5[3]})
+						local tile = tonumber(split5[1])
+						local back
+						if not tile then --background tiles
+							local s = split5[1]:split("╚")
+							tile = tonumber(s[1])
+							back = tonumber(s[2])
+						end
+						local entity = split5[2]
+						local argument
+						if entity and (not tonumber(entity)) and entity:find("╔") then --entity arguments
+							local s = split5[2]:split("╔")
+							entity = s[1]
+							argument = s[2]
+						end
+						table.insert(ox, {tile,tonumber(entity) or entity,split5[3],back=back,argument=argument})
 					end
 					table.insert(oo, ox)
 				end
@@ -7284,7 +7326,14 @@ function savemtobject(objecttable, name)
 					--TODO: Change delimeters?
 					break
 				end
-				data = data .. s[j][layer] .. "-"
+				
+				if layer == 1 and s[j]["back"] then --╚ instead of ~
+					data = data .. s[j][layer] .. "╚" .. s[j]["back"] ..  "-"
+				elseif layer == 2 and s[j]["argument"] then --╔ instead of :
+					data = data .. s[j][layer] .. "╔" .. s[j]["argument"] .. "-"
+				else
+					data = data .. s[j][layer] .. "-"
+				end
 			end
 			data = string.sub(data, 1, -2)
 			data = data .. ","
