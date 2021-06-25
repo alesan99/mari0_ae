@@ -299,13 +299,9 @@ function handlegroup(i, h, u, v, j, dt, passed)
 	local horcollision = false
 	local vercollision = false
 	for g, t in pairs(u) do
-		if j == "bomb" and h == "upfire" then
-			print(v.meltice,v.mask[t.category],t.meltice,t.mask[v.category])
-		end
 		--    Same object?          Active                 Not masked
 		if (i ~= g or j ~= h) and t.active and (v.mask == nil or v.mask[t.category] ~= true) and (t.mask == nil or t.mask[v.category] ~= true) then
-			
-	local collision1, collision2 = checkcollision(v, t, h, g, j, i, dt, passed)
+			local collision1, collision2 = checkcollision(v, t, h, g, j, i, dt, passed)
 			if collision1 then
 				horcollision = true
 			elseif collision2 then

@@ -3504,6 +3504,7 @@ function loadnitpicks()
 		NoCharacterZipNotices = t.nocharacterzipnotices
 		NoMusic = t.nomusic
 		EditorZoom = t.editorzoom
+		DirectDLCDownloads = t.directdlcdownloads
 		_3DMODE = t.render3d
 		HITBOXDEBUG = t.viewhitboxes
 		if t.pcversion then

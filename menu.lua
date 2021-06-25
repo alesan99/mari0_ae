@@ -2263,22 +2263,37 @@ function menu_keypressed(key, unicode)
 				love.graphics.present()
 				
 				if onlinemappackurl[i] ~= "error" then
-					onlinemappackerror = not downloadmappack(onlinemappackurl[i], onlinemappackfilename[i] or "mappack.zip", onlinemappacksize[i])
-					if onlinemappacksize[i] == "url" then
+					local filename = onlinemappackfilename[i]
+					if filename and filename == "" then
+						filename = onlinemappackname[i]:gsub(" ", "_")
+						filename = filename .. ".zip"
+					end
+					local downloaded
+					onlinemappackerror, downloaded = downloadmappack(onlinemappackurl[i], filename or "mappack.zip", onlinemappacksize[i])
+					onlinemappackerror = not onlinemappackerror
+					if onlinemappacksize[i] == "url" and ((not downloaded) or onlinemappackerror) then
 						--link
 						if not onlinemappackerror then
 							notice.new(TEXT["Opened Download Link"], notice.white, 2)
 						else
 							notice.new(TEXT["Couldn't Open Link\nLink copied to clipboard"], notice.red, 3)
-							love.system.setClipBoardText(onlinemappackurl[i])
+							love.system.setClipboardText(onlinemappackurl[i])
 						end
 					else
 						if not onlinemappackerror then
-							mountmappack(onlinemappackfilename[i] or "mappack.zip")
+							mountmappack(filename or "mappack.zip")
 							loadmappacks()
 							mappackhorscroll = 0
 							mappacktype = "local"
 							downloadedmappacks[i] = true
+							local name = filename:sub(1,1)
+							for i = 1, #mappacklist do
+								if mappacklist[i]:sub(1,1) == name then
+									mappackselection = i
+									break
+								end
+							end
+							updatescroll()
 							onlineupdatescroll()
 							notice.new("DLC downloaded!", notice.white, 2)
 						else

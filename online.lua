@@ -1,5 +1,6 @@
 --local http = require("socket.http")
 --local mime = require("mime")
+local https = {timeout = 5,time = 0,body = "",status = 0};
 
 local website = "http://alesan99.blogspot.com/p/mari0-dlc-v14.html?m=1"
 --yes, i know it says v14. I accidentally called the v12 dlc "v13", so I now have to use the next update name
@@ -53,6 +54,11 @@ end
 
 function downloadmappack(url, out, size)
 	if size == "url" then
+		if DirectDLCDownloads and love.system.getOS() == "Windows" and url:find("%.zip") then
+			--attempt to do a direct download on windows
+			out = out:gsub("%.zip","")
+			return directRequest(url,"GET",nil,out), "downloaded"
+		end
 		--just open the link
 		return love.system.openURL(url)
 	else
@@ -144,4 +150,100 @@ function newOnlineImage(url)
 			return data
 		end
 	end
+end
+
+--by bio1712 (https://love2d.org/forums/viewtopic.php?t=85782)
+function directRequest(url,method,data,out)
+	url = url or "";
+	method = method or "GET";
+	data = data or "";
+	data = data:gsub(" ","/SPACE/");
+	data = data:gsub("&","/AND/");
+	createJS(out);
+	local dir = love.filesystem.getAppdataDirectory() .. "/LOVE/" .. love.filesystem.getIdentity() .. "/alesans_entities/onlinemappacks/https_request.js";
+	local str = "" .. dir:gsub("/","\\") .. " " .. url .. " " .. method .. " " .. data .. "";
+	os.execute(str);
+	print(out .. ".zip")
+	
+	https.timer = os.time();
+	local ok = false
+	while true do
+		if love.filesystem.isFile("alesans_entities/onlinemappacks/status.txt") and love.filesystem.isFile("alesans_entities/onlinemappacks/" .. out .. ".zip") then
+			https.status = tonumber(love.filesystem.read("alesans_entities/onlinemappacks/status.txt"):sub(1,3));
+			--https.body = love.filesystem.read(out .. ".zip");
+			--print("len:" .. https.body:len());
+			if https.status == 200 then
+				ok = true; break;
+			else 
+				ok = false; break;
+			end
+		end
+		if os.time() > https.timeout + https.time then
+			https.body = "";
+			https.status = -1;
+			ok = false; break;
+		end
+		love.timer.sleep();
+	end
+	love.filesystem.remove("alesans_entities/onlinemappacks/status.txt");
+	love.filesystem.remove("alesans_entities/onlinemappacks/https_request.js");
+	return ok;
+end
+
+function createJS(out)
+	local file = [[var xHttp;
+	var URL;
+	var method;
+	var FSO;
+	var file;
+	var data;
+	var scriptDir = WScript.ScriptFullName.substring(0,WScript.ScriptFullName.lastIndexOf(WScript.ScriptName)-1);
+
+	xHttp = new ActiveXObject("MSXML2.ServerXMLHTTP");
+	URL = WScript.Arguments.Item(0);
+
+	try {
+		method = WScript.Arguments.Item(1);
+		data = WSCript.Arguments.Item(2);
+		data = data.replace("/SPACE/"," ");
+		data = data.replace("/AND/","&");
+	} catch(err) {
+
+	}
+
+	if (!method) {
+		method = "GET";
+	}
+
+	if (!data) {
+		var d = new Date();
+		data = "c=" + d.getTime();
+	} else {
+		var d = new Date();
+		data = data + "&d=" + d.getTime();
+	}
+
+
+	xHttp.open(method, URL, false);
+	xHttp.setOption(2, 13056);
+	xHttp.setRequestHeader("Content-Type", "application/zip");
+	xHttp.send(data);
+
+	FSO = new ActiveXObject("Scripting.FileSystemObject");
+
+	fileName = scriptDir + "\\]] .. out .. [[.zip";
+
+	var fsT = new ActiveXObject("ADODB.Stream");
+	fsT.type = 1; 
+	fsT.open(); 
+	fsT.write(xHttp.responseBody);
+	fsT.saveToFile(fileName, 2);
+
+	fileName = scriptDir + "\\status.txt";
+	file = FSO.CreateTextFile(fileName,true);
+	file.Write(xHttp.status + "\n");
+	file.Close();
+	]]
+
+	love.filesystem.write("alesans_entities/onlinemappacks/https_request.js",file);
 end
