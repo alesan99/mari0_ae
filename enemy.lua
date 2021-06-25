@@ -3790,6 +3790,9 @@ end
 
 function enemy:dotrack()
 	self.track = true
+	if self.transforms and self:gettransformtrigger("tracked") then
+		self:transform(self:gettransformsinto("tracked"))
+	end
 end
 
 function enemy:applygel(side, x, y)
