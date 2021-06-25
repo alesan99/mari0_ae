@@ -37,7 +37,7 @@ function upfire:init(x, y, r)
 					true, true, true, true, true,
 					true, true, true, true, true,
 					true, true, true, true, true,
-					false, true}
+					false, false}
 	
 	--IMAGE STUFF
 	self.drawable = true
@@ -87,17 +87,40 @@ function upfire:update(dt)
 end
 
 function upfire:leftcollide(a, b)
+	if self:globalcollide(a, b) then
+		return false
+	end
 	return false
 end
 
 function upfire:rightcollide(a, b)
+	if self:globalcollide(a, b) then
+		return false
+	end
 	return false
 end
 
 function upfire:floorcollide(a, b)
+	if self:globalcollide(a, b) then
+		return false
+	end
 	return false
 end
 
 function upfire:ceilcollide(a, b)
+	if self:globalcollide(a, b) then
+		return false
+	end
+	return false
+end
+
+function upfire:globalcollide(a, b)
+	return true
+end
+
+function upfire:passivecollide(a, b)
+	if self:globalcollide(a, b) then
+		return false
+	end
 	return false
 end

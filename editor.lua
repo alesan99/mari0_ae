@@ -5382,9 +5382,13 @@ function openrightclickmenu(x, y, tileX, tileY)
 		end
 
 		--load in default values if there aren't enough
-		local defaultvalues
-		if rct.default and (not rct.fixdefault) and tostring(rct.default):find("|") and (not usingdefaultvalues) then
-			defaultvalues = rct.default:split("|")
+		local defaultvalues = {}
+		if rct.default and (not rct.fixdefault) and (not usingdefaultvalues) then
+			if tostring(rct.default):find("|") then
+				defaultvalues = rct.default:split("|")
+			else
+				defaultvalues = {rct.default}
+			end
 			local numberofdefaultvalues = #defaultvalues
 			for i = #rightclickvalues2+1, numberofdefaultvalues do
 				if ((rct.ignoredefault and rct.ignoredefault[i])) then
@@ -5561,7 +5565,7 @@ function openrightclickmenu(x, y, tileX, tileY)
 					d.displayfunction = t[3]
 					d.rightclickvalue = t[2]
 					if t.range then
-						local v = tostring(vt[t[2]] or t.range.default or 0)
+						local v = tostring(vt[t[2]] or defaultvalues[d.rightclickvalue] or 0)
 						v = v:gsub("n", "-")
 						v = tonumber(v)
 						d.value = (v-t.range[1])/(t.range[2]-t.range[1])

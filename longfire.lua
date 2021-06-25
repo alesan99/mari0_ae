@@ -111,11 +111,11 @@ function longfire:update(dt)
 				if objects["frozencoin"][tilemap(cox, coy)] then
 					objects["frozencoin"][tilemap(cox, coy)]:meltice()
 				end
-				for i, v in pairs(objects["muncher"]) do
-					if v.frozen and aabb(cox-1, coy-1, 1, 1, v.x, v.y, v.width, v.height) then
-						v:melt()
-					end
-				end
+			end
+		end
+		for i, v in pairs(objects["muncher"]) do
+			if v.frozen and aabb(self.x,self.y,self.width,self.height, v.x, v.y, v.width, v.height) then
+				v:melt()
 			end
 		end
 	end

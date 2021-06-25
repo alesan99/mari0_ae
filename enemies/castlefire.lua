@@ -253,7 +253,7 @@ function castlefire:updatepos()
 		end
 		--melt frozen munchers
 		for i, v in pairs(objects["muncher"]) do
-			if v.frozen and aabb(cox-1, coy-1, 1, 1, v.x, v.y, v.width, v.height) then
+			if v.frozen and aabb(self.child[i].x, self.child[i].y, self.child[i].width,self.child[i].height, v.x, v.y, v.width, v.height) then
 				v:melt()
 			end
 		end

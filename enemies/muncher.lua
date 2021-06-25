@@ -231,7 +231,11 @@ function muncher:floorcollide(a, b)
 		return true
 	end
 
-	if mariohammerkill[a] then
+	if a == "bomb" and b.explosion then
+		return false
+	end
+
+	if mariohammerkill[a] and (not b.shot) and (not b.dead) then
 		if a == "enemy" then
 			if b:shotted("right", nil, nil, false, true) then
 				addpoints(firepoints[b.t] or 100, self.x, self.y)

@@ -23,7 +23,7 @@ function bomb:init(x, y)
 					false, false, true, false, false,
 					false, true, false, false, false,
 					false, false, true, false, false,
-					true, false, true, true, true,
+					true, false, true, true, false,
 					false, true}
 	
 	self.emancipatecheck = true
@@ -91,27 +91,6 @@ function bomb:update(dt)
 		return false
 	end
 	
-	if self.explosion and not self.shot then
-		self.timer = self.timer + dt
-		while self.timer > 0.1 do
-			self.quadi = self.quadi + 1
-			if self.quadi == 8 then
-				self.quadi = 7
-			end
-			self.quad = fireballquad[self.quadi]
-			self.timer = self.timer - 0.1
-		end
-		self.explosiontimer = self.explosiontimer + dt
-		if self.explosiontimer > 0.5 then
-			return true
-		end
-	elseif self.stomped and not self.shot then
-		self.explodetimer = self.explodetimer + dt
-		if self.explodetimer > 3 then
-			self:explode()
-		end
-	end
-	
 	if edgewrapping then --wrap around screen
 		local minx, maxx = -self.width, mapwidth
 		if self.x < minx then
@@ -128,8 +107,27 @@ function bomb:update(dt)
 		self.y = self.y+self.speedy*dt
 		
 		return false
-		
+	
+	elseif self.explosion then
+		self.timer = self.timer + dt
+		while self.timer > 0.1 do
+			self.quadi = self.quadi + 1
+			if self.quadi == 8 then
+				self.quadi = 7
+			end
+			self.quad = fireballquad[self.quadi]
+			self.timer = self.timer - 0.1
+		end
+		self.explosiontimer = self.explosiontimer + dt
+		if self.explosiontimer > 0.5 then
+			return true
+		end
 	elseif self.stomped then
+		self.explodetimer = self.explodetimer + dt
+		if self.explodetimer > 3 then
+			self:explode()
+		end
+
 		if not self.falling then
 			if self.speedx > 0 then
 				self.speedx = math.max(0, self.speedx - friction*dt)
@@ -184,6 +182,7 @@ function bomb:explode()
 	self.stompbounce = false
 	self.freezable = false
 	self.trackable = false
+	self.dead = true
 	
 	local oldw, oldh = self.width, self.height
 	self.width = 2
@@ -339,6 +338,11 @@ end
 
 function bomb:ceilcollide(a, b)
 	if self:globalcollide(a, b) then
+		return false
+	end
+
+	if a == "muncher" and (not self.explosion) and (not b.static) then
+		self:explode()
 		return false
 	end
 end
