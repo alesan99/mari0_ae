@@ -9130,6 +9130,9 @@ function supersizeentity(v, size)
 		if v.supersizeoffsetx then
 			v.x = v.x + v.supersizeoffsetx
 		end
+		if v.supersizeoffsety then
+			v.x = v.y + v.supersizeoffsety
+		end
 	end
 
 	if v.dosupersize then
