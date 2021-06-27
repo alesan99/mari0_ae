@@ -3048,7 +3048,7 @@ function loadcustombackground(filename)
 			if not data then return	end
 			data = data:gsub("\r", "")
 			loadcustombackgroundanim(custombackgroundimg, custombackgroundwidth, custombackgroundheight, custombackgroundanim, i, data)
-		else
+		elseif not SlowBackgrounds then
 			custombackgroundimg[i]:setWrap("repeat","repeat")
 			custombackgroundquad[i] = love.graphics.newQuad(0,0,width*16,height*16,custombackgroundimg[i]:getWidth(),custombackgroundimg[i]:getHeight())
 		end
@@ -3066,7 +3066,7 @@ function loadcustombackground(filename)
 				if not data then return	end
 				data = data:gsub("\r", "")
 				loadcustombackgroundanim(custombackgroundimg, custombackgroundwidth, custombackgroundheight, custombackgroundanim, i, data)
-			else
+			elseif not SlowBackgrounds then
 				custombackgroundimg[i]:setWrap("repeat","repeat")
 				custombackgroundquad[i] = love.graphics.newQuad(0,0,width*16,height*16,custombackgroundimg[i]:getWidth(),custombackgroundimg[i]:getHeight())
 			end
@@ -3084,8 +3084,10 @@ function loadcustombackground(filename)
 		custombackgroundimg[i] = love.graphics.newImage("graphics/SMB/portalbackground.png")
 		custombackgroundwidth[i] = custombackgroundimg[i]:getWidth()/16
 		custombackgroundheight[i] = custombackgroundimg[i]:getHeight()/16
-		custombackgroundimg[i]:setWrap("repeat","repeat")
-		custombackgroundquad[i] = love.graphics.newQuad(0,0,width*16,height*16,custombackgroundimg[i]:getWidth(),custombackgroundimg[i]:getHeight())
+		if not SlowBackgrounds then
+			custombackgroundimg[i]:setWrap("repeat","repeat")
+			custombackgroundquad[i] = love.graphics.newQuad(0,0,width*16,height*16,custombackgroundimg[i]:getWidth(),custombackgroundimg[i]:getHeight())
+		end
 	end
 end
 
