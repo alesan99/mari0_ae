@@ -187,6 +187,8 @@ function trackcontroller:init(x, y, a, b, travel, fast, on)
 		return false
 	end
 
+	self.b.trackcontroller = self
+
 	self.on = true
 	if on ~= nil then
 		self.on = on
