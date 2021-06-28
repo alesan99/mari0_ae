@@ -2399,6 +2399,14 @@ function enemy:customtimeraction(action, arg)
 				self.spawnsenemy = self.spawnsenemyrandoms[math.random(#self.spawnsenemyrandoms)]
 			end
 			self:spawnenemy(self.spawnsenemy)
+		elseif action == "trackreverse" then
+			if self.tracked then
+				if self.trackcontroller.travel == "forward" then
+					self.trackcontroller.travel = "backwards"
+				else
+					self.trackcontroller.travel = "forward"
+				end
+			end
 		end
 		if string.sub(action, 0, 7) == "reverse" then
 			local parameter = string.sub(action, 8, string.len(action))
