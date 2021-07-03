@@ -540,7 +540,6 @@ function guielement:draw(a, offx, offy)
 
 				--cursor
 				if self.inputting and self.cursorblink then
-					--bookmark
 					love.graphics.rectangle("fill", (self.x+self.xrange*self.value+string.len(self.textvalue)*8)*scale, (self.y+math.ceil((self.height-8)/2)-1)*scale, 2*scale, 9*scale)
 				end
 			end
@@ -580,7 +579,6 @@ function guielement:draw(a, offx, offy)
 		
 		--cursor
 		if self.inputting and self.cursorblink then
-			--bookmark
 			local x = math.ceil((self.cursorpos-1-self.textoffset) % self.width)+1
 			local y = math.min(math.ceil(self.cursorpos/self.width), self.height)
 			
@@ -805,7 +803,7 @@ function guielement:keypress(key,textinput)
 							love.keyboard.setTextInput(false)--[DROID]
 						end
 					end
-				elseif key == "left" then --bookmark
+				elseif key == "left" then
 					self.cursorpos = math.max(1, self.cursorpos - 1)
 					if self.cursorpos-1 <= self.textoffset and not (self.width >= self.maxlength or self.height > 1) then
 						self.textoffset = math.max(self.textoffset - 1, 0)

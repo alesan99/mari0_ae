@@ -1002,6 +1002,12 @@ function game_update(dt)
 					if objects["player"][fastestplayer].height > 2 then
 						py = objects["player"][fastestplayer].y+objects["player"][fastestplayer].height/2
 					end
+					local pspeed = objects["player"][1].speedy
+					if objects["player"][fastestplayer].oldy and pspeed == 0 and math.abs(objects["player"][fastestplayer].y-objects["player"][fastestplayer].oldy) < 3 then
+						pspeed = (objects["player"][fastestplayer].y-objects["player"][fastestplayer].oldy)/dt
+					end
+					objects["player"][fastestplayer].oldy = objects["player"][fastestplayer].y
+					
 					local sx, sy = px-xscroll, py-yscroll--position on screen
 					yscrolltarget = yscrolltarget or splityscroll[split]
 
@@ -1011,8 +1017,8 @@ function game_update(dt)
 						upbound = 8
 						downbound = 6
 					end
-					if objects["player"][1].speedy == 0 then
-						yscrolltarget = math.min(py-downbound, math.max(py-upbound, yscrolltarget))--(objects["player"][1].y+objects["player"][1].width/2)-(height/2)
+					if speed == 0 then
+						yscrolltarget = math.min(py-downbound, math.max(py-upbound, yscrolltarget))--(objects["player"][fastestplayer].y+objects["player"][fastestplayer].width/2)-(height/2)
 					elseif sy > upbound then
 						yscrolltarget = py-upbound
 					elseif sy < downbound then
@@ -1034,10 +1040,10 @@ function game_update(dt)
 					end
 					
 					local diff = math.abs(splityscroll[split]-yscrolltarget)
-					local speed = math.abs(objects["player"][fastestplayer].speedy)--scrollrate*(diff/1.5)+0.5 --math.min(superscrollrate)?
+					local speed = math.abs(pspeed)--scrollrate*(diff/1.5)+0.5 --math.min(superscrollrate)?
 					if seeking then	
 						speed = seekspeed
-					elseif speed == 0 then--not objects["player"][1].jumping and not objects["player"][1].falling then
+					elseif speed == 0 then--not objects["player"][fastestplayer].jumping and not objects["player"][fastestplayer].falling then
 						if diff > 2.5 then
 							speed = superscrollrate
 						else

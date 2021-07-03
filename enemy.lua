@@ -2380,10 +2380,6 @@ function enemy:customtimeraction(action, arg)
 			self[p] = tonumber(self[p])
 		elseif a == "tostring" then
 			self[p] = tostring(self[p])
-		elseif a == "if" then
-			self:ifstatement(ogarg[1],ogarg[2],ogarg[3],ogarg[4],ogarg[5])
-			--                   first;  Symb; Second;     Action;     Arg;
-			--EXAMPLE: [0,"if",["speedx",">=","speedy",["set","speedy"],25]
 		end
 	else --backwards compatibility
 		if action == "bounce" then
@@ -2419,6 +2415,10 @@ function enemy:customtimeraction(action, arg)
 			self[parameter] = self[parameter] * arg
 		elseif action == "setframe" then
 			self.quad = self.quadgroup[arg]
+		elseif a == "if" then
+			self:ifstatement(ogarg[1],ogarg[2],ogarg[3],ogarg[4],ogarg[5])
+			--                   first;  Symb; Second;     Action;     Arg;
+			--EXAMPLE: [0,"if",["speedx",">=","speedy",["set","speedy"],25]
 		elseif string.sub(action, 0, 3) == "set" then
 			self[string.sub(action, 4, string.len(action))] = arg
 		end
