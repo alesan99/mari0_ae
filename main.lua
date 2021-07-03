@@ -93,7 +93,6 @@ local loadingbardraw = function(add)
 	loadingbarv = loadingbarv + (add)/(8)
 	love.graphics.setColor(255,255,255)
 	love.graphics.rectangle("fill", 0, (height*16-3)*scale, (width*16*loadingbarv)*scale, 3*scale)
-
 	love.graphics.pop()
 	love.graphics.present()
 end

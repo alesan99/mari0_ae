@@ -542,7 +542,7 @@ function editor_update(dt)
 				local rcp = rightclickpath
 				local ox, oy =  rcp.last[1],  rcp.last[2]
 				local dir = rcp.dir
-				local tx, ty = getMouseTile(x, y+8*scale)
+				local tx, ty = getMouseTile(x, y+8*screenzoom*scale)
 				local coveredtiles = {}
 				tx = tx-rcp.x
 				ty = ty-rcp.y
@@ -722,7 +722,7 @@ function editor_update(dt)
 				local rcp = rightclicktrack
 				local ox, oy =  rcp.last[1],  rcp.last[2]
 				local dir = rcp.dir
-				local tx, ty = getMouseTile(x, y+8*scale)
+				local tx, ty = getMouseTile(x, y+8*screenzoom*scale)
 				tx = tx-rcp.x
 				ty = ty-rcp.y
 				local overlap = ((tx == ox) and (ty == oy))
@@ -842,7 +842,7 @@ function editor_update(dt)
 			if tileselection then
 				if not tileselection.finished then
 					--increase tileselection
-					local tx, ty = getMouseTile(x, y+8*scale)
+					local tx, ty = getMouseTile(x, y+8*screenzoom*scale)
 					tileselection[3] = tx
 					tileselection[4] = ty
 				end
@@ -1176,7 +1176,7 @@ function editor_draw()
 			
 			love.graphics.setLineWidth(scale)
 			
-			local cox, coy = getMouseTile(mousex, mousey+8*scale)
+			local cox, coy = getMouseTile(mousex, mousey+8*screenzoom*scale)
 			
 			local table1 = {}
 			for i, v in pairs(outputsi) do
@@ -1389,7 +1389,7 @@ function editor_draw()
 							tile = tonumber(command:sub(s2+4, -1))
 						end
 						love.graphics.setColor(255,255,255,150)
-						local tx, ty = getMouseTile(mousex, mousey+8*scale)
+						local tx, ty = getMouseTile(mousex, mousey+8*screenzoom*scale)
 						properprint(tx .. "-" .. ty, mousex, mousey)
 					end
 					--tile tool preview selection
@@ -1564,7 +1564,7 @@ function editor_draw()
 										quadi = 3
 									end
 								end
-								local cox, coy = getMouseTile(mousex, mousey+8*scale)
+								local cox, coy = getMouseTile(mousex, mousey+8*screenzoom*scale)
 								if (cox == tx and coy == ty and not trackrightclickmenu.active) or (trackrightclickmenu.active and trackrightclickmenustage == i) then
 									love.graphics.setColor(255,216,0,255)
 								end
@@ -4853,7 +4853,7 @@ function editor_mousepressed(x, y, button)
 						mtclipboard = {}
 					end
 					resettileselection()
-					local tx, ty = getMouseTile(x, y+8*scale)
+					local tx, ty = getMouseTile(x, y+8*screenzoom*scale)
 					tileselection = {tx, ty, tx, ty}
 					tileselection.finished = false
 					allowdrag = true
@@ -5075,8 +5075,7 @@ function editor_mousepressed(x, y, button)
 				local r1, r2 = love.mouse.getX()/(width*16*scale), love.mouse.getY()/(height*16*scale)
 				local zoom1 = screenzoom
 				local centerx, centery = xscroll+(width*(1/screenzoom))*r1, yscroll+(height*(1/screenzoom))*r2
-				screenzoom = math.min(1,math.max(0.05, screenzoom + (screenzoom/(dy*5))))
-				screenzoom2 = 1/screenzoom
+				setscreenzoom(math.min(1,math.max(0.05, screenzoom + (screenzoom/(dy*5)))))
 				if zoom1 ~= screenzoom then
 					xscroll = centerx - (width*(1/screenzoom))*r1
 					yscroll = centery - (height*(1/screenzoom))*r2
@@ -5119,8 +5118,7 @@ function editor_mousepressed(x, y, button)
 				local r1, r2 = love.mouse.getX()/(width*16*scale), love.mouse.getY()/(height*16*scale)
 				local zoom1 = screenzoom
 				local centerx, centery = xscroll+(width*(1/screenzoom))*r1, yscroll+(height*(1/screenzoom))*r2
-				screenzoom = math.min(1,math.max(0.05, screenzoom + (screenzoom/(dy*5))))
-				screenzoom2 = 1/screenzoom
+				setscreenzoom(math.min(1,math.max(0.05, screenzoom + (screenzoom/(dy*5)))))
 				if zoom1 ~= screenzoom then
 					xscroll = centerx - (width*(1/screenzoom))*r1
 					yscroll = centery - (height*(1/screenzoom))*r2

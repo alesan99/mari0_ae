@@ -894,8 +894,8 @@ function game_update(dt)
 				--LEFT
 
 				if (not (autoscrollingx and not editormode)) and (camerasetting ~= 3 or editormode) then
-					if fastestplayer.x < splitxscroll[split] + scrollingleftstart and splitxscroll[split] > 0 then
-						if fastestplayer.x < splitxscroll[split] + scrollingleftstart and fastestplayer.speedx < 0 then
+					if fastestplayer.x < splitxscroll[split] + scrollingleftstart*screenzoom2 and splitxscroll[split] > 0 then
+						if fastestplayer.x < splitxscroll[split] + scrollingleftstart*screenzoom2 and fastestplayer.speedx < 0 then
 							if fastestplayer.speedx < -scrollrate then
 								splitxscroll[split] = splitxscroll[split] - scrollrate*dt
 							else
@@ -903,23 +903,23 @@ function game_update(dt)
 							end
 						end
 					
-						if fastestplayer.x < splitxscroll[split] + scrollingleftcomplete then
+						if fastestplayer.x < splitxscroll[split] + scrollingleftcomplete*screenzoom2 then
 							splitxscroll[split] = splitxscroll[split] - scrollrate*dt
-							if fastestplayer.x > splitxscroll[split] + scrollingleftcomplete then
-								splitxscroll[split] = fastestplayer.x - scrollingleftcomplete
+							if fastestplayer.x > splitxscroll[split] + scrollingleftcomplete*screenzoom2 then
+								splitxscroll[split] = fastestplayer.x - scrollingleftcomplete*screenzoom2
 							end
 						end
 					end
 				end
 				if autoscrollingx and not editormode then
-					splitxscroll[split] = math.max(0, math.min(mapwidth-width, splitxscroll[split] + autoscrollingx*dt))
+					splitxscroll[split] = math.max(0, math.min(mapwidth-width*screenzoom2, splitxscroll[split] + autoscrollingx*dt))
 				end
 				
 				--RIGHT
 				
 				if not (autoscrollingx and not editormode) then
-					if fastestplayer.x > splitxscroll[split] + width - scrollingstart and splitxscroll[split] < mapwidth - width then
-						if fastestplayer.x > splitxscroll[split] + width - scrollingstart and fastestplayer.speedx > 0.3 then
+					if fastestplayer.x > splitxscroll[split] + width*screenzoom2 - scrollingstart*screenzoom2 and splitxscroll[split] < mapwidth - width*screenzoom2 then
+						if fastestplayer.x > splitxscroll[split] + width*screenzoom2 - scrollingstart*screenzoom2 and fastestplayer.speedx > 0.3 then
 							if fastestplayer.speedx > scrollrate then
 								splitxscroll[split] = splitxscroll[split] + scrollrate*dt
 							else
@@ -927,10 +927,10 @@ function game_update(dt)
 							end
 						end
 					
-						if fastestplayer.x > splitxscroll[split] + width - scrollingcomplete then
+						if fastestplayer.x > splitxscroll[split] + width*screenzoom2 - scrollingcomplete*screenzoom2 then
 							splitxscroll[split] = splitxscroll[split] + scrollrate*dt
-							if splitxscroll[split] > fastestplayer.x - (width - scrollingcomplete) then
-								splitxscroll[split] = fastestplayer.x - (width - scrollingcomplete)
+							if splitxscroll[split] > fastestplayer.x - (width*screenzoom2 - scrollingcomplete*screenzoom2) then
+								splitxscroll[split] = fastestplayer.x - (width*screenzoom2 - scrollingcomplete*screenzoom2)
 							end
 						end
 					end
@@ -941,15 +941,15 @@ function game_update(dt)
 
 				--just force that shit
 				if not levelfinished and not (autoscrollingx and not editormode) then
-					if fastestplayer.x > splitxscroll[split] + width - scrollingcomplete then
+					if fastestplayer.x > splitxscroll[split] + width*screenzoom2 - scrollingcomplete*screenzoom2 then
 						splitxscroll[split] = splitxscroll[split] + superscroll*dt
-						if fastestplayer.x < splitxscroll[split] + width - scrollingcomplete then
-							splitxscroll[split] = fastestplayer.x - width + scrollingcomplete
+						if fastestplayer.x < splitxscroll[split] + width*screenzoom2 - scrollingcomplete*screenzoom2 then
+							splitxscroll[split] = fastestplayer.x - width*screenzoom2 + scrollingcomplete*screenzoom2
 						end
-					elseif fastestplayer.x < splitxscroll[split] + scrollingleftcomplete then
+					elseif fastestplayer.x < splitxscroll[split] + scrollingleftcomplete*screenzoom2 then
 						splitxscroll[split] = splitxscroll[split] - superscroll*dt
-						if fastestplayer.x > splitxscroll[split] + scrollingleftcomplete then
-							splitxscroll[split] = fastestplayer.x - scrollingleftcomplete
+						if fastestplayer.x > splitxscroll[split] + scrollingleftcomplete*screenzoom2 then
+							splitxscroll[split] = fastestplayer.x - scrollingleftcomplete*screenzoom2
 						end
 					end
 				end
@@ -996,7 +996,8 @@ function game_update(dt)
 					end
 				end
 			end
-			if mapheight ~= 15 and objects["player"][fastestplayer] then
+			if mapheight > 15*screenzoom2 and objects["player"][fastestplayer] then
+				print(mapheight,15*screenzoom2)
 				if not (autoscrollingy and not editormode) then
 					local px, py = objects["player"][fastestplayer].x, objects["player"][fastestplayer].y
 					if objects["player"][fastestplayer].height > 2 then
@@ -1011,11 +1012,11 @@ function game_update(dt)
 					local sx, sy = px-xscroll, py-yscroll--position on screen
 					yscrolltarget = yscrolltarget or splityscroll[split]
 
-					local upbound = 9
-					local downbound = 4
+					local upbound = 9*screenzoom2
+					local downbound = 4*screenzoom2
 					if camerasetting == 2 then
-						upbound = 8
-						downbound = 6
+						upbound = 8*screenzoom2
+						downbound = 6*screenzoom2
 					end
 					if speed == 0 then
 						yscrolltarget = math.min(py-downbound, math.max(py-upbound, yscrolltarget))--(objects["player"][fastestplayer].y+objects["player"][fastestplayer].width/2)-(height/2)
@@ -1026,15 +1027,15 @@ function game_update(dt)
 					end
 
 					local seeking = false
-					local yscrolltarget = math.min(math.max(0, mapheight-height-1), math.max(0, yscrolltarget))
+					local yscrolltarget = math.min(math.max(0, mapheight-height*screenzoom2-1), math.max(0, yscrolltarget))
 					if objects["player"][fastestplayer].animationstate == "idle" then
 						if objects["player"][fastestplayer].upkeytimer > seektime then
 							yscrolltarget = yscrolltarget - seekrange
-							yscrolltarget = math.min(math.max(0, mapheight-height-1), math.max(0, yscrolltarget))
+							yscrolltarget = math.min(math.max(0, mapheight-height*screenzoom2-1), math.max(0, yscrolltarget))
 							seeking = true
 						elseif objects["player"][fastestplayer].downkeytimer > seektime then
 							yscrolltarget = yscrolltarget + seekrange
-							yscrolltarget = math.min(math.max(0, mapheight-height-1), math.max(0, yscrolltarget))
+							yscrolltarget = math.min(math.max(0, mapheight-height*screenzoom2-1), math.max(0, yscrolltarget))
 							seeking = true
 						end
 					end
@@ -1056,8 +1057,8 @@ function game_update(dt)
 						splityscroll[split] = math.max(yscrolltarget, splityscroll[split] - speed*dt)
 					end
 
-					if splityscroll[split] > mapheight-height-1 then
-						splityscroll[split] = math.max(0, mapheight-height-1)
+					if splityscroll[split] > mapheight-height*screenzoom2-1 then
+						splityscroll[split] = math.max(0, mapheight-height*screenzoom2-1)
 					end
 					
 					if splityscroll[split] < 0 then
@@ -1065,7 +1066,7 @@ function game_update(dt)
 					end
 				elseif not editormode then
 					--vertical autoscrolling
-					splityscroll[split] = math.max(0, math.min(mapheight-height-1, splityscroll[split] + autoscrollingy*dt))
+					splityscroll[split] = math.max(0, math.min(mapheight-height*screenzoom2-1, splityscroll[split] + autoscrollingy*dt))
 				end
 			end
 		end
@@ -1240,12 +1241,12 @@ function game_update(dt)
 		spritebatchX[1] = math.floor(splitxscroll[1])
 		
 		if editormode == false and splitxscroll[1] < mapwidth-width then
-			local x1, x2 = math.ceil(prevxscroll)+width*screenzoom2+1, math.floor(splitxscroll[1])+width*screenzoom2+1
+			local x1, x2 = math.ceil(prevxscroll)+math.ceil(width*screenzoom2)+1, math.floor(splitxscroll[1])+math.ceil(width*screenzoom2)+1
 			if prevxscroll > splitxscroll[1] then --spawn enemies in both directions
 				x1, x2 = math.floor(splitxscroll[1])+1, math.floor(prevxscroll)+1
 			end
-			for x = x1, x2 do
-				for y = math.floor(splityscroll[1])+1, math.min(mapheight, math.ceil(splityscroll[1])+height*screenzoom2+1+2) do
+			for x = math.max(1, x1), math.min(mapwidth, x2) do
+				for y = math.max(1, math.floor(splityscroll[1])+1), math.min(mapheight, math.ceil(splityscroll[1])+math.ceil(height*screenzoom2)+1+2) do
 					spawnenemyentity(x, y)
 				end
 				if goombaattack then
@@ -1283,12 +1284,12 @@ function game_update(dt)
 		generatespritebatch()
 		spritebatchY[1] = math.floor(splityscroll[1])
 		if editormode == false then
-			for x = math.floor(splitxscroll[1])+1, math.ceil(splitxscroll[1])+width*screenzoom2+1 do
+			for x = math.max(1, math.floor(splitxscroll[1])+1), math.min(mapwidth, math.ceil(splitxscroll[1])+math.ceil(width*screenzoom2)+1) do
 				local y1, y2 = math.floor(splityscroll[1])+1, math.floor(prevyscroll)+1
 				if prevyscroll < splityscroll[1] then
-					y1, y2 = math.floor(prevyscroll)+1+height*screenzoom2+2, math.floor(splityscroll[1])+1+height*screenzoom2+2
+					y1, y2 = math.floor(prevyscroll)+1+math.ceil(height*screenzoom2)+2, math.floor(splityscroll[1])+1+math.ceil(height*screenzoom2)+2
 				end
-				for y = y1, y2 do
+				for y = math.max(1, y1), math.min(mapheight, y2) do
 					spawnenemyentity(x, y)
 				end
 			end
@@ -4241,8 +4242,7 @@ function startlevel(level, reason)
 	
 	splitxscroll = {0}
 	splityscroll = {0}
-	screenzoom = 1
-	screenzoom2 = 1/screenzoom
+	setscreenzoom(1)
 	
 	startx = 3
 	starty = 13
@@ -9194,6 +9194,24 @@ function getdrawrange(xscroll,yscroll,spritebatch)
 		end
 	end
 	return xfromdraw,xtodraw, yfromdraw,ytodraw, xoff,yoff
+end
+
+function setscreenzoom(z)
+	if z ~= 1 or (screenzoom and screenzoom ~= 1) then
+		for i = 1, players do
+			smbspritebatch[i]:setBufferSize(math.max(maxtilespritebatchsprites,width*height+width+height+1))
+			portalspritebatch[i]:setBufferSize(math.max(maxtilespritebatchsprites,width*height+width+height+1))
+			if customtiles then
+				customspritebatch[i]:setBufferSize(math.max(maxtilespritebatchsprites,width*height+width+height+1))
+				for i2 = 1, #customtilesimg do
+					customspritebatch[i][i2]:setBufferSize(math.max(maxtilespritebatchsprites,width*height+width+height+1))
+				end
+			end
+		end
+	end
+	
+	screenzoom = z
+	screenzoom2 = 1/screenzoom
 end
 -------------------
 --DAILY CHALLENGE--
