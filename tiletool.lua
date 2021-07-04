@@ -162,6 +162,10 @@ function tiletool:trigger()
 end
 
 function tiletool:action(cox, coy)
+	if map[cox][coy] == emptytile then
+		map[cox][coy] = shallowcopy(emptytile)
+	end
+
 	if self.func == "remove" then
 		if (self.on or not self.linked) then
 			objects["tile"][tilemap(cox, coy)] = nil
@@ -187,6 +191,7 @@ function tiletool:action(cox, coy)
 	elseif string.find(self.func, "change to ") then
 		local tilei = self.func:sub(11, -1)
 		if tonumber(tilei) ~= nil and math.floor(tonumber(tilei)) ~= 0 and map and map[cox] and map[cox][coy] and map[cox][coy][1] then
+			
 			local changeid = math.floor(tonumber(tilei))
 			if (self.on or not self.linked) and tilequads[changeid] then
 				objects["tile"][tilemap(cox, coy)] = nil

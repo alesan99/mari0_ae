@@ -275,9 +275,6 @@ function love.load()
 	JSON = require "JSON"
 	require "notice"
 	require "languages"
-	if debugGraphs then
-		debugGraph = require "libs/debugGraph"
-	end
 	
 	local luas = {"intro", "menu", "levelscreen", "game", "editor", "physics", "online", "quad", "animatedquad", "entity", "dailychallenge",
 				"portalwall", "tile", "mario", "mushroom", "hatconfigs", "flower", "star", "coinblockanimation",
@@ -1031,6 +1028,7 @@ function love.load()
 
 	--debug graphs
 	if debugGraphs then
+		debugGraph = require "libs/debugGraph"
 		fpsGraph = debugGraph:new('fps', 0, 0)
 		memGraph = debugGraph:new('mem', 0, 30)
 		drawGraph = debugGraph:new('custom', 0, 60)
@@ -3514,6 +3512,9 @@ function loadnitpicks()
 		if t.androidversion then
 			android = t.androidversion
 			androidtest = true
+		end
+		if t.debugGraphs then
+			debugGraphs = t.debugGraphs
 		end
 	end
 end

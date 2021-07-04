@@ -4826,6 +4826,9 @@ function loadmap(filename)
 						loadentity(t, x, y, r, r[2])
 					end
 				end
+			elseif r[1] == 1 and (not editormode) and android then
+				--save memory
+				map[x][y] = emptytile
 			end
 		end
 	end

@@ -993,7 +993,7 @@ function editor_update(dt)
 		--tile stamp selection on android
 		if android and tilestampholdtimer then
 			tilestampholdtimer = tilestampholdtimer + dt
-			if tilestampholdtimer > 1 then
+			if tilestampholdtimer > 0.8 then
 				if math.abs(x-tilestampholdx) < 5*scale and math.abs(y-tilestampholdy) < 5*scale then
 					editor_mousepressed(tilestampholdx,tilestampholdy,"l")
 					love.system.vibrate(0.1)
@@ -4834,6 +4834,7 @@ function editor_mousepressed(x, y, button)
 		if pastingtiles then
 			pastingtiles = false
 		end
+		if eyedroppertool then eyedroppertool = false; ANDROIDSHOWTOOLS = false end
 		if inmap(cox, coy) == false then
 			return
 		end
