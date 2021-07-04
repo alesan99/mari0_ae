@@ -2453,12 +2453,14 @@ function love.joystick.getAxis(i, j) --id, axis
 	end
 end
 function love.joystickadded(joystick)
-	if android then
-		local gamepadName = joystick:getName()
-		if gamepadName then
-			notice.new(string.format("%s connected!", gamepadName), notice.white)
-		else
-			notice.new(string.format("Unknown gamepad connected!", gamepadName), notice.white)
+	if android and notice then
+		if joystick:isGamepad() then
+			local gamepadName = joystick:getName()
+			if gamepadName then
+				notice.new(string.format("%s connected!", gamepadName), notice.white)
+			else
+				notice.new(string.format("Unknown gamepad connected!", gamepadName), notice.white)
+			end
 		end
 	end
 end
