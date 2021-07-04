@@ -997,7 +997,6 @@ function game_update(dt)
 				end
 			end
 			if mapheight > 15*screenzoom2 and objects["player"][fastestplayer] then
-				print(mapheight,15*screenzoom2)
 				if not (autoscrollingy and not editormode) then
 					local px, py = objects["player"][fastestplayer].x, objects["player"][fastestplayer].y
 					if objects["player"][fastestplayer].height > 2 then
@@ -7864,6 +7863,9 @@ end
 
 function checkkey(s,i,n)
 	if s[1] == "joy" then
+		if android and androidButtonDown(i,n) then
+			return true
+		end
 		if s[3] == "hat" then
 			if string.match(love.joystick.getHat(s[2], s[4]), s[5]) then
 				return true
@@ -7891,11 +7893,11 @@ function checkkey(s,i,n)
 				end
 			end
 		end
-	elseif s[1] and android then
-		return androidButtonDown(i,n)
 	elseif s[1] then
 		if love.keyboard.isDown(s[1]) then
 			return true
+		elseif android then
+			return androidButtonDown(i,n)
 		else 
 			return false
 		end
@@ -8005,41 +8007,47 @@ end
 
 function game_joystickreleased( joystick, button )
 	for i = 1, players do
-		local s1 = controls[i]["jump"]
-		local s2 = controls[i]["run"]
-		local s3 = controls[i]["reload"]
-		local s4 = controls[i]["use"]
-		local s5 = controls[i]["left"]
-		local s6 = controls[i]["right"]
-		local s7 = controls[i]["portal1"]
-		local s8 = controls[i]["portal2"]
-		local s9 = controls[i]["up"]
-		local s10 = controls[i]["down"]
-		if s1[1] == "joy" and joystick == tonumber(s1[2]) and s1[3] == "but" and button == tonumber(s1[4]) then
-			objects["player"][i]:buttonrelease("jump")
-			objects["player"][i]:stopjump()
-			animationsystem_buttonreleasetrigger(i, "jump") return
-		elseif s2[1] == "joy" and joystick == s2[2] and s2[3] == "but" and button == s2[4] then
-			objects["player"][i]:buttonrelease("run")
-			animationsystem_buttonreleasetrigger(i, "run") return
-		elseif s3[1] == "joy" and joystick == s3[2] and s3[3] == "but" and button == s3[4] then
-			objects["player"][i]:buttonrelease("reload")
-			animationsystem_buttonreleasetrigger(i, "reload") return
-		elseif s4[1] == "joy" and joystick == s4[2] and s4[3] == "but" and button == s4[4] then
-			objects["player"][i]:buttonrelease("use")
-			animationsystem_buttonreleasetrigger(i, "use") return
-		elseif s5[1] == "joy" and joystick == s5[2] and s5[3] == "but" and button == s5[4] then
-			objects["player"][i]:buttonrelease("left")
-			animationsystem_buttonreleasetrigger(i, "left") return
-		elseif s6[1] == "joy" and joystick == s6[2] and s6[3] == "but" and button == s6[4] then
-			objects["player"][i]:buttonrelease("right")
-			animationsystem_buttonreleasetrigger(i, "right") return
-		elseif s9[1] == "joy" and joystick == s9[2] and s9[3] == "but" and button == s9[4] then
-			objects["player"][i]:buttonrelease("up")
-			animationsystem_buttonreleasetrigger(i, "up") return
-		elseif s10[1] == "joy" and joystick == s10[2] and s10[3] == "but" and button == s10[4] then
-			objects["player"][i]:buttonrelease("down")
-			animationsystem_buttonreleasetrigger(i, "down") return
+		if (not noupdate) and objects["player"][i].controlsenabled then --and (not objects["player"][i].vine) and (not objects["player"][i].fence) then
+			if editormode and (editormenuopen or rightclickmenuopen) then
+				break
+			end
+			
+			local s1 = controls[i]["jump"]
+			local s2 = controls[i]["run"]
+			local s3 = controls[i]["reload"]
+			local s4 = controls[i]["use"]
+			local s5 = controls[i]["left"]
+			local s6 = controls[i]["right"]
+			local s7 = controls[i]["portal1"]
+			local s8 = controls[i]["portal2"]
+			local s9 = controls[i]["up"]
+			local s10 = controls[i]["down"]
+			if s1[1] == "joy" and joystick == tonumber(s1[2]) and s1[3] == "but" and button == tonumber(s1[4]) then
+				objects["player"][i]:buttonrelease("jump")
+				objects["player"][i]:stopjump()
+				animationsystem_buttonreleasetrigger(i, "jump") return
+			elseif s2[1] == "joy" and joystick == s2[2] and s2[3] == "but" and button == s2[4] then
+				objects["player"][i]:buttonrelease("run")
+				animationsystem_buttonreleasetrigger(i, "run") return
+			elseif s3[1] == "joy" and joystick == s3[2] and s3[3] == "but" and button == s3[4] then
+				objects["player"][i]:buttonrelease("reload")
+				animationsystem_buttonreleasetrigger(i, "reload") return
+			elseif s4[1] == "joy" and joystick == s4[2] and s4[3] == "but" and button == s4[4] then
+				objects["player"][i]:buttonrelease("use")
+				animationsystem_buttonreleasetrigger(i, "use") return
+			elseif s5[1] == "joy" and joystick == s5[2] and s5[3] == "but" and button == s5[4] then
+				objects["player"][i]:buttonrelease("left")
+				animationsystem_buttonreleasetrigger(i, "left") return
+			elseif s6[1] == "joy" and joystick == s6[2] and s6[3] == "but" and button == s6[4] then
+				objects["player"][i]:buttonrelease("right")
+				animationsystem_buttonreleasetrigger(i, "right") return
+			elseif s9[1] == "joy" and joystick == s9[2] and s9[3] == "but" and button == s9[4] then
+				objects["player"][i]:buttonrelease("up")
+				animationsystem_buttonreleasetrigger(i, "up") return
+			elseif s10[1] == "joy" and joystick == s10[2] and s10[3] == "but" and button == s10[4] then
+				objects["player"][i]:buttonrelease("down")
+				animationsystem_buttonreleasetrigger(i, "down") return
+			end
 		end
 	end
 end

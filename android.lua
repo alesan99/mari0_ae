@@ -1,6 +1,8 @@
 require "androidbutton"
 local buttons = {}
 
+local touchClicking = true --is clicking allowed (ex: it shouldn't be allowed during gameplay, because there's dedicated clicking buttons)
+
 local controllingPlayer = 1
 local androidSetPlayer
 
@@ -99,7 +101,7 @@ function androidLoad()
 		end
 	end
 
-	--[[Multiplayer
+	--Multiplayer
 	for i = 1, 4 do
 		buttons["player" .. i] = touchButton:new(function() androidSetPlayer(i) end, i, bx+(bw+1)*(i-1), by, bw, bh)
 		buttons["player" .. i].playeri = i
@@ -107,12 +109,26 @@ function androidLoad()
 		buttons["player" .. i].drawText = true
 		buttons["player" .. i].multiplayerOnly = true
 		buttons["player" .. i].gameOnly = true
-	end]]
+	end
 end
 
 function androidUpdate(dt)
 	for i, b in pairs(buttons) do
 		b:update(dt)
+	end
+
+	--is clicking allowed?
+	touchClicking = true
+	if gamestate == "game" and (not editormode) then
+		if playertype ~= "minecraft" then
+			touchClicking = false
+		end
+	end
+
+	--return to player 1
+	if gamestate ~= "game" and controllingPlayer ~= 1 then
+		controllingPlayer = 1
+		buttons["player1"].i()
 	end
 
 	--update portal colors
@@ -251,7 +267,7 @@ function love.touchpressed(id, x, y, dx, dy, pressure)
 	mouseTouchX = ox
 	mouseTouchY = oy
 	mouseTouchId = id
-	if not (gamestate == "game" and (not editormode) and objects and objects["player"][controllingPlayer].portalgun) then
+	if touchClicking then
 		--make sure buttons are aware of the change before "clicking"
 		for i, v in pairs(guielements) do
 			v:update(0)
@@ -270,7 +286,9 @@ function love.touchmoved(id, x, y, dx, dy, pressure)
 	if mouseTouchId == id and ((not touches[id]) or touchesStillDrag[id]) then
 		mouseTouchX = ox
 		mouseTouchY = oy
-		love.mousemoved(x,y,realdx,realdy,"simulated")
+		if touchClicking then
+			love.mousemoved(x,y,realdx,realdy,"simulated")
+		end
 	end
 
 	--Slide finger to different button
@@ -312,7 +330,7 @@ function love.touchreleased(id, x, y, dx, dy, pressure)
 		end
 	end
 
-	if mouseTouchId == id then
+	if mouseTouchId == id and touchClicking then
 		mouseTouchX = ox
 		mouseTouchY = oy
 		mouseTouchId = false
@@ -332,12 +350,18 @@ function androidButtonDown(i,n)
 end
 
 function androidMouseDown(b)
-	if mouseTouchId then
+	if mouseTouchId and touchClicking then
 		if ANDROIDRIGHTCLICK and b == 2 then
 			return true
 		elseif b == 1 then
 			return true
 		end
+	end
+	if b == 1 and buttons["portal1"].held then
+		return true
+	end
+	if b == 2 and buttons["portal2"].held then
+		return true
 	end
 	return false
 end

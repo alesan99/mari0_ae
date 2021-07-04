@@ -2863,6 +2863,7 @@ function mario:movement(dt)
 		mariorightkey = rightkey(self.playernumber)
 		marioleftkey = leftkey(self.playernumber)
 	end
+	if android and editormode and (not autoscroll) then mariorightkey = false; marioleftkey = false end
 	if self.reversecontrols then
 		local oldmariorightkey = mariorightkey
 		mariorightkey = marioleftkey

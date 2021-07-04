@@ -989,6 +989,18 @@ function editor_update(dt)
 		if y > tilemenuy+height*16-32 and y > tilemenuy+height*16 then
 			tilemenumoving = true
 		end
+
+		--tile stamp selection on android
+		if android and tilestampholdtimer then
+			tilestampholdtimer = tilestampholdtimer + dt
+			if tilestampholdtimer > 1 then
+				if math.abs(x-tilestampholdx) < 5*scale and math.abs(y-tilestampholdy) < 5*scale then
+					editor_mousepressed(tilestampholdx,tilestampholdy,"l")
+					love.system.vibrate(0.1)
+				end
+				tilestampholdtimer = false
+			end
+		end
 	elseif editorstate == "tools" then
 		--update description for the button that is being hovered
 		if guielements["linkbutton"]:inhighlight(love.mouse.getPosition()) then
@@ -4925,7 +4937,7 @@ function editor_mousepressed(x, y, button)
 							end
 						end
 					elseif editentities == false and love.keyboard.isDown("f") and not android then
-						--replace tiles
+						--fill tiles
 						local tx, ty = getMouseTile(x, y+8*screenzoom*scale)
 						if inmap(tx, ty) then
 							local ontile = map[tx][ty][1]
@@ -4986,8 +4998,8 @@ function editor_mousepressed(x, y, button)
 						else
 							currenttile = tile + tileliststart-1
 						end
-						if not android and love.keyboard.isDown("lshift") then
-							local sx, sy = love.mouse.getX(), love.mouse.getY()
+						if love.keyboard.isDown("lshift") or (tilestampholdtimer and tilestampholdtimer > 1) then
+							local sx, sy = x, y
 							sx = (sx - 5*scale)/scale
 							sy = sy + tilesoffset
 							sy = (sy - 38*scale)/scale
@@ -4995,17 +5007,26 @@ function editor_mousepressed(x, y, button)
 							sy = math.floor(sy/17)
 							tilestampselection = {x = (sx*17+5)*scale, y = (sy*17+38)*scale-tilesoffset, mx = love.mouse.getX(), my = love.mouse.getY()}
 						else
-							editorclose()
-							allowdrag = false
+							if android then
+								--hold to do tile stamp selection
+								tilestampholdtimer = 0
+								tilestampholdx = x
+								tilestampholdy = y
+							else
+								editorclose()
+								allowdrag = false
+							end
 						end
 					end
 				else
-					local tile, list = getentitylistpos(love.mouse.getX(), love.mouse.getY())
+					local tile, list = getentitylistpos(x, y)
 					if tile then
 						currenttile = entitiesform[list][tile]
-						editorclose()
-						allowdrag = false
-					elseif list then --a little funky on android
+						if not android then
+							editorclose()
+							allowdrag = false
+						end
+					elseif list then
 						if not entitiesform[list].hidden then --hide
 							entitiesform[list].hidden = true
 							entitiesform[list].h = 0
@@ -6046,116 +6067,139 @@ function editor_mousereleased(x, y, button)
 	end
 
 	if button == "l" then
-		guirepeattimer = 0
-		minimapdragging = false
-		tilemenumoving = false
-		if editorstate == "linktool" then
-		elseif editorstate == "selectiontool" then
-			if selectiontoolclick[1][1] and selectiontoolclick[1][2] then
-				selectiontoolclick[2][1] = x/scale + xscroll*16
-				selectiontoolclick[2][2] = y/scale + yscroll*16
-				local x1, y1, x2, y2 = selectiontoolclick[1][1], selectiontoolclick[1][2], selectiontoolclick[2][1], selectiontoolclick[2][2]
-				if x2 < x1 then
-					x1 = selectiontoolclick[2][1]
-					x2 = selectiontoolclick[1][1]
-				end
-				if y2 < y1 then
-					y1 = selectiontoolclick[2][2]
-					y2 = selectiontoolclick[1][2]
-				end
-				x1, y1, x2, y2 = math.ceil(x1/16), math.ceil((y1+8)/16), math.ceil(x2/16), math.ceil((y2+8)/16)
-				for x = x1, x2 do
-					for y = y1, y2 do
-						if ismaptile(x, y) and map[x][y][2] and tonumber(map[x][y][2]) and map[x][y][2] > 1 then
-							table.insert(selectiontoolselection, {x, y})
-						end
+		if editormenuopen == false then
+			tilemenumoving = false
+			if editorstate == "linktool" then
+			elseif editorstate == "selectiontool" then
+				if selectiontoolclick[1][1] and selectiontoolclick[1][2] then
+					selectiontoolclick[2][1] = x/scale + xscroll*16
+					selectiontoolclick[2][2] = y/scale + yscroll*16
+					local x1, y1, x2, y2 = selectiontoolclick[1][1], selectiontoolclick[1][2], selectiontoolclick[2][1], selectiontoolclick[2][2]
+					if x2 < x1 then
+						x1 = selectiontoolclick[2][1]
+						x2 = selectiontoolclick[1][1]
 					end
-				end
-			end
-			
-			selectiontoolclick = {{false, false}, {false, false}}
-			allowdrag = true
-		elseif editormenuopen and editorstate == "tiles" then
-			allowdrag = true
-			if tilestampselection and editentities == false then
-				local t = tilestampselection
-				if x <= t.x then
-					t.x = t.x+17*scale
-				end
-				if y <= t.y then
-					t.y = t.y+17*scale
-				end
-				if x < t.x then
-					t.x2 = t.x; t.x = x
-				else
-					t.x2 = x
-				end
-				if y < t.y then
-					t.y2 = t.y; t.y = y
-				else
-					t.y2 = y
-				end
-				pastingtiles = true
-				pastecenter = {0,0}
-				mtclipboard = {}
-				local tile = 1
-
-				for tx = 1, math.ceil((t.x2-t.x)/(17*scale)) do
-					mtclipboard[tx] = {}
-					for ty = 1, math.ceil((t.y2-t.y)/(17*scale)) do
-						local tile = gettilelistpos(t.x+(17*scale)*(tx-1), t.y+(17*scale)*(ty-1))
-						if tile and tile <= tilelistcount+1 then
-							if animatedtilelist then
-								tile = tile + tileliststart-1+90000
-							else
-								tile = tile + tileliststart-1
+					if y2 < y1 then
+						y1 = selectiontoolclick[2][2]
+						y2 = selectiontoolclick[1][2]
+					end
+					x1, y1, x2, y2 = math.ceil(x1/16), math.ceil((y1+8)/16), math.ceil(x2/16), math.ceil((y2+8)/16)
+					for x = x1, x2 do
+						for y = y1, y2 do
+							if ismaptile(x, y) and map[x][y][2] and tonumber(map[x][y][2]) and map[x][y][2] > 1 then
+								table.insert(selectiontoolselection, {x, y})
 							end
-							mtclipboard[tx][ty] = {tile or 1}
 						end
 					end
 				end
-				allowdrag = false
-				editorclose()
-				tilestampselection = false
+				
+				selectiontoolclick = {{false, false}, {false, false}}
+				allowdrag = true
 			else
-				tilestampselection = false
-			end
-		else
-			if pastingtiles and tileselectionmoving then
-				--PASTE TILES
-				for i, v in pairs(mtclipboard) do
-					for j, w in pairs(v) do
-						if w[1] == 1 and (not w[2]) and (not w["back"]) and pastemode == 1 then
-							-- nothing
-						else
-							local tx, ty = getMouseTile(x+(i-1 + pastecenter[1])*16*scale, y+(j-1 + pastecenter[2])*16*scale+8*scale)
-							if ismaptile(tx, ty) then
-								local d = mtclipboard[i][j]
-								currenttile = d[1]
-								backgroundtilemode = false
-								placetile(x+(i-1 + pastecenter[1])*16*scale, y+(j-1 + pastecenter[2])*16*scale)
-								map[tx][ty] = {d[1] or map[tx][ty][1], d[2] or map[tx][ty][2], d[3] or map[tx][ty][3], back=d["back"], argument=d["argument"]}
-								map[tx][ty]["gels"] = {}
-								--generate new tracks if track moved
-								if d[2] and entityquads[d[2]] and entityquads[d[2]].t == "track" then
-									generatetrackpreviews()
+				if pastingtiles and tileselectionmoving then
+					--PASTE TILES
+					for i, v in pairs(mtclipboard) do
+						for j, w in pairs(v) do
+							if w[1] == 1 and (not w[2]) and (not w["back"]) and pastemode == 1 then
+								-- nothing
+							else
+								local tx, ty = getMouseTile(x+(i-1 + pastecenter[1])*16*scale, y+(j-1 + pastecenter[2])*16*scale+8*scale)
+								if ismaptile(tx, ty) then
+									local d = mtclipboard[i][j]
+									currenttile = d[1]
+									backgroundtilemode = false
+									placetile(x+(i-1 + pastecenter[1])*16*scale, y+(j-1 + pastecenter[2])*16*scale)
+									map[tx][ty] = {d[1] or map[tx][ty][1], d[2] or map[tx][ty][2], d[3] or map[tx][ty][3], back=d["back"], argument=d["argument"]}
+									map[tx][ty]["gels"] = {}
+									--generate new tracks if track moved
+									if d[2] and entityquads[d[2]] and entityquads[d[2]].t == "track" then
+										generatetrackpreviews()
+									end
 								end
 							end
 						end
 					end
+					local tx, ty = getMouseTile(x, y+8*scale)
+					tileselection = {tx+math.floor(pastecenter[1]), ty+math.floor(pastecenter[2]), tx+math.floor(pastecenter[1])+#mtclipboard-1, ty+math.floor(pastecenter[2])+#mtclipboard[1]-1}
+					tileselection.finished = true
+					pastingtiles = false
+					tileselectionmoving = false
+				elseif tileselection and not tileselection.finished then
+					local sx, sy = math.min(tileselection[1],tileselection[3]), math.min(tileselection[2],tileselection[4])
+					local sw, sh = math.max(tileselection[1],tileselection[3]), math.max(tileselection[2],tileselection[4])
+					tileselection = {sx, sy, sw, sh}
+					tileselection.finished = true
 				end
-				local tx, ty = getMouseTile(x, y+8*scale)
-				tileselection = {tx+math.floor(pastecenter[1]), ty+math.floor(pastecenter[2]), tx+math.floor(pastecenter[1])+#mtclipboard-1, ty+math.floor(pastecenter[2])+#mtclipboard[1]-1}
-				tileselection.finished = true
-				pastingtiles = false
-				tileselectionmoving = false
-			elseif tileselection and not tileselection.finished then
-				local sx, sy = math.min(tileselection[1],tileselection[3]), math.min(tileselection[2],tileselection[4])
-				local sw, sh = math.max(tileselection[1],tileselection[3]), math.max(tileselection[2],tileselection[4])
-				tileselection = {sx, sy, sw, sh}
-				tileselection.finished = true
+				allowdrag = true
 			end
-			allowdrag = true
+		else
+			guirepeattimer = 0
+			minimapdragging = false
+			tilestampholdtimer = false
+			if editorstate == "tiles" then
+				allowdrag = true
+				if editmtobjects then
+				elseif editentities == false then
+					if tilestampselection then
+						local t = tilestampselection
+						if x <= t.x then
+							t.x = t.x+17*scale
+						end
+						if y <= t.y then
+							t.y = t.y+17*scale
+						end
+						if x < t.x then
+							t.x2 = t.x; t.x = x
+						else
+							t.x2 = x
+						end
+						if y < t.y then
+							t.y2 = t.y; t.y = y
+						else
+							t.y2 = y
+						end
+						pastingtiles = true
+						pastecenter = {0,0}
+						mtclipboard = {}
+						local tile = 1
+
+						for tx = 1, math.ceil((t.x2-t.x)/(17*scale)) do
+							mtclipboard[tx] = {}
+							for ty = 1, math.ceil((t.y2-t.y)/(17*scale)) do
+								local tile = gettilelistpos(t.x+(17*scale)*(tx-1), t.y+(17*scale)*(ty-1))
+								if tile and tile <= tilelistcount+1 then
+									if animatedtilelist then
+										tile = tile + tileliststart-1+90000
+									else
+										tile = tile + tileliststart-1
+									end
+									mtclipboard[tx][ty] = {tile or 1}
+								end
+							end
+						end
+						allowdrag = false
+						editorclose()
+						tilestampselection = false
+					else
+						if android then
+							local tile = gettilelistpos(x, y)
+							if tile and tile <= tilelistcount+1 then
+								editorclose()
+								--allowdrag = false
+							end
+						end
+					end
+				else
+					tilestampselection = false
+					if android then
+						local tile, list = getentitylistpos(x, y)
+						if tile then
+							editorclose()
+							--allowdrag = false
+						end
+					end
+				end
+			end
 		end
 	end
 

@@ -121,7 +121,8 @@ function touchButton:update(dt)
 		self.active = (gamestate == "game") and ((not editormode) or (not editormenuopen) and (autoscroll and (not HIDEANDROIDBUTTONS)))
 	else
 		self.active = ((not editormode) or ((not editormenuopen) and (not (self.autoscrollGone and (not autoscroll))) and (not HIDEANDROIDBUTTONS)) or self.i == "start")
-			and (not (self.gameOnly and gamestate ~= "game")) and (not (self.multiplayerOnly and players <= 1))
+			and (not (self.gameOnly and gamestate ~= "game"))
+			and (not (self.multiplayerOnly and (players <= 1 or (SERVER or CLIENT) or players < self.playeri)))
 	end
 end
 
@@ -160,12 +161,14 @@ function touchButton:press(id,x,y)
 					touchRunLock = not touchRunLock
 				end
 			else
-				--[[if controls[self.player][self.i][1] == "joy" then
+				if controls[self.player][self.i][1] == "joy" then
 					local c = controls[self.player][self.i]
-					game_joystickpressed(c[2],c[4])
-				else]]
+					if c[3] == "but" then
+						game_joystickpressed(c[2],c[4])
+					end
+				else
 					love.keypressed(controls[self.player][self.i][1])
-				--end
+				end
 			end
 		end
 		if self.mousebut then
@@ -194,7 +197,14 @@ function touchButton:release(id,x,y)
 				end
 			elseif self.i == "runlock" then
 			else
-				love.keyreleased(controls[self.player][self.i][1])
+				if controls[self.player][self.i][1] == "joy" then
+					local c = controls[self.player][self.i]
+					if c[3] == "but" then
+						game_joystickreleased(c[2],c[4])
+					end
+				else
+					love.keyreleased(controls[self.player][self.i][1])
+				end
 			end
 		end
 		if self.mousebut then
