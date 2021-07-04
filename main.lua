@@ -2396,8 +2396,9 @@ function love.keyboard.isDown(k)
 end
 
 function love.joystickpressed(joystick, button, simulated)
+	local joystick = joystick
 	if not simulated then
-		local joystick = joystick:getID()
+		joystick = joystick:getID()
 	end
 	
 	if keyprompt then
@@ -2415,8 +2416,9 @@ function love.joystickpressed(joystick, button, simulated)
 end
 
 function love.joystickreleased(joystick, button, simulated)
+	local joystick = joystick
 	if not simulated then
-		local joystick = joystick:getID()
+		joystick = joystick:getID()
 	end
 	
 	if gamestate == "menu" or gamestate == "options" then

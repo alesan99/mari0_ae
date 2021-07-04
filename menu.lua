@@ -301,7 +301,7 @@ function menu_update(dt)
 		local s3 = controls[1]["down"]
 		local s4 = controls[1]["up"]
 		if s1[1] == "joy" then
-			if checkkey(s1) then
+			if checkkey(s1,1,"right") then
 				if not oldjoystick[1] then
 					menu_keypressed("right")
 					oldjoystick[1] = true
@@ -311,7 +311,7 @@ function menu_update(dt)
 			end
 		end
 		if s2[1] == "joy" then
-			if checkkey(s2) then
+			if checkkey(s2,1,"left") then
 				if not oldjoystick[2] then
 					menu_keypressed("left")
 					oldjoystick[2] = true
@@ -321,7 +321,7 @@ function menu_update(dt)
 			end
 		end
 		if s3[1] == "joy" then
-			if checkkey(s3) then
+			if checkkey(s3,1,"down") then
 				if not oldjoystick[3] then
 					menu_keypressed("down")
 					oldjoystick[3] = true
@@ -331,7 +331,7 @@ function menu_update(dt)
 			end
 		end
 		if s4[1] == "joy" then
-			if checkkey(s4) then
+			if checkkey(s4,1,"up") then
 				if not oldjoystick[4] then
 					menu_keypressed("up")
 					oldjoystick[4] = true
@@ -1070,7 +1070,7 @@ function menu_draw()
 					
 					if controls[skinningplayer][controlstable[i]] then
 						for j = 1, #controls[skinningplayer][controlstable[i]] do
-							s = s .. controls[skinningplayer][controlstable[i]][j]
+							s = s .. tostring(controls[skinningplayer][controlstable[i]][j])
 						end
 					end
 					if s == " " then

@@ -160,11 +160,11 @@ function touchButton:press(id,x,y)
 				if gamestate == "game" then
 					touchRunLock = not touchRunLock
 				end
-			else
+			elseif controls[self.player][self.i][1] then
 				if controls[self.player][self.i][1] == "joy" then
 					local c = controls[self.player][self.i]
 					if c[3] == "but" then
-						love.joystickpressed(c[2],c[4])
+						love.joystickpressed(c[2],c[4],"simulated")
 					end
 				else
 					love.keypressed(controls[self.player][self.i][1])
@@ -196,11 +196,11 @@ function touchButton:release(id,x,y)
 					love.keyreleased("return")
 				end
 			elseif self.i == "runlock" then
-			else
+			elseif controls[self.player][self.i][1] then
 				if controls[self.player][self.i][1] == "joy" then
 					local c = controls[self.player][self.i]
 					if c[3] == "but" then
-						love.joystickreleased(c[2],c[4])
+						love.joystickreleased(c[2],c[4],"simulated")
 					end
 				else
 					love.keyreleased(controls[self.player][self.i][1])

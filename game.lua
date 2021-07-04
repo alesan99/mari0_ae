@@ -213,7 +213,7 @@ function game_update(dt)
 		local s3 = controls[1]["down"]
 		local s4 = controls[1]["up"]
 		if s1[1] == "joy" then
-			if checkkey(s1) then
+			if checkkey(s1,1,"right") then
 				if not oldjoystick[1] then
 					game_keypressed("right")
 					oldjoystick[1] = true
@@ -223,7 +223,7 @@ function game_update(dt)
 			end
 		end
 		if s2[1] == "joy" then
-			if checkkey(s2) then
+			if checkkey(s2,1,"left") then
 				if not oldjoystick[2] then
 					game_keypressed("left")
 					oldjoystick[2] = true
@@ -233,7 +233,7 @@ function game_update(dt)
 			end
 		end
 		if s3[1] == "joy" then
-			if checkkey(s3) then
+			if checkkey(s3,1,"down") then
 				if not oldjoystick[3] then
 					game_keypressed("down")
 					oldjoystick[3] = true
@@ -243,7 +243,7 @@ function game_update(dt)
 			end
 		end
 		if s4[1] == "joy" then
-			if checkkey(s4) then
+			if checkkey(s4,1,"up") then
 				if not oldjoystick[4] then
 					game_keypressed("up")
 					oldjoystick[4] = true
@@ -7921,7 +7921,7 @@ function game_joystickpressed( joystick, button )
 	end
 	
 	for i = 1, players do
-		if (not noupdate) and objects and and objects["player"] and objects["player"][i].controlsenabled then --and (not objects["player"][i].vine) and (not objects["player"][i].fence) then
+		if (not noupdate) and objects and objects["player"][i].controlsenabled then --and (not objects["player"][i].vine) and (not objects["player"][i].fence) then
 			if editormode and (editormenuopen or rightclickmenuopen) then
 				break
 			end
