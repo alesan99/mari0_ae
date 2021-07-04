@@ -5037,7 +5037,7 @@ function editor_mousepressed(x, y, button)
 						else
 							currenttile = tile + tileliststart-1
 						end
-						if love.keyboard.isDown("lshift") or (tilestampholdtimer and tilestampholdtimer > 1) then
+						if love.keyboard.isDown("lshift") or (tilestampholdtimer and tilestampholdtimer > 0.8) then
 							local sx, sy = x, y
 							sx = (sx - 5*scale)/scale
 							sy = sy + tilesoffset
