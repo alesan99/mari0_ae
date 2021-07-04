@@ -164,7 +164,7 @@ function touchButton:press(id,x,y)
 				if controls[self.player][self.i][1] == "joy" then
 					local c = controls[self.player][self.i]
 					if c[3] == "but" then
-						game_joystickpressed(c[2],c[4])
+						love.joystickpressed(c[2],c[4])
 					end
 				else
 					love.keypressed(controls[self.player][self.i][1])
@@ -200,7 +200,7 @@ function touchButton:release(id,x,y)
 				if controls[self.player][self.i][1] == "joy" then
 					local c = controls[self.player][self.i]
 					if c[3] == "but" then
-						game_joystickreleased(c[2],c[4])
+						love.joystickreleased(c[2],c[4])
 					end
 				else
 					love.keyreleased(controls[self.player][self.i][1])

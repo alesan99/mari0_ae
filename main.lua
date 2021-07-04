@@ -2395,8 +2395,10 @@ function love.keyboard.isDown(k)
 	return oldkeyboard_isDown(k)
 end
 
-function love.joystickpressed(joystick, button)
-	local joystick = joystick:getID()
+function love.joystickpressed(joystick, button, simulated)
+	if not simulated then
+		local joystick = joystick:getID()
+	end
 	
 	if keyprompt then
 		keypromptenter("joybutton", joystick, button)
@@ -2412,8 +2414,10 @@ function love.joystickpressed(joystick, button)
 	end
 end
 
-function love.joystickreleased(joystick, button)
-	local joystick = joystick:getID()
+function love.joystickreleased(joystick, button, simulated)
+	if not simulated then
+		local joystick = joystick:getID()
+	end
 	
 	if gamestate == "menu" or gamestate == "options" then
 		menu_joystickreleased(joystick, button)
@@ -2444,6 +2448,16 @@ function love.joystick.getAxis(i, j) --id, axis
 		return getjoysticki(i):getAxis(j)
 	else
 		return 0 --workaround for annoying joystick bug
+	end
+end
+function love.joystickadded(joystick)
+	if android then
+		local gamepadName = joystick:getName()
+		if gamepadName then
+			notice.new(string.format("%s connected!", gamepadName), notice.white)
+		else
+			notice.new(string.format("Unknown gamepad connected!", gamepadName), notice.white)
+		end
 	end
 end
 function love.joystick.isDown(i, b)

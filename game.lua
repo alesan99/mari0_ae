@@ -7921,7 +7921,7 @@ function game_joystickpressed( joystick, button )
 	end
 	
 	for i = 1, players do
-		if (not noupdate) and objects["player"][i].controlsenabled then --and (not objects["player"][i].vine) and (not objects["player"][i].fence) then
+		if (not noupdate) and objects and and objects["player"] and objects["player"][i].controlsenabled then --and (not objects["player"][i].vine) and (not objects["player"][i].fence) then
 			if editormode and (editormenuopen or rightclickmenuopen) then
 				break
 			end
