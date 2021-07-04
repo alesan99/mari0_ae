@@ -110,7 +110,7 @@ function touchButton:update(dt)
 	if self.hide then
 		self.active = false
 	elseif self.editor then
-		self.active = editormode and (not editormenuopen) and ((not HIDEANDROIDBUTTONS) or self.hideButton)
+		self.active = editormode and (not editormenuopen) and ((not HIDEANDROIDBUTTONS) or self.hideButton) and ((not self.editorTool) or ANDROIDSHOWTOOLS)
 	elseif self.portal then
 		if objects and objects["player"] and objects["player"][self.player].portalgun then
 			self.active = ((not editormode) or (((not editormenuopen) and editorstate == "portalgun") and (not HIDEANDROIDBUTTONS)))

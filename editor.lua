@@ -4815,7 +4815,32 @@ function editor_mousepressed(x, y, button)
 		return
 	end
 
-	if button == "l" then
+	if button == "m" or (button == "l" and eyedroppertool) then
+		--eye dropper (pick tile)
+		local cox, coy = getMouseTile(x, y+8*screenzoom*scale)
+		if pastingtiles then
+			pastingtiles = false
+		end
+		if inmap(cox, coy) == false then
+			return
+		end
+		if editentities and map[cox][coy][2] then
+			currenttile = map[cox][coy][2]
+			return false
+		end
+		editentities = false
+		tilesall()
+		if backgroundtilemode then
+			local backgroundtile = bmapt(cox, coy, 1)
+			if backgroundtile then
+				currenttile = backgroundtile
+			else
+				currenttile = 1
+			end
+		else
+			currenttile = map[cox][coy][1]
+		end
+	elseif button == "l" then
 		if editormenuopen == false then
 			levelmodified = true
 			if customrcopen == "link" then
@@ -4914,7 +4939,7 @@ function editor_mousepressed(x, y, button)
 								placetile(x+((lx-1)*16*scale), y+((ly-1)*16*scale))
 							end
 						end
-					elseif editentities == false and love.keyboard.isDown("e") and not android then
+					elseif editentities == false and ((love.keyboard.isDown("e") and not android) or (android and replacetool)) then
 						--replace tiles
 						local tx, ty = getMouseTile(x, y+8*screenzoom*scale)
 						if inmap(tx, ty) then
@@ -4936,7 +4961,7 @@ function editor_mousepressed(x, y, button)
 								end
 							end
 						end
-					elseif editentities == false and love.keyboard.isDown("f") and not android then
+					elseif editentities == false and ((love.keyboard.isDown("f") and not android) or (android and paintbuckettool)) then
 						--fill tiles
 						local tx, ty = getMouseTile(x, y+8*screenzoom*scale)
 						if inmap(tx, ty) then
@@ -5062,30 +5087,6 @@ function editor_mousepressed(x, y, button)
 					end
 				end
 			end
-		end
-	elseif button == "m" then
-		local cox, coy = getMouseTile(x, y+8*screenzoom*scale)
-		if pastingtiles then
-			pastingtiles = false
-		end
-		if inmap(cox, coy) == false then
-			return
-		end
-		if editentities and map[cox][coy][2] then
-			currenttile = map[cox][coy][2]
-			return false
-		end
-		editentities = false
-		tilesall()
-		if backgroundtilemode then
-			local backgroundtile = bmapt(cox, coy, 1)
-			if backgroundtile then
-				currenttile = backgroundtile
-			else
-				currenttile = 1
-			end
-		else
-			currenttile = map[cox][coy][1]
 		end
 		
 	elseif button == "wu" then

@@ -6,15 +6,26 @@ local touchClicking = true --is clicking allowed (ex: it shouldn't be allowed du
 local controllingPlayer = 1
 local androidSetPlayer
 
+local resettools = function()
+	ANDROIDRIGHTCLICK = false
+	eyedroppertool = false
+	paintbuckettool = false
+	replacetool = false
+end
 local editorButtons = {
-	{function() HIDEANDROIDBUTTONS = not HIDEANDROIDBUTTONS end, function() return HIDEANDROIDBUTTONS end},
-	{function() editentities = false; currenttile = 1 end},
-	{function() editentities = true; currenttile = 1 end},
-	{function() ANDROIDRIGHTCLICK = not ANDROIDRIGHTCLICK end, function() return ANDROIDRIGHTCLICK end},
-	{function() backgroundtilemode = not backgroundtilemode end, function() return backgroundtilemode end},
-	{function() undo_undo() end}
+	{function() HIDEANDROIDBUTTONS = not HIDEANDROIDBUTTONS end, function() return HIDEANDROIDBUTTONS end,1},
+	{function() editentities = false; currenttile = 1 end,nil,2},
+	{function() editentities = true; currenttile = 1 end,nil,3},
+	{function() ANDROIDRIGHTCLICK = not ANDROIDRIGHTCLICK end, function() return ANDROIDRIGHTCLICK end,4},
+	{function() ANDROIDSHOWTOOLS = not ANDROIDSHOWTOOLS end, function() return ANDROIDSHOWTOOLS end,11},
+	{function() undo_undo() end,nil,6},
 }
-
+local editorToolButtons = {
+	{function() local old = eyedroppertool; resettools(); eyedroppertool = not old end, function() return eyedroppertool end, 7},
+	{function() local old = paintbuckettool; resettools(); paintbuckettool = not old end, function() return paintbuckettool end, 8},
+	{function() local old = replacetool; resettools(); replacetool = not old end, function() return replacetool end, 8},
+	{function() backgroundtilemode = not backgroundtilemode end, function() return backgroundtilemode end,5},
+}
 
 local skin, skinData, skinImg, skinSpriteBatch
 androidLowRes = false
@@ -91,13 +102,26 @@ function androidLoad()
 	end
 	local bx, by, bw, bh = t["editor"][1],t["editor"][2],t["editor"][3],t["editor"][4]
 	for i = 1, #editorButtons do
-		buttons["editor" .. i] = touchButton:new(editorButtons[i][1], {editorButtonsimg,editorButtonsq[i]}, bx+(bw+2)*(i-1), by, bw, bh)
+		local t = editorButtons[i]
+		buttons["editor" .. i] = touchButton:new(t[1], {editorButtonsimg,editorButtonsq[math.min(#editorButtonsq,t[3] or i)]}, bx+(bw+2)*(i-1), by, bw, bh)
 		buttons["editor" .. i].editor = true
 		if i == 1 then
 			buttons["editor" .. i].hideButton = true
 		end
-		if editorButtons[i][2] then
-			buttons["editor" .. i].highlightFunc = editorButtons[i][2]
+		if t[2] then
+			buttons["editor" .. i].highlightFunc = t[2]
+		end
+	end
+	for i = 1, #editorToolButtons do
+		local t = editorToolButtons[i]
+		buttons["editorTool" .. i] = touchButton:new(t[1], {editorButtonsimg,editorButtonsq[math.min(#editorButtonsq,t[3] or i)]}, bx+(bw+2)*(5-1), by+(bh+2)*i, bw, bh)
+		buttons["editorTool" .. i].editor = true
+		buttons["editorTool" .. i].editorTool = true
+		if i == 1 then
+			buttons["editorTool" .. i].hideButton = true
+		end
+		if t[2] then
+			buttons["editorTool" .. i].highlightFunc = t[2]
 		end
 	end
 
