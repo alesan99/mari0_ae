@@ -59,8 +59,8 @@ local debugGraphs = false
 VERSION = 13.0118
 VERSIONSTRING = "13d"
 
-android = true --[DROID]
-androidtest = true--testing android on pc
+android = (love.system.getOS() == "Android" or love.system.getOS() == "iOS") --[DROID]
+androidtest = false--testing android on pc
 --local antiandroidkeyrepeat = false --fucking stupid android keyboards
 
 local updatesoundlist

@@ -23,7 +23,7 @@ local editorButtons = {
 local editorToolButtons = {
 	{function() local old = eyedroppertool; resettools(); eyedroppertool = not old end, function() return eyedroppertool end, 7},
 	{function() local old = paintbuckettool; resettools(); paintbuckettool = not old end, function() return paintbuckettool end, 8},
-	{function() local old = replacetool; resettools(); replacetool = not old end, function() return replacetool end, 8},
+	{function() local old = replacetool; resettools(); replacetool = not old end, function() return replacetool end, 9},
 	{function() backgroundtilemode = not backgroundtilemode end, function() return backgroundtilemode end,5},
 }
 
@@ -117,9 +117,6 @@ function androidLoad()
 		buttons["editorTool" .. i] = touchButton:new(t[1], {editorButtonsimg,editorButtonsq[math.min(#editorButtonsq,t[3] or i)]}, bx+(bw+2)*(5-1), by+(bh+2)*i, bw, bh)
 		buttons["editorTool" .. i].editor = true
 		buttons["editorTool" .. i].editorTool = true
-		if i == 1 then
-			buttons["editorTool" .. i].hideButton = true
-		end
 		if t[2] then
 			buttons["editorTool" .. i].highlightFunc = t[2]
 		end
@@ -317,7 +314,7 @@ function love.touchmoved(id, x, y, dx, dy, pressure)
 
 	--Slide finger to different button
 	local button1 = getButton(id, x, y)
-	if button1 and (not button1.held) then
+	if button1 and (not button1.held) and button1.editor == false then
 		for i, b in pairs(buttons) do
 			if b.id == id then
 				b:release(id,x,y)

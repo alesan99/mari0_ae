@@ -1736,6 +1736,11 @@ function editor_draw()
 							end
 						end
 					--end
+					if android then
+						love.graphics.setColor(255, 255, 255, 200)
+						love.graphics.setLineWidth(1*scale)
+						love.graphics.rectangle("line",math.floor((x-splitxscroll[1]-1)*16*scale), math.floor(((y-splityscroll[1]-1)*16+8)*scale), 16*scale, 16*scale)
+					end
 				end
 			
 				love.graphics.setColor(255, 255, 255, 200)
@@ -1772,6 +1777,10 @@ function editor_draw()
 					love.graphics.setStencilTest()
 				elseif editentities == false and not pastingtiles then
 					love.graphics.draw(tilequads[currenttile].image, tilequads[currenttile].quad, math.floor((x-splitxscroll[1]-1)*16*scale), math.floor(((y-splityscroll[1]-1)*16+8)*scale), 0, scale, scale)
+					if android then
+						love.graphics.setLineWidth(1*scale)
+						love.graphics.rectangle("line",math.floor((x-splitxscroll[1]-1)*16*scale), math.floor(((y-splityscroll[1]-1)*16+8)*scale), 16*scale, 16*scale)
+					end
 					if editortilemousescroll and (brushsizex <= 1 and brushsizey <= 1) then
 						for i = 1, 2 do
 							love.graphics.setColor(255, 255, 255, 200-(i*70))
@@ -1855,6 +1864,10 @@ function editor_draw()
 							end
 						end
 						love.graphics.draw(entityquads[currenttile].image, entityquads[currenttile].quad, math.floor((x-splitxscroll[1]-1+offsetx)*16*scale), math.floor(((y-splityscroll[1]-1)*16+8)*scale), 0, scale, scale)
+					end
+					if android then
+						love.graphics.setLineWidth(1*scale)
+						love.graphics.rectangle("line",math.floor((x-splitxscroll[1]-1)*16*scale), math.floor(((y-splityscroll[1]-1)*16+8)*scale), 16*scale, 16*scale)
 					end
 					if editortilemousescroll and ( brushsizex <= 1 and brushsizey <= 1) then
 						if type(editortilemousescroll) == "table" then
