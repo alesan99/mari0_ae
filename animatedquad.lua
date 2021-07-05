@@ -113,7 +113,10 @@ function animatedquad:updateproperties()
 					if self.props.collision then
 						objects["tile"][tilemap(x, y)] = tile:new(x-1, y-1)
 					else
-						objects["tile"][tilemap(x, y)] = nil
+						if objects["tile"][tilemap(x, y)] then
+							objects["tile"][tilemap(x, y)].active = false
+							objects["tile"][tilemap(x, y)] = nil
+						end
 						checkportalremove(x, y)
 					end
 				elseif oldportalable ~= self.props.portalable then --change portalbility
