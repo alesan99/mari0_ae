@@ -168,7 +168,10 @@ function tiletool:action(cox, coy)
 
 	if self.func == "remove" then
 		if (self.on or not self.linked) then
-			objects["tile"][tilemap(cox, coy)] = nil
+			if objects["tile"][tilemap(cox, coy)] then
+				objects["tile"][tilemap(cox, coy)].active = false
+				objects["tile"][tilemap(cox, coy)] = nil
+			end
 			map[cox][coy][1] = 1
 			map[cox][coy]["gels"] = {}
 			checkportalremove(cox, coy)
@@ -194,22 +197,32 @@ function tiletool:action(cox, coy)
 			
 			local changeid = math.floor(tonumber(tilei))
 			if (self.on or not self.linked) and tilequads[changeid] then
-				objects["tile"][tilemap(cox, coy)] = nil
-				map[cox][coy][1] = changeid
-				if tilequads[map[cox][coy][1]].collision then
-					objects["tile"][tilemap(cox, coy)] = tile:new(cox-1, coy-1, 1, 1, true)
+				if map[cox][coy][1] ~= changeid then
+					map[cox][coy][1] = changeid
+					if objects["tile"][tilemap(cox, coy)] then
+						objects["tile"][tilemap(cox, coy)].active = false
+						objects["tile"][tilemap(cox, coy)] = nil
+					end
+					if tilequads[map[cox][coy][1]].collision then
+						objects["tile"][tilemap(cox, coy)] = tile:new(cox-1, coy-1, 1, 1, true)
+					end
+					checkportalremove(cox, coy)
+					self:updateranges()
 				end
-				checkportalremove(cox, coy)
-				self:updateranges()
 				return true
 			else
-				objects["tile"][tilemap(cox, coy)] = nil
-				map[cox][coy][1] = self.tileid[tilemap(cox, coy)]
-				if tilequads[map[cox][coy][1]].collision then
-					objects["tile"][tilemap(cox, coy)] = tile:new(cox-1, coy-1, 1, 1, true)
+				if map[cox][coy][1] ~= self.tileid[tilemap(cox, coy)] then
+					map[cox][coy][1] = self.tileid[tilemap(cox, coy)]
+					if objects["tile"][tilemap(cox, coy)] then
+						objects["tile"][tilemap(cox, coy)].active = false
+						objects["tile"][tilemap(cox, coy)] = nil
+					end
+					if tilequads[map[cox][coy][1]].collision then
+						objects["tile"][tilemap(cox, coy)] = tile:new(cox-1, coy-1, 1, 1, true)
+					end
+					checkportalremove(cox, coy)
+					self:updateranges()
 				end
-				checkportalremove(cox, coy)
-				self:updateranges()
 				return true
 			end
 		end
@@ -234,7 +247,10 @@ function tiletool:action(cox, coy)
 	elseif self.func == "explode" then
 		if map[cox][coy][1] == self.tileid[tilemap(cox, coy)] and (self.on or not self.linked) then 
 			playsound(boomsound)
-			objects["tile"][tilemap(cox, coy)] = nil
+			if objects["tile"][tilemap(cox, coy)] then
+				objects["tile"][tilemap(cox, coy)].active = false
+				objects["tile"][tilemap(cox, coy)] = nil
+			end
 			map[cox][coy][1] = 1
 			map[cox][coy]["gels"] = {}
 			self:updateranges()
@@ -305,7 +321,10 @@ function tiletool:action(cox, coy)
 		if tilequads[map[x][y][1]].collision then
 			objects["tile"][tilemap(x, y)] = tile:new(x-1, y-1, 1, 1, true)
 		else
-			objects["tile"][tilemap(x, y)] = nil
+			if objects["tile"][tilemap(cox, coy)] then
+				objects["tile"][tilemap(x, y)].active = false
+				objects["tile"][tilemap(x, y)] = nil
+			end
 		end
 		checkportalremove(x, y)
 		return true
