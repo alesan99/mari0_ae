@@ -1530,7 +1530,10 @@ function mario:update(dt)
 					if inmap(self.animationbridgex, y) and (tilequads[map[self.animationbridgex][y][1]]:getproperty("bridge", self.animationbridgex, y) or map[self.animationbridgex][y][1] == 10) then
 						removedtile = true
 						map[self.animationbridgex][y][1] = 1
-						objects["tile"][tilemap(self.animationbridgex, y)] = nil
+						if objects["tile"][tilemap(self.animationbridgex, y)] then
+							objects["tile"][tilemap(self.animationbridgex, y)].active = false
+							objects["tile"][tilemap(self.animationbridgex, y)] = nil
+						end
 					end
 				end
 				
@@ -7189,11 +7192,15 @@ function destroyblock(x, y, v) --v = true, "nopoints"
 	if objects["tile"][tilemap(x, y)] and objects["tile"][tilemap(x, y)].slant then
 		local tile = objects["tile"][tilemap(x, y)]
 		for num = 1, tile.slants do
+			objects["pixeltile"][num + tilemap(tile.cox, tile.coy)*100].active = false
 			objects["pixeltile"][num + tilemap(tile.cox, tile.coy)*100] = nil
 		end
 	end
 	map[x][y][1] = 1
-	objects["tile"][tilemap(x, y)] = nil
+	if objects["tile"][tilemap(x, y)] then
+		objects["tile"][tilemap(x, y)].active = false
+		objects["tile"][tilemap(x, y)] = nil
+	end
 	map[x][y][2] = nil
 	map[x][y][3] = nil
 	map[x][y]["gels"] = {}
