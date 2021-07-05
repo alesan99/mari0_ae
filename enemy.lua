@@ -2431,10 +2431,10 @@ function enemy:ifstatement(t, action, arg)
 	--EXAMPLE: ["if","speedx","==","speedy","and","jumping","~=",false],["set","speedy"],10
 	local statementPass = false
 	for i = 1, math.floor(#t/4) do
-		local check = t[1]
+		local check = t[i]
 
 		--get properties needed for comparison
-		local prop1,prop2 = t[2], t[4]
+		local prop1,prop2 = t[i+1], t[i+3]
 		if (type(prop1) == "string" and self[prop1]) then
 			prop1 = self[prop1]
 		elseif (type(prop1) == "table" and prop1[1] and prop1[2] and prop1[1] == "property") then
@@ -2447,8 +2447,8 @@ function enemy:ifstatement(t, action, arg)
 		end
 
 		--comparison
-		local comparison = t[3]
-		if (not comparison) or type(comparison) ~= "string" then
+		local comparison = t[i+2]
+		if (not comparison) or (type(comparison) ~= "string") then
 			return false
 		end
 		comparison = comparison:lower()
@@ -2456,7 +2456,7 @@ function enemy:ifstatement(t, action, arg)
 		local pass 
 		if (comparison == "equal" or comparison == "==") and (prop1 == prop2) then
 			pass = true
-		elseif (comparison == "notequal" or comparison == "!=") and (prop1 ~= prop2) then
+		elseif (comparison == "notequal" or comparison == "~=" or comparison == "!=") and (prop1 ~= prop2) then
 			pass = true
 
 		elseif (comparison == "greater" or comparison == ">") and (prop1 > prop2) then

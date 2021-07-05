@@ -163,7 +163,7 @@ end
 
 function tiletool:action(cox, coy)
 	if map[cox][coy] == emptytile then
-		map[cox][coy] = shallowcopy(emptytile)
+		map[cox][coy] = deepcopy(emptytile)
 	end
 
 	if self.func == "remove" then

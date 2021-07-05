@@ -4826,9 +4826,12 @@ function loadmap(filename)
 						loadentity(t, x, y, r, r[2])
 					end
 				end
-			elseif r[1] == 1 and (not editormode) and android then
+			elseif r[1] == 1 and (not editormode) then
 				--save memory
-				map[x][y] = emptytile
+				if (not r["back"]) and (not r["track"]) then
+					map[x][y] = nil
+					map[x][y] = emptytile
+				end
 			end
 		end
 	end
@@ -8281,6 +8284,7 @@ function placeblock(x, y, side)
 	end
 	
 	if #checkrect(x-1, y-1, 1, 1, "all") == 0 then
+		if map[x][y] == emptytile then map[x][y] = deepcopy(emptytile) end
 		map[x][y][1] = tileno
 		objects["tile"][tilemap(x, y)] = tile:new(x-1, y-1, 1, 1, true)
 		generatespritebatch()
