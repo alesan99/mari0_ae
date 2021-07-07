@@ -4204,11 +4204,15 @@ function placetile(x, y, tilei)
 	
 	if backgroundtilemode then
 		if not editentities then
-			if currenttile == 1 then
-				map[cox][coy]["back"] = nil
-			else
-				map[cox][coy]["back"] = currenttile
-				bmap_on = true
+			if map[cox][coy]["back"] ~= currenttile then
+				if currenttile == 1 then
+					map[cox][coy]["back"] = nil
+				else
+					map[cox][coy]["back"] = currenttile
+					bmap_on = true
+				end
+				undo_store(cox, coy)
+				generatespritebatch()
 			end
 		end
 	elseif editentities == false then
@@ -7127,7 +7131,7 @@ function savecustomimage()
 			loadtiles("custom")
 		
 			customspritebatch = {}
-			for i = 1, players do
+			for i = 1, 2 do
 				customspritebatch[i] = {}
 				for i2 = 1, #customtilesimg do
 					customspritebatch[i][i2] = love.graphics.newSpriteBatch( customtilesimg[i2], maxtilespritebatchsprites )

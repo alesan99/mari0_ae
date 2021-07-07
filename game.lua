@@ -1568,12 +1568,11 @@ function game_draw()
 			else
 				love.graphics.setColor(255,255,255,255)
 			end
-			for y = yfromdraw, ytodraw do
-				for x = xfromdraw, xtodraw do
-					local backgroundtile = bmapt(x, y, 1)
-					if backgroundtile and tilequads[backgroundtile] and not tilequads[backgroundtile].invisible then
-						love.graphics.draw(tilequads[backgroundtile].image, tilequads[backgroundtile].quad, math.floor((x-1-xoff)*16*scale), math.floor(((y-1-yoff)*16-8)*scale), 0, scale, scale)
-					end
+			love.graphics.draw(smbspritebatch[2], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
+			love.graphics.draw(portalspritebatch[2], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
+			if customtiles then
+				for i = 1, #customspritebatch[2] do
+					love.graphics.draw(customspritebatch[2][i], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
 				end
 			end
 			love.graphics.setColor(255,255,255,255)
@@ -1584,11 +1583,11 @@ function game_draw()
 			love.graphics.push()
 			love.graphics.translate(3*scale, 3*scale)
 			love.graphics.setColor(dropshadowcolor)
-			love.graphics.draw(smbspritebatch[split], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
-			love.graphics.draw(portalspritebatch[split], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
+			love.graphics.draw(smbspritebatch[1], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
+			love.graphics.draw(portalspritebatch[1], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
 			if customtiles then
-				for i = 1, #customspritebatch[split] do
-					love.graphics.draw(customspritebatch[split][i], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
+				for i = 1, #customspritebatch[1] do
+					love.graphics.draw(customspritebatch[1][i], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
 				end
 			end
 			drawmaptiles("dropshadow", xscroll, yscroll)
@@ -1715,11 +1714,11 @@ function game_draw()
 		
 		--TILES
 		if not _3DMODE then
-			love.graphics.draw(smbspritebatch[split], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
-			love.graphics.draw(portalspritebatch[split], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
+			love.graphics.draw(smbspritebatch[1], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
+			love.graphics.draw(portalspritebatch[1], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
 			if customtiles then
-				for i = 1, #customspritebatch[split] do
-					love.graphics.draw(customspritebatch[split][i], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
+				for i = 1, #customspritebatch[1] do
+					love.graphics.draw(customspritebatch[1][i], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
 				end
 			end
 
@@ -2122,11 +2121,11 @@ function game_draw()
 				love.graphics.translate(i*scale, i*scale)
 				love.graphics.scale(1-(((2*scale)/(width*16*scale))*(i)), 1-(((2*scale)/(height*16*scale))*(i)))
 				love.graphics.setColor(color)
-				love.graphics.draw(smbspritebatch[split], math.floor((-math.fmod(xscroll, 1)*16)*scale), math.floor((-math.fmod(yscroll, 1)*16)*scale))
-				love.graphics.draw(portalspritebatch[split], math.floor((-math.fmod(xscroll, 1)*16)*scale), math.floor((-math.fmod(yscroll, 1)*16)*scale))
+				love.graphics.draw(smbspritebatch[1], math.floor((-math.fmod(xscroll, 1)*16)*scale), math.floor((-math.fmod(yscroll, 1)*16)*scale))
+				love.graphics.draw(portalspritebatch[1], math.floor((-math.fmod(xscroll, 1)*16)*scale), math.floor((-math.fmod(yscroll, 1)*16)*scale))
 				if customtiles then
-					for i = 1, #customspritebatch[split] do
-						love.graphics.draw(customspritebatch[split][i], math.floor((-math.fmod(xscroll, 1)*16)*scale), math.floor((-math.fmod(yscroll, 1)*16)*scale))
+					for i = 1, #customspritebatch[1] do
+						love.graphics.draw(customspritebatch[1][i], math.floor((-math.fmod(xscroll, 1)*16)*scale), math.floor((-math.fmod(yscroll, 1)*16)*scale))
 					end
 				end
 				if i > 8 then
@@ -4970,53 +4969,83 @@ function generatespritebatch()
 end
 
 function updatespritebatch()
-	for split = 1, #splitscreen do
-		local smbmsb = smbspritebatch[split]
-		local portalmsb = portalspritebatch[split]
-		local custommsb
-		if customtiles then
-			custommsb = customspritebatch[split]
-		end
-		smbmsb:clear()
-		portalmsb:clear()
-		if customtiles then
-			for i = 1, #custommsb do
-				custommsb[i]:clear()
-			end
-		end
-		
-		local xscroll, yscroll = splitxscroll[split], splityscroll[split]
+	local split = 1
 
-		local xfromdraw,xtodraw, yfromdraw,ytodraw, xoff,yoff = getdrawrange(xscroll,yscroll,"spritebatch")
-		
-		local lmap = map
-		
-		for y = yfromdraw, ytodraw do
-			for x = xfromdraw, xtodraw do
-				local bounceyoffset = 0
-				
-				local draw = true
-				if getblockbounce(x, y) then
-					draw = false
-				end
-				if draw == true then
-					if (not lmap[x]) then
-						print("spritebatch tile doesnt exist " .. x)
-					else
-						local t = lmap[x][y]
-						
-						if t then
-							local tilenumber = t[1]
-							if tilenumber ~= 0 and tilequads[tilenumber].invisible == false and tilequads[tilenumber].coinblock == false and tilequads[tilenumber].coin == false 
-								and (not tilequads[tilenumber].foreground) and ((not _3DMODE) or tilequads[tilenumber].collision) then
-								if math.floor(tilenumber) <= smbtilecount then
-									smbmsb:add( tilequads[tilenumber].quad, (x-1-xoff)*16*scale, ((y-1-yoff)*16-8)*scale, 0, scale, scale )
-								elseif tilenumber <= smbtilecount+portaltilecount then
-									portalmsb:add( tilequads[tilenumber].quad, (x-1-xoff)*16*scale, ((y-1-yoff)*16-8)*scale, 0, scale, scale )
-								elseif tilenumber <= smbtilecount+portaltilecount+customtilecount then
-									custommsb[tilequads[tilenumber].ts]:add( tilequads[tilenumber].quad, (x-1-xoff)*16*scale, ((y-1-yoff)*16-8)*scale, 0, scale, scale )
-								end
+	local smbmsb = smbspritebatch[1]
+	local portalmsb = portalspritebatch[1]
+	local custommsb
+	if customtiles then
+		custommsb = customspritebatch[1]
+	end
+	smbmsb:clear()
+	portalmsb:clear()
+	if customtiles then
+		for i = 1, #custommsb do
+			custommsb[i]:clear()
+		end
+	end
+	
+	local smbmbacksb = smbspritebatch[2]
+	local portalmbacksb = portalspritebatch[2]
+	local custommbacksb
+	if customtiles then
+		custommbacksb = customspritebatch[2]
+	end
+	smbmbacksb:clear()
+	portalmbacksb:clear()
+	if customtiles then
+		for i = 1, #custommbacksb do
+			custommbacksb[i]:clear()
+		end
+	end
+	
+	local xscroll, yscroll = splitxscroll[split], splityscroll[split]
+
+	local xfromdraw,xtodraw, yfromdraw,ytodraw, xoff,yoff = getdrawrange(xscroll,yscroll,"spritebatch")
+	
+	local lmap = map
+	
+	for y = yfromdraw, ytodraw do
+		for x = xfromdraw, xtodraw do
+			local bounceyoffset = 0
+			
+			local draw = true
+			if getblockbounce(x, y) then
+				draw = false
+			end
+			if draw == true then
+				if (not lmap[x]) then
+					print("spritebatch tile doesnt exist " .. x)
+				else
+					local t = lmap[x][y]
+					
+					if t then
+						local tilenumber = t[1]
+						if tilenumber ~= 0 and tilequads[tilenumber].invisible == false and tilequads[tilenumber].coinblock == false and tilequads[tilenumber].coin == false 
+							and (not tilequads[tilenumber].foreground) and ((not _3DMODE) or tilequads[tilenumber].collision) then
+							if math.floor(tilenumber) <= smbtilecount then
+								smbmsb:add( tilequads[tilenumber].quad, (x-1-xoff)*16*scale, ((y-1-yoff)*16-8)*scale, 0, scale, scale )
+							elseif tilenumber <= smbtilecount+portaltilecount then
+								portalmsb:add( tilequads[tilenumber].quad, (x-1-xoff)*16*scale, ((y-1-yoff)*16-8)*scale, 0, scale, scale )
+							elseif tilenumber <= smbtilecount+portaltilecount+customtilecount then
+								custommsb[tilequads[tilenumber].ts]:add( tilequads[tilenumber].quad, (x-1-xoff)*16*scale, ((y-1-yoff)*16-8)*scale, 0, scale, scale )
 							end
+						end
+					end
+				end
+			end
+			
+
+			if bmap_on then
+				if lmap[x] and lmap[x][y] then
+					local backgroundtile = bmapt(x, y, 1)
+					if backgroundtile and tilequads[backgroundtile] and not tilequads[backgroundtile].invisible then
+						if math.floor(backgroundtile) <= smbtilecount then
+							smbmbacksb:add( tilequads[backgroundtile].quad, (x-1-xoff)*16*scale, ((y-1-yoff)*16-8)*scale, 0, scale, scale )
+						elseif backgroundtile <= smbtilecount+portaltilecount then
+							portalmbacksb:add( tilequads[backgroundtile].quad, (x-1-xoff)*16*scale, ((y-1-yoff)*16-8)*scale, 0, scale, scale )
+						elseif backgroundtile <= smbtilecount+portaltilecount+customtilecount then
+							custommbacksb[tilequads[backgroundtile].ts]:add( tilequads[backgroundtile].quad, (x-1-xoff)*16*scale, ((y-1-yoff)*16-8)*scale, 0, scale, scale )
 						end
 					end
 				end
@@ -9230,7 +9259,7 @@ end
 
 function setscreenzoom(z)
 	if z ~= 1 or (screenzoom and screenzoom ~= 1) then
-		for i = 1, players do
+		for i = 1, #smbspritebatch do
 			smbspritebatch[i]:setBufferSize(math.max(maxtilespritebatchsprites,width*height+width+height+1))
 			portalspritebatch[i]:setBufferSize(math.max(maxtilespritebatchsprites,width*height+width+height+1))
 			if customtiles then
