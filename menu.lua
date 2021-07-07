@@ -1064,7 +1064,7 @@ function menu_draw()
 						love.graphics.setColor(100, 100, 100, 255)
 					end
 					
-					properprintF(TEXT[controlstable[i]], 30*scale, (70+(i-1)*12)*scale)
+					properprintF(TEXT[controlstable[i]], 30*scale, (70+(i-1)*11)*scale)
 					
 					local s = ""
 					
@@ -1076,7 +1076,7 @@ function menu_draw()
 					if s == " " then
 						s = "space"
 					end
-					properprint(s, 120*scale, (70+(i-1)*12)*scale)
+					properprint(s, 120*scale, (70+(i-1)*11)*scale)
 				end
 			end
 				
@@ -2419,7 +2419,7 @@ function menu_keypressed(key, unicode)
 		elseif (key == "down" or key == "s") then
 			if optionstab == 1 then
 				if skinningplayer ~= mouseowner then
-					if optionsselection < 15 then
+					if optionsselection < 16 then
 						optionsselection = optionsselection + 1
 					else
 						optionsselection = 1
@@ -2461,7 +2461,7 @@ function menu_keypressed(key, unicode)
 			else
 				if optionstab == 1 then
 					if skinningplayer ~= mouseowner then
-						optionsselection = 15
+						optionsselection = 16
 					else
 						optionsselection = 11
 					end
@@ -3003,7 +3003,7 @@ function keypromptenter(t, ...)
 	end
 	buttonerror = false
 	axiserror = false
-	local buttononly = {"run", "jump", "reload", "use", "portal1", "portal2"}
+	local buttononly = {"run", "jump", "reload", "use", "portal1", "portal2", "pause"}
 	local axisonly = {"aimx", "aimy"}
 	if t ~= "key" or arg[1] ~= "escape" then
 		if t == "key" then

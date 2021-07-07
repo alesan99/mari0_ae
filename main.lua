@@ -1742,7 +1742,7 @@ function defaultconfig()
 	controls = {}
 	
 	local i = 1
-	controlstable = {"left", "right", "up", "down", "run", "jump", "reload", "use", "aimx", "aimy", "portal1", "portal2"}
+	controlstable = {"left", "right", "up", "down", "run", "jump", "reload", "use", "aimx", "aimy", "portal1", "portal2", "pause"}
 	controls[i] = {}
 	controls[i]["right"] = {"d"}
 	controls[i]["left"] = {"a"}
@@ -1756,7 +1756,7 @@ function defaultconfig()
 	controls[i]["portal2"] = {""}
 	controls[i]["reload"] = {"r"}
 	controls[i]["use"] = {"e"}
-	controls[i]["pause"] = {"escape"}
+	controls[i]["pause"] = {""}
 	
 	for i = 2, 4 do
 		controls[i] = {}		

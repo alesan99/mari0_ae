@@ -162,7 +162,7 @@ function game_load(suspended)
 	customspritebatch = {}
 	spritebatchX = {}
 	spritebatchY = {}
-	for i = 1, players do
+	for i = 1, 2 do
 		smbspritebatch[i] = love.graphics.newSpriteBatch( smbtilesimg, maxtilespritebatchsprites )
 		portalspritebatch[i] = love.graphics.newSpriteBatch( portaltilesimg, maxtilespritebatchsprites )
 		if customtiles then
@@ -7910,14 +7910,30 @@ function checkkey(s,i,n)
 	end
 end
 
-function game_joystickpressed( joystick, button )	
+function game_joystickpressed( joystick, button )
+	--pause with controller
+	for i = 1, players do
+		local s = controls[i]["pause"]
+		if s and s[1] == "joy" and joystick == s[2] and s[3] == "but" and button == s[4] then
+			game_keypressed("escape")
+			break
+		end
+	end
+
 	if pausemenuopen then
-		local s1 = controls[1]["jump"]
-		if s1[1] == "joy" and joystick == tonumber(s1[2]) and s1[3] == "but" and button == tonumber(s1[4]) then
-			game_keypressed("return")
+		--select pause options
+		for i = 1, players do
+			local s1 = controls[i]["jump"]
+			local s2 = controls[i]["pause"]
+			if s2 and s2[1] == "joy" then
+				if s1[1] == "joy" and joystick == tonumber(s1[2]) and s1[3] == "but" and button == tonumber(s1[4]) then
+					game_keypressed("return")
+				end
+			end
 		end
 		return
 	end
+
 	if endpressbutton then
 		endgame()
 		return
@@ -7939,6 +7955,7 @@ function game_joystickpressed( joystick, button )
 			local s8 = controls[i]["portal2"]
 			local s9 = controls[i]["up"]
 			local s10 = controls[i]["down"]
+
 			if s1[1] == "joy" and joystick == tonumber(s1[2]) and s1[3] == "but" and button == tonumber(s1[4]) then
 				objects["player"][i]:button("jump")
 				objects["player"][i]:wag()
