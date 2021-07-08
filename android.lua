@@ -134,6 +134,9 @@ function androidLoad()
 end
 
 function androidUpdate(dt)
+	if androidHIDE then
+		return false
+	end
 	for i, b in pairs(buttons) do
 		b:update(dt)
 	end
@@ -162,6 +165,10 @@ end
 local lastTouchX, lastTouchY = 0,0
 local lastReleaseX, lastReleaseY = 0,0
 function androidDraw()
+	if androidHIDE then
+		return false
+	end
+
 	if not androidLowRes then
 		love.graphics.push()
 		if resizable and letterboxfullscreen then

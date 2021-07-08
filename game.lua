@@ -180,6 +180,24 @@ function game_load(suspended)
 	portalprojectilespritebatch = love.graphics.newSpriteBatch(portalprojectileparticleimg, 1000, "dynamic" )
 	
 	custommusic = false
+
+	--hide android controls
+	if android and not androidHIDE then
+		local hide = true
+		for i = 1, players do
+			if controls[i] then
+				for j, w in pairs(controls[i]) do
+					if not (w[1] and w[1] == "joy") then
+						hide = false
+						break
+					end
+				end
+			end
+		end
+		if hide then
+			androidHIDE = true
+		end
+	end
 	
 	--send chat ingame
 	if SERVER or CLIENT then
