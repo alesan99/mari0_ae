@@ -7972,7 +7972,7 @@ function game_joystickpressed( joystick, button )
 		for i = 1, players do
 			local s1 = controls[i]["jump"]
 			local s2 = controls[i]["pause"]
-			if s2 and s2[1] == "joy" then
+			if (s2 and s2[1] == "joy") or i == 1 then
 				if s1[1] == "joy" and joystick == tonumber(s1[2]) and s1[3] == "but" and button == tonumber(s1[4]) then
 					game_keypressed("return")
 				end
