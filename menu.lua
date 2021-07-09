@@ -1438,11 +1438,13 @@ function menu_draw()
 				properprintF("alesans_e..", (180-28)*scale, 180*scale)
 			end
 			
-			love.graphics.setColor(100, 100, 100, 255)
-			properprintF(TEXT["lock mouse with f12"], 30*scale, 195*scale)
+			--love.graphics.setColor(100, 100, 100, 255)
+			--properprintF(TEXT["lock mouse with f12"], 30*scale, 195*scale)
 			
 			love.graphics.setColor(255, 255, 255, 255)
-			properprintF("alesan99's entities v" .. VERSIONSTRING, (236-(#("alesan99's entities v" .. VERSIONSTRING)*8))*scale, 207*scale)
+			properprintF("alesan99's entities", 30*scale, 198*scale)
+			local version = "Version " .. VERSIONSTRING
+			properprintF(version, (234-(#(version)*8))*scale, 207*scale)
 		elseif optionstab == 4 then
 			love.graphics.setColor(255, 255, 255, 255)
 			if not gamefinished then
