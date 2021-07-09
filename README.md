@@ -222,6 +222,7 @@ It even has bonus features like online multiplayer, custom characters, custom en
   > - Half slants are color coded: `0`, `0`, `200 0`, `0`, `100`
   > - Upsidedown slants are color coded: `100`, `0`, `0`
   > - Have both left and right slants enabled to make a slab
+</details>
 
 ## 💌 Credits
 Special thanks to:
