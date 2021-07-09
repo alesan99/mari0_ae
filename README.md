@@ -6,11 +6,16 @@
 
 It even has bonus features like online multiplayer, custom characters, custom enemies/powerups, animated tiles, infinite levels and music, vertical scrolling, tile properties, and more!
 
-<br><br>
-<p align="center"><img src="https://i.imgur.com/th4xsMi.png"></p>
-<details>
-  <summary><p align="center">🖼️ Show more screenshots 🖼️</p></summary>
+<br>
 
+<p align="center"><img src="https://i.imgur.com/th4xsMi.png"></p>
+
+<br>
+
+<details>
+  <summary>🖼️ Show more screenshots</summary>
+
+  <blockquote>
   <p align="center"><img src="https://i.imgur.com/fS2o7pc.png"></p>
   <p align="center"><img src="https://i.imgur.com/67uPzZZ.png"></p>
   <p align="center"><img src="https://i.imgur.com/VhvWBcj.png"></p>
@@ -20,6 +25,7 @@ It even has bonus features like online multiplayer, custom characters, custom en
   <p align="center"><img src="https://i.imgur.com/cnW3Vob.png"></p>
   <p align="center"><img src="https://i.imgur.com/016vjP0.png"></p>
   <p align="center"><img src="https://i.imgur.com/E8mXQFj.png"></p>
+  </blockquote>
 </details>
 
 ### ✨ Features
@@ -1101,14 +1107,7 @@ ADDED Portal Physics (1-block jump height)
 </details>
 
 ## 📥 Downloads
-https://forum.stabyourself.net/viewtopic.php?f=13&t=3636
-
-## 👷 Contributions
-Bug fixes and quality of life improvements are welcome!
-This includes stuff like custom enemy properties and new animations.
-
-Avoid major additions that will potentially cause bugs or complicate the game/code (Stuff like powerups).
-I appreciate the help, but the goal is to continue the mod while I am busy. Major changes will only increase my workload and make the mod even buggier.
+[**DOWNLOADS (current version: 0.10.0 v13c)**](https://forum.stabyourself.net/viewtopic.php?f=13&t=3636)
 
 ## 📢 Mappacks Made with this mod
 - Alesan's Entities (included in mod)
@@ -1148,7 +1147,7 @@ I appreciate the help, but the goal is to continue the mod while I am busy. Majo
 
 ## 💌 Credits
 Special thanks to:
-- [***ME***](https://github.com/alesan99) (check out my [Twitch](http://www.twitch.tv/alesan99) and [Youtube](https://www.youtube.com/channel/UClCb0X0Yd36KgGnJwhIrcQw))
+- [***ME***](https://alesan99.blogspot.com) (check out my [Twitch](http://www.twitch.tv/alesan99) and [Youtube](https://www.youtube.com/channel/UClCb0X0Yd36KgGnJwhIrcQw))
 - **Maurice** and **Fakeuser** for regular turrets
 - **Hans1998** for player sprite help and the banzai bill sprite
 - **Automatik** for helping me with the poison mushroom
@@ -1166,4 +1165,11 @@ Special thanks to:
 - **Critfish** for overgrown portal sprites
 - **MadNyle** for propeller sound effect and mega mushroom
 - [**NNB**](https://github.com/NNBnh) for this Github README page
-- All you guys for reporting bugs and making maps
+- **All you guys** for reporting bugs and making maps
+
+## 👷 Contributions
+Bug fixes and quality of life improvements are welcome!
+This includes stuff like custom enemy properties and new animations.
+
+Avoid major additions that will potentially cause bugs or complicate the game/code (Stuff like powerups).
+I appreciate the help, but the goal is to continue the mod while I am busy. Major changes will only increase my workload and make the mod even buggier.
