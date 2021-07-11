@@ -144,9 +144,9 @@ function androidUpdate(dt)
 	--is clicking allowed?
 	touchClicking = true
 	if gamestate == "game" and (not editormode) then
-		if playertype ~= "minecraft" then
+		--if playertype == "minecraft" or playertype == "gelcannon" then
 			touchClicking = false
-		end
+		--end
 	end
 
 	--return to player 1
@@ -358,12 +358,14 @@ function love.touchreleased(id, x, y, dx, dy, pressure)
 		end
 	end
 
-	if mouseTouchId == id and touchClicking then
+	if mouseTouchId == id then
 		mouseTouchX = ox
 		mouseTouchY = oy
 		mouseTouchId = false
-		love.mousereleased(x,y,1,"simulated")
-		--lastReleaseX, lastReleaseY = x,y
+		if touchClicking then
+			love.mousereleased(x,y,1,"simulated")
+			--lastReleaseX, lastReleaseY = x,y
+		end
 	end
 end
 

@@ -57,7 +57,7 @@ local debugGraph,fpsGraph,memGraph,drawGraph
 local debugGraphs = false
 
 VERSION = 13.0118
-VERSIONSTRING = "13d (7/9/21)"
+VERSIONSTRING = "13d (7/11/21)"
 
 android = (love.system.getOS() == "Android" or love.system.getOS() == "iOS") --[DROID]
 androidtest = false--testing android on pc
@@ -2298,9 +2298,7 @@ function love.mousereleased(x, y, button, istouch)
 	if gamestate == "menu" or gamestate == "options" or gamestate == "mappackmenu" then
 		menu_mousereleased(x, y, button)
 	elseif gamestate == "game" then
-		if (not android) or editormode then
-			game_mousereleased(x, y, button)
-		end
+		game_mousereleased(x, y, button)
 	end
 	
 	if ignoregui then
