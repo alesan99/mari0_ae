@@ -923,7 +923,7 @@ function guielement:keypress(key,textinput)
 						while self.cursorpos-1 < self.textoffset do
 							self.textoffset = math.max(self.textoffset - 1, 0)
 						end
-					else
+					elseif self.cursorpos > 1 then
 						self.value = self.value:sub(1,self.cursorpos-2)..self.value:sub(self.cursorpos)
 						if self.cursorpos > 1 then --and self.cursorpos > string.len(self.value)+1 then
 							self.cursorpos = self.cursorpos - 1
