@@ -321,7 +321,7 @@ function tiletool:action(cox, coy)
 		if tilequads[map[x][y][1]].collision then
 			objects["tile"][tilemap(x, y)] = tile:new(x-1, y-1, 1, 1, true)
 		else
-			if objects["tile"][tilemap(cox, coy)] then
+			if objects["tile"][tilemap(x, y)] then
 				objects["tile"][tilemap(x, y)].active = false
 				objects["tile"][tilemap(x, y)] = nil
 			end
