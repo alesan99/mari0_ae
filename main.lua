@@ -3516,6 +3516,7 @@ function loadnitpicks()
 		if t.androidversion then
 			android = t.androidversion
 			androidtest = true
+			changescale(scale, fullscreen)
 		end
 		if t.debugGraphs then
 			debugGraphs = t.debugGraphs
