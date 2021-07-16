@@ -57,11 +57,10 @@ local debugGraph,fpsGraph,memGraph,drawGraph
 local debugGraphs = false
 
 VERSION = 13.0118
-VERSIONSTRING = "13d (7/11/21)"
+VERSIONSTRING = "13d (7/16/21)"
 
 android = (love.system.getOS() == "Android" or love.system.getOS() == "iOS") --[DROID]
 androidtest = false--testing android on pc
---local antiandroidkeyrepeat = false --fucking stupid android keyboards
 
 local updatesoundlist
 
@@ -1081,10 +1080,6 @@ function love.update(dt)
 	elseif frameadvance == 2 then
 		frameadvance = 1
 	end
-	
-	--[[if android then
-		antiandroidkeyrepeat = false
-	end]]
 
 	if jsonerrorwindow.opened and jsonerrorwindow:update(dt) then
 		
@@ -2100,13 +2095,6 @@ function love.keypressed(key, scancode, isrepeat, textinput)
 			return
 		end
 	end
-	
-	--[[if android then 
-		if key == antiandroidkeyrepeat then
-			--return (this is prevented in the gui)
-		end
-		antiandroidkeyrepeat = key
-	end]]
 
 	if jsonerrorwindow.opened then
 		jsonerrorwindow:keypressed(key)
