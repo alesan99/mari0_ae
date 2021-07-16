@@ -1646,7 +1646,7 @@ function game_draw()
 							if j == "player" then
 								drawplayer(v.playernumber, nil, nil, nil, nil, "dropshadow")
 							else
-								drawentity(j,w,i,v,currentscissor)
+								drawentity(j,w,i,v,currentscissor,true)
 							end
 						end
 					end
@@ -2950,7 +2950,7 @@ function game_draw()
 	end
 end
 
-function drawentity(j, w, i, v, currentscissor)
+function drawentity(j, w, i, v, currentscissor, drop)
 	local dirscale
 	
 	if v.animationdirection == "left" then
@@ -3038,7 +3038,7 @@ function drawentity(j, w, i, v, currentscissor)
 		drawplayer(v.playernumber)
 	else
 		if v.graphic and v.quad then
-			if v.graphiccolor then
+			if v.graphiccolor and (not drop) then
 				love.graphics.setColor(v.graphiccolor)
 			end
 			love.graphics.draw(v.graphic, v.quad, math.floor(((v.x-xscroll)*16+v.offsetX)*scale), math.floor(((v.y-yscroll)*16-v.offsetY)*scale), v.rotation, dirscale, horscale, v.quadcenterX, v.quadcenterY)
@@ -3086,7 +3086,7 @@ function drawentity(j, w, i, v, currentscissor)
 				drawplayer(i, px, py, pr, pad)
 			else
 				if v.graphic and v.quad then
-					if v.graphiccolor then
+					if v.graphiccolor and (not drop) then
 						love.graphics.setColor(v.graphiccolor)
 					end
 					love.graphics.draw(v.graphic, v.quad, math.floor(((px-xscroll)*16+v.offsetX)*scale), math.floor(((py-yscroll)*16-v.offsetY)*scale), pr, dirscale, horscale, v.quadcenterX, v.quadcenterY)
