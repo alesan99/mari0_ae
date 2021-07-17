@@ -8855,9 +8855,6 @@ function mario:dive(water)
 end
 
 function mario:turretshot(tx, ty, sx, sy) --turret
-	if self.dead or self.invincible or self.starred then 
-		return false
-	end
 	if self.pickup and not self.pickup.rigidgrab then
 		if tx > self.x+self.width/2 and self.pointingangle < 0 then --right
 			return false
@@ -8866,6 +8863,15 @@ function mario:turretshot(tx, ty, sx, sy) --turret
 		end
 	end
 	if self.hitpointsdelay > 0 then
+		return false
+	end
+	if self.dead or self.starred then 
+		return false
+	end
+	if (self.speedx < 0) ~= (sx < 0) then
+		self.speedx = self.speedx + (sx/math.abs(sx))*9 --push back
+	end
+	if self.invincible then 
 		return false
 	end
 	self.hitpointsdelay = turrethitdelay
@@ -8878,9 +8884,6 @@ function mario:turretshot(tx, ty, sx, sy) --turret
 	local v = math.max(0, self.hitpoints/maxhitpoints)*255
 	makepoof(self.x+self.width/2+(8*(math.random()-.5))/16, self.y+self.height/2+(8*(math.random()-.5))/16, "turretshot", {v,v,v})
 
-	if (self.speedx < 0) ~= (sx > 0) then
-		self.speedx = self.speedx - sx*0.8 --push back
-	end
 	
 	return true
 	--print(self.hitpoints)

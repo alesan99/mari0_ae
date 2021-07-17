@@ -609,7 +609,7 @@ function handlePlayerCollisions(sx, sy, ex, ey)
 				end
 				if aabb(math.min(sx, ex), math.min(sy, ey), tw, th, w.x, w.y, w.width, w.height) then
 					if w.turretshot then
-						w:turretshot(math.min(sx, ex)+tw/2, math.min(sy, ey)+th/2, sx, sy)
+						w:turretshot(math.min(sx, ex)+tw/2, math.min(sy, ey)+th/2, (ex-sx), (ey-sy))
 					end
 					return true
 				end
