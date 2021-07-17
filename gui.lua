@@ -145,6 +145,8 @@ function guielement:init(...)
 	end
 end
 
+local doubleinput = false
+local doubleinputcheck = false
 function guielement:update(dt)
 	if self.active then
 		if self.type == "scrollbar" then
@@ -170,6 +172,7 @@ function guielement:update(dt)
 				end
 			end
 		elseif self.type == "input" then
+			doubleinputcheck = false
 			self.timer = self.timer + dt
 			while self.timer > blinktime do
 				self.cursorblink = not self.cursorblink
@@ -840,7 +843,15 @@ function guielement:keypress(key,textinput)
 					self.timer = 0
 				else
 					if android then
-						if (not textinput) then
+						local justchanged = false
+						if not doubleinput then
+							if doubleinputcheck and doubleinputcheck == key then
+								doubleinput = true
+								justchanged = true
+							end
+							doubleinputcheck = key
+						end
+						if doubleinput and ((not textinput) or justchanged) then
 							return false
 						end
 					end

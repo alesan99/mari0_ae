@@ -1014,7 +1014,7 @@ function love.load()
 	end
 
 	--mouse cursors
-	if (not android) then--fuck you love2d android, just fucking these instead of crashing
+	if (not android) and (not androidsafe) then--fuck you love2d android, just fucking these instead of crashing
 		mousecursor_hand = love.mouse.getSystemCursor("hand")
 		mousecursor_sizewe = love.mouse.getSystemCursor("sizewe")
 	end
@@ -1934,7 +1934,7 @@ end
 
 function changescale(s, fullscreen)
 	if android or (s == 5) then
-		if android then
+		if android or androidsafe then
 			scale = 1
 		elseif fullscreen then
 			local w, h = love.window.getDesktopDimensions()
@@ -2177,7 +2177,7 @@ function love.keyreleased(key, unicode)
 end
 
 function love.textinput(c)
-	if android and not androidtest then --[[DROID]]
+	if android --[[and not androidtest]] then --[[DROID]]
 		love.keypressed(c,nil,nil,"textinput")
 	else
 		if debugconsole and debuginputon then
@@ -3512,6 +3512,10 @@ function loadnitpicks()
 		HITBOXDEBUG = t.viewhitboxes
 		if t.pcversion then
 			android = false
+			androidsafe = true
+		end
+		if t.hideandroidbuttons then
+			androidHIDE = true
 		end
 		if t.androidversion then
 			android = t.androidversion
