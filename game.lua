@@ -2730,12 +2730,14 @@ function game_draw()
 				--stencils not supported
 				local v = objects["player"][1]
 				local x, y = v.x+v.width/2-xscroll, v.y+v.height/2-.5-yscroll
-				love.graphics.draw(mariolightimg, (x*16-mariolightimg:getWidth()/2)*scale, (y*16-mariolightimg:getHeight()/2)*scale, 0, scale, scale)
+				local lightscale = v.light/3.5
+				local iw, ih = mariolightimg:getWidth()*lightscale, mariolightimg:getHeight()*lightscale
+				love.graphics.draw(mariolightimg, (x*16-iw/2)*scale, (y*16-ih/2)*scale, 0, lightscale*scale, lightscale*scale)
 				--fill in the blanks
-				love.graphics.rectangle("fill", 0, 0, width*16*scale, ((y*16)-mariolightimg:getHeight()/2)*scale) --top
-				love.graphics.rectangle("fill", 0, ((y*16)+mariolightimg:getHeight()/2)*scale, width*16*scale, ((height-y)*16-mariolightimg:getHeight()/2)*scale) --bottom
-				love.graphics.rectangle("fill", 0, ((y*16)-mariolightimg:getHeight()/2)*scale, ((x*16)-mariolightimg:getHeight()/2)*scale, mariolightimg:getHeight()*scale) --left
-				love.graphics.rectangle("fill", ((x*16)+mariolightimg:getHeight()/2)*scale, ((y*16)-mariolightimg:getHeight()/2)*scale, (((width-x)*16)-mariolightimg:getWidth()/2)*scale, mariolightimg:getHeight()*scale) --right
+				love.graphics.rectangle("fill", 0, 0, width*16*scale, ((y*16)-ih/2)*scale) --top
+				love.graphics.rectangle("fill", 0, ((y*16)+ih/2)*scale, width*16*scale, ((height-y)*16-ih/2)*scale) --bottom
+				love.graphics.rectangle("fill", 0, ((y*16)-ih/2)*scale, ((x*16)-ih/2)*scale, ih*scale) --left
+				love.graphics.rectangle("fill", ((x*16)+ih/2)*scale, ((y*16)-ih/2)*scale, (((width-x)*16)-iw/2)*scale, ih*scale) --right
 			else
 				--whatever let's hope the device supports stencils
 				love.graphics.rectangle("fill", 0, 0, width*16*scale, height*16*scale)
@@ -9281,7 +9283,6 @@ function setscreenzoom(z)
 			smbspritebatch[i]:setBufferSize(math.max(maxtilespritebatchsprites,width*height+width+height+1))
 			portalspritebatch[i]:setBufferSize(math.max(maxtilespritebatchsprites,width*height+width+height+1))
 			if customtiles then
-				customspritebatch[i]:setBufferSize(math.max(maxtilespritebatchsprites,width*height+width+height+1))
 				for i2 = 1, #customtilesimg do
 					customspritebatch[i][i2]:setBufferSize(math.max(maxtilespritebatchsprites,width*height+width+height+1))
 				end

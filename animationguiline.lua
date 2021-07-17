@@ -1757,6 +1757,19 @@ table.insert(toenter, {name = "launchplayer",
 	}
 })
 
+table.insert(toenter, {name = "setplayerlight", 
+	t = {
+		t="action",
+		nicename="set player light:",
+		entries={
+			{
+				t="numinput",
+				default="3.5",
+			},
+		}
+	}
+})
+
 --SORT ALPHABETICALLY (I didn't even know you could greater/less compare strings.)
 table.sort(toenter, function(a, b) return a.t.nicename < b.t.nicename end)
 

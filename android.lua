@@ -34,6 +34,10 @@ function androidLoad()
 	--Skin
 	local skinjsonfile = "android/skin.json"
 	local skinimgfile = "android/skin.png"
+	if love.filesystem.exists("alesans_entities/skin.zip") then
+		local success = love.filesystem.mount("alesans_entities/skin.zip", "alesans_entities", true)
+	end
+
 	if love.filesystem.exists("alesans_entities/skin.json") then
 		skinjsonfile = "alesans_entities/skin.json"
 	end

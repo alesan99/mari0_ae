@@ -103,6 +103,7 @@ launchplayer[:player]:x:y			launches player at defined speed
 addtime:time						adds <seconds> time
 removetime:time						removes <seconds> time
 settime:time						sets time
+setplayerlight:blocks				sets player's light in lights out mode
 --]]
 
 function animation:init(path, name)
@@ -902,6 +903,10 @@ function animation:update(dt)
 							objects["player"][i].key = math.max(0, objects["player"][i].key - tonumber(v[2]))
 						end
 					end
+				end
+			elseif v[1] == "setplayerlight" then
+				for i = 1, players do
+					objects["player"][i].light = tonumber(v[2])
 				end
 			elseif v[1] == "setnumber" then
 				local name = tostring(v[2])
