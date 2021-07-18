@@ -19,6 +19,13 @@ function seesawplatform:init(x, y, size, callback, side)
 	
 	self.callback = callback
 	self.side = side
+
+	self.checktable = {"player", "box", "enemy"}
+	for i, v in pairs(enemies) do
+		if objects[v] and underwater == false then
+			table.insert(self.checktable, v)
+		end
+	end
 	
 	--IMAGE STUFF
 	self.drawable = false
@@ -32,17 +39,9 @@ function seesawplatform:update(dt)
 	local previousX = self.x
 	local previousY = self.y
 	
-	local checktable = {}
-	for i, v in pairs(enemies) do
-		if objects[v] then
-			table.insert(checktable, v)
-		end
-	end
-	table.insert(checktable, "player")
-	
 	local numberofobjects = 0
 	
-	for i, v in pairs(checktable) do
+	for i, v in pairs(self.checktable) do
 		for j, w in pairs(objects[v]) do
 			if not w.jumping and inrange(w.x, self.x-w.width, self.x+self.width) then
 				if inrange(w.y, self.y - w.height - 0.1, self.y - w.height + 0.1) then
@@ -51,9 +50,9 @@ function seesawplatform:update(dt)
 						local x1, y1 = math.ceil(w.x+0.01), math.ceil(self.y+self.height)
 						local x2, y2 = math.ceil(w.x+w.width), math.ceil(self.y+self.height)
 						local maxy, col = math.huge, false
-						if (inmap(x1, y1) and tilequads[map[x1][y1][1]]:getproperty("collision", x1, y1) and not tilequads[map[x1][y1][1]]:getproperty("invisible", x1, y1)) then
+						if (inmap(x1, y1) and checkfortileincoord(x1, y1)) then
 							maxy = y1-1-w.height
-						elseif (inmap(x2, y2) and tilequads[map[x2][y2][1]]:getproperty("collision", x2, y2) and not tilequads[map[x2][y2][1]]:getproperty("invisible", x2, y2)) then
+						elseif (inmap(x2, y2) and checkfortileincoord(x2, y2)) then
 							maxy = y2-1-w.height
 						end
 						w.y = math.min(maxy, self.y - w.height + self.speedy*dt)
