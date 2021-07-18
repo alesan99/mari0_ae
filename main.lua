@@ -56,8 +56,8 @@ if debugconsole then debuginputon = true; debuginput = "print()"; print("DEBUG O
 local debugGraph,fpsGraph,memGraph,drawGraph
 local debugGraphs = false
 
-VERSION = 13.0119
-VERSIONSTRING = "13d (7/17/21)"
+VERSION = 13.0120
+VERSIONSTRING = "13d (7/18/21)"
 
 android = (love.system.getOS() == "Android" or love.system.getOS() == "iOS") --[DROID]
 androidtest = false--testing android on pc
@@ -1934,7 +1934,7 @@ end
 
 function changescale(s, fullscreen)
 	if android or (s == 5) then
-		if android or androidsafe then
+		if android then
 			scale = 1
 		elseif fullscreen then
 			local w, h = love.window.getDesktopDimensions()
