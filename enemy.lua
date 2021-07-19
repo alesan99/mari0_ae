@@ -2249,7 +2249,7 @@ function enemy:shotted(dir, cause, high, fireball, star)
     if self.shotsound then
         self:playsound(self.shotsound)
     elseif not self.noshotsound then
-		playsound("shot")
+		self:playsound("shot")
     end
 	
 	if self.transforms then
@@ -2829,7 +2829,7 @@ function enemy:leftcollide(a, b, c, d)
 				if a == "tile" then
 					hitblock(b.cox, b.coy, self, true)
 				else
-					playsound("blockhit")
+					self:playsound("blockhit")
 				end
 			end
 			return false
@@ -2959,7 +2959,7 @@ function enemy:rightcollide(a, b, c, d)
 				if a == "tile" then
 					hitblock(b.cox, b.coy, self, true)
 				else
-					playsound("blockhit")
+					self:playsound("blockhit")
 				end
 			end
 			return false
@@ -3063,7 +3063,7 @@ function enemy:floorcollide(a, b, c, d)
 			objects["player"][i]:groundshock()
 		end
 		earthquake = 4
-		playsound(thwompsound)
+		self:playsound(thwompsound)
 		self.speedy = 0
 	end
 	
@@ -3734,7 +3734,7 @@ function enemy:used(id)
 	if self.grabsound then
 		self:playsound(self.grabsound)
 	elseif not self.nograbsound then
-		playsound(grabsound)
+		self:playsound(grabsound)
 	end
 end
 
