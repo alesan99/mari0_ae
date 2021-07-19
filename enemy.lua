@@ -2366,10 +2366,10 @@ function enemy:customtimeraction(action, arg, arg2)
 		elseif a == "atan2" then
 			local in1, in2 = ogarg[1],ogarg[2]
 			if ogarg[1] and type(ogarg[1]) == "table" and ogarg[1][1] and ogarg[1][2] and ogarg[1][1] == "property" then
-				in1 = self[ogarg[1]]
+				in1 = self[ogarg[1][2]]
 			end
 			if ogarg[2] and type(ogarg[2]) == "table" and ogarg[2][1] and ogarg[2][2] and ogarg[2][1] == "property" then
-				in2 = self[ogarg[2]]
+				in2 = self[ogarg[2][2]]
 			end
 			self[p] = math.atan2(in1,in2)
 		elseif a == "min" then
