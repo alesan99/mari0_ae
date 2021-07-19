@@ -2385,7 +2385,7 @@ function enemy:customtimeraction(action, arg, arg2)
 	else --backwards compatibility
 		if action == "bounce" then
 			if self.speedy == 0 then self.speedy = -(arg or 10) end
-		elseif action == "self:playsound" then
+		elseif action == "playsound" then
 			self:playsound(arg)
 		elseif action == "spawnenemy" then
 			if self.spawnsenemyrandoms then
