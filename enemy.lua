@@ -2246,9 +2246,11 @@ function enemy:shotted(dir, cause, high, fireball, star)
 		collectcoin(nil, nil, tonumber(self.givecoinwhenshot) or 1)
 	end
 	
-	if not self.noshotsound then
-		self:playsound("shot")
-	end
+    if self.shotsound then
+        self:playsound(self.shotsound)
+    elseif not self.noshotsound then
+		playsound("shot")
+    end
 	
 	if self.transforms then
 		if self:gettransformtrigger("shot") then
@@ -2827,7 +2829,7 @@ function enemy:leftcollide(a, b, c, d)
 				if a == "tile" then
 					hitblock(b.cox, b.coy, self, true)
 				else
-					self:playsound("blockhit")
+					playsound("blockhit")
 				end
 			end
 			return false
@@ -2957,7 +2959,7 @@ function enemy:rightcollide(a, b, c, d)
 				if a == "tile" then
 					hitblock(b.cox, b.coy, self, true)
 				else
-					self:playsound("blockhit")
+					playsound("blockhit")
 				end
 			end
 			return false
@@ -3061,7 +3063,7 @@ function enemy:floorcollide(a, b, c, d)
 			objects["player"][i]:groundshock()
 		end
 		earthquake = 4
-		self:playsound(thwompsound)
+		playsound(thwompsound)
 		self.speedy = 0
 	end
 	
@@ -3732,7 +3734,7 @@ function enemy:used(id)
 	if self.grabsound then
 		self:playsound(self.grabsound)
 	elseif not self.nograbsound then
-		self:playsound(grabsound)
+		playsound(grabsound)
 	end
 end
 
