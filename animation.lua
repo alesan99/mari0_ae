@@ -197,10 +197,10 @@ function animation:addtrigger(v)
 		if name:find("player ") then
 			name = tonumber(string.sub(v[2], -1))
 		end
-		if not animationplayerhurttriggerfuncs[v[2]] then --player
-			animationplayerhurttriggerfuncs[v[2]] = {}
+		if not animationplayerhurttriggerfuncs[name] then --player
+			animationplayerhurttriggerfuncs[name] = {}
 		end
-		table.insert(animationplayerhurttriggerfuncs[v[2]], self)
+		table.insert(animationplayerhurttriggerfuncs[name], self)
 	end
 end
 
