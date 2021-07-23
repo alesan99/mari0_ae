@@ -1593,6 +1593,16 @@ function game_draw()
 					love.graphics.draw(customspritebatch[2][i], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
 				end
 			end
+			if animatedtilecount and animatedtilecount > 0 then
+				for y = 1, ytodraw do
+					for x = 1, xtodraw do
+						local backgroundtile = bmapt(math.floor(xscroll)+x, math.floor(yscroll)+y, 1)
+						if backgroundtile and backgroundtile > 90000 and tilequads[backgroundtile] and not tilequads[backgroundtile].invisible then
+							love.graphics.draw(tilequads[backgroundtile].image, tilequads[backgroundtile].quad, math.floor((x-1-math.fmod(xscroll, 1))*16*scale), math.floor(((y-1-math.fmod(yscroll, 1))*16-8)*scale), 0, scale, scale)
+						end
+					end
+				end
+			end
 			love.graphics.setColor(255,255,255,255)
 		end
 
