@@ -8,7 +8,12 @@ function animationtrigger:init(x, y, r, id)
 	self.coy = y
 	
 	self.r = r
-	self.id = tostring(id)
+	local v = convertr(id, {"string", "string"})
+	self.id = v[1]
+	self.arg = false
+	if v[2] and v[2] ~= "" then
+		self.arg = v[2]
+	end
 end
 
 function animationtrigger:link()
@@ -30,7 +35,7 @@ function animationtrigger:input(t)
 		end
 		
 		for i = 1, #animationtriggerfuncs[self.id] do
-			animationtriggerfuncs[self.id][i]:trigger()
+			animationtriggerfuncs[self.id][i]:trigger(self.arg)
 		end
 	end
 end

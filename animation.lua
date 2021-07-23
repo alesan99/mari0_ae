@@ -117,6 +117,7 @@ function animation:init(path, name)
 	self.firstupdate = true
 	self.running = false
 	self.sleep = 0
+	self.arg = false
 	self.enabled = true
 end
 
@@ -197,10 +198,10 @@ function animation:addtrigger(v)
 		if name:find("player ") then
 			name = tonumber(string.sub(v[2], -1))
 		end
-		if not animationplayerhurttriggerfuncs[v[2]] then --player
-			animationplayerhurttriggerfuncs[v[2]] = {}
+		if not animationplayerhurttriggerfuncs[name] then --player
+			animationplayerhurttriggerfuncs[name] = {}
 		end
-		table.insert(animationplayerhurttriggerfuncs[v[2]], self)
+		table.insert(animationplayerhurttriggerfuncs[name], self)
 	end
 end
 
@@ -311,7 +312,13 @@ function animation:update(dt)
 		end
 		
 		while self.sleep == 0 and self.currentaction <= #self.actions do
-			local v = self.actions[self.currentaction]
+			local v = deepcopy(self.actions[self.currentaction])
+			if self.arg then
+				for j, w in pairs(v) do
+					v[j] = w:gsub("%%arg%%",self.arg)
+				end
+			end
+
 			if v[1] == "disablecontrols" then
 				if v[2] == "everyone" then
 					for i = 1, players do
@@ -864,7 +871,11 @@ function animation:update(dt)
 			elseif v[1] == "triggeranimation" then
 				if animationtriggerfuncs[v[2]] then
 					for i = 1, #animationtriggerfuncs[v[2]] do
-						animationtriggerfuncs[v[2]][i]:trigger()
+						arg = false
+						if v[3] and v[3] ~= "" then
+							arg = v[3]
+						end
+						animationtriggerfuncs[v[2]][i]:trigger(arg)
 					end
 				end
 				
@@ -944,12 +955,19 @@ function animation:update(dt)
 	end
 end
 
-function animation:trigger()
+function animation:trigger(arg)
 	if self.enabled then
 		--check conditions
 		local pass = true
 		
-		for i, v in pairs(self.conditions) do
+		conditions = deepcopy(self.conditions)
+		for i, v in pairs(conditions) do
+			if arg then
+				for j, w in pairs(v) do
+					w = w:gsub("%%arg%%", arg)
+				end
+			end
+
 			if v[1] == "noprevsublevel" then
 				if prevsublevel then
 					pass = false
@@ -1083,6 +1101,7 @@ function animation:trigger()
 			self.running = true
 			self.currentaction = 1
 			self.sleep = 0
+			self.arg = arg
 		end
 	end
 end

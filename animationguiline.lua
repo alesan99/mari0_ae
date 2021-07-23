@@ -1616,6 +1616,16 @@ t = {
 			t="input",
 			default="myanim",
 		},
+
+		{
+			t="text",
+			value="and arg",
+		},
+
+		{
+			t="input",
+			default="",
+		},
 	}
 }
 })

@@ -1303,17 +1303,6 @@ rightclicktype["castlefirecw"] = {
 			if not rightclickvalues2[2] then
 				rightclickvalues2[2] = castlefiredelay
 			end
-		elseif i == 2 then
-			local v = v
-			local f = castlefiredelay
-			if v == "fast" then
-				f = castlefirefastdelay
-			elseif v == "slow" then
-				f = castlefiredelay
-			elseif tonumber(v) then
-				f = tonumber(v)
-			end
-			return (f-0.03)/0.97
 		end
 		return v
 	end,
@@ -1408,13 +1397,16 @@ rightclicktype["beltswitch"] = {
 }
 rightclicktype["animationtrigger"] = {
 	name = "animation trigger",
-	default = "",
+	default = "|",
 	format = {
 		"animation id",
 		{"input", 1, "", 14, 20, 1, function(v) rightclickvalues2[1] = v end},
+		"animation arg",
+		{"input", 2, "", 14, 20, 1, function(v) rightclickvalues2[2] = v end},
 		{"button", 2, {"link trigger", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
 	}
-}rightclicktype["animationoutput"] = {
+}
+rightclicktype["animationoutput"] = {
 	name = "animation output",
 	default = "",
 	format = {
