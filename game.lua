@@ -1312,6 +1312,8 @@ function game_update(dt)
 			end
 		end
 	end
+	prevxscroll = splitxscroll[1]
+	prevyscroll = splityscroll[1]
 
 	--portal update
 	for i, v in pairs(portals) do
