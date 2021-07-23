@@ -964,7 +964,7 @@ function animation:trigger(arg)
 		for i, v in pairs(conditions) do
 			if arg then
 				for j, w in pairs(v) do
-					w = w:gsub("%%arg%%", arg)
+					v[j] = w:gsub("%%arg%%", arg)
 				end
 			end
 
