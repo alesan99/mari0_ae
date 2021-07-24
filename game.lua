@@ -730,7 +730,7 @@ function game_update(dt)
 	--item animations
 	local delete = {}
 	for i, v in pairs(itemanimations) do
-		if v:update(dt) then
+		if v:update(dt) or v.instantdelete then
 			table.insert(delete, i)
 		end
 	end
