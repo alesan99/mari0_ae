@@ -1780,6 +1780,45 @@ table.insert(toenter, {name = "setplayerlight",
 	}
 })
 
+table.insert(toenter, {name = "waitforinput", 
+	t = {
+		t="action",
+		nicename="wait for input:",
+		entries={
+			{
+				t="buttonselection",
+			},
+			
+			{
+				t="text",
+				value="by"
+			},
+			
+			{
+				t="playerselectionany",
+			},
+		}
+	}
+})
+
+
+table.insert(toenter, {name = "waitfortrigger", 
+	t = {
+		t="action",
+		nicename="wait for anim trigger:",
+		entries={
+			{
+				t="text",
+				value="with id",
+			},
+			{
+				t="input",
+				default="myanim",
+			},
+		}
+	}
+})
+
 --SORT ALPHABETICALLY (I didn't even know you could greater/less compare strings.)
 table.sort(toenter, function(a, b) return a.t.nicename < b.t.nicename end)
 
