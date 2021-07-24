@@ -2139,10 +2139,10 @@ function animationguiline:movedown()
 	movedownanimationguiline(self.type, self)
 end
 
-function animationguiline:keypressed(key)
+function animationguiline:keypressed(key, textinput)
 	for i = 1, #self.elements do
 		if self.elements[i].gui then
-			self.elements[i].gui:keypress(key)
+			self.elements[i].gui:keypress(key, textinput)
 		end
 	end
 end
