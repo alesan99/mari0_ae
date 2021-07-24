@@ -1615,7 +1615,7 @@ t = {
 		{
 			t="input",
 			default="myanim",
-		},
+		}
 	}
 }
 })
@@ -1765,6 +1765,45 @@ table.insert(toenter, {name = "setplayerlight",
 			{
 				t="numinput",
 				default="3.5",
+			},
+		}
+	}
+})
+
+table.insert(toenter, {name = "waitforinput", 
+	t = {
+		t="action",
+		nicename="wait for input:",
+		entries={
+			{
+				t="buttonselection",
+			},
+			
+			{
+				t="text",
+				value="by"
+			},
+			
+			{
+				t="playerselectionany",
+			},
+		}
+	}
+})
+
+
+table.insert(toenter, {name = "waitfortrigger", 
+	t = {
+		t="action",
+		nicename="wait for anim trigger:",
+		entries={
+			{
+				t="text",
+				value="with id",
+			},
+			{
+				t="input",
+				default="myanim",
 			},
 		}
 	}
@@ -2100,10 +2139,10 @@ function animationguiline:movedown()
 	movedownanimationguiline(self.type, self)
 end
 
-function animationguiline:keypressed(key, textinput)
+function animationguiline:keypressed(key)
 	for i = 1, #self.elements do
 		if self.elements[i].gui then
-			self.elements[i].gui:keypress(key, textinput)
+			self.elements[i].gui:keypress(key)
 		end
 	end
 end
