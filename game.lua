@@ -5088,7 +5088,7 @@ function updatespritebatch()
 	queuespritebatchupdate = false
 end
 
-function game_keypressed(key, unicode)
+function game_keypressed(key, textinput)
 	if pausemenuopen then
 		if menuprompt then
 			if (key == "left" or key == "a") then

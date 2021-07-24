@@ -56,8 +56,8 @@ if debugconsole then debuginputon = true; debuginput = "print()"; print("DEBUG O
 local debugGraph,fpsGraph,memGraph,drawGraph
 local debugGraphs = false
 
-VERSION = 13.0121
-VERSIONSTRING = "13d (7/22/21)"
+VERSION = 13.0122
+VERSIONSTRING = "13d (7/24/21)"
 
 android = (love.system.getOS() == "Android" or love.system.getOS() == "iOS") --[DROID]
 androidtest = false--testing android on pc
@@ -2159,7 +2159,7 @@ function love.keypressed(key, scancode, isrepeat, textinput)
 		
 		menu_keypressed(key, unicode)
 	elseif gamestate == "game" then
-		game_keypressed(key, unicode)
+		game_keypressed(key, textinput)
 	elseif gamestate == "levelscreen" or gamestate == "gameover" then
 		levelscreen_keypressed(key)
 	elseif gamestate == "intro" then
