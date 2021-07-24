@@ -730,7 +730,7 @@ function game_update(dt)
 	--item animations
 	local delete = {}
 	for i, v in pairs(itemanimations) do
-		if v:update(dt) then
+		if v:update(dt) or v.instantdelete then
 			table.insert(delete, i)
 		end
 	end
@@ -1312,6 +1312,8 @@ function game_update(dt)
 			end
 		end
 	end
+	prevxscroll = splitxscroll[1]
+	prevyscroll = splityscroll[1]
 
 	--portal update
 	for i, v in pairs(portals) do
@@ -5086,7 +5088,7 @@ function updatespritebatch()
 	queuespritebatchupdate = false
 end
 
-function game_keypressed(key, unicode)
+function game_keypressed(key, textinput)
 	if pausemenuopen then
 		if menuprompt then
 			if (key == "left" or key == "a") then

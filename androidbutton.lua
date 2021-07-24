@@ -107,7 +107,7 @@ end
 
 function touchButton:update(dt)
 	--Check if it should be active
-	if self.hide then
+	if self.hide or jsonerrorwindow.opened then
 		self.active = false
 	elseif self.editor then
 		self.active = editormode and (not editormenuopen) and ((not HIDEANDROIDBUTTONS) or self.hideButton) and ((not self.editorTool) or ANDROIDSHOWTOOLS)

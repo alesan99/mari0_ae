@@ -131,6 +131,12 @@ function guielement:init(...)
 		
 		self.fillcolor = {0, 0, 0}
 		self.textcolor = {255, 255, 255}
+
+		if android then
+			self.didtypecheck = false
+			self.didtypetextinput = false
+			self.didtype = false
+		end
 		
 		self:updatePos()
 		--[[while string.len(self.value)-self.textoffset > self.width-1 and self.width ~= 1 and self.width ~= self.maxlength do
@@ -172,7 +178,6 @@ function guielement:update(dt)
 				end
 			end
 		elseif self.type == "input" then
-			doubleinputcheck = false
 			self.timer = self.timer + dt
 			while self.timer > blinktime do
 				self.cursorblink = not self.cursorblink
@@ -209,6 +214,16 @@ function guielement:update(dt)
 			--[[DROID]]
 			if android then
 				android_key_repeat = false
+
+				if self.didtypecheck and (not self.didtype) then
+					--force a text input if for some reason the android keyboard did not do anything
+					self:keypress(self.didtypecheck,"forcetextinput")
+				end
+
+				doubleinputcheck = false
+				self.didtypecheck = false
+				self.didtype = false
+				self.didtypetextinput = false
 			end
 		elseif self.type == "button" then
 			if self.autorepeat then
@@ -843,16 +858,25 @@ function guielement:keypress(key,textinput)
 					self.timer = 0
 				else
 					if android then
-						local justchanged = false
-						if not doubleinput then
-							if doubleinputcheck and doubleinputcheck == key then
-								doubleinput = true
-								justchanged = true
+						if not (textinput and textinput == "forcetextinput") then
+							local justchanged = false
+							if not doubleinput then
+								if doubleinputcheck and doubleinputcheck == key then
+									doubleinput = true
+									justchanged = true
+								end
+								doubleinputcheck = key
 							end
-							doubleinputcheck = key
-						end
-						if doubleinput and ((not textinput) or justchanged) then
-							return false
+							if textinput or (not self.didtypecheck) then
+								self.didtypecheck = key
+								if textinput then
+									self.didtypetextinput = true
+								end
+							end
+							if doubleinput and ((not textinput) or justchanged) then
+								return false
+							end
+							self.didtype = true
 						end
 					end
 					if string.len(self.value) < self.maxlength or self.maxlength == 0 then

@@ -6246,7 +6246,7 @@ function editor_mousereleased(x, y, button)
 	end
 end
 
-function editor_keypressed(key)
+function editor_keypressed(key, textinput)
 	if (not editormenuopen) and (not customrcopen) and (not rightclickmenuopen) then
 		if key == "=" then
 			assistmode = not assistmode
@@ -6501,7 +6501,7 @@ function editor_keypressed(key)
 	if animationguilines then
 		for i, v in pairs(animationguilines) do
 			for k, w in pairs(v) do
-				w:keypressed(key)
+				w:keypressed(key, textinput)
 			end
 		end
 	end
