@@ -964,7 +964,7 @@ function game_update(dt)
 						if fastestplayer.x < splitxscroll[split] + width*screenzoom2 - scrollingcomplete*screenzoom2 then
 							splitxscroll[split] = fastestplayer.x - width*screenzoom2 + scrollingcomplete*screenzoom2
 						end
-					elseif fastestplayer.x < splitxscroll[split] + scrollingleftcomplete*screenzoom2 then
+					elseif fastestplayer.x < splitxscroll[split] + scrollingleftcomplete*screenzoom2 and (camerasetting ~= 3 or editormode) then
 						splitxscroll[split] = splitxscroll[split] - superscroll*dt
 						if fastestplayer.x > splitxscroll[split] + scrollingleftcomplete*screenzoom2 then
 							splitxscroll[split] = fastestplayer.x - scrollingleftcomplete*screenzoom2
