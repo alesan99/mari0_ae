@@ -177,6 +177,7 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	guielements["timelimitincrease"].autorepeat = true
 	guielements["timelimitincrease"].repeatwait = 0.3
 	guielements["timelimitincrease"].repeatdelay = 0.08
+	guielements["timelimitreset"] = guielement:new("button", 45 + string.len(mariotimelimit)*8, 152, "0", resettimelimit, 0)
 	guielements["portalgundropdown"] = guielement:new("dropdown", 17, 175, 11, changeportalgun, portalguni, "normal", "none", "1 only", "2 only", "gel")
 	--guielements["portalgundropdown"].dropup = true
 	guielements["widthbutton"] = guielement:new("button", 384-(utf8.len(TEXT["change size"])*8), 200, TEXT["change size"], openchangewidth, 2)
@@ -2462,6 +2463,7 @@ function editor_draw()
 				guielements["timelimitdecrease"]:draw()
 				properprint(mariotimelimit, 29*scale, 154*scale)
 				guielements["timelimitincrease"]:draw()
+				guielements["timelimitreset"]:draw()
 				properprintF(TEXT["timelimit"], 8*scale, 142*scale)
 				
 				--left side
@@ -3174,6 +3176,7 @@ function maintab()
 	guielements["spritesetdropdown"].active = true
 	guielements["timelimitdecrease"].active = true
 	guielements["timelimitincrease"].active = true
+	guielements["timelimitreset"].active = true
 	guielements["portalgundropdown"].active = true
 	guielements["savebutton"].active = true
 	guielements["menubutton"].active = true
@@ -6946,6 +6949,7 @@ function decreasetimelimit()
 	end
 	mariotime = mariotimelimit
 	guielements["timelimitincrease"].x = 31 + string.len(mariotimelimit)*8
+	guielements["timelimitreset"].x = 45 + string.len(mariotimelimit)*8
 end
 
 function increasetimelimit()
@@ -6953,6 +6957,15 @@ function increasetimelimit()
 	mariotimelimit = mariotimelimit + 10
 	mariotime = mariotimelimit
 	guielements["timelimitincrease"].x = 31 + string.len(mariotimelimit)*8
+	guielements["timelimitreset"].x = 45 + string.len(mariotimelimit)*8
+end
+
+function resettimelimit()
+	levelmodified = true
+	mariotimelimit = 0
+	mariotime = mariotimelimit
+	guielements["timelimitincrease"].x = 31 + string.len(mariotimelimit)*8
+	guielements["timelimitreset"].x = 45 + string.len(mariotimelimit)*8
 end
 
 function changeportalgun(var)
