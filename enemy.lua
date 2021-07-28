@@ -2430,7 +2430,7 @@ function enemy:ifstatement(t, action, arg)
 	--EXAMPLE: ["if","speedx","==","speedy"],["set","speedy"],10
 	--EXAMPLE: ["if","speedx","==","speedy","and","jumping","~=",false],["set","speedy"],10
 	local statementPass = false
-	for i = 1, math.floor(#t/4) do
+	for i = 1, math.floor(#t), 4 do
 		local check = t[i]
 
 		--get properties needed for comparison
