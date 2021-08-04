@@ -738,7 +738,7 @@ function guielement:click(x, y, button)
 					if self.inputting then
 						--click where you want the cursor
 						local mx, my = love.mouse.getX()/scale, love.mouse.getY()/scale
-						self.cursorpos = math.max(math.min(round(((mx-self.x)+6.5)/8) + self.textoffset + math.max((math.min(math.ceil(((my-self.y)-1)/10),self.height)-1)*self.width,0), string.len(self.value)+1),0)
+						self.cursorpos = math.max(math.min(round(((mx-self.x)+6.5)/8) + self.textoffset + math.max((math.min(math.ceil(((my-self.y)-1)/10),self.height)-1)*self.width,0), string.len(self.value)+1),1)
 						if not self.numdrag then
 							self.highlighting = true
 							self.highlight = self.cursorpos
