@@ -844,9 +844,9 @@ function guielement:keypress(key,textinput)
 					self.cursorblink = true
 					self.timer = 0
 				elseif key == "backspace" then
-					self.value = string.sub(self.value,1,self.cursorpos-2)..string.sub(self.value,self.cursorpos) --self.value = string.sub(self.value, 1, string.len(self.value)-1)
 
 					if self.cursorpos > 1 then --and self.cursorpos > string.len(self.value)+1 then
+						self.value = string.sub(self.value,1,self.cursorpos-2)..string.sub(self.value,self.cursorpos) --self.value = string.sub(self.value, 1, string.len(self.value)-1)
 						self.cursorpos = self.cursorpos - 1
 					end
 
