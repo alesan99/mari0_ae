@@ -1,0 +1,52 @@
+name: Compile
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        path: main
+        submodules: true
+      name: Checkout Repository
+    - name: Update Packages
+      run: sudo apt-get update
+    - name: Install Dependencies
+      run: sudo apt-get install --assume-yes wine-stable wine64 python3-pip
+    - name: Install makelove
+      run:
+        pip3 install git+https://github.com/pfirsich/makelove/
+    - name: Build
+      run: cd main && python3 -m makelove
+    - name: Prepare Artifact Names
+      run: |
+        echo "ARTIFACT_NAME_LOVE=$(ls main/makelove-build/love | head -n1)" >> $GITHUB_ENV
+        echo "ARTIFACT_NAME_APPIMAGE=$(ls main/makelove-build/appimage | head -n1)" >> $GITHUB_ENV
+        echo "ARTIFACT_NAME_WIN64=$(ls main/makelove-build/win64 | head -n1)" >> $GITHUB_ENV
+        echo "ARTIFACT_NAME_WIN32=$(ls main/makelove-build/win32 | head -n1)" >> $GITHUB_ENV
+        echo "ARTIFACT_NAME_MACOS=$(ls main/makelove-build/macos | head -n1)" >> $GITHUB_ENV
+    - name: Artifact (LÖVE)
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ env.ARTIFACT_NAME_LOVE }}
+        path: main/makelove-build/love/${{ env.ARTIFACT_NAME_LOVE }}
+    - name: Artifact (AppImage)
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ env.ARTIFACT_NAME_APPIMAGE }}
+        path: main/makelove-build/appimage/${{ env.ARTIFACT_NAME_APPIMAGE }}
+    - name: Artifact (Win64)
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ env.ARTIFACT_NAME_WIN64 }}
+        path: main/makelove-build/win64/${{ env.ARTIFACT_NAME_WIN64 }}
+    - name: Artifact (Win32)
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ env.ARTIFACT_NAME_WIN32 }}
+        path: main/makelove-build/win32/${{ env.ARTIFACT_NAME_WIN32 }}
+    - name: Artifact (MacOS)
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ env.ARTIFACT_NAME_MACOS }}
+        path: main/makelove-build/macos/${{ env.ARTIFACT_NAME_MACOS }}

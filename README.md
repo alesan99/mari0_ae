@@ -9,7 +9,9 @@ Avoid major additions that will potentially cause bugs or complicate the game/co
 I appreciate the help, but the goal is to continue the mod while I am busy. Major changes will only increase my workload and make the mod even buggier.
 
 ## 📥 Downloads
-[**DOWNLOAD PAGE:**] https://forum.stabyourself.net/viewtopic.php?f=13&t=3636
+[**Downloads are available here.**](https://forum.stabyourself.net/viewtopic.php?f=13&t=3636)
+
+Development builds are available [here](https://github.com/alesan99/mari0_ae/actions).
 
 ## 💡 About
 **Alesan99's Entities** adds many entities to [Mari0](https://stabyourself.net/mari0)! From Enemies to power ups you'll never run out of entities to make levels now!
@@ -236,13 +238,14 @@ Special thanks to:
 - [**Galas**](http://www.spriters-resource.com/custom_edited/mario/sheet/17965) for some power up sprites
 - **Bobthelawyer** for mario's hammer physics code
 - **KGK64** for Dry beetle sprites
-- **WillWare** for animated quad cache code from Mari0 SE Community Edtion
+- **Skysometric** for animated quad cache code from Mari0 SE Community Edtion
 - **Oxiriar** and Toonn from the Mari0 Gang Discord for smb3 item sprites
 - **NH1507** for toad and toadette character sprites
 - **HansAgain** for new portal sprites, new mario sprites, and pneumatic tubes
 - **Subpixel** for bowser3, rotodiscs, ninji, and splunkin sprites
 - **Critfish** for overgrown portal sprites
 - **MadNyle** for propeller sound effect and mega mushroom
+- **qixils** for the automatic GitHub workflows
 - **All you guys** for reporting bugs and making maps
 
-- And thanks to [**NNB**](https://github.com/NNBnh) for this Github README page
+- And thanks to [**NNB**](https://github.com/NNBnh) for this GitHub README page
