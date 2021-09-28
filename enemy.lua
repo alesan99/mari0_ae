@@ -279,6 +279,7 @@ function enemy:init(x, y, t, a, properties)
 	self.starty = self.y
 	self.startactive = self.active
 	self.startdrawable = self.drawable
+	self.startkillsenemies = self.killsenemies
 	
 	self.spawnallow = true
 	self.spawnedenemies = {}
@@ -3309,6 +3310,7 @@ function enemy:stomp(x, b)
 				self.speedx = 0
 				self.combo = 1
 				self.quad = self.quadgroup[self.smallquad]
+				self.killsenemies = self.startkillsenemies
 			end
 		else
 			self.active = false
