@@ -2693,24 +2693,36 @@ function enemy:globalcollide(a, b, c, d, dir)
 		return true
 	end
 	
-	if self.breaksblocks then
-		if (self.breakblockside == nil or self.breakblockside == "global") then
-			if a == "tile" then
-				if self.breakshardblocks and (tilequads[map[b.cox][b.coy][1]].coinblock or (tilequads[map[b.cox][b.coy][1]].debris and blockdebrisquads[tilequads[map[b.cox][b.coy][1]].debris])) then -- hard block
-					destroyblock(b.cox, b.coy, "nopoints")
-				else
-					hitblock(b.cox, b.coy, self, true)
-				end
-			elseif a == "flipblock" then
-				if self.breaksflipblocks then
-					b:destroy()
-				end
-			end
-		end
+	if self.breakblockside == nil or self.breakblockside == "global" then
+		self:breakblock(a, b)
 	end
 	
 	if self.nocollidestops or b.nocollidestops then
 		return true
+	end
+end
+
+function enemy:breakblock(a, b)
+	if a == "tile" then
+		if self.breakshardblocks and (tilequads[map[b.cox][b.coy][1]].coinblock or (tilequads[map[b.cox][b.coy][1]].debris and blockdebrisquads[tilequads[map[b.cox][b.coy][1]].debris])) then -- hard block
+			destroyblock(b.cox, b.coy, "nopoints")
+		else
+			if self.breaksblocks then
+				hitblock(b.cox, b.coy, {size=2}, (self.small and math.abs(self.speedx) > 0.01))
+			elseif self.hitsblocks then
+				hitblock(b.cox, b.coy, {size=1}, (self.small and math.abs(self.speedx) > 0.01))
+			end
+		end
+	elseif a == "flipblock" then
+		if self.breaksflipblocks or self.breaksentityblocks then
+			b:destroy()
+		elseif self.hitsflipblocks or self.hitsentityblocks then
+			b:hit()
+		end
+	elseif a == "powblock" then
+		if self.triggerspowblock then
+			b:hit()
+		end
 	end
 end
 
@@ -2779,20 +2791,8 @@ function enemy:leftcollide(a, b, c, d)
 		self.speedx = math.abs(self.speedx)
 	end
 	
-	if self.breaksblocks then
-		if (self.breakblockside == "sides" or self.breakblockside == "left") then
-			if a == "tile" then
-				if self.breakshardblocks and (tilequads[map[b.cox][b.coy][1]].coinblock or (tilequads[map[b.cox][b.coy][1]].debris and blockdebrisquads[tilequads[map[b.cox][b.coy][1]].debris])) then -- hard block
-					destroyblock(b.cox, b.coy, "nopoints")
-				else
-					hitblock(b.cox, b.coy, self, true)
-				end
-			elseif a == "flipblock" then
-				if self.breaksflipblocks then
-					b:destroy()
-				end
-			end
-		end
+	if self.breakblockside == "sides" or self.breakblockside == "left" then
+		self:breakblock(a, b)
 	end
 
 	if self.gel then
@@ -2908,20 +2908,8 @@ function enemy:rightcollide(a, b, c, d)
 		self.speedx = -math.abs(self.speedx)
 	end
 	
-	if self.breaksblocks then
-		if (self.breakblockside == "sides" or self.breakblockside == "right") then
-			if a == "tile" then
-				if self.breakshardblocks and (tilequads[map[b.cox][b.coy][1]].coinblock or (tilequads[map[b.cox][b.coy][1]].debris and blockdebrisquads[tilequads[map[b.cox][b.coy][1]].debris])) then -- hard block
-					destroyblock(b.cox, b.coy, "nopoints")
-				else
-					hitblock(b.cox, b.coy, self, true)
-				end
-			elseif a == "flipblock" then
-				if self.breaksflipblocks then
-					b:destroy()
-				end
-			end
-		end
+	if self.breakblockside == "sides" or self.breakblockside == "right" then
+		self:breakblock(a, b)
 	end
 
 	if self.gel then
@@ -3025,20 +3013,8 @@ function enemy:ceilcollide(a, b, c, d)
 		self.speedy = math.abs(self.speedy)
 	end
 	
-	if self.breaksblocks then
-		if self.breakblockside == "ceil" then
-			if a == "tile" then
-				if self.breakshardblocks and (tilequads[map[b.cox][b.coy][1]].coinblock or (tilequads[map[b.cox][b.coy][1]].debris and blockdebrisquads[tilequads[map[b.cox][b.coy][1]].debris])) then -- hard block
-					destroyblock(b.cox, b.coy, "nopoints")
-				else
-					hitblock(b.cox, b.coy, self, true)
-				end
-			elseif a == "flipblock" then
-				if self.breaksflipblocks then
-					b:destroy()
-				end
-			end
-		end
+	if self.breakblockside == "ceil" then
+		self:breakblock(a, b)
 	end
 
 	if self.gel then
@@ -3141,20 +3117,8 @@ function enemy:floorcollide(a, b, c, d)
 		end
 	end
 
-	if self.breaksblocks then
-		if self.breakblockside == "floor" then
-			if a == "tile" then
-				if self.breakshardblocks and (tilequads[map[b.cox][b.coy][1]].coinblock or (tilequads[map[b.cox][b.coy][1]].debris and blockdebrisquads[tilequads[map[b.cox][b.coy][1]].debris])) then -- hard block
-					destroyblock(b.cox, b.coy, "nopoints")
-				else
-					hitblock(b.cox, b.coy, self, true)
-				end
-			elseif a == "flipblock" then
-				if self.breaksflipblocks then
-					b:destroy()
-				end
-			end
-		end
+	if self.breakblockside == "floor" then
+		self:breakblock(a, b)
 	end
 
 	if self.gel then
