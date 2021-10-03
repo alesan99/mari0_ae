@@ -2071,7 +2071,7 @@ function game_draw()
 		for j, w in pairs(objects) do	
 			if j ~= "tile" and j ~= "pixeltile" then
 				for i, v in pairs(w) do
-					if v.drawable and not v.drawback then
+					if v.drawable and (not v.drawback) and (not v.drawfront) then
 						love.graphics.setColor(255, 255, 255)
 						drawentity(j,w,i,v,currentscissor)
 					end
@@ -2548,6 +2548,14 @@ function game_draw()
 		
 		--custom foreground
 		rendercustomforeground(xscroll, yscroll, scrollfactor2, scrollfactor2y)
+		
+		--OBJECTS
+		for i, v in pairs(objects["enemy"]) do	
+			if v.drawfront and v.drawable then
+				love.graphics.setColor(255, 255, 255)
+				drawentity("enemy",nil,i,v,currentscissor)
+			end
+		end
 		
 		--UI over everything
 		love.graphics.scale(1/screenzoom,1/screenzoom)
