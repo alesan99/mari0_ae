@@ -328,6 +328,7 @@ function levelscreen_draw()
 				properprintfunc(s, (width/2*16)*scale-string.len(s)*4*scale, 200*scale)
 			elseif levelscreentext[marioworld .. "-" .. mariolevel] then
 				local s = levelscreentext[marioworld .. "-" .. mariolevel]
+				s = s:gsub("B", "-")
 				properprintfunc(s, (width/2*16)*scale-string.len(s)*4*scale, 200*scale)
 			end
 			
