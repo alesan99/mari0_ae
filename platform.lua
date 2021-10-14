@@ -175,50 +175,7 @@ function platform:update(dt)
 			self.trackanimtimer = 1
 		end
 		self.oldx, self.oldy = self.x, self.y
-	elseif self.dir == "right" or self.dir == "justright" then
-		self.x = self.x + self.speedx*dt
-		
-		for i, v in pairs(self.checktable) do
-			for j, w in pairs(objects[v]) do
-				if (not w.ignoreplatform) and w.active then
-					if inrange(w.x, self.x-w.width, self.x+self.width) then
-						if w.y == self.y - w.height then
-							if #checkrect(w.x+self.speedx*dt, w.y, w.width, w.height, {"exclude", w}, true) == 0 then
-								w.x = w.x + self.speedx*dt
-								--make sure red koopas dont fall off
-								if v == "drybones" or (v == "koopa" and w.t == "red" and not w.small) or (v == "goomba" and (w.t == "goombrat" or w.t == "spiketop" or w.t == "wiggler")) or (w.turnaroundoncliff and not w.small) then
-									if not inrange(w.x+w.width/2+w.speedx*dt, self.x, self.x+self.width) then
-										if w.speedx < 0 then
-											w.animationdirection = "left"
-										else
-											w.animationdirection = "right"
-										end
-										w.speedx = -w.speedx
-									end
-								end
-							end
-						end
-					end
-					if self.speedy ~= 0 then
-						if not w.jumping and inrange(w.x, self.x-w.width, self.x+self.width) then
-							if inrange(w.y, self.y - w.height - 0.1, self.y - w.height + 0.1) then
-								local x1, y1 = math.ceil(w.x+0.01), math.ceil(self.y+self.height)
-								local x2, y2 = math.ceil(w.x+w.width), math.ceil(self.y+self.height)
-								local maxy, col = math.huge, false
-								if (inmap(x1, y1) and tilequads[map[x1][y1][1]]:getproperty("collision", x1, y1) and not tilequads[map[x1][y1][1]]:getproperty("invisible", x1, y1)) then
-									maxy = y1-1-w.height
-								elseif (inmap(x2, y2) and tilequads[map[x2][y2][1]]:getproperty("collision", x2, y2) and not tilequads[map[x2][y2][1]]:getproperty("invisible", x2, y2)) then
-									maxy = y2-1-w.height
-								end
-								w.y = math.min(maxy, self.y - w.height + self.speedy*dt)
-							end
-						end
-					end
-				end
-			end
-		end
-		self.y = self.y + self.speedy*dt
-	elseif self.dir == "up" or self.dir == "justup" or self.dir == "justdown" then
+	elseif self.dir == "right" or self.dir == "justright" or self.dir == "up" or self.dir == "justup" or self.dir == "justdown" then
 		self.x = self.x + self.speedx*dt
 		
 		for i, v in pairs(self.checktable) do
@@ -227,7 +184,8 @@ function platform:update(dt)
 					if self.speedx ~= 0 then
 						if inrange(w.x, self.x-w.width, self.x+self.width) then
 							if w.y == self.y - w.height then
-								if #checkrect(w.x+self.speedx*dt, w.y, w.width, w.height, {"exclude", w}, true) == 0 then
+								if ((not w.playernumber) and not checkintile(w.x+self.speedx*dt, w.y, w.width, w.height, {}, w, "ignoreplatforms")) or
+									(w.playernumber and #checkrect(w.x+self.speedx*dt, w.y, w.width, w.height, {"exclude", w}, true) == 0) then
 									w.x = w.x + self.speedx*dt
 									--make sure red koopas dont fall off
 									if v == "drybones" or (v == "koopa" and w.t == "red" and not w.small) or (v == "goomba" and (w.t == "goombrat" or w.t == "spiketop" or w.t == "wiggler")) or (w.turnaroundoncliff and not w.small) then
@@ -244,17 +202,23 @@ function platform:update(dt)
 							end
 						end
 					end
-					if not w.jumping and inrange(w.x, self.x-w.width, self.x+self.width) then
-						if inrange(w.y, self.y - w.height - 0.1, self.y - w.height + 0.1) then
-							local x1, y1 = math.ceil(w.x+0.01), math.ceil(self.y+self.height)
-							local x2, y2 = math.ceil(w.x+w.width), math.ceil(self.y+self.height)
-							local maxy, col = math.huge, false
-							if (inmap(x1, y1) and checkfortileincoord(x1, y1)) then
-								maxy = y1-1-w.height
-							elseif (inmap(x2, y2) and checkfortileincoord(x2, y2)) then
-								maxy = y2-1-w.height
+					if self.speedy ~= 0 then
+						if not w.jumping and inrange(w.x, self.x-w.width, self.x+self.width) then
+							local clip_past_platform = (w.y+w.height-w.speedy*dt < self.y and w.y+w.height > self.y)
+							if inrange(w.y, self.y - w.height - 0.1, self.y - w.height + 0.1) or clip_past_platform then
+								local x1, y1 = math.ceil(w.x+0.01), math.ceil(self.y+self.height)
+								local x2, y2 = math.ceil(w.x+w.width), math.ceil(self.y+self.height)
+								local maxy, col = math.huge, false
+								if (inmap(x1, y1) and checkfortileincoord(x1, y1)) then
+									maxy = y1-1-w.height
+								elseif (inmap(x2, y2) and checkfortileincoord(x2, y2)) then
+									maxy = y2-1-w.height
+								end
+								w.y = math.min(maxy, self.y - w.height + self.speedy*dt)
+								if clip_past_platform then
+									w.speedy = 0
+								end
 							end
-							w.y = math.min(maxy, self.y - w.height + self.speedy*dt)
 						end
 					end
 				end
@@ -263,17 +227,10 @@ function platform:update(dt)
 		self.y = self.y + self.speedy*dt
 	elseif self.dir == "fall" and breakoutmode then
 		local speed = 15
-		if leftkey(1) then
-			self.speedx = -speed
-		elseif rightkey(1) then
-			self.speedx = speed
-		else
-			self.speedx = 0
-		end
-		self.gravity = 0
-		self.static = false
-		self.PLATFORM = false
-		self.mask[2] = false
+		if leftkey(1) then self.speedx = -speed
+		elseif rightkey(1) then self.speedx = speed
+		else self.speedx = 0 end
+		self.gravity = 0; self.static = false; self.PLATFORM = false; self.mask[2] = false
 		self.trackanimtimer = (((self.trackanimtimer + 4*dt)-1)%2)+1
 	elseif self.dir == "fall" then
 		local numberofobjects = 0

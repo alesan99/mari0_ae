@@ -162,7 +162,7 @@ function game_load(suspended)
 	customspritebatch = {}
 	spritebatchX = {}
 	spritebatchY = {}
-	for i = 1, players do
+	for i = 1, 2 do
 		smbspritebatch[i] = love.graphics.newSpriteBatch( smbtilesimg, maxtilespritebatchsprites )
 		portalspritebatch[i] = love.graphics.newSpriteBatch( portaltilesimg, maxtilespritebatchsprites )
 		if customtiles then
@@ -180,6 +180,24 @@ function game_load(suspended)
 	portalprojectilespritebatch = love.graphics.newSpriteBatch(portalprojectileparticleimg, 1000, "dynamic" )
 	
 	custommusic = false
+
+	--hide android controls
+	if android and not androidHIDE then
+		local hide = true
+		for i = 1, players do
+			if controls[i] then
+				for j, w in pairs(controls[i]) do
+					if not (w[1] and w[1] == "joy") then
+						hide = false
+						break
+					end
+				end
+			end
+		end
+		if hide then
+			androidHIDE = true
+		end
+	end
 	
 	--send chat ingame
 	if SERVER or CLIENT then
@@ -213,7 +231,7 @@ function game_update(dt)
 		local s3 = controls[1]["down"]
 		local s4 = controls[1]["up"]
 		if s1[1] == "joy" then
-			if checkkey(s1) then
+			if checkkey(s1,1,"right") then
 				if not oldjoystick[1] then
 					game_keypressed("right")
 					oldjoystick[1] = true
@@ -223,7 +241,7 @@ function game_update(dt)
 			end
 		end
 		if s2[1] == "joy" then
-			if checkkey(s2) then
+			if checkkey(s2,1,"left") then
 				if not oldjoystick[2] then
 					game_keypressed("left")
 					oldjoystick[2] = true
@@ -233,7 +251,7 @@ function game_update(dt)
 			end
 		end
 		if s3[1] == "joy" then
-			if checkkey(s3) then
+			if checkkey(s3,1,"down") then
 				if not oldjoystick[3] then
 					game_keypressed("down")
 					oldjoystick[3] = true
@@ -243,7 +261,7 @@ function game_update(dt)
 			end
 		end
 		if s4[1] == "joy" then
-			if checkkey(s4) then
+			if checkkey(s4,1,"up") then
 				if not oldjoystick[4] then
 					game_keypressed("up")
 					oldjoystick[4] = true
@@ -712,7 +730,7 @@ function game_update(dt)
 	--item animations
 	local delete = {}
 	for i, v in pairs(itemanimations) do
-		if v:update(dt) then
+		if v:update(dt) or v.instantdelete then
 			table.insert(delete, i)
 		end
 	end
@@ -894,8 +912,8 @@ function game_update(dt)
 				--LEFT
 
 				if (not (autoscrollingx and not editormode)) and (camerasetting ~= 3 or editormode) then
-					if fastestplayer.x < splitxscroll[split] + scrollingleftstart and splitxscroll[split] > 0 then
-						if fastestplayer.x < splitxscroll[split] + scrollingleftstart and fastestplayer.speedx < 0 then
+					if fastestplayer.x < splitxscroll[split] + scrollingleftstart*screenzoom2 and splitxscroll[split] > 0 then
+						if fastestplayer.x < splitxscroll[split] + scrollingleftstart*screenzoom2 and fastestplayer.speedx < 0 then
 							if fastestplayer.speedx < -scrollrate then
 								splitxscroll[split] = splitxscroll[split] - scrollrate*dt
 							else
@@ -903,23 +921,23 @@ function game_update(dt)
 							end
 						end
 					
-						if fastestplayer.x < splitxscroll[split] + scrollingleftcomplete then
+						if fastestplayer.x < splitxscroll[split] + scrollingleftcomplete*screenzoom2 then
 							splitxscroll[split] = splitxscroll[split] - scrollrate*dt
-							if fastestplayer.x > splitxscroll[split] + scrollingleftcomplete then
-								splitxscroll[split] = fastestplayer.x - scrollingleftcomplete
+							if fastestplayer.x > splitxscroll[split] + scrollingleftcomplete*screenzoom2 then
+								splitxscroll[split] = fastestplayer.x - scrollingleftcomplete*screenzoom2
 							end
 						end
 					end
 				end
 				if autoscrollingx and not editormode then
-					splitxscroll[split] = math.max(0, math.min(mapwidth-width, splitxscroll[split] + autoscrollingx*dt))
+					splitxscroll[split] = math.max(0, math.min(mapwidth-width*screenzoom2, splitxscroll[split] + autoscrollingx*dt))
 				end
 				
 				--RIGHT
 				
 				if not (autoscrollingx and not editormode) then
-					if fastestplayer.x > splitxscroll[split] + width - scrollingstart and splitxscroll[split] < mapwidth - width then
-						if fastestplayer.x > splitxscroll[split] + width - scrollingstart and fastestplayer.speedx > 0.3 then
+					if fastestplayer.x > splitxscroll[split] + width*screenzoom2 - scrollingstart*screenzoom2 and splitxscroll[split] < mapwidth - width*screenzoom2 then
+						if fastestplayer.x > splitxscroll[split] + width*screenzoom2 - scrollingstart*screenzoom2 and fastestplayer.speedx > 0.3 then
 							if fastestplayer.speedx > scrollrate then
 								splitxscroll[split] = splitxscroll[split] + scrollrate*dt
 							else
@@ -927,10 +945,10 @@ function game_update(dt)
 							end
 						end
 					
-						if fastestplayer.x > splitxscroll[split] + width - scrollingcomplete then
+						if fastestplayer.x > splitxscroll[split] + width*screenzoom2 - scrollingcomplete*screenzoom2 then
 							splitxscroll[split] = splitxscroll[split] + scrollrate*dt
-							if splitxscroll[split] > fastestplayer.x - (width - scrollingcomplete) then
-								splitxscroll[split] = fastestplayer.x - (width - scrollingcomplete)
+							if splitxscroll[split] > fastestplayer.x - (width*screenzoom2 - scrollingcomplete*screenzoom2) then
+								splitxscroll[split] = fastestplayer.x - (width*screenzoom2 - scrollingcomplete*screenzoom2)
 							end
 						end
 					end
@@ -941,15 +959,15 @@ function game_update(dt)
 
 				--just force that shit
 				if not levelfinished and not (autoscrollingx and not editormode) then
-					if fastestplayer.x > splitxscroll[split] + width - scrollingcomplete then
+					if fastestplayer.x > splitxscroll[split] + width*screenzoom2 - scrollingcomplete*screenzoom2 then
 						splitxscroll[split] = splitxscroll[split] + superscroll*dt
-						if fastestplayer.x < splitxscroll[split] + width - scrollingcomplete then
-							splitxscroll[split] = fastestplayer.x - width + scrollingcomplete
+						if fastestplayer.x < splitxscroll[split] + width*screenzoom2 - scrollingcomplete*screenzoom2 then
+							splitxscroll[split] = fastestplayer.x - width*screenzoom2 + scrollingcomplete*screenzoom2
 						end
-					elseif fastestplayer.x < splitxscroll[split] + scrollingleftcomplete then
+					elseif fastestplayer.x < splitxscroll[split] + scrollingleftcomplete*screenzoom2 and (camerasetting ~= 3 or editormode) then
 						splitxscroll[split] = splitxscroll[split] - superscroll*dt
-						if fastestplayer.x > splitxscroll[split] + scrollingleftcomplete then
-							splitxscroll[split] = fastestplayer.x - scrollingleftcomplete
+						if fastestplayer.x > splitxscroll[split] + scrollingleftcomplete*screenzoom2 then
+							splitxscroll[split] = fastestplayer.x - scrollingleftcomplete*screenzoom2
 						end
 					end
 				end
@@ -996,23 +1014,29 @@ function game_update(dt)
 					end
 				end
 			end
-			if mapheight ~= 15 and objects["player"][fastestplayer] then
+			if mapheight > 15*screenzoom2 and objects["player"][fastestplayer] then
 				if not (autoscrollingy and not editormode) then
 					local px, py = objects["player"][fastestplayer].x, objects["player"][fastestplayer].y
 					if objects["player"][fastestplayer].height > 2 then
 						py = objects["player"][fastestplayer].y+objects["player"][fastestplayer].height/2
 					end
+					local pspeed = objects["player"][1].speedy
+					if objects["player"][fastestplayer].oldy and pspeed == 0 and math.abs(objects["player"][fastestplayer].y-objects["player"][fastestplayer].oldy) < 3 then
+						pspeed = (objects["player"][fastestplayer].y-objects["player"][fastestplayer].oldy)/dt
+					end
+					objects["player"][fastestplayer].oldy = objects["player"][fastestplayer].y
+					
 					local sx, sy = px-xscroll, py-yscroll--position on screen
 					yscrolltarget = yscrolltarget or splityscroll[split]
 
-					local upbound = 9
-					local downbound = 4
+					local upbound = 9*screenzoom2
+					local downbound = 4*screenzoom2
 					if camerasetting == 2 then
-						upbound = 8
-						downbound = 6
+						upbound = 8*screenzoom2
+						downbound = 6*screenzoom2
 					end
-					if objects["player"][1].speedy == 0 then
-						yscrolltarget = math.min(py-downbound, math.max(py-upbound, yscrolltarget))--(objects["player"][1].y+objects["player"][1].width/2)-(height/2)
+					if speed == 0 then
+						yscrolltarget = math.min(py-downbound, math.max(py-upbound, yscrolltarget))--(objects["player"][fastestplayer].y+objects["player"][fastestplayer].width/2)-(height/2)
 					elseif sy > upbound then
 						yscrolltarget = py-upbound
 					elseif sy < downbound then
@@ -1020,24 +1044,24 @@ function game_update(dt)
 					end
 
 					local seeking = false
-					local yscrolltarget = math.min(math.max(0, mapheight-height-1), math.max(0, yscrolltarget))
+					local yscrolltarget = math.min(math.max(0, mapheight-height*screenzoom2-1), math.max(0, yscrolltarget))
 					if objects["player"][fastestplayer].animationstate == "idle" then
 						if objects["player"][fastestplayer].upkeytimer > seektime then
 							yscrolltarget = yscrolltarget - seekrange
-							yscrolltarget = math.min(math.max(0, mapheight-height-1), math.max(0, yscrolltarget))
+							yscrolltarget = math.min(math.max(0, mapheight-height*screenzoom2-1), math.max(0, yscrolltarget))
 							seeking = true
 						elseif objects["player"][fastestplayer].downkeytimer > seektime then
 							yscrolltarget = yscrolltarget + seekrange
-							yscrolltarget = math.min(math.max(0, mapheight-height-1), math.max(0, yscrolltarget))
+							yscrolltarget = math.min(math.max(0, mapheight-height*screenzoom2-1), math.max(0, yscrolltarget))
 							seeking = true
 						end
 					end
 					
 					local diff = math.abs(splityscroll[split]-yscrolltarget)
-					local speed = math.abs(objects["player"][fastestplayer].speedy)--scrollrate*(diff/1.5)+0.5 --math.min(superscrollrate)?
+					local speed = math.abs(pspeed)--scrollrate*(diff/1.5)+0.5 --math.min(superscrollrate)?
 					if seeking then	
 						speed = seekspeed
-					elseif speed == 0 then--not objects["player"][1].jumping and not objects["player"][1].falling then
+					elseif speed == 0 then--not objects["player"][fastestplayer].jumping and not objects["player"][fastestplayer].falling then
 						if diff > 2.5 then
 							speed = superscrollrate
 						else
@@ -1050,8 +1074,8 @@ function game_update(dt)
 						splityscroll[split] = math.max(yscrolltarget, splityscroll[split] - speed*dt)
 					end
 
-					if splityscroll[split] > mapheight-height-1 then
-						splityscroll[split] = math.max(0, mapheight-height-1)
+					if splityscroll[split] > mapheight-height*screenzoom2-1 then
+						splityscroll[split] = math.max(0, mapheight-height*screenzoom2-1)
 					end
 					
 					if splityscroll[split] < 0 then
@@ -1059,7 +1083,7 @@ function game_update(dt)
 					end
 				elseif not editormode then
 					--vertical autoscrolling
-					splityscroll[split] = math.max(0, math.min(mapheight-height-1, splityscroll[split] + autoscrollingy*dt))
+					splityscroll[split] = math.max(0, math.min(mapheight-height*screenzoom2-1, splityscroll[split] + autoscrollingy*dt))
 				end
 			end
 		end
@@ -1234,12 +1258,12 @@ function game_update(dt)
 		spritebatchX[1] = math.floor(splitxscroll[1])
 		
 		if editormode == false and splitxscroll[1] < mapwidth-width then
-			local x1, x2 = math.ceil(prevxscroll)+width*screenzoom2+1, math.floor(splitxscroll[1])+width*screenzoom2+1
+			local x1, x2 = math.ceil(prevxscroll)+math.ceil(width*screenzoom2)+1, math.floor(splitxscroll[1])+math.ceil(width*screenzoom2)+1
 			if prevxscroll > splitxscroll[1] then --spawn enemies in both directions
 				x1, x2 = math.floor(splitxscroll[1])+1, math.floor(prevxscroll)+1
 			end
-			for x = x1, x2 do
-				for y = math.floor(splityscroll[1])+1, math.min(mapheight, math.ceil(splityscroll[1])+height*screenzoom2+1+2) do
+			for x = math.max(1, x1), math.min(mapwidth, x2) do
+				for y = math.max(1, math.floor(splityscroll[1])+1), math.min(mapheight, math.ceil(splityscroll[1])+math.ceil(height*screenzoom2)+1+2) do
 					spawnenemyentity(x, y)
 				end
 				if goombaattack then
@@ -1277,17 +1301,19 @@ function game_update(dt)
 		generatespritebatch()
 		spritebatchY[1] = math.floor(splityscroll[1])
 		if editormode == false then
-			for x = math.floor(splitxscroll[1])+1, math.ceil(splitxscroll[1])+width*screenzoom2+1 do
+			for x = math.max(1, math.floor(splitxscroll[1])+1), math.min(mapwidth, math.ceil(splitxscroll[1])+math.ceil(width*screenzoom2)+1) do
 				local y1, y2 = math.floor(splityscroll[1])+1, math.floor(prevyscroll)+1
 				if prevyscroll < splityscroll[1] then
-					y1, y2 = math.floor(prevyscroll)+1+height*screenzoom2+2, math.floor(splityscroll[1])+1+height*screenzoom2+2
+					y1, y2 = math.floor(prevyscroll)+1+math.ceil(height*screenzoom2)+2, math.floor(splityscroll[1])+1+math.ceil(height*screenzoom2)+2
 				end
-				for y = y1, y2 do
+				for y = math.max(1, y1), math.min(mapheight, y2) do
 					spawnenemyentity(x, y)
 				end
 			end
 		end
 	end
+	prevxscroll = splitxscroll[1]
+	prevyscroll = splityscroll[1]
 
 	--portal update
 	for i, v in pairs(portals) do
@@ -1562,11 +1588,20 @@ function game_draw()
 			else
 				love.graphics.setColor(255,255,255,255)
 			end
-			for y = yfromdraw, ytodraw do
-				for x = xfromdraw, xtodraw do
-					local backgroundtile = bmapt(x, y, 1)
-					if backgroundtile and tilequads[backgroundtile] and not tilequads[backgroundtile].invisible then
-						love.graphics.draw(tilequads[backgroundtile].image, tilequads[backgroundtile].quad, math.floor((x-1-xoff)*16*scale), math.floor(((y-1-yoff)*16-8)*scale), 0, scale, scale)
+			love.graphics.draw(smbspritebatch[2], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
+			love.graphics.draw(portalspritebatch[2], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
+			if customtiles then
+				for i = 1, #customspritebatch[2] do
+					love.graphics.draw(customspritebatch[2][i], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
+				end
+			end
+			if animatedtilecount and animatedtilecount > 0 then
+				for y = 1, ytodraw do
+					for x = 1, xtodraw do
+						local backgroundtile = bmapt(math.floor(xscroll)+x, math.floor(yscroll)+y, 1)
+						if backgroundtile and backgroundtile > 90000 and tilequads[backgroundtile] and not tilequads[backgroundtile].invisible then
+							love.graphics.draw(tilequads[backgroundtile].image, tilequads[backgroundtile].quad, math.floor((x-1-math.fmod(xscroll, 1))*16*scale), math.floor(((y-1-math.fmod(yscroll, 1))*16-8)*scale), 0, scale, scale)
+						end
 					end
 				end
 			end
@@ -1578,11 +1613,11 @@ function game_draw()
 			love.graphics.push()
 			love.graphics.translate(3*scale, 3*scale)
 			love.graphics.setColor(dropshadowcolor)
-			love.graphics.draw(smbspritebatch[split], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
-			love.graphics.draw(portalspritebatch[split], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
+			love.graphics.draw(smbspritebatch[1], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
+			love.graphics.draw(portalspritebatch[1], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
 			if customtiles then
-				for i = 1, #customspritebatch[split] do
-					love.graphics.draw(customspritebatch[split][i], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
+				for i = 1, #customspritebatch[1] do
+					love.graphics.draw(customspritebatch[1][i], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
 				end
 			end
 			drawmaptiles("dropshadow", xscroll, yscroll)
@@ -1623,7 +1658,7 @@ function game_draw()
 							if j == "player" then
 								drawplayer(v.playernumber, nil, nil, nil, nil, "dropshadow")
 							else
-								drawentity(j,w,i,v,currentscissor)
+								drawentity(j,w,i,v,currentscissor,true)
 							end
 						end
 					end
@@ -1709,11 +1744,11 @@ function game_draw()
 		
 		--TILES
 		if not _3DMODE then
-			love.graphics.draw(smbspritebatch[split], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
-			love.graphics.draw(portalspritebatch[split], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
+			love.graphics.draw(smbspritebatch[1], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
+			love.graphics.draw(portalspritebatch[1], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
 			if customtiles then
-				for i = 1, #customspritebatch[split] do
-					love.graphics.draw(customspritebatch[split][i], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
+				for i = 1, #customspritebatch[1] do
+					love.graphics.draw(customspritebatch[1][i], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
 				end
 			end
 
@@ -2116,11 +2151,11 @@ function game_draw()
 				love.graphics.translate(i*scale, i*scale)
 				love.graphics.scale(1-(((2*scale)/(width*16*scale))*(i)), 1-(((2*scale)/(height*16*scale))*(i)))
 				love.graphics.setColor(color)
-				love.graphics.draw(smbspritebatch[split], math.floor((-math.fmod(xscroll, 1)*16)*scale), math.floor((-math.fmod(yscroll, 1)*16)*scale))
-				love.graphics.draw(portalspritebatch[split], math.floor((-math.fmod(xscroll, 1)*16)*scale), math.floor((-math.fmod(yscroll, 1)*16)*scale))
+				love.graphics.draw(smbspritebatch[1], math.floor((-math.fmod(xscroll, 1)*16)*scale), math.floor((-math.fmod(yscroll, 1)*16)*scale))
+				love.graphics.draw(portalspritebatch[1], math.floor((-math.fmod(xscroll, 1)*16)*scale), math.floor((-math.fmod(yscroll, 1)*16)*scale))
 				if customtiles then
-					for i = 1, #customspritebatch[split] do
-						love.graphics.draw(customspritebatch[split][i], math.floor((-math.fmod(xscroll, 1)*16)*scale), math.floor((-math.fmod(yscroll, 1)*16)*scale))
+					for i = 1, #customspritebatch[1] do
+						love.graphics.draw(customspritebatch[1][i], math.floor((-math.fmod(xscroll, 1)*16)*scale), math.floor((-math.fmod(yscroll, 1)*16)*scale))
 					end
 				end
 				if i > 8 then
@@ -2707,12 +2742,14 @@ function game_draw()
 				--stencils not supported
 				local v = objects["player"][1]
 				local x, y = v.x+v.width/2-xscroll, v.y+v.height/2-.5-yscroll
-				love.graphics.draw(mariolightimg, (x*16-mariolightimg:getWidth()/2)*scale, (y*16-mariolightimg:getHeight()/2)*scale, 0, scale, scale)
+				local lightscale = v.light/3.5
+				local iw, ih = mariolightimg:getWidth()*lightscale, mariolightimg:getHeight()*lightscale
+				love.graphics.draw(mariolightimg, (x*16-iw/2)*scale, (y*16-ih/2)*scale, 0, lightscale*scale, lightscale*scale)
 				--fill in the blanks
-				love.graphics.rectangle("fill", 0, 0, width*16*scale, ((y*16)-mariolightimg:getHeight()/2)*scale) --top
-				love.graphics.rectangle("fill", 0, ((y*16)+mariolightimg:getHeight()/2)*scale, width*16*scale, ((height-y)*16-mariolightimg:getHeight()/2)*scale) --bottom
-				love.graphics.rectangle("fill", 0, ((y*16)-mariolightimg:getHeight()/2)*scale, ((x*16)-mariolightimg:getHeight()/2)*scale, mariolightimg:getHeight()*scale) --left
-				love.graphics.rectangle("fill", ((x*16)+mariolightimg:getHeight()/2)*scale, ((y*16)-mariolightimg:getHeight()/2)*scale, (((width-x)*16)-mariolightimg:getWidth()/2)*scale, mariolightimg:getHeight()*scale) --right
+				love.graphics.rectangle("fill", 0, 0, width*16*scale, ((y*16)-ih/2)*scale) --top
+				love.graphics.rectangle("fill", 0, ((y*16)+ih/2)*scale, width*16*scale, ((height-y)*16-ih/2)*scale) --bottom
+				love.graphics.rectangle("fill", 0, ((y*16)-ih/2)*scale, ((x*16)-ih/2)*scale, ih*scale) --left
+				love.graphics.rectangle("fill", ((x*16)+ih/2)*scale, ((y*16)-ih/2)*scale, (((width-x)*16)-iw/2)*scale, ih*scale) --right
 			else
 				--whatever let's hope the device supports stencils
 				love.graphics.rectangle("fill", 0, 0, width*16*scale, height*16*scale)
@@ -2927,7 +2964,7 @@ function game_draw()
 	end
 end
 
-function drawentity(j, w, i, v, currentscissor)
+function drawentity(j, w, i, v, currentscissor, drop)
 	local dirscale
 	
 	if v.animationdirection == "left" then
@@ -3015,7 +3052,7 @@ function drawentity(j, w, i, v, currentscissor)
 		drawplayer(v.playernumber)
 	else
 		if v.graphic and v.quad then
-			if v.graphiccolor then
+			if v.graphiccolor and (not drop) then
 				love.graphics.setColor(v.graphiccolor)
 			end
 			love.graphics.draw(v.graphic, v.quad, math.floor(((v.x-xscroll)*16+v.offsetX)*scale), math.floor(((v.y-yscroll)*16-v.offsetY)*scale), v.rotation, dirscale, horscale, v.quadcenterX, v.quadcenterY)
@@ -3063,7 +3100,7 @@ function drawentity(j, w, i, v, currentscissor)
 				drawplayer(i, px, py, pr, pad)
 			else
 				if v.graphic and v.quad then
-					if v.graphiccolor then
+					if v.graphiccolor and (not drop) then
 						love.graphics.setColor(v.graphiccolor)
 					end
 					love.graphics.draw(v.graphic, v.quad, math.floor(((px-xscroll)*16+v.offsetX)*scale), math.floor(((py-yscroll)*16-v.offsetY)*scale), pr, dirscale, horscale, v.quadcenterX, v.quadcenterY)
@@ -4235,8 +4272,7 @@ function startlevel(level, reason)
 	
 	splitxscroll = {0}
 	splityscroll = {0}
-	screenzoom = 1
-	screenzoom2 = 1/screenzoom
+	setscreenzoom(1)
 	
 	startx = 3
 	starty = 13
@@ -4821,6 +4857,12 @@ function loadmap(filename)
 						loadentity(t, x, y, r, r[2])
 					end
 				end
+			elseif r[1] == 1 and (not editormode) then
+				--save memory
+				if (not r["back"]) and (not r["track"]) then
+					map[x][y] = nil
+					map[x][y] = emptytile
+				end
 			end
 		end
 	end
@@ -4959,53 +5001,83 @@ function generatespritebatch()
 end
 
 function updatespritebatch()
-	for split = 1, #splitscreen do
-		local smbmsb = smbspritebatch[split]
-		local portalmsb = portalspritebatch[split]
-		local custommsb
-		if customtiles then
-			custommsb = customspritebatch[split]
-		end
-		smbmsb:clear()
-		portalmsb:clear()
-		if customtiles then
-			for i = 1, #custommsb do
-				custommsb[i]:clear()
-			end
-		end
-		
-		local xscroll, yscroll = splitxscroll[split], splityscroll[split]
+	local split = 1
 
-		local xfromdraw,xtodraw, yfromdraw,ytodraw, xoff,yoff = getdrawrange(xscroll,yscroll,"spritebatch")
-		
-		local lmap = map
-		
-		for y = yfromdraw, ytodraw do
-			for x = xfromdraw, xtodraw do
-				local bounceyoffset = 0
-				
-				local draw = true
-				if getblockbounce(x, y) then
-					draw = false
-				end
-				if draw == true then
-					if (not lmap[x]) then
-						print("spritebatch tile doesnt exist " .. x)
-					else
-						local t = lmap[x][y]
-						
-						if t then
-							local tilenumber = t[1]
-							if tilenumber ~= 0 and tilequads[tilenumber].invisible == false and tilequads[tilenumber].coinblock == false and tilequads[tilenumber].coin == false 
-								and (not tilequads[tilenumber].foreground) and ((not _3DMODE) or tilequads[tilenumber].collision) then
-								if math.floor(tilenumber) <= smbtilecount then
-									smbmsb:add( tilequads[tilenumber].quad, (x-1-xoff)*16*scale, ((y-1-yoff)*16-8)*scale, 0, scale, scale )
-								elseif tilenumber <= smbtilecount+portaltilecount then
-									portalmsb:add( tilequads[tilenumber].quad, (x-1-xoff)*16*scale, ((y-1-yoff)*16-8)*scale, 0, scale, scale )
-								elseif tilenumber <= smbtilecount+portaltilecount+customtilecount then
-									custommsb[tilequads[tilenumber].ts]:add( tilequads[tilenumber].quad, (x-1-xoff)*16*scale, ((y-1-yoff)*16-8)*scale, 0, scale, scale )
-								end
+	local smbmsb = smbspritebatch[1]
+	local portalmsb = portalspritebatch[1]
+	local custommsb
+	if customtiles then
+		custommsb = customspritebatch[1]
+	end
+	smbmsb:clear()
+	portalmsb:clear()
+	if customtiles then
+		for i = 1, #custommsb do
+			custommsb[i]:clear()
+		end
+	end
+	
+	local smbmbacksb = smbspritebatch[2]
+	local portalmbacksb = portalspritebatch[2]
+	local custommbacksb
+	if customtiles then
+		custommbacksb = customspritebatch[2]
+	end
+	smbmbacksb:clear()
+	portalmbacksb:clear()
+	if customtiles then
+		for i = 1, #custommbacksb do
+			custommbacksb[i]:clear()
+		end
+	end
+	
+	local xscroll, yscroll = splitxscroll[split], splityscroll[split]
+
+	local xfromdraw,xtodraw, yfromdraw,ytodraw, xoff,yoff = getdrawrange(xscroll,yscroll,"spritebatch")
+	
+	local lmap = map
+	
+	for y = yfromdraw, ytodraw do
+		for x = xfromdraw, xtodraw do
+			local bounceyoffset = 0
+			
+			local draw = true
+			if getblockbounce(x, y) then
+				draw = false
+			end
+			if draw == true then
+				if (not lmap[x]) then
+					print("spritebatch tile doesnt exist " .. x)
+				else
+					local t = lmap[x][y]
+					
+					if t then
+						local tilenumber = t[1]
+						if tilenumber ~= 0 and tilequads[tilenumber].invisible == false and tilequads[tilenumber].coinblock == false and tilequads[tilenumber].coin == false 
+							and (not tilequads[tilenumber].foreground) and ((not _3DMODE) or tilequads[tilenumber].collision) then
+							if math.floor(tilenumber) <= smbtilecount then
+								smbmsb:add( tilequads[tilenumber].quad, (x-1-xoff)*16*scale, ((y-1-yoff)*16-8)*scale, 0, scale, scale )
+							elseif tilenumber <= smbtilecount+portaltilecount then
+								portalmsb:add( tilequads[tilenumber].quad, (x-1-xoff)*16*scale, ((y-1-yoff)*16-8)*scale, 0, scale, scale )
+							elseif tilenumber <= smbtilecount+portaltilecount+customtilecount then
+								custommsb[tilequads[tilenumber].ts]:add( tilequads[tilenumber].quad, (x-1-xoff)*16*scale, ((y-1-yoff)*16-8)*scale, 0, scale, scale )
 							end
+						end
+					end
+				end
+			end
+			
+
+			if bmap_on then
+				if lmap[x] and lmap[x][y] then
+					local backgroundtile = bmapt(x, y, 1)
+					if backgroundtile and tilequads[backgroundtile] and not tilequads[backgroundtile].invisible then
+						if math.floor(backgroundtile) <= smbtilecount then
+							smbmbacksb:add( tilequads[backgroundtile].quad, (x-1-xoff)*16*scale, ((y-1-yoff)*16-8)*scale, 0, scale, scale )
+						elseif backgroundtile <= smbtilecount+portaltilecount then
+							portalmbacksb:add( tilequads[backgroundtile].quad, (x-1-xoff)*16*scale, ((y-1-yoff)*16-8)*scale, 0, scale, scale )
+						elseif backgroundtile <= smbtilecount+portaltilecount+customtilecount then
+							custommbacksb[tilequads[backgroundtile].ts]:add( tilequads[backgroundtile].quad, (x-1-xoff)*16*scale, ((y-1-yoff)*16-8)*scale, 0, scale, scale )
 						end
 					end
 				end
@@ -5016,7 +5088,7 @@ function updatespritebatch()
 	queuespritebatchupdate = false
 end
 
-function game_keypressed(key, unicode)
+function game_keypressed(key, textinput)
 	if pausemenuopen then
 		if menuprompt then
 			if (key == "left" or key == "a") then
@@ -7858,6 +7930,9 @@ end
 
 function checkkey(s,i,n)
 	if s[1] == "joy" then
+		if android and androidButtonDown(i,n) then
+			return true
+		end
 		if s[3] == "hat" then
 			if string.match(love.joystick.getHat(s[2], s[4]), s[5]) then
 				return true
@@ -7885,32 +7960,48 @@ function checkkey(s,i,n)
 				end
 			end
 		end
-	elseif s[1] and android then
-		return androidButtonDown(i,n)
 	elseif s[1] then
 		if love.keyboard.isDown(s[1]) then
 			return true
+		elseif android then
+			return androidButtonDown(i,n)
 		else 
 			return false
 		end
 	end
 end
 
-function game_joystickpressed( joystick, button )	
+function game_joystickpressed( joystick, button )
+	--pause with controller
+	for i = 1, players do
+		local s = controls[i]["pause"]
+		if s and s[1] == "joy" and joystick == s[2] and s[3] == "but" and button == s[4] then
+			game_keypressed("escape")
+			break
+		end
+	end
+
 	if pausemenuopen then
-		local s1 = controls[1]["jump"]
-		if s1[1] == "joy" and joystick == tonumber(s1[2]) and s1[3] == "but" and button == tonumber(s1[4]) then
-			game_keypressed("return")
+		--select pause options
+		for i = 1, players do
+			local s1 = controls[i]["jump"]
+			local s2 = controls[i]["pause"]
+			if (s2 and s2[1] == "joy") or i == 1 then
+				if s1[1] == "joy" and joystick == tonumber(s1[2]) and s1[3] == "but" and button == tonumber(s1[4]) then
+					game_keypressed("return")
+				end
+			end
 		end
 		return
 	end
+
 	if endpressbutton then
 		endgame()
 		return
 	end
 	
 	for i = 1, players do
-		if (not noupdate) and objects["player"][i].controlsenabled then --and (not objects["player"][i].vine) and (not objects["player"][i].fence) then
+		if (not noupdate) and objects and objects["player"][i].controlsenabled then --and (not objects["player"][i].vine) and (not objects["player"][i].fence) then
 			if editormode and (editormenuopen or rightclickmenuopen) then
 				break
 			end
@@ -7925,6 +8016,7 @@ function game_joystickpressed( joystick, button )
 			local s8 = controls[i]["portal2"]
 			local s9 = controls[i]["up"]
 			local s10 = controls[i]["down"]
+
 			if s1[1] == "joy" and joystick == tonumber(s1[2]) and s1[3] == "but" and button == tonumber(s1[4]) then
 				objects["player"][i]:button("jump")
 				objects["player"][i]:wag()
@@ -7999,41 +8091,47 @@ end
 
 function game_joystickreleased( joystick, button )
 	for i = 1, players do
-		local s1 = controls[i]["jump"]
-		local s2 = controls[i]["run"]
-		local s3 = controls[i]["reload"]
-		local s4 = controls[i]["use"]
-		local s5 = controls[i]["left"]
-		local s6 = controls[i]["right"]
-		local s7 = controls[i]["portal1"]
-		local s8 = controls[i]["portal2"]
-		local s9 = controls[i]["up"]
-		local s10 = controls[i]["down"]
-		if s1[1] == "joy" and joystick == tonumber(s1[2]) and s1[3] == "but" and button == tonumber(s1[4]) then
-			objects["player"][i]:buttonrelease("jump")
-			objects["player"][i]:stopjump()
-			animationsystem_buttonreleasetrigger(i, "jump") return
-		elseif s2[1] == "joy" and joystick == s2[2] and s2[3] == "but" and button == s2[4] then
-			objects["player"][i]:buttonrelease("run")
-			animationsystem_buttonreleasetrigger(i, "run") return
-		elseif s3[1] == "joy" and joystick == s3[2] and s3[3] == "but" and button == s3[4] then
-			objects["player"][i]:buttonrelease("reload")
-			animationsystem_buttonreleasetrigger(i, "reload") return
-		elseif s4[1] == "joy" and joystick == s4[2] and s4[3] == "but" and button == s4[4] then
-			objects["player"][i]:buttonrelease("use")
-			animationsystem_buttonreleasetrigger(i, "use") return
-		elseif s5[1] == "joy" and joystick == s5[2] and s5[3] == "but" and button == s5[4] then
-			objects["player"][i]:buttonrelease("left")
-			animationsystem_buttonreleasetrigger(i, "left") return
-		elseif s6[1] == "joy" and joystick == s6[2] and s6[3] == "but" and button == s6[4] then
-			objects["player"][i]:buttonrelease("right")
-			animationsystem_buttonreleasetrigger(i, "right") return
-		elseif s9[1] == "joy" and joystick == s9[2] and s9[3] == "but" and button == s9[4] then
-			objects["player"][i]:buttonrelease("up")
-			animationsystem_buttonreleasetrigger(i, "up") return
-		elseif s10[1] == "joy" and joystick == s10[2] and s10[3] == "but" and button == s10[4] then
-			objects["player"][i]:buttonrelease("down")
-			animationsystem_buttonreleasetrigger(i, "down") return
+		if (not noupdate) and objects["player"][i].controlsenabled then --and (not objects["player"][i].vine) and (not objects["player"][i].fence) then
+			if editormode and (editormenuopen or rightclickmenuopen) then
+				break
+			end
+			
+			local s1 = controls[i]["jump"]
+			local s2 = controls[i]["run"]
+			local s3 = controls[i]["reload"]
+			local s4 = controls[i]["use"]
+			local s5 = controls[i]["left"]
+			local s6 = controls[i]["right"]
+			local s7 = controls[i]["portal1"]
+			local s8 = controls[i]["portal2"]
+			local s9 = controls[i]["up"]
+			local s10 = controls[i]["down"]
+			if s1[1] == "joy" and joystick == tonumber(s1[2]) and s1[3] == "but" and button == tonumber(s1[4]) then
+				objects["player"][i]:buttonrelease("jump")
+				objects["player"][i]:stopjump()
+				animationsystem_buttonreleasetrigger(i, "jump") return
+			elseif s2[1] == "joy" and joystick == s2[2] and s2[3] == "but" and button == s2[4] then
+				objects["player"][i]:buttonrelease("run")
+				animationsystem_buttonreleasetrigger(i, "run") return
+			elseif s3[1] == "joy" and joystick == s3[2] and s3[3] == "but" and button == s3[4] then
+				objects["player"][i]:buttonrelease("reload")
+				animationsystem_buttonreleasetrigger(i, "reload") return
+			elseif s4[1] == "joy" and joystick == s4[2] and s4[3] == "but" and button == s4[4] then
+				objects["player"][i]:buttonrelease("use")
+				animationsystem_buttonreleasetrigger(i, "use") return
+			elseif s5[1] == "joy" and joystick == s5[2] and s5[3] == "but" and button == s5[4] then
+				objects["player"][i]:buttonrelease("left")
+				animationsystem_buttonreleasetrigger(i, "left") return
+			elseif s6[1] == "joy" and joystick == s6[2] and s6[3] == "but" and button == s6[4] then
+				objects["player"][i]:buttonrelease("right")
+				animationsystem_buttonreleasetrigger(i, "right") return
+			elseif s9[1] == "joy" and joystick == s9[2] and s9[3] == "but" and button == s9[4] then
+				objects["player"][i]:buttonrelease("up")
+				animationsystem_buttonreleasetrigger(i, "up") return
+			elseif s10[1] == "joy" and joystick == s10[2] and s10[3] == "but" and button == s10[4] then
+				objects["player"][i]:buttonrelease("down")
+				animationsystem_buttonreleasetrigger(i, "down") return
+			end
 		end
 	end
 end
@@ -8264,6 +8362,7 @@ function placeblock(x, y, side)
 	end
 	
 	if #checkrect(x-1, y-1, 1, 1, "all") == 0 then
+		if map[x][y] == emptytile then map[x][y] = deepcopy(emptytile) end
 		map[x][y][1] = tileno
 		objects["tile"][tilemap(x, y)] = tile:new(x-1, y-1, 1, 1, true)
 		generatespritebatch()
@@ -9188,6 +9287,23 @@ function getdrawrange(xscroll,yscroll,spritebatch)
 		end
 	end
 	return xfromdraw,xtodraw, yfromdraw,ytodraw, xoff,yoff
+end
+
+function setscreenzoom(z)
+	if z ~= 1 or (screenzoom and screenzoom ~= 1) then
+		for i = 1, #smbspritebatch do
+			smbspritebatch[i]:setBufferSize(math.max(maxtilespritebatchsprites,width*height+width+height+1))
+			portalspritebatch[i]:setBufferSize(math.max(maxtilespritebatchsprites,width*height+width+height+1))
+			if customtiles then
+				for i2 = 1, #customtilesimg do
+					customspritebatch[i][i2]:setBufferSize(math.max(maxtilespritebatchsprites,width*height+width+height+1))
+				end
+			end
+		end
+	end
+	
+	screenzoom = z
+	screenzoom2 = 1/screenzoom
 end
 -------------------
 --DAILY CHALLENGE--

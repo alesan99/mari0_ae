@@ -56,12 +56,11 @@ if debugconsole then debuginputon = true; debuginput = "print()"; print("DEBUG O
 local debugGraph,fpsGraph,memGraph,drawGraph
 local debugGraphs = false
 
-VERSION = 13.0118
-VERSIONSTRING = "13d"
+VERSION = 13.0122
+VERSIONSTRING = "13d (7/24/21)"
 
 android = (love.system.getOS() == "Android" or love.system.getOS() == "iOS") --[DROID]
 androidtest = false--testing android on pc
---local antiandroidkeyrepeat = false --fucking stupid android keyboards
 
 local updatesoundlist
 
@@ -93,7 +92,6 @@ local loadingbardraw = function(add)
 	loadingbarv = loadingbarv + (add)/(8)
 	love.graphics.setColor(255,255,255)
 	love.graphics.rectangle("fill", 0, (height*16-3)*scale, (width*16*loadingbarv)*scale, 3*scale)
-
 	love.graphics.pop()
 	love.graphics.present()
 end
@@ -276,9 +274,6 @@ function love.load()
 	JSON = require "JSON"
 	require "notice"
 	require "languages"
-	if debugGraphs then
-		debugGraph = require "libs/debugGraph"
-	end
 	
 	local luas = {"intro", "menu", "levelscreen", "game", "editor", "physics", "online", "quad", "animatedquad", "entity", "dailychallenge",
 				"portalwall", "tile", "mario", "mushroom", "hatconfigs", "flower", "star", "coinblockanimation",
@@ -1019,7 +1014,7 @@ function love.load()
 	end
 
 	--mouse cursors
-	if (not android) then--fuck you love2d android, just fucking these instead of crashing
+	if (not android) and (not androidsafe) then--fuck you love2d android, just fucking these instead of crashing
 		mousecursor_hand = love.mouse.getSystemCursor("hand")
 		mousecursor_sizewe = love.mouse.getSystemCursor("sizewe")
 	end
@@ -1032,6 +1027,7 @@ function love.load()
 
 	--debug graphs
 	if debugGraphs then
+		debugGraph = require "libs/debugGraph"
 		fpsGraph = debugGraph:new('fps', 0, 0)
 		memGraph = debugGraph:new('mem', 0, 30)
 		drawGraph = debugGraph:new('custom', 0, 60)
@@ -1084,10 +1080,6 @@ function love.update(dt)
 	elseif frameadvance == 2 then
 		frameadvance = 1
 	end
-	
-	--[[if android then
-		antiandroidkeyrepeat = false
-	end]]
 
 	if jsonerrorwindow.opened and jsonerrorwindow:update(dt) then
 		
@@ -1745,7 +1737,7 @@ function defaultconfig()
 	controls = {}
 	
 	local i = 1
-	controlstable = {"left", "right", "up", "down", "run", "jump", "reload", "use", "aimx", "aimy", "portal1", "portal2"}
+	controlstable = {"left", "right", "up", "down", "run", "jump", "reload", "use", "aimx", "aimy", "portal1", "portal2", "pause"}
 	controls[i] = {}
 	controls[i]["right"] = {"d"}
 	controls[i]["left"] = {"a"}
@@ -1759,7 +1751,7 @@ function defaultconfig()
 	controls[i]["portal2"] = {""}
 	controls[i]["reload"] = {"r"}
 	controls[i]["use"] = {"e"}
-	controls[i]["pause"] = {"escape"}
+	controls[i]["pause"] = {""}
 	
 	for i = 2, 4 do
 		controls[i] = {}		
@@ -2103,13 +2095,6 @@ function love.keypressed(key, scancode, isrepeat, textinput)
 			return
 		end
 	end
-	
-	--[[if android then 
-		if key == antiandroidkeyrepeat then
-			--return (this is prevented in the gui)
-		end
-		antiandroidkeyrepeat = key
-	end]]
 
 	if jsonerrorwindow.opened then
 		jsonerrorwindow:keypressed(key)
@@ -2174,7 +2159,7 @@ function love.keypressed(key, scancode, isrepeat, textinput)
 		
 		menu_keypressed(key, unicode)
 	elseif gamestate == "game" then
-		game_keypressed(key, unicode)
+		game_keypressed(key, textinput)
 	elseif gamestate == "levelscreen" or gamestate == "gameover" then
 		levelscreen_keypressed(key)
 	elseif gamestate == "intro" then
@@ -2192,7 +2177,7 @@ function love.keyreleased(key, unicode)
 end
 
 function love.textinput(c)
-	if android and not androidtest then --[[DROID]]
+	if android --[[and not androidtest]] then --[[DROID]]
 		love.keypressed(c,nil,nil,"textinput")
 	else
 		if debugconsole and debuginputon then
@@ -2301,9 +2286,7 @@ function love.mousereleased(x, y, button, istouch)
 	if gamestate == "menu" or gamestate == "options" or gamestate == "mappackmenu" then
 		menu_mousereleased(x, y, button)
 	elseif gamestate == "game" then
-		if (not android) or editormode then
-			game_mousereleased(x, y, button)
-		end
+		game_mousereleased(x, y, button)
 	end
 	
 	if ignoregui then
@@ -2398,8 +2381,11 @@ function love.keyboard.isDown(k)
 	return oldkeyboard_isDown(k)
 end
 
-function love.joystickpressed(joystick, button)
-	local joystick = joystick:getID()
+function love.joystickpressed(joystick, button, simulated)
+	local joystick = joystick
+	if not simulated then
+		joystick = joystick:getID()
+	end
 	
 	if keyprompt then
 		keypromptenter("joybutton", joystick, button)
@@ -2415,8 +2401,11 @@ function love.joystickpressed(joystick, button)
 	end
 end
 
-function love.joystickreleased(joystick, button)
-	local joystick = joystick:getID()
+function love.joystickreleased(joystick, button, simulated)
+	local joystick = joystick
+	if not simulated then
+		joystick = joystick:getID()
+	end
 	
 	if gamestate == "menu" or gamestate == "options" then
 		menu_joystickreleased(joystick, button)
@@ -2447,6 +2436,18 @@ function love.joystick.getAxis(i, j) --id, axis
 		return getjoysticki(i):getAxis(j)
 	else
 		return 0 --workaround for annoying joystick bug
+	end
+end
+function love.joystickadded(joystick)
+	if android and notice then
+		if joystick:isGamepad() then
+			local gamepadName = joystick:getName()
+			if gamepadName then
+				notice.new(string.format("%s connected!", gamepadName), notice.white)
+			else
+				notice.new(string.format("Unknown gamepad connected!", gamepadName), notice.white)
+			end
+		end
 	end
 end
 function love.joystick.isDown(i, b)
@@ -3511,10 +3512,21 @@ function loadnitpicks()
 		HITBOXDEBUG = t.viewhitboxes
 		if t.pcversion then
 			android = false
+			androidsafe = true
+		end
+		if t.hideandroidbuttons then
+			androidHIDE = true
 		end
 		if t.androidversion then
 			android = t.androidversion
 			androidtest = true
+			changescale(scale, fullscreen)
+		end
+		if t.debugGraphs then
+			debugGraphs = t.debugGraphs
+		end
+		if t.console then
+			if love._openConsole then love._openConsole() end
 		end
 	end
 end

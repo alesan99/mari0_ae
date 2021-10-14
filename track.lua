@@ -50,6 +50,7 @@ function track:init(x, y, r)
 	end
 	for i = 1, #self.path do
 		local t = self.path[i]
+		if map[t[1]][t[2]] == emptytile then map[t[1]][t[2]] = shallowcopy(emptytile) end
 		map[t[1]][t[2]]["track"] = {start=t[3], ending=t[4], grab=t[5]}
 		if self.visible == false then
 			map[t[1]][t[2]]["track"].invisible = true

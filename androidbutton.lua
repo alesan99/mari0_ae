@@ -107,10 +107,10 @@ end
 
 function touchButton:update(dt)
 	--Check if it should be active
-	if self.hide then
+	if self.hide or jsonerrorwindow.opened then
 		self.active = false
 	elseif self.editor then
-		self.active = editormode and (not editormenuopen) and ((not HIDEANDROIDBUTTONS) or self.hideButton)
+		self.active = editormode and (not editormenuopen) and ((not HIDEANDROIDBUTTONS) or self.hideButton) and ((not self.editorTool) or ANDROIDSHOWTOOLS)
 	elseif self.portal then
 		if objects and objects["player"] and objects["player"][self.player].portalgun then
 			self.active = ((not editormode) or (((not editormenuopen) and editorstate == "portalgun") and (not HIDEANDROIDBUTTONS)))
@@ -121,7 +121,8 @@ function touchButton:update(dt)
 		self.active = (gamestate == "game") and ((not editormode) or (not editormenuopen) and (autoscroll and (not HIDEANDROIDBUTTONS)))
 	else
 		self.active = ((not editormode) or ((not editormenuopen) and (not (self.autoscrollGone and (not autoscroll))) and (not HIDEANDROIDBUTTONS)) or self.i == "start")
-			and (not (self.gameOnly and gamestate ~= "game")) and (not (self.multiplayerOnly and players <= 1))
+			and (not (self.gameOnly and gamestate ~= "game"))
+			and (not (self.multiplayerOnly and (players <= 1 or (SERVER or CLIENT) or players < self.playeri)))
 	end
 end
 
@@ -159,13 +160,15 @@ function touchButton:press(id,x,y)
 				if gamestate == "game" then
 					touchRunLock = not touchRunLock
 				end
-			else
-				--[[if controls[self.player][self.i][1] == "joy" then
+			elseif controls[self.player][self.i][1] then
+				if controls[self.player][self.i][1] == "joy" then
 					local c = controls[self.player][self.i]
-					game_joystickpressed(c[2],c[4])
-				else]]
+					if c[3] == "but" then
+						love.joystickpressed(c[2],c[4],"simulated")
+					end
+				else
 					love.keypressed(controls[self.player][self.i][1])
-				--end
+				end
 			end
 		end
 		if self.mousebut then
@@ -193,8 +196,15 @@ function touchButton:release(id,x,y)
 					love.keyreleased("return")
 				end
 			elseif self.i == "runlock" then
-			else
-				love.keyreleased(controls[self.player][self.i][1])
+			elseif controls[self.player][self.i][1] then
+				if controls[self.player][self.i][1] == "joy" then
+					local c = controls[self.player][self.i]
+					if c[3] == "but" then
+						love.joystickreleased(c[2],c[4],"simulated")
+					end
+				else
+					love.keyreleased(controls[self.player][self.i][1])
+				end
 			end
 		end
 		if self.mousebut then

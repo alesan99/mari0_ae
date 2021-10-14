@@ -1757,6 +1757,19 @@ table.insert(toenter, {name = "launchplayer",
 	}
 })
 
+table.insert(toenter, {name = "setplayerlight", 
+	t = {
+		t="action",
+		nicename="set player light:",
+		entries={
+			{
+				t="numinput",
+				default="3.5",
+			},
+		}
+	}
+})
+
 --SORT ALPHABETICALLY (I didn't even know you could greater/less compare strings.)
 table.sort(toenter, function(a, b) return a.t.nicename < b.t.nicename end)
 
@@ -2087,10 +2100,10 @@ function animationguiline:movedown()
 	movedownanimationguiline(self.type, self)
 end
 
-function animationguiline:keypressed(key)
+function animationguiline:keypressed(key, textinput)
 	for i = 1, #self.elements do
 		if self.elements[i].gui then
-			self.elements[i].gui:keypress(key)
+			self.elements[i].gui:keypress(key, textinput)
 		end
 	end
 end

@@ -921,3 +921,5 @@ for k = 0, maxsublevels do
 end
 
 maxtilespritebatchsprites = 1000
+
+emptytile = {1,gels={}}

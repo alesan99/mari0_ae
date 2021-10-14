@@ -1,18 +1,31 @@
 require "androidbutton"
 local buttons = {}
 
+local touchClicking = true --is clicking allowed (ex: it shouldn't be allowed during gameplay, because there's dedicated clicking buttons)
+
 local controllingPlayer = 1
 local androidSetPlayer
 
+local resettools = function()
+	ANDROIDRIGHTCLICK = false
+	eyedroppertool = false
+	paintbuckettool = false
+	replacetool = false
+end
 local editorButtons = {
-	{function() HIDEANDROIDBUTTONS = not HIDEANDROIDBUTTONS end, function() return HIDEANDROIDBUTTONS end},
-	{function() editentities = false; currenttile = 1 end},
-	{function() editentities = true; currenttile = 1 end},
-	{function() ANDROIDRIGHTCLICK = not ANDROIDRIGHTCLICK end, function() return ANDROIDRIGHTCLICK end},
-	{function() backgroundtilemode = not backgroundtilemode end, function() return backgroundtilemode end},
-	{function() undo_undo() end}
+	{function() HIDEANDROIDBUTTONS = not HIDEANDROIDBUTTONS end, function() return HIDEANDROIDBUTTONS end,1},
+	{function() editentities = false; currenttile = 1 end,nil,2},
+	{function() editentities = true; currenttile = 1 end,nil,3},
+	{function() ANDROIDRIGHTCLICK = not ANDROIDRIGHTCLICK end, function() return ANDROIDRIGHTCLICK end,4},
+	{function() ANDROIDSHOWTOOLS = not ANDROIDSHOWTOOLS end, function() return ANDROIDSHOWTOOLS end,11},
+	{function() undo_undo() end,nil,6},
 }
-
+local editorToolButtons = {
+	{function() local old = eyedroppertool; resettools(); eyedroppertool = not old end, function() return eyedroppertool end, 7},
+	{function() local old = paintbuckettool; resettools(); paintbuckettool = not old end, function() return paintbuckettool end, 8},
+	{function() local old = replacetool; resettools(); replacetool = not old end, function() return replacetool end, 9},
+	{function() backgroundtilemode = not backgroundtilemode end, function() return backgroundtilemode end,5},
+}
 
 local skin, skinData, skinImg, skinSpriteBatch
 androidLowRes = false
@@ -21,6 +34,10 @@ function androidLoad()
 	--Skin
 	local skinjsonfile = "android/skin.json"
 	local skinimgfile = "android/skin.png"
+	if love.filesystem.exists("alesans_entities/skin.zip") then
+		local success = love.filesystem.mount("alesans_entities/skin.zip", "alesans_entities", true)
+	end
+
 	if love.filesystem.exists("alesans_entities/skin.json") then
 		skinjsonfile = "alesans_entities/skin.json"
 	end
@@ -89,17 +106,27 @@ function androidLoad()
 	end
 	local bx, by, bw, bh = t["editor"][1],t["editor"][2],t["editor"][3],t["editor"][4]
 	for i = 1, #editorButtons do
-		buttons["editor" .. i] = touchButton:new(editorButtons[i][1], {editorButtonsimg,editorButtonsq[i]}, bx+(bw+2)*(i-1), by, bw, bh)
+		local t = editorButtons[i]
+		buttons["editor" .. i] = touchButton:new(t[1], {editorButtonsimg,editorButtonsq[math.min(#editorButtonsq,t[3] or i)]}, bx+(bw+2)*(i-1), by, bw, bh)
 		buttons["editor" .. i].editor = true
 		if i == 1 then
 			buttons["editor" .. i].hideButton = true
 		end
-		if editorButtons[i][2] then
-			buttons["editor" .. i].highlightFunc = editorButtons[i][2]
+		if t[2] then
+			buttons["editor" .. i].highlightFunc = t[2]
+		end
+	end
+	for i = 1, #editorToolButtons do
+		local t = editorToolButtons[i]
+		buttons["editorTool" .. i] = touchButton:new(t[1], {editorButtonsimg,editorButtonsq[math.min(#editorButtonsq,t[3] or i)]}, bx+(bw+2)*(5-1), by+(bh+2)*i, bw, bh)
+		buttons["editorTool" .. i].editor = true
+		buttons["editorTool" .. i].editorTool = true
+		if t[2] then
+			buttons["editorTool" .. i].highlightFunc = t[2]
 		end
 	end
 
-	--[[Multiplayer
+	--Multiplayer
 	for i = 1, 4 do
 		buttons["player" .. i] = touchButton:new(function() androidSetPlayer(i) end, i, bx+(bw+1)*(i-1), by, bw, bh)
 		buttons["player" .. i].playeri = i
@@ -107,12 +134,29 @@ function androidLoad()
 		buttons["player" .. i].drawText = true
 		buttons["player" .. i].multiplayerOnly = true
 		buttons["player" .. i].gameOnly = true
-	end]]
+	end
 end
 
 function androidUpdate(dt)
+	if androidHIDE then
+		return false
+	end
 	for i, b in pairs(buttons) do
 		b:update(dt)
+	end
+
+	--is clicking allowed?
+	touchClicking = true
+	if gamestate == "game" and (not editormode) then
+		--if playertype == "minecraft" or playertype == "gelcannon" then
+			touchClicking = false
+		--end
+	end
+
+	--return to player 1
+	if gamestate ~= "game" and controllingPlayer ~= 1 then
+		controllingPlayer = 1
+		buttons["player1"].i()
 	end
 
 	--update portal colors
@@ -125,6 +169,10 @@ end
 local lastTouchX, lastTouchY = 0,0
 local lastReleaseX, lastReleaseY = 0,0
 function androidDraw()
+	if androidHIDE then
+		return false
+	end
+
 	if not androidLowRes then
 		love.graphics.push()
 		if resizable and letterboxfullscreen then
@@ -251,7 +299,7 @@ function love.touchpressed(id, x, y, dx, dy, pressure)
 	mouseTouchX = ox
 	mouseTouchY = oy
 	mouseTouchId = id
-	if not (gamestate == "game" and (not editormode) and objects and objects["player"][controllingPlayer].portalgun) then
+	if touchClicking then
 		--make sure buttons are aware of the change before "clicking"
 		for i, v in pairs(guielements) do
 			v:update(0)
@@ -270,12 +318,14 @@ function love.touchmoved(id, x, y, dx, dy, pressure)
 	if mouseTouchId == id and ((not touches[id]) or touchesStillDrag[id]) then
 		mouseTouchX = ox
 		mouseTouchY = oy
-		love.mousemoved(x,y,realdx,realdy,"simulated")
+		if touchClicking then
+			love.mousemoved(x,y,realdx,realdy,"simulated")
+		end
 	end
 
 	--Slide finger to different button
 	local button1 = getButton(id, x, y)
-	if button1 and (not button1.held) then
+	if button1 and (not button1.held) and button1.editor == false then
 		for i, b in pairs(buttons) do
 			if b.id == id then
 				b:release(id,x,y)
@@ -316,8 +366,10 @@ function love.touchreleased(id, x, y, dx, dy, pressure)
 		mouseTouchX = ox
 		mouseTouchY = oy
 		mouseTouchId = false
-		love.mousereleased(x,y,1,"simulated")
-		--lastReleaseX, lastReleaseY = x,y
+		if touchClicking then
+			love.mousereleased(x,y,1,"simulated")
+			--lastReleaseX, lastReleaseY = x,y
+		end
 	end
 end
 
@@ -332,12 +384,18 @@ function androidButtonDown(i,n)
 end
 
 function androidMouseDown(b)
-	if mouseTouchId then
+	if mouseTouchId and touchClicking then
 		if ANDROIDRIGHTCLICK and b == 2 then
 			return true
 		elseif b == 1 then
 			return true
 		end
+	end
+	if b == 1 and buttons["portal1"].held then
+		return true
+	end
+	if b == 2 and buttons["portal2"].held then
+		return true
 	end
 	return false
 end

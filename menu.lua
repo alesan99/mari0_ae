@@ -301,7 +301,7 @@ function menu_update(dt)
 		local s3 = controls[1]["down"]
 		local s4 = controls[1]["up"]
 		if s1[1] == "joy" then
-			if checkkey(s1) then
+			if checkkey(s1,1,"right") then
 				if not oldjoystick[1] then
 					menu_keypressed("right")
 					oldjoystick[1] = true
@@ -311,7 +311,7 @@ function menu_update(dt)
 			end
 		end
 		if s2[1] == "joy" then
-			if checkkey(s2) then
+			if checkkey(s2,1,"left") then
 				if not oldjoystick[2] then
 					menu_keypressed("left")
 					oldjoystick[2] = true
@@ -321,7 +321,7 @@ function menu_update(dt)
 			end
 		end
 		if s3[1] == "joy" then
-			if checkkey(s3) then
+			if checkkey(s3,1,"down") then
 				if not oldjoystick[3] then
 					menu_keypressed("down")
 					oldjoystick[3] = true
@@ -331,7 +331,7 @@ function menu_update(dt)
 			end
 		end
 		if s4[1] == "joy" then
-			if checkkey(s4) then
+			if checkkey(s4,1,"up") then
 				if not oldjoystick[4] then
 					menu_keypressed("up")
 					oldjoystick[4] = true
@@ -507,7 +507,7 @@ function menu_draw()
 		love.graphics.draw(titleimage, titlequad[titleframe], x*scale, 24*scale, 0, scale, scale)
 		
 		love.graphics.setColor(255, 255, 255)
-		properprintF("©2012-2020 maurice", (x+titlewidth-144)*scale, 112*scale)
+		properprintF("©2012-2021 maurice", (x+titlewidth-144)*scale, 112*scale)
 		love.graphics.setColor(255, 255, 255, 255)
 		
 		if selection == 0 then
@@ -1064,19 +1064,19 @@ function menu_draw()
 						love.graphics.setColor(100, 100, 100, 255)
 					end
 					
-					properprintF(TEXT[controlstable[i]], 30*scale, (70+(i-1)*12)*scale)
+					properprintF(TEXT[controlstable[i]], 30*scale, (70+(i-1)*11)*scale)
 					
 					local s = ""
 					
 					if controls[skinningplayer][controlstable[i]] then
 						for j = 1, #controls[skinningplayer][controlstable[i]] do
-							s = s .. controls[skinningplayer][controlstable[i]][j]
+							s = s .. tostring(controls[skinningplayer][controlstable[i]][j])
 						end
 					end
 					if s == " " then
 						s = "space"
 					end
-					properprint(s, 120*scale, (70+(i-1)*12)*scale)
+					properprint(s, 120*scale, (70+(i-1)*11)*scale)
 				end
 			end
 				
@@ -1438,11 +1438,13 @@ function menu_draw()
 				properprintF("alesans_e..", (180-28)*scale, 180*scale)
 			end
 			
-			love.graphics.setColor(100, 100, 100, 255)
-			properprintF(TEXT["lock mouse with f12"], 30*scale, 195*scale)
+			--love.graphics.setColor(100, 100, 100, 255)
+			--properprintF(TEXT["lock mouse with f12"], 30*scale, 195*scale)
 			
 			love.graphics.setColor(255, 255, 255, 255)
-			properprintF("alesan99's entities v" .. VERSIONSTRING, (236-(#("alesan99's entities v" .. VERSIONSTRING)*8))*scale, 207*scale)
+			properprintF("alesan99's entities", 30*scale, 198*scale)
+			local version = "Version " .. VERSIONSTRING
+			properprintF(version, (234-(#(version)*8))*scale, 207*scale)
 		elseif optionstab == 4 then
 			love.graphics.setColor(255, 255, 255, 255)
 			if not gamefinished then
@@ -2419,7 +2421,7 @@ function menu_keypressed(key, unicode)
 		elseif (key == "down" or key == "s") then
 			if optionstab == 1 then
 				if skinningplayer ~= mouseowner then
-					if optionsselection < 15 then
+					if optionsselection < 16 then
 						optionsselection = optionsselection + 1
 					else
 						optionsselection = 1
@@ -2461,7 +2463,7 @@ function menu_keypressed(key, unicode)
 			else
 				if optionstab == 1 then
 					if skinningplayer ~= mouseowner then
-						optionsselection = 15
+						optionsselection = 16
 					else
 						optionsselection = 11
 					end
@@ -3003,7 +3005,7 @@ function keypromptenter(t, ...)
 	end
 	buttonerror = false
 	axiserror = false
-	local buttononly = {"run", "jump", "reload", "use", "portal1", "portal2"}
+	local buttononly = {"run", "jump", "reload", "use", "portal1", "portal2", "pause"}
 	local axisonly = {"aimx", "aimy"}
 	if t ~= "key" or arg[1] ~= "escape" then
 		if t == "key" then

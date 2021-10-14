@@ -279,6 +279,7 @@ function enemy:init(x, y, t, a, properties)
 	self.starty = self.y
 	self.startactive = self.active
 	self.startdrawable = self.drawable
+	self.startkillsenemies = self.killsenemies
 	
 	self.spawnallow = true
 	self.spawnedenemies = {}
@@ -1963,30 +1964,47 @@ function enemy:update(dt)
 
 	--Check if player is near
 	if self.transforms and (self:gettransformtrigger("playernear") or self:gettransformtrigger("playernotnear")) then
+		local check = false
 		if type(self.playerneardist) == "number" then
 			for i = 1, players do
 				local v = objects["player"][i]
-				if inrange(v.x+v.width/2, self.x+self.width/2-(self.playerneardist or 3), self.x+self.width/2+(self.playerneardist or 3)) then
-					if self:gettransformtrigger("playernear") then
-						self:transform(self:gettransformsinto("playernear"))
-						return
-					end
-				elseif self:gettransformtrigger("playernotnear") then
-					self:transform(self:gettransformsinto("playernotnear"))
-					return
-				end
+				check = inrange(v.x+v.width/2, self.x+self.width/2-(self.playerneardist or 3), self.x+self.width/2+(self.playerneardist or 3))
+				if check then break end
 			end
 		elseif type(self.playerneardist) == "table" and #self.playerneardist == 4 then
 			local col = checkrect(self.x+self.playerneardist[1], self.y+self.playerneardist[2], self.playerneardist[3], self.playerneardist[4], {"player"})
-			if #col > 0 then
-				if self:gettransformtrigger("playernear") then
-					self:transform(self:gettransformsinto("playernear"))
-					return
+			check = (#col > 0)
+		end
+
+		if check and self:gettransformtrigger("playernear")then
+			self:transform(self:gettransformsinto("playernear"))
+			return
+		elseif (not check) and self:gettransformtrigger("playernotnear") then
+			self:transform(self:gettransformsinto("playernotnear"))
+			return
+		end
+	end
+	
+	--Check if enemy/enemies is near
+	if self.transforms and (self:gettransformtrigger("enemynear") or self:gettransformtrigger("enemynotnear")) then
+		local check = false
+		for i, v in pairs(objects["enemy"]) do
+			if (type(self.enemynearcheck) == "table" and tablecontains(self.enemynearcheck, v.t)) or self.enemynearcheck == v.t then
+				if type(self.enemyneardist) == "number" then
+					check = inrange(v.x+v.width/2, self.x+self.width/2-(self.enemyneardist or 3), self.x+self.width/2+(self.enemyneardist or 3))
+				elseif type(self.enemyneardist) == "table" and #self.enemyneardist == 4 then
+					check = aabb(v.x, v.y, v.width, v.height, self.x+self.enemyneardist[1], self.y+self.enemyneardist[2], self.enemyneardist[3], self.enemyneardist[4])
 				end
-			elseif self:gettransformtrigger("playernotnear") then
-				self:transform(self:gettransformsinto("playernotnear"))
-				return
+				if check then break end
 			end
+		end
+
+		if check and self:gettransformtrigger("enemynear")then
+			self:transform(self:gettransformsinto("enemynear"))
+			return
+		elseif (not check) and self:gettransformtrigger("enemynotnear") then
+			self:transform(self:gettransformsinto("enemynotnear"))
+			return
 		end
 	end
 	
@@ -2179,7 +2197,7 @@ function enemy:update(dt)
 		self.customtimertimer = self.customtimertimer + dt
 		while self.customtimertimer > self.customtimer[self.currentcustomtimerstage][1] do
 			self.customtimertimer = self.customtimertimer - self.customtimer[self.currentcustomtimerstage][1]
-			self:customtimeraction(self.customtimer[self.currentcustomtimerstage][2], self.customtimer[self.currentcustomtimerstage][3])
+			self:customtimeraction(self.customtimer[self.currentcustomtimerstage][2], self.customtimer[self.currentcustomtimerstage][3], self.customtimer[self.currentcustomtimerstage][4])
 			self.currentcustomtimerstage = self.currentcustomtimerstage + 1
 			if self.currentcustomtimerstage > #self.customtimer then
 				self.currentcustomtimerstage = 1
@@ -2190,10 +2208,10 @@ function enemy:update(dt)
 			end
 		end
 	end
-	if false and self.customtrigger then --disabled until finished
-		--[property1,comparison,property2, [action, parameter],argument]
+	if self.customtrigger then --disabled until finished
+		--[ ["if",property1,comparison,property2], [action, parameter],argument]
 		for i = 1, #self.customtrigger do
-			self:ifstatement(self.customtrigger[i][1], self.customtrigger[i][2], self.customtrigger[i][3], self.customtrigger[i][4], self.customtrigger[i][5])
+			self:ifstatement(self.customtrigger[i][1], self.customtrigger[i][2], self.customtrigger[i][3])
 		end
 	end
 end
@@ -2307,9 +2325,9 @@ function enemy:shotted(dir, cause, high, fireball, star)
 	return true
 end
 
-function enemy:customtimeraction(action, arg)
+function enemy:customtimeraction(action, arg, arg2)
 	--set to a variable
-	local ogarg = arg
+	local ogarg, ogarg2 = arg, arg2
 	if arg and type(arg) == "table" and arg[1] and arg[2] and arg[1] == "property" then
 		arg = self[arg[2]]
 	end
@@ -2366,10 +2384,10 @@ function enemy:customtimeraction(action, arg)
 		elseif a == "atan2" then
 			local in1, in2 = ogarg[1],ogarg[2]
 			if ogarg[1] and type(ogarg[1]) == "table" and ogarg[1][1] and ogarg[1][2] and ogarg[1][1] == "property" then
-				in1 = self[ogarg[1]]
+				in1 = self[ogarg[1][2]]
 			end
 			if ogarg[2] and type(ogarg[2]) == "table" and ogarg[2][1] and ogarg[2][2] and ogarg[2][1] == "property" then
-				in2 = self[ogarg[2]]
+				in2 = self[ogarg[2][2]]
 			end
 			self[p] = math.atan2(in1,in2)
 		elseif a == "min" then
@@ -2380,10 +2398,11 @@ function enemy:customtimeraction(action, arg)
 			self[p] = tonumber(self[p])
 		elseif a == "tostring" then
 			self[p] = tostring(self[p])
+
 		elseif a == "if" then
-			self:ifstatement(ogarg[1],ogarg[2],ogarg[3],ogarg[4],ogarg[5])
+			self:ifstatement(action, ogarg, ogarg2)
 			--                   first;  Symb; Second;     Action;     Arg;
-			--EXAMPLE: [0,"if",["speedx",">=","speedy",["set","speedy"],25]
+			--EXAMPLE: [0,["if","speedx",">=","speedy"],["set","speedy"],25]
 		end
 	else --backwards compatibility
 		if action == "bounce" then
@@ -2425,36 +2444,71 @@ function enemy:customtimeraction(action, arg)
 	end
 end
 
-function enemy:ifstatement(propName1, comparison, propName2, action, arg)
-	--EXAMPLE: ["speedx","==","speedy",["set","speedy"],10]
-	local prop1,prop2
-	if self[propName1] then
-		first = self[propName1]
-	end	
-	if self[propName2] then
-		second = self[prop2]
-	end	
-	
-	local pass = false
-    if comparison == "equal" and (prop1 == prop2) then
-		pass = true
-    elseif comparison == "greater" and (prop1 > prop2) then
-        pass = true
-    elseif comparison == "less" and (prop1 < prop2) then
-		pass = true
-    elseif comparison == "greaterequal" and (prop1 >= prop2) then
-        pass = true
-    elseif comparison == "lessequal" and (prop1 <= prop2) then
-        pass = true
-    elseif comparison == "notequal" and (prop1 ~= prop2) then
-        pass = true
-	elseif comparison == "exists" and prop1 ~= nil then
-        pass = true
-	elseif comparison == "notexists" and prop1 == nil then
-        pass = true
-    end
+function enemy:ifstatement(t, action, arg)
+	--EXAMPLE: ["if","speedx","==","speedy"],["set","speedy"],10
+	--EXAMPLE: ["if","speedx","==","speedy","and","jumping","~=",false],["set","speedy"],10
+	local statementPass = false
+	for i = 1, math.floor(#t/4) do
+		local check = t[i]
 
-	if pass then
+		--get properties needed for comparison
+		local prop1,prop2 = t[i+1], t[i+3]
+		if (type(prop1) == "string" and self[prop1]) then
+			prop1 = self[prop1]
+		elseif (type(prop1) == "table" and prop1[1] and prop1[2] and prop1[1] == "property") then
+			prop1 = self[prop1[2]]
+		end	
+		if (type(prop2) == "string" and self[prop2]) then
+			prop2 = self[prop2]
+		elseif (type(prop2) == "table" and prop2[2] and prop2[2] and prop2[2] == "property") then
+			prop2 = self[prop2[2]]
+		end
+
+		--comparison
+		local comparison = t[i+2]
+		if (not comparison) or (type(comparison) ~= "string") then
+			return false
+		end
+		comparison = comparison:lower()
+
+		local pass 
+		if (comparison == "equal" or comparison == "==") and (prop1 == prop2) then
+			pass = true
+		elseif (comparison == "notequal" or comparison == "~=" or comparison == "!=") and (prop1 ~= prop2) then
+			pass = true
+
+		elseif (comparison == "greater" or comparison == ">") and (prop1 > prop2) then
+			pass = true
+		elseif (comparison == "less" or comparison == "<") and (prop1 < prop2) then
+			pass = true
+		elseif (comparison == "greaterequal" or comparison == ">=") and (prop1 >= prop2) then
+			pass = true
+		elseif (comparison == "lessequal" or comparison == "<=") and (prop1 <= prop2) then
+			pass = true
+
+		elseif (comparison == "exists") and prop1 ~= nil then
+			pass = true
+		elseif (comparison == "notexists") and prop1 == nil then
+			pass = true
+		end
+
+		--logical operators
+		if check == "if" or check == "and" then
+			if pass then
+				statementPass = true
+			else
+				statementPass = false
+				break
+			end
+		elseif check == "or" then
+			if pass then
+				statementPass = true
+				break
+			end
+		end
+	end
+
+	if statementPass then
 		self:customtimeraction(action, arg)
 	end
 end
@@ -2650,31 +2704,43 @@ function enemy:globalcollide(a, b, c, d, dir)
 
 		if b.enemykillsinstantly then
 			self.instantdelete = true
-			self.output()
+			self:output()
 		end
 		
 		addpoints((firepoints[self.t] or 200), self.x, self.y)
 		return true
 	end
 	
-	if self.breaksblocks then
-		if (self.breakblockside == nil or self.breakblockside == "global") then
-			if a == "tile" then
-				if self.breakshardblocks and (tilequads[map[b.cox][b.coy][1]].coinblock or (tilequads[map[b.cox][b.coy][1]].debris and blockdebrisquads[tilequads[map[b.cox][b.coy][1]].debris])) then -- hard block
-					destroyblock(b.cox, b.coy, "nopoints")
-				else
-					hitblock(b.cox, b.coy, self, true)
-				end
-			elseif a == "flipblock" then
-				if self.breaksflipblocks then
-					b:destroy()
-				end
-			end
-		end
+	if self.breakblockside == nil or self.breakblockside == "global" then
+		self:breakblock(a, b)
 	end
 	
 	if self.nocollidestops or b.nocollidestops then
 		return true
+	end
+end
+
+function enemy:breakblock(a, b)
+	if a == "tile" then
+		if self.breakshardblocks and (tilequads[map[b.cox][b.coy][1]].coinblock or (tilequads[map[b.cox][b.coy][1]].debris and blockdebrisquads[tilequads[map[b.cox][b.coy][1]].debris])) then -- hard block
+			destroyblock(b.cox, b.coy, "nopoints")
+		else
+			if self.breaksblocks then
+				hitblock(b.cox, b.coy, {size=2}, (self.small and math.abs(self.speedx) > 0.01))
+			elseif self.hitsblocks then
+				hitblock(b.cox, b.coy, {size=1}, (self.small and math.abs(self.speedx) > 0.01))
+			end
+		end
+	elseif a == "flipblock" then
+		if self.breaksflipblocks or self.breaksentityblocks then
+			b:destroy()
+		elseif self.hitsflipblocks or self.hitsentityblocks then
+			b:hit()
+		end
+	elseif a == "powblock" then
+		if self.triggerspowblock then
+			b:hit()
+		end
 	end
 end
 
@@ -2743,20 +2809,8 @@ function enemy:leftcollide(a, b, c, d)
 		self.speedx = math.abs(self.speedx)
 	end
 	
-	if self.breaksblocks then
-		if (self.breakblockside == "sides" or self.breakblockside == "left") then
-			if a == "tile" then
-				if self.breakshardblocks and (tilequads[map[b.cox][b.coy][1]].coinblock or (tilequads[map[b.cox][b.coy][1]].debris and blockdebrisquads[tilequads[map[b.cox][b.coy][1]].debris])) then -- hard block
-					destroyblock(b.cox, b.coy, "nopoints")
-				else
-					hitblock(b.cox, b.coy, self, true)
-				end
-			elseif a == "flipblock" then
-				if self.breaksflipblocks then
-					b:destroy()
-				end
-			end
-		end
+	if self.breakblockside == "sides" or self.breakblockside == "left" then
+		self:breakblock(a, b)
 	end
 
 	if self.gel then
@@ -2872,20 +2926,8 @@ function enemy:rightcollide(a, b, c, d)
 		self.speedx = -math.abs(self.speedx)
 	end
 	
-	if self.breaksblocks then
-		if (self.breakblockside == "sides" or self.breakblockside == "right") then
-			if a == "tile" then
-				if self.breakshardblocks and (tilequads[map[b.cox][b.coy][1]].coinblock or (tilequads[map[b.cox][b.coy][1]].debris and blockdebrisquads[tilequads[map[b.cox][b.coy][1]].debris])) then -- hard block
-					destroyblock(b.cox, b.coy, "nopoints")
-				else
-					hitblock(b.cox, b.coy, self, true)
-				end
-			elseif a == "flipblock" then
-				if self.breaksflipblocks then
-					b:destroy()
-				end
-			end
-		end
+	if self.breakblockside == "sides" or self.breakblockside == "right" then
+		self:breakblock(a, b)
 	end
 
 	if self.gel then
@@ -2989,20 +3031,8 @@ function enemy:ceilcollide(a, b, c, d)
 		self.speedy = math.abs(self.speedy)
 	end
 	
-	if self.breaksblocks then
-		if self.breakblockside == "ceil" then
-			if a == "tile" then
-				if self.breakshardblocks and (tilequads[map[b.cox][b.coy][1]].coinblock or (tilequads[map[b.cox][b.coy][1]].debris and blockdebrisquads[tilequads[map[b.cox][b.coy][1]].debris])) then -- hard block
-					destroyblock(b.cox, b.coy, "nopoints")
-				else
-					hitblock(b.cox, b.coy, self, true)
-				end
-			elseif a == "flipblock" then
-				if self.breaksflipblocks then
-					b:destroy()
-				end
-			end
-		end
+	if self.breakblockside == "ceil" then
+		self:breakblock(a, b)
 	end
 
 	if self.gel then
@@ -3105,20 +3135,8 @@ function enemy:floorcollide(a, b, c, d)
 		end
 	end
 
-	if self.breaksblocks then
-		if self.breakblockside == "floor" then
-			if a == "tile" then
-				if self.breakshardblocks and (tilequads[map[b.cox][b.coy][1]].coinblock or (tilequads[map[b.cox][b.coy][1]].debris and blockdebrisquads[tilequads[map[b.cox][b.coy][1]].debris])) then -- hard block
-					destroyblock(b.cox, b.coy, "nopoints")
-				else
-					hitblock(b.cox, b.coy, self, true)
-				end
-			elseif a == "flipblock" then
-				if self.breaksflipblocks then
-					b:destroy()
-				end
-			end
-		end
+	if self.breakblockside == "floor" then
+		self:breakblock(a, b)
 	end
 
 	if self.gel then
@@ -3273,6 +3291,7 @@ function enemy:stomp(x, b)
 				self.speedx = 0
 				self.combo = 1
 				self.quad = self.quadgroup[self.smallquad]
+				self.killsenemies = self.startkillsenemies
 			end
 		else
 			self.active = false
@@ -3305,7 +3324,7 @@ function enemy:autodeleted()
 end
 
 function enemy:output(transformed)
-	if (not self.outtable) or self.outputted then
+	if (not self) or (not self.outtable) or self.outputted then
 		--for some reason the enemy hasn't spawned correctly
 		return false
 	end

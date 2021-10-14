@@ -134,6 +134,12 @@ function guielement:init(...)
 		
 		self.fillcolor = {0, 0, 0}
 		self.textcolor = {255, 255, 255}
+
+		if android then
+			self.didtypecheck = false
+			self.didtypetextinput = false
+			self.didtype = false
+		end
 		
 		self:updatePos()
 		--[[while string.len(self.value)-self.textoffset > self.width-1 and self.width ~= 1 and self.width ~= self.maxlength do
@@ -148,6 +154,8 @@ function guielement:init(...)
 	end
 end
 
+local doubleinput = false
+local doubleinputcheck = false
 function guielement:update(dt)
 	if self.active then
 		if self.type == "scrollbar" then
@@ -225,6 +233,16 @@ function guielement:update(dt)
 			--[[DROID]]
 			if android then
 				android_key_repeat = false
+
+				if self.didtypecheck and (not self.didtype) then
+					--force a text input if for some reason the android keyboard did not do anything
+					self:keypress(self.didtypecheck,"forcetextinput")
+				end
+
+				doubleinputcheck = false
+				self.didtypecheck = false
+				self.didtype = false
+				self.didtypetextinput = false
 			end
 		elseif self.type == "button" then
 			if self.autorepeat then
@@ -559,7 +577,6 @@ function guielement:draw(a, offx, offy)
 
 				--cursor
 				if self.inputting and self.cursorblink then
-					--bookmark
 					love.graphics.rectangle("fill", (self.x+self.xrange*self.value+string.len(self.textvalue)*8)*scale, (self.y+math.ceil((self.height-8)/2)-1)*scale, 2*scale, 9*scale)
 				end
 			end
@@ -628,7 +645,7 @@ function guielement:draw(a, offx, offy)
 			local varwidth = self.width
 			if self.height == 1 then varwidth = 999999 end
 			local x = math.ceil((self.cursorpos-1-self.textoffset) % varwidth)+1
-			local y = math.min(math.ceil(self.cursorpos/self.width), self.height) --bookmark
+			local y = math.min(math.ceil(self.cursorpos/self.width), self.height)
 			
 			if (self.cursorpos == self.maxlength+1) and (self.height > 1 or self.width >= self.maxlength) then
 				x = self.width+1
@@ -858,7 +875,7 @@ function guielement:keypress(key,textinput)
 							love.keyboard.setTextInput(false)--[DROID]
 						end
 					end
-				elseif key == "left" then --bookmark
+				elseif key == "left" then
 					if not self.shift then
 						if self.highlight then
 							self.cursorpos = math.min(self.cursorpos,self.highlight)+1
@@ -867,7 +884,6 @@ function guielement:keypress(key,textinput)
 					else
 						self.highlight = self.highlight or self.cursorpos
 					end
-
 					self.cursorpos = math.max(1, self.cursorpos - 1)
 					while self.cursorpos-1 < self.textoffset do
 						self.textoffset = math.max(self.textoffset - 1, 0)
@@ -942,8 +958,25 @@ function guielement:keypress(key,textinput)
 					print(textclipboard)
 				else
 					if android then
-						if (not textinput) then
-							return false
+						if not (textinput and textinput == "forcetextinput") then
+							local justchanged = false
+							if not doubleinput then
+								if doubleinputcheck and doubleinputcheck == key then
+									doubleinput = true
+									justchanged = true
+								end
+								doubleinputcheck = key
+							end
+							if textinput or (not self.didtypecheck) then
+								self.didtypecheck = key
+								if textinput then
+									self.didtypetextinput = true
+								end
+							end
+							if doubleinput and ((not textinput) or justchanged) then
+								return false
+							end
+							self.didtype = true
 						end
 					end
 					if string.len(self.value) < self.maxlength or self.maxlength == 0 then

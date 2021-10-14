@@ -1303,17 +1303,6 @@ rightclicktype["castlefirecw"] = {
 			if not rightclickvalues2[2] then
 				rightclickvalues2[2] = castlefiredelay
 			end
-		elseif i == 2 then
-			local v = v
-			local f = castlefiredelay
-			if v == "fast" then
-				f = castlefirefastdelay
-			elseif v == "slow" then
-				f = castlefiredelay
-			elseif tonumber(v) then
-				f = tonumber(v)
-			end
-			return (f-0.03)/0.97
 		end
 		return v
 	end,

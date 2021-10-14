@@ -453,7 +453,7 @@ function tilemoving:floorcollide(a, b)
 	if self:globalcollide(a, b) then
 		return false
 	end
-	if (a == "player" and self.gravitydir == "down") or a == "skewer" then
+	if (a == "player" and b.gravitydir == "down") or a == "skewer" then
 		self:hit(a, b)
 	end
 	return false
