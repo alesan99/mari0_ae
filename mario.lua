@@ -7472,6 +7472,53 @@ function mario:emancipate(a)
 	end
 end
 
+function mario:shootportal(i)
+	if (not self.controlsenabled) or self.vine or self.fence then
+		return false
+	end
+
+	--knockback
+	if portalknockback and self.portalgun then
+		local xadd = math.sin(self.pointingangle)*30
+		local yadd = math.cos(self.pointingangle)*30
+		self.speedx = self.speedx + xadd
+		self.speedy = self.speedy + yadd
+		self.falling = true
+		self.animationstate = "falling"
+		self:setquad()
+	end
+	
+	if playertype == "portal" and self.portalgun and (self.portals == "both" or self.portals == i .. " only") then
+		local sourcex, sourcey = self.x+self.portalsourcex, self.y+self.portalsourcey
+		local direction = self.pointingangle
+		
+		net_action(self.playernumber, "portal|" .. i .. "|" .. sourcex .. "|" .. sourcey .. "|" .. direction)
+		shootportal(self.playernumber, i, sourcex, sourcey, direction)
+	elseif playertype == "minecraft" then
+		local v = self
+		local sourcex, sourcey = self.x+self.portalsourcex, self.y+self.portalsourcey
+		local cox, coy, side, tend, x, y = traceline(sourcex, sourcey, v.pointingangle)
+		
+		if i == 1 then
+			if cox then
+				local dist = math.sqrt((v.x+v.width/2 - x)^2 + (v.y+v.height/2 - y)^2)
+				if dist <= minecraftrange then
+					breakingblockX = cox
+					breakingblockY = coy
+					breakingblockprogress = 0
+				end
+			end
+		elseif i == 2 then
+			if cox then
+				local dist = math.sqrt((v.x+v.width/2 - x)^2 + (v.y+v.height/2 - y)^2)
+				if dist <= minecraftrange then
+					placeblock(cox, coy, side)
+				end
+			end
+		end
+	end
+end
+
 function mario:removeportal(i, preplaced)
 	if (not preplaced) then
 		playsound(portalfizzlesound)
