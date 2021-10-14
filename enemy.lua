@@ -638,9 +638,11 @@ function enemy:update(dt)
 			end
 		end
 		if self.watergravity then
-			self.gravity = self.watergravity
-		else
-			self.gravity = self.startgravity
+			if oldwater == false and self.water == true then
+				self.gravity = self.watergravity
+			elseif oldwater == true and self.water == false then
+				self.gravity = self.startgravity
+			end
 		end
 		if self.y+self.height < uwmaxheight and underwater and self.watergravity then
 			self.speedy = uwpushdownspeed
