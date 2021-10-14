@@ -436,7 +436,11 @@ function enemy:init(x, y, t, a, properties)
 				if type(self.spawnchildrenoffsety) == "table" then
 					offsety = self.spawnchildrenoffsety[i]
 				end
-				local temp = enemy:new(self.x+self.width/2+.5+offsetx, self.y+self.height+offsety, self.spawnchildren[i], {"ignorespawnchildren"})
+				local a = {"ignorespawnchildren"}
+				if self.childrencanspawnchildren then
+					a = {}
+				end
+				local temp = enemy:new(self.x+self.width/2+.5+offsetx, self.y+self.height+offsety, self.spawnchildren[i], a)
 				if self.spawnchildrenparent then
 					temp.parent = self
 				end
