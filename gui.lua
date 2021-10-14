@@ -118,8 +118,11 @@ function guielement:init(...)
 		self.height = arg[8] or 1
 		self.extra = arg[9] or "none"
 		self.spacing = arg[10] or 1
+		self.highlighting = false
+		self.highlight = false
 		
 		self.timer = 0
+		self.offsettimer = 0
 		self.cursorblink = true
 		self.inputting = false
 		self.cursorpos = string.len(self.value)+1
@@ -179,6 +182,7 @@ function guielement:update(dt)
 			end
 		elseif self.type == "input" then
 			self.timer = self.timer + dt
+			self.offsettimer = math.max(self.offsettimer-dt, 0)
 			while self.timer > blinktime do
 				self.cursorblink = not self.cursorblink
 				self.timer = self.timer - blinktime
@@ -188,9 +192,24 @@ function guielement:update(dt)
 			else
 				self.shift = false
 			end
+			if love.keyboard.isDown("rctrl") or love.keyboard.isDown("lctrl") or ((love.keyboard.isDown("rgui") or love.keyboard.isDown("lgui")) and love.system.getOS() == "OS X") then
+				self.ctrl = true
+			else
+				self.ctrl = false
+			end
 
+			if self.highlighting then
+				local mx, my = love.mouse.getX()/scale, love.mouse.getY()/scale
+				self.cursorpos = math.max(math.min(round(((math.min(math.max(mx,self.x),self.x+self.width*8)-self.x)+6)/8) + self.textoffset + math.max((math.min(math.ceil(((my-self.y)-1)/10),self.height)-1)*self.width,0), #self.value+1),1)
+				if self.height == 1 and mx > self.x + 4 + self.width*8 and self.offsettimer == 0 then
+					self.textoffset = math.min(self.textoffset + 1, #self.value - self.width + 1)
+					self.offsettimer = 0.1
+				elseif self.height == 1 and mx < self.x and self.offsettimer == 0 then
+					self.textoffset = math.max(self.textoffset - 1, 0)
+					self.offsettimer = 0.1
+				end
 			--drag number without typing
-			if self.numdraggingstart then
+			elseif self.numdraggingstart then
 				local dx = (love.mouse.getX()-self.oldmousex)/scale
 				if math.abs(dx) > 2 then
 					--start dragging number
@@ -563,6 +582,9 @@ function guielement:draw(a, offx, offy)
 			end
 		end
 	elseif self.type == "input" then
+		if self.width >= self.maxlength or self.height > 1 then
+			self.textoffset = 0
+		end
 		local high = self:inhighlight(love.mouse.getPosition())
 	
 		love.graphics.setColor(self.bordercolor)
@@ -587,22 +609,48 @@ function guielement:draw(a, offx, offy)
 		end
 		
 		if self.height == 1 then
+			if self.highlight then
+				local highlight = {math.min(self.highlight,self.cursorpos),math.max(self.highlight,self.cursorpos)}
+
+				love.graphics.setColor({(self.textcolor[1]-self.fillcolor[1])/2,(self.textcolor[2]-self.fillcolor[2])/2,(self.textcolor[3]-self.fillcolor[3])/2})
+				local x3 = math.max(1, highlight[1] - self.textoffset)
+				local x4 = math.min(self.width+1, highlight[2] - self.textoffset)
+				love.graphics.rectangle("fill", (self.x+2+self.spacing+(x3-1)*8)*scale, (self.y+2+self.spacing)*scale, (x4-x3)*8*scale, 7*scale)
+			end
 			local s = tostring(self.value)
+			love.graphics.setColor(self.textcolor)
 			properprint(s:sub(self.textoffset+1, self.textoffset+self.width), (self.x+1+self.spacing)*scale, (self.y+2+self.spacing)*scale)
 		else
+			local x3, x4
+			local highlight
+			if self.highlight then
+				highlight = {math.min(self.highlight,self.cursorpos),math.max(self.highlight,self.cursorpos)}
+			end
 			for i = 1, #newstring do
+				if self.highlight then
+					love.graphics.setColor({(self.textcolor[1]-self.fillcolor[1])/2,(self.textcolor[2]-self.fillcolor[2])/2,(self.textcolor[3]-self.fillcolor[3])/2})
+					x3 = math.max(math.ceil(highlight[1]-1)+1-self.width*(i-1),1)
+					x4 = math.min(math.ceil(highlight[2]-1)+1-self.width*(i-1),self.width+1)
+					if highlight[2] >= (i-1)* self.width+1 and highlight[1] <= i * self.width then
+						love.graphics.rectangle("fill", (self.x+2+self.spacing+(x3-1)*8)*scale, (self.y+2+self.spacing+(i-1)*10)*scale, (x4-x3)*8*scale, 7*scale)
+					end
+				end
+				love.graphics.setColor(self.textcolor)
 				properprint(newstring[i], (self.x+2)*scale, (self.y+2+self.spacing+(i-1)*10)*scale)
 			end
 		end
 		
 		--cursor
 		if self.inputting and self.cursorblink then
-			local x = math.ceil((self.cursorpos-1-self.textoffset) % self.width)+1
+			local varwidth = self.width
+			if self.height == 1 then varwidth = 999999 end
+			local x = math.ceil((self.cursorpos-1-self.textoffset) % varwidth)+1
 			local y = math.min(math.ceil(self.cursorpos/self.width), self.height)
 			
 			if (self.cursorpos == self.maxlength+1) and (self.height > 1 or self.width >= self.maxlength) then
 				x = self.width+1
 			end
+			--print(x)
 			love.graphics.rectangle("fill", (self.x+1+self.spacing+(x-1)*8)*scale, (self.y+1+self.spacing+(y-1)*10)*scale, 2*scale, 9*scale)
 		end
 	elseif self.type == "text" then
@@ -707,7 +755,11 @@ function guielement:click(x, y, button)
 					if self.inputting then
 						--click where you want the cursor
 						local mx, my = love.mouse.getX()/scale, love.mouse.getY()/scale
-						self.cursorpos = math.max(math.min(round(((mx-self.x)+6.5)/8) + self.textoffset + math.max((math.min(math.ceil(((my-self.y)-1)/10),self.height)-1)*self.width,0), string.len(self.value)+1),0)
+						self.cursorpos = math.max(math.min(round(((mx-self.x)+6.5)/8) + self.textoffset + math.max((math.min(math.ceil(((my-self.y)-1)/10),self.height)-1)*self.width,0), string.len(self.value)+1),1)
+						if not self.numdrag then
+							self.highlighting = true
+							self.highlight = self.cursorpos
+						end
 					else
 						self.cursorpos = string.len(self.value)+1
 					end
@@ -733,6 +785,7 @@ function guielement:click(x, y, button)
 						love.keyboard.setKeyRepeat(false)
 					end
 					self.inputting = false
+					self.highlight = false
 				end
 			end
 		end
@@ -743,7 +796,7 @@ function guielement:keypress(key,textinput)
 	if self.active then
 		if self.type == "scrollbar" then
 			--Type in number into scrollbar
-			if self.inputting then
+			if self.inputting and not self.highlighting then
 				if key == "escape" then
 					self.inputting = false
 					love.keyboard.setKeyRepeat(false)
@@ -794,6 +847,7 @@ function guielement:keypress(key,textinput)
 				end
 				if key == "escape" and not android then
 					self.inputting = false
+					self.highlight = false
 					love.keyboard.setKeyRepeat(false)
 				elseif (key == "return" or key == "enter" or key == "kpenter") or (android and key == "escape") then
 					if self.func then
@@ -822,40 +876,86 @@ function guielement:keypress(key,textinput)
 						end
 					end
 				elseif key == "left" then
+					if not self.shift then
+						if self.highlight then
+							self.cursorpos = math.min(self.cursorpos,self.highlight)+1
+							self.highlight = false
+						end
+					else
+						self.highlight = self.highlight or self.cursorpos
+					end
 					self.cursorpos = math.max(1, self.cursorpos - 1)
-					if self.cursorpos-1 <= self.textoffset and not (self.width >= self.maxlength or self.height > 1) then
+					while self.cursorpos-1 < self.textoffset do
 						self.textoffset = math.max(self.textoffset - 1, 0)
 					end
 					self.cursorblink = true
 					self.timer = 0
 				elseif key == "right" then
-					self.cursorpos = math.min(string.len(self.value) + 1, self.cursorpos + 1)
-					if self.cursorpos-1 >= self.textoffset+self.width and not (self.width >= self.maxlength or self.height > 1) then
+					if not self.shift then
+						if self.highlight then
+							self.cursorpos = math.max(self.cursorpos,self.highlight)-1
+							self.highlight = false
+						end
+					else
+						self.highlight = self.highlight or self.cursorpos
+					end
+
+					self.cursorpos = math.min(#self.value + 1, self.cursorpos + 1)
+					while self.cursorpos-1 >= self.textoffset+self.width do
 						self.textoffset = math.min(self.textoffset + 1, self.maxlength - self.width)
 					end
 					self.cursorblink = true
 					self.timer = 0
 				elseif key == "up" and self.height > 1 then
+					if not self.shift then
+						self.highlight = false
+					else
+						self.highlight = self.highlight or self.cursorpos
+					end
+
 					self.cursorpos = math.max(1, self.cursorpos - self.width)
 					self.cursorblink = true
 					self.timer = 0
 				elseif key == "down" and self.height > 1 then
-					self.cursorpos = math.min(string.len(self.value) + 1, self.cursorpos + self.width)
-					self.cursorblink = true
-					self.timer = 0
-				elseif key == "backspace" then
-					self.value = string.sub(self.value,1,self.cursorpos-2)..string.sub(self.value,self.cursorpos) --self.value = string.sub(self.value, 1, string.len(self.value)-1)
-
-					if self.cursorpos > 1 then --and self.cursorpos > string.len(self.value)+1 then
-						self.cursorpos = self.cursorpos - 1
+					if not self.shift then
+						self.highlight = false
+					else
+						self.highlight = self.highlight or self.cursorpos
 					end
 
-					if not (self.width >= self.maxlength or self.height > 1) then
+					self.cursorpos = math.min(#self.value + 1, self.cursorpos + self.width)
+					self.cursorblink = true
+					self.timer = 0
+				elseif key == "backspace" or (key == "x" and self.ctrl and self.highlight) then
+					if self.highlight then
+						local highlight = {math.min(self.highlight,self.cursorpos),math.max(self.highlight,self.cursorpos)}
+						if key == "x" and self.ctrl then
+							textclipboard = self.value:sub(highlight[1],highlight[2]-1)
+							print(textclipboard)
+						end
+						self.value = self.value:sub(1,highlight[1]-1)..self.value:sub(highlight[2])
+						self.cursorpos = highlight[1]
+						self.highlight = false
+						while self.cursorpos-1 < self.textoffset do
+							self.textoffset = math.max(self.textoffset - 1, 0)
+						end
+					elseif self.cursorpos > 1 then
+						self.value = self.value:sub(1,self.cursorpos-2)..self.value:sub(self.cursorpos)
+						if self.cursorpos > 1 then --and self.cursorpos > string.len(self.value)+1 then
+							self.cursorpos = self.cursorpos - 1
+						end
 						self.textoffset = math.max(self.textoffset - 1, 0)
 					end
 
 					self.cursorblink = true
 					self.timer = 0
+				elseif key == "a" and self.ctrl then
+					self.highlight = 1
+					self.cursorpos = #self.value + 1
+				elseif key == "c" and self.ctrl then
+					local highlight = {math.min(self.highlight,self.cursorpos),math.max(self.highlight,self.cursorpos)}
+					textclipboard = self.value:sub(highlight[1],highlight[2]-1)
+					print(textclipboard)
 				else
 					if android then
 						if not (textinput and textinput == "forcetextinput") then
@@ -928,16 +1028,47 @@ function guielement:keypress(key,textinput)
 						end
 						
 						if found then
-							self.value = string.sub(self.value,1,self.cursorpos-1)..targetkey..string.sub(self.value,self.cursorpos)
-							if self.cursorpos <= self.maxlength then
-								self.cursorpos = self.cursorpos + 1
+							if key == "v" and self.ctrl then
+								local highlightlength = 0
+								if self.highlight then
+									highlightlength = math.abs(self.highlight - self.cursorpos)
+								end
+								if textclipboard then
+									if (#textclipboard or 0) + #self.value - highlightlength <= self.maxlength then
+										targetkey = textclipboard
+									else
+										notice.new("no room to paste!")
+										targetkey = ""
+									end
+								else
+									notice.new("clipboard is empty!")
+									targetkey = ""
+								end
 							end
-							if self.cursorpos > self.textoffset+self.width and not (self.width >= self.maxlength or self.height > 1) then  --old offsets
-								self.textoffset = self.textoffset + 1  --old offsets
+							if self.highlight and targetkey ~= "" then
+								local highlight = {math.min(self.highlight,self.cursorpos),math.max(self.highlight,self.cursorpos)}
+								self.value = self.value:sub(1,highlight[1]-1)..targetkey..self.value:sub(highlight[2])
+								self.cursorpos = highlight[1]
+								self.highlight = false
+							elseif targetkey ~= "" then
+								self.value = self.value:sub(1,self.cursorpos-1)..targetkey..self.value:sub(self.cursorpos)
+							end
+
+							if self.cursorpos <= self.maxlength then
+								self.cursorpos = self.cursorpos + #targetkey
+							end
+							while self.cursorpos > self.textoffset+self.width do
+								self.textoffset = self.textoffset + 1
 							end
 							self.cursorblink = true
 							self.timer = 0
+
+							print(self.cursorpos)
+							print(self.textoffset)
+							print("")
 						end
+					elseif key == "v" and self.ctrl and textclipboard and #textclipboard > 0 then
+						notice.new("no room to paste!")
 					end
 				end
 				
@@ -950,7 +1081,12 @@ end
 function guielement:unclick(x, y)
 	if self.active then
 		if self.type == "input" then
-			if self.numdrag then
+			if self.highlighting then
+				self.highlighting = false
+				if self.highlight == self.cursorpos then
+					self.highlight = false
+				end
+			elseif self.numdrag then
 				self.numdraggingstart = false
 				self.numdragging = false
 				if not android then
