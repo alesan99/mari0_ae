@@ -1,0 +1,10 @@
+name = "Alesan99's entities"
+default_targets = ["win32", "win64", "appimage", "macos"]
+build_directory = "makelove-build"
+icon_file = "graphics/icon.png"
+love_version = "0.10.2"
+
+love_files = [
+    "::git-ls-tree::",
+    "-*/.*",
+]
