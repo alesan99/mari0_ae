@@ -199,7 +199,7 @@ yoshitoungekill = {"mushroom", "goomba", "koopa", "hammerbro", "hammer", "plant"
 dkhammerkill = {"goomba", "koopa", "hammerbro", "plant", "cheep", "bowser", "squid", "flyingfish", "lakito", "sidestepper", "icicle", "splunkin", "ninji", "mole", "pokey", "barrel", "chainchomp", "rockywrench", "enemy", "spike", "spikeball", "magikoopa"}
 
 tileentities = {"tile", "buttonblock", "flipblock", "platform", "donut", "frozencoin", "tilemoving", "belt"}
-tileentitieswind = {"tile", "buttonblock", "flipblock", "platform", "donut", "frozencoin", "tilemoving", "belt", "smallspring", "box", "spring", "screenboundary", "cubedispenser", "ceilblocker"}
+tileentitieswind = {"tile", "buttonblock", "flipblock", "platform", "donut", "frozencoin", "tilemoving", "belt", "smallspring", "box", "spring", "screenboundary", "cubedispenser", "ceilblocker", "snakeblock", "powblock", "pbutton"}
 
 freezetime = 6.5 --8
 iceblockspeed = 10
