@@ -5226,6 +5226,13 @@ function mario:rightcollide(a, b, passive)
 	end
 
 	if self.size == 14 and self.ducking and (a ~= "mushroom") and self.blueshelled then --blueshell
+		if a == "tile" then --shell go over gaps
+			local x, y = b.cox, b.coy
+			if inmap(x, y-1) and tilequads[map[x][y-1][1]].collision == false and self.speedy > 0 and self.y+self.height+1 < y+spacerunroom then
+				self.y = b.y - self.height; self.speedy = 0; self.x = b.x-self.width+0.0001; self.falling = false
+				return false
+			end
+		end
 		if a == "tile" or a == "portalwall" or a == "spring" or a == "donut" or a == "springgreen" or a == "bigmole" or a == "muncher" or (a == "flipblock" and not b.flippable) or a == "frozencoin" or a == "buttonblock" or (a == "enemy" and (b.resistsenemykill or b.resistseverything)) then	
 			self.speedx = -math.abs(self.speedx)
 			local x, y = b.cox, b.coy
@@ -5632,6 +5639,13 @@ function mario:leftcollide(a, b)
 	end
 
 	if self.size == 14 and self.ducking and (a ~= "mushroom") and self.blueshelled then --blueshell
+		if a == "tile" then --shell go over gaps
+			local x, y = b.cox, b.coy
+			if inmap(x, y-1) and tilequads[map[x][y-1][1]].collision == false and self.speedy > 0 and self.y+self.height+1 < y+spacerunroom then
+				self.y = b.y - self.height; self.speedy = 0; self.x = b.x+1-0.0001; self.falling = false
+				return false
+			end
+		end
 		if a == "tile" or a == "portalwall" or a == "spring" or a == "donut" or a == "springgreen" or a == "bigmole" or a == "muncher" or (a == "flipblock" and not b.flippable) or a == "frozencoin" or a == "buttonblock" or (a == "enemy" and (b.resistsenemykill or b.resistseverything)) then	
 			self.speedx = math.abs(self.speedx)
 			local x, y = b.cox, b.coy
@@ -5809,6 +5823,18 @@ function mario:leftcollide(a, b)
 			end
 		end
 		self:die("time")
+	elseif a == "frozencoin" or a == "buttonblock" or a == "flipblock" then
+		--Check if mario should run across a gap.
+		local x, y = b.cox, b.coy
+		if inmap(x, y-1) and tilequads[map[x][y-1][1]].collision == false and self.speedy > 0 and self.y+self.height+1 < y+spacerunroom then
+			self.y = b.y - self.height
+			self.speedy = 0
+			self.x = b.x+1-0.0001
+			self.falling = false
+			self.animationstate = "running"
+			self:setquad()
+			return false
+		end
 	elseif a == "tile" then
 		local x, y = b.cox, b.coy
 		
