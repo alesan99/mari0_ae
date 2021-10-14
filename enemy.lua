@@ -422,11 +422,7 @@ function enemy:init(x, y, t, a, properties)
 	end
 	
 	if self.spawnsound then
-		if self.sound and self.spawnsound == self.t then
-			playsound(self.sound)
-		else
-			playsound(self.spawnsound)
-		end
+		self:playsound(self.spawnsound)
 	end
 
 	if self.spawnchildren then
@@ -2270,9 +2266,11 @@ function enemy:shotted(dir, cause, high, fireball, star)
 		collectcoin(nil, nil, tonumber(self.givecoinwhenshot) or 1)
 	end
 	
-	if not self.noshotsound then
-		playsound("shot")
-	end
+    if self.shotsound then
+        self:playsound(self.shotsound)
+    elseif not self.noshotsound then
+		self:playsound("shot")
+    end
 	
 	if self.transforms then
 		if self:gettransformtrigger("shot") then
@@ -2410,11 +2408,7 @@ function enemy:customtimeraction(action, arg, arg2)
 		if action == "bounce" then
 			if self.speedy == 0 then self.speedy = -(arg or 10) end
 		elseif action == "playsound" then
-			if self.sound and arg == self.t then
-				playsound(self.sound)
-			else
-				playsound(arg)
-			end
+			self:playsound(arg)
 		elseif action == "spawnenemy" then
 			if self.spawnsenemyrandoms then
 				self.spawnsenemy = self.spawnsenemyrandoms[math.random(#self.spawnsenemyrandoms)]
@@ -2856,7 +2850,7 @@ function enemy:leftcollide(a, b, c, d)
 				if a == "tile" then
 					hitblock(b.cox, b.coy, self, true)
 				else
-					playsound("blockhit")
+					self:playsound("blockhit")
 				end
 			end
 			return false
@@ -2974,7 +2968,7 @@ function enemy:rightcollide(a, b, c, d)
 				if a == "tile" then
 					hitblock(b.cox, b.coy, self, true)
 				else
-					playsound("blockhit")
+					self:playsound("blockhit")
 				end
 			end
 			return false
@@ -3066,7 +3060,7 @@ function enemy:floorcollide(a, b, c, d)
 			objects["player"][i]:groundshock()
 		end
 		earthquake = 4
-		playsound(thwompsound)
+		self:playsound(thwompsound)
 		self.speedy = 0
 	end
 	
@@ -3375,11 +3369,7 @@ function enemy:output(transformed)
 			end
 		end
 		if self.deathsound then --AE ADDITION
-			if self.sound and self.deathsound == self.t then
-				playsound(self.sound)
-			else
-				playsound(self.deathsound)
-			end
+			self:playsound(self.deathsound)
 		end
 		if self.droplevelballondeath then
 			local obj = levelball:new(self.x+self.width/2, self.y+self.height/2)
@@ -3728,13 +3718,9 @@ function enemy:used(id)
 	self.pickupready = false
 
 	if self.grabsound then
-		if self.sound and self.grabsound == self.t then
-			playsound(self.sound)
-		else
-			playsound(self.grabsound)
-		end
+		self:playsound(self.grabsound)
 	elseif not self.nograbsound then
-		playsound(grabsound)
+		self:playsound(grabsound)
 	end
 end
 
@@ -3776,9 +3762,9 @@ function enemy:dropped(gravitydir)
 	self.y = (self.carryparent.y-self.height)+(self.carryoffsety or 0)
 
 	if self.throwsound then
-		playsound(self.throwsound)
+		self:playsound(self.throwsound)
 	elseif not self.nothrowsound then
-		playsound(throwsound)
+		self:playsound(throwsound)
 	end
 	self.carryparent = nil
 	
@@ -3802,7 +3788,7 @@ function enemy:kick(dir)
 		return false
 	end
 	if not self.nokicksound then
-		playsound(shotsound)
+		self:playsound(shotsound)
 	end
 	if dir == "left" then
 		self.speedx = -self.kickspeed
@@ -3930,6 +3916,16 @@ function enemy:dosupersize()
 			if name == "quadno" then
 				self.quad = self.quadgroup[self.quadno]
 			end
+		end
+	end
+end
+
+function enemy:playsound(sound)
+	if (not self.dontplaysoundsoffscreen) or onscreen(self.x, self.y, self.width, self.height) then
+		if self.sound and sound == self.t then
+			playsound(self.sound)
+		else
+			playsound(sound)
 		end
 	end
 end
