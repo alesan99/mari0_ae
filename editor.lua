@@ -1353,8 +1353,6 @@ function editor_draw()
 							offx = -platwidth/2+0.5
 						end
 
-						print(t[4])
-
 						local transparent = false
 						while (t[4] == "down" and y+offy < mapheight+0.5) or (t[4] == "up" and y+offy > 0) do
 							love.graphics.setColor(255,255,255,255)
