@@ -35,6 +35,7 @@ function cappy:init(player)
 					false, false, false, false, false,
 					false, false, false, false, false,
 					false, true}
+	self.rotation = 0
 	--IMAGE STUFF
 	self.drawable = false
 	if self.player.hats then
@@ -70,9 +71,10 @@ function cappy:update(dt)
 			local rx, ry = (self.player.x + -self.x), (self.player.y + -self.y)
 			local dist = math.sqrt(rx*rx+ry*ry)
 			self.speedx, self.speedy = (rx)/dist*returnspeed, (ry)/dist*returnspeed
-		elseif math.abs(self.x-self.ox) > throwdist then
+		elseif math.abs(self.x-self.ox) > throwdist or self.speedx == 0 then
 			--stay in position when thrown
 			self.speedx = 0
+			self.speedy = 0
 			if ((self.button == "run" and runkey(self.num)) or (self.button == "use" and usekey(self.num))) and self.holdtimer < holdtime then
 				self.holdtimer = self.holdtimer + dt
 			else
