@@ -1963,30 +1963,47 @@ function enemy:update(dt)
 
 	--Check if player is near
 	if self.transforms and (self:gettransformtrigger("playernear") or self:gettransformtrigger("playernotnear")) then
+		local check = false
 		if type(self.playerneardist) == "number" then
 			for i = 1, players do
 				local v = objects["player"][i]
-				if inrange(v.x+v.width/2, self.x+self.width/2-(self.playerneardist or 3), self.x+self.width/2+(self.playerneardist or 3)) then
-					if self:gettransformtrigger("playernear") then
-						self:transform(self:gettransformsinto("playernear"))
-						return
-					end
-				elseif self:gettransformtrigger("playernotnear") then
-					self:transform(self:gettransformsinto("playernotnear"))
-					return
-				end
+				check = inrange(v.x+v.width/2, self.x+self.width/2-(self.playerneardist or 3), self.x+self.width/2+(self.playerneardist or 3))
+				if check then break end
 			end
 		elseif type(self.playerneardist) == "table" and #self.playerneardist == 4 then
 			local col = checkrect(self.x+self.playerneardist[1], self.y+self.playerneardist[2], self.playerneardist[3], self.playerneardist[4], {"player"})
-			if #col > 0 then
-				if self:gettransformtrigger("playernear") then
-					self:transform(self:gettransformsinto("playernear"))
-					return
+			check = (#col > 0)
+		end
+
+		if check and self:gettransformtrigger("playernear")then
+			self:transform(self:gettransformsinto("playernear"))
+			return
+		elseif (not check) and self:gettransformtrigger("playernotnear") then
+			self:transform(self:gettransformsinto("playernotnear"))
+			return
+		end
+	end
+	
+	--Check if enemy/enemies is near
+	if self.transforms and (self:gettransformtrigger("enemynear") or self:gettransformtrigger("enemynotnear")) then
+		local check = false
+		for i, v in pairs(objects["enemy"]) do
+			if (type(self.enemynearcheck) == "table" and tablecontains(self.enemynearcheck, v.t)) or self.enemynearcheck == v.t then
+				if type(self.enemyneardist) == "number" then
+					check = inrange(v.x+v.width/2, self.x+self.width/2-(self.enemyneardist or 3), self.x+self.width/2+(self.enemyneardist or 3))
+				elseif type(self.enemyneardist) == "table" and #self.enemyneardist == 4 then
+					check = aabb(v.x, v.y, v.width, v.height, self.x+self.enemyneardist[1], self.y+self.enemyneardist[2], self.enemyneardist[3], self.enemyneardist[4])
 				end
-			elseif self:gettransformtrigger("playernotnear") then
-				self:transform(self:gettransformsinto("playernotnear"))
-				return
+				if check then break end
 			end
+		end
+
+		if check and self:gettransformtrigger("enemynear")then
+			self:transform(self:gettransformsinto("enemynear"))
+			return
+		elseif (not check) and self:gettransformtrigger("enemynotnear") then
+			self:transform(self:gettransformsinto("enemynotnear"))
+			return
 		end
 	end
 	
