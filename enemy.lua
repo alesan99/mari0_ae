@@ -2266,11 +2266,11 @@ function enemy:shotted(dir, cause, high, fireball, star)
 		collectcoin(nil, nil, tonumber(self.givecoinwhenshot) or 1)
 	end
 	
-    if self.shotsound then
-        self:playsound(self.shotsound)
-    elseif not self.noshotsound then
+	if self.shotsound then
+		self:playsound(self.shotsound)
+	elseif not self.noshotsound then
 		self:playsound("shot")
-    end
+	end
 	
 	if self.transforms then
 		if self:gettransformtrigger("shot") then
@@ -2401,7 +2401,7 @@ function enemy:customtimeraction(action, arg, arg2)
 
 		elseif a == "if" then
 			self:ifstatement(action, ogarg, ogarg2)
-			--                   first;  Symb; Second;     Action;     Arg;
+			--				   first;  Symb; Second;	 Action;	 Arg;
 			--EXAMPLE: [0,["if","speedx",">=","speedy"],["set","speedy"],25]
 		end
 	else --backwards compatibility
