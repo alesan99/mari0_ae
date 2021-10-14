@@ -969,7 +969,7 @@ function mario:update(dt)
 			local dobreak = false
 			for j, obj in pairs(dkhammerkill) do
 				for i, v in pairs(objects[obj]) do
-					if (not v.shot) and v.width and aabb(x, y, w, h, v.x, v.y, v.width, v.height) then
+					if v.active and (not v.shot) and v.width and aabb(x, y, w, h, v.x, v.y, v.width, v.height) then
 						if obj == "enemy" then
 							if v:shotted("right", "dkhammer", false, false) ~= false then
 								addpoints(v.firepoints or 200, self.x, self.y)
