@@ -1924,7 +1924,7 @@ function mario:update(dt)
 			if self.animationmisc then
 				self.animationmisc.frame = 2
 				if self.animationmisc.locked then
-					self.animationmisc.frame = 2
+					self.animationmisc.frame = 1
 				end
 			end
 			self.active = true
