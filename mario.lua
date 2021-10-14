@@ -7201,6 +7201,7 @@ function destroyblock(x, y, v) --v = true, "nopoints"
 	if (not v) or not (v == "nopoints") then
 		addpoints(50)
 	end
+	updateranges()
 	
 	if debris and blockdebrisquads[debris] then
 		table.insert(blockdebristable, blockdebris:new(x-.5, y-.5, 3.5, -23, blockdebrisimage, blockdebrisquads[debris][spriteset]))
@@ -7213,7 +7214,7 @@ function destroyblock(x, y, v) --v = true, "nopoints"
 		table.insert(blockdebristable, blockdebris:new(x-.5, y-.5, 3.5, -14))
 		table.insert(blockdebristable, blockdebris:new(x-.5, y-.5, -3.5, -14))
 	end
-		
+	
 	if (not v) or (v == "nopoints") then
 		generatespritebatch()
 	end

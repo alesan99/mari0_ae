@@ -436,7 +436,11 @@ function enemy:init(x, y, t, a, properties)
 				if type(self.spawnchildrenoffsety) == "table" then
 					offsety = self.spawnchildrenoffsety[i]
 				end
-				local temp = enemy:new(self.x+self.width/2+.5+offsetx, self.y+self.height+offsety, self.spawnchildren[i], {"ignorespawnchildren"})
+				local a = {"ignorespawnchildren"}
+				if self.childrencanspawnchildren then
+					a = {}
+				end
+				local temp = enemy:new(self.x+self.width/2+.5+offsetx, self.y+self.height+offsety, self.spawnchildren[i], a)
 				if self.spawnchildrenparent then
 					temp.parent = self
 				end
@@ -1787,7 +1791,7 @@ function enemy:update(dt)
 		end
 	end
 	
-	if self.facesplayer then
+	if self.facesplayer or self.facesplayery then
 		local closestplayer = 1
 		local closestdist = math.sqrt((objects["player"][1].x-self.x)^2+(objects["player"][1].y-self.y)^2)
 		for i = 2, players do
@@ -1799,10 +1803,19 @@ function enemy:update(dt)
 			end
 		end
 		
-		if objects["player"][closestplayer].x + objects["player"][closestplayer].width/2 > self.x + self.width/2 then
-			self.animationdirection = "left"
-		else
-			self.animationdirection = "right"
+		if self.facesplayer then
+			if objects["player"][closestplayer].x + objects["player"][closestplayer].width/2 > self.x + self.width/2 then
+				self.animationdirection = "left"
+			else
+				self.animationdirection = "right"
+			end
+		end
+		if self.facesplayery then
+			if objects["player"][closestplayer].y + objects["player"][closestplayer].height/2 > self.y + self.height/2 then
+				self.upsidedown = false
+			else
+				self.upsidedown = true
+			end
 		end
 	end
 	

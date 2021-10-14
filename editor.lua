@@ -1342,6 +1342,48 @@ function editor_draw()
 							love.graphics.draw(platformimg, platformquad[3], math.floor((x+dx+platwidth-2-xscroll+offx)*16*scale), math.floor((y+dy-yscroll-23/16+offy)*16*scale), 0, scale, scale)
 						end
 					end
+				elseif customrcopen == "platformspawnerup" or customrcopen == "platformspawnerdown" then
+					local t = rightclickvalues2
+					if t[1] then
+						local platwidth = math.floor((rightclickobjects[5].value*9+1)*2)/2
+						local dx, dy = 0, 0
+						local x, y = rightclickmenucox, rightclickmenucoy
+						local offx, offy = 0, -0.5
+						if platwidth ~= math.floor(platwidth) then
+							offx = -platwidth/2+0.5
+						end
+
+						print(t[4])
+
+						local transparent = false
+						while (t[4] == "down" and y+offy < mapheight+0.5) or (t[4] == "up" and y+offy > 0) do
+							love.graphics.setColor(255,255,255,255)
+							if transparent then
+								love.graphics.setColor(255, 255, 255, 100)
+							end
+							for i = 1, platwidth do
+								local q = 2
+								if i == 1 then
+									q = 1
+								elseif i == platwidth then
+									q = 3
+								end
+								love.graphics.draw(platformimg, platformquad[q], math.floor((x+i-2-xscroll+offx)*16*scale), math.floor((y-yscroll-23/16+offy)*16*scale), 0, scale, scale)
+							end
+							if math.ceil(platwidth) ~= platwidth then
+								love.graphics.draw(platformimg, platformquad[3], math.floor((x+platwidth-2-xscroll+offx)*16*scale), math.floor((y-yscroll-23/16+offy)*16*scale), 0, scale, scale)
+							end
+
+							if t[4] == "down" then
+								offy = offy + ((rightclickobjects[9].value*9+1) * (((rightclickobjects[7].value*19.5)/2)+0.5))
+							elseif t[4] == "up" then
+								offy = offy - ((rightclickobjects[9].value*9+1) * (((rightclickobjects[7].value*19.5)/2)+0.5))
+							end
+							if not transparent then
+								transparent = true
+							end
+						end
+					end
 				elseif customrcopen == "belt" or customrcopen == "beltswitch" then
 					drawbelt(rightclickmenucox, rightclickmenucoy, rightclickvalues2[2], customrcopen, rightclickvalues2[3] or false)
 				elseif customrcopen == "redseesaw" then
