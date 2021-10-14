@@ -36,7 +36,7 @@
 	-Galas for power up sprites
 	-Bobthelawyer for mario's hammer physics code
 	-KGK64 for Dry beetle sprites
-	-WillWare for animated quad cache code from Mari0 SE Community Edtion
+	-Skysometric for animated quad cache code from Mari0 SE Community Edtion
 	-Oxiriar and Toonn from the Mari0 Gang Discord for smb3 item sprites
 	-NH1507 for toad and toadette character sprites
 	-HansAgain for new portal sprites, new mario sprites, and pneumatic tubes
