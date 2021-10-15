@@ -38,11 +38,7 @@ function longfire:init(x, y, r, on)
 	end
 	
 	self.active = true
-	if self.dir ~= "right" or self.dir ~= "left" then
-		self.static = false
-	else
-		self.static = true
-	end
+	self.static = true
 	self.gravity = 0
 	self.category = 17
 	
@@ -82,6 +78,7 @@ function longfire:init(x, y, r, on)
 	self.toggletimer = 0
 	self.quadi = 1
 	self.burp = true
+	self.portalable = false
 end
 
 function longfire:update(dt)
