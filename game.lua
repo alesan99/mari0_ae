@@ -812,6 +812,10 @@ function game_update(dt)
 	for i, v in pairs(objects["funnel"]) do
 		v:update(dt)
 	end
+	--tracks
+	for i, v in pairs(tracks) do
+		v:update(dt)
+	end
 
 	--clear pipes
 	local delete = {}

@@ -79,6 +79,14 @@ function track:init(x, y, r)
 end
 
 function track:update(dt)
+	--lazy, update any newly spawned trackcontrollers
+	print(self.trackcontrollernum)
+	if self.on == false and self.trackcontrollernum and self.trackcontrollernum ~= #objects["trackcontroller"] then
+		print("eyo")
+		self:tellcontrollers()
+	end
+	self.trackcontrollernum = #objects["trackcontroller"]
+
 	if self.delete then
 		return true
 	end
@@ -104,6 +112,10 @@ function track:input(t)
 	elseif t == "toggle" then
 		self.on = not self.on
 	end
+	self:tellcontrollers()
+end
+
+function track:tellcontrollers()
 	local trackcontrollers = {}
 	for i, v in pairs(objects["trackcontroller"]) do
 		if not trackcontrollers[v.x .. "-" .. v.y] then
