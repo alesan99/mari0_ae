@@ -78,7 +78,6 @@ function longfire:init(x, y, r, on)
 	self.toggletimer = 0
 	self.quadi = 1
 	self.burp = true
-	self.portalable = false
 end
 
 function longfire:update(dt)
