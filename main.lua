@@ -1186,6 +1186,7 @@ function lovedraw()
 		end
 	end
 	love.graphics.setColor(255, 255, 255)
+	love.graphics.push()
 	if gamestate == "menu" or gamestate == "mappackmenu" or gamestate == "onlinemenu" or gamestate == "lobby" or gamestate == "options" then
 		menu_draw()
 	elseif gamestate == "levelscreen" or gamestate == "gameover" or gamestate == "mappackfinished" or gamestate == "dclevelscreen" then
@@ -1195,6 +1196,7 @@ function lovedraw()
 	elseif gamestate == "intro" then
 		intro_draw()
 	end
+	love.graphics.pop()
 	
 	notice.draw()
 	
