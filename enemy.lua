@@ -757,7 +757,7 @@ function enemy:update(dt)
 				if self.bouncetimerstage and not self.bounceforcerandom then
 					force = self.bounceforce[self.bouncetimerstage]
 				else
-					force = self.bounceforce[math.floor(#self.bounceforce)]
+					force = self.bounceforce[math.random(#self.bounceforce)]
 				end
 			end
 			self.speedy = -(force or 10)
