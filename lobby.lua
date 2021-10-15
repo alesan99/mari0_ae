@@ -200,10 +200,10 @@ function lobby_drawchat()
 			end]]
 			
 			love.graphics.setColor(unpack(playerlist[pid].colors[1]))
-			properprintFbackground(nick, 8*scale, (196-(height*10))*scale, true)
+			properprintbackground(nick, 8*scale, (196-(height*10))*scale, true)
 			
 			love.graphics.setColor(255, 255, 255)
-			properprintF(":" .. chatmessages[i].message, (8+(string.len(nick))*8)*scale, (196-(height*10))*scale)
+			properprint(":" .. chatmessages[i].message, (8+(string.len(nick))*8)*scale, (196-(height*10))*scale)
 			height = height + 1
 		end
 	end
