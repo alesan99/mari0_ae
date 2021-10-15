@@ -3326,6 +3326,9 @@ end
 
 function enemy:autodeleted()
 	self.dead = true
+	if self.transforms and self:gettransformtrigger("autodeleted") then
+		self:transform(self:gettransformsinto("autodeleted"))
+	end
 	if self.shot then
 		self:output()
 	else
