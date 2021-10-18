@@ -209,6 +209,7 @@ function blocktogglebutton:changeblocks(b)
 							else
 								objects["tile"][tilemap(x, y)] = nil
 								checkportalremove(x, y)
+								objects["tile"][tilemap(x, y)] = nil
 							end
 							map[x][y].oldtile = nil
 							if map[x][y].oldentitycoin then
@@ -227,6 +228,7 @@ function blocktogglebutton:changeblocks(b)
 						map[x][y].oldtile = t
 						objects["tile"][tilemap(x, y)] = nil
 						checkportalremove(x, y)
+						objects["tile"][tilemap(x, y)] = nil
 					elseif tilequads[t].coin then
 						map[x][y][1] = bricki
 						map[x][y].oldtile = t

@@ -2718,6 +2718,10 @@ function mario:updateangle()
 		end
 		return
 	end
+
+	if self.disableaiming then
+		return false
+	end
 	
 	if self.playernumber == mouseowner then
 		local scale = scale
