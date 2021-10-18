@@ -969,7 +969,7 @@ function mario:update(dt)
 			local dobreak = false
 			for j, obj in pairs(dkhammerkill) do
 				for i, v in pairs(objects[obj]) do
-					if (not v.shot) and v.width and aabb(x, y, w, h, v.x, v.y, v.width, v.height) then
+					if v.active and (not v.shot) and v.width and aabb(x, y, w, h, v.x, v.y, v.width, v.height) then
 						if obj == "enemy" then
 							if v:shotted("right", "dkhammer", false, false) ~= false then
 								addpoints(v.firepoints or 200, self.x, self.y)
@@ -1924,7 +1924,7 @@ function mario:update(dt)
 			if self.animationmisc then
 				self.animationmisc.frame = 2
 				if self.animationmisc.locked then
-					self.animationmisc.frame = 2
+					self.animationmisc.frame = 1
 				end
 			end
 			self.active = true
@@ -5226,6 +5226,13 @@ function mario:rightcollide(a, b, passive)
 	end
 
 	if self.size == 14 and self.ducking and (a ~= "mushroom") and self.blueshelled then --blueshell
+		if a == "tile" then --shell go over gaps
+			local x, y = b.cox, b.coy
+			if inmap(x, y-1) and tilequads[map[x][y-1][1]].collision == false and self.speedy > 0 and self.y+self.height+1 < y+spacerunroom then
+				self.y = b.y - self.height; self.speedy = 0; self.x = b.x-self.width+0.0001; self.falling = false
+				return false
+			end
+		end
 		if a == "tile" or a == "portalwall" or a == "spring" or a == "donut" or a == "springgreen" or a == "bigmole" or a == "muncher" or (a == "flipblock" and not b.flippable) or a == "frozencoin" or a == "buttonblock" or (a == "enemy" and (b.resistsenemykill or b.resistseverything)) then	
 			self.speedx = -math.abs(self.speedx)
 			local x, y = b.cox, b.coy
@@ -5632,6 +5639,13 @@ function mario:leftcollide(a, b)
 	end
 
 	if self.size == 14 and self.ducking and (a ~= "mushroom") and self.blueshelled then --blueshell
+		if a == "tile" then --shell go over gaps
+			local x, y = b.cox, b.coy
+			if inmap(x, y-1) and tilequads[map[x][y-1][1]].collision == false and self.speedy > 0 and self.y+self.height+1 < y+spacerunroom then
+				self.y = b.y - self.height; self.speedy = 0; self.x = b.x+1-0.0001; self.falling = false
+				return false
+			end
+		end
 		if a == "tile" or a == "portalwall" or a == "spring" or a == "donut" or a == "springgreen" or a == "bigmole" or a == "muncher" or (a == "flipblock" and not b.flippable) or a == "frozencoin" or a == "buttonblock" or (a == "enemy" and (b.resistsenemykill or b.resistseverything)) then	
 			self.speedx = math.abs(self.speedx)
 			local x, y = b.cox, b.coy
@@ -5809,6 +5823,18 @@ function mario:leftcollide(a, b)
 			end
 		end
 		self:die("time")
+	elseif a == "frozencoin" or a == "buttonblock" or a == "flipblock" then
+		--Check if mario should run across a gap.
+		local x, y = b.cox, b.coy
+		if inmap(x, y-1) and tilequads[map[x][y-1][1]].collision == false and self.speedy > 0 and self.y+self.height+1 < y+spacerunroom then
+			self.y = b.y - self.height
+			self.speedy = 0
+			self.x = b.x+1-0.0001
+			self.falling = false
+			self.animationstate = "running"
+			self:setquad()
+			return false
+		end
 	elseif a == "tile" then
 		local x, y = b.cox, b.coy
 		
@@ -6045,7 +6071,7 @@ function mario:ceilcollide(a, b)
 				if self.helmet then
 					--helmet hit
 					if self.helmet == "beetle" and not b.static then
-						if b.gravity ~= 0 then
+						if (not b.gravity) or b.gravity ~= 0 then
 							b.speedy = math.min(-helmetbounceforce, self.speedy)
 						end
 						playsound(helmethitsound)
@@ -6102,7 +6128,7 @@ function mario:ceilcollide(a, b)
 			if self.helmet then
 				--helmet hit
 				if self.helmet == "beetle" and not b.static then
-					if b.gravity ~= 0 then
+					if (not b.gravity) or b.gravity ~= 0 or a == "thwomp" then
 						b.speedy = math.min(-helmetbounceforce, self.speedy)
 					end
 					playsound(helmethitsound)
@@ -7201,6 +7227,7 @@ function destroyblock(x, y, v) --v = true, "nopoints"
 	if (not v) or not (v == "nopoints") then
 		addpoints(50)
 	end
+	updateranges()
 	
 	if debris and blockdebrisquads[debris] then
 		table.insert(blockdebristable, blockdebris:new(x-.5, y-.5, 3.5, -23, blockdebrisimage, blockdebrisquads[debris][spriteset]))
@@ -7213,7 +7240,7 @@ function destroyblock(x, y, v) --v = true, "nopoints"
 		table.insert(blockdebristable, blockdebris:new(x-.5, y-.5, 3.5, -14))
 		table.insert(blockdebristable, blockdebris:new(x-.5, y-.5, -3.5, -14))
 	end
-		
+	
 	if (not v) or (v == "nopoints") then
 		generatespritebatch()
 	end
@@ -7468,6 +7495,53 @@ function mario:emancipate(a)
 	
 	for i, v in pairs(delete) do
 		table.remove(portalprojectiles, v) --remove
+	end
+end
+
+function mario:shootportal(i)
+	if (not self.controlsenabled) or self.vine or self.fence then
+		return false
+	end
+
+	--knockback
+	if portalknockback and self.portalgun then
+		local xadd = math.sin(self.pointingangle)*30
+		local yadd = math.cos(self.pointingangle)*30
+		self.speedx = self.speedx + xadd
+		self.speedy = self.speedy + yadd
+		self.falling = true
+		self.animationstate = "falling"
+		self:setquad()
+	end
+	
+	if playertype == "portal" and self.portalgun and (self.portals == "both" or self.portals == i .. " only") then
+		local sourcex, sourcey = self.x+self.portalsourcex, self.y+self.portalsourcey
+		local direction = self.pointingangle
+		
+		net_action(self.playernumber, "portal|" .. i .. "|" .. sourcex .. "|" .. sourcey .. "|" .. direction)
+		shootportal(self.playernumber, i, sourcex, sourcey, direction)
+	elseif playertype == "minecraft" then
+		local v = self
+		local sourcex, sourcey = self.x+self.portalsourcex, self.y+self.portalsourcey
+		local cox, coy, side, tend, x, y = traceline(sourcex, sourcey, v.pointingangle)
+		
+		if i == 1 then
+			if cox then
+				local dist = math.sqrt((v.x+v.width/2 - x)^2 + (v.y+v.height/2 - y)^2)
+				if dist <= minecraftrange then
+					breakingblockX = cox
+					breakingblockY = coy
+					breakingblockprogress = 0
+				end
+			end
+		elseif i == 2 then
+			if cox then
+				local dist = math.sqrt((v.x+v.width/2 - x)^2 + (v.y+v.height/2 - y)^2)
+				if dist <= minecraftrange then
+					placeblock(cox, coy, side)
+				end
+			end
+		end
 	end
 end
 

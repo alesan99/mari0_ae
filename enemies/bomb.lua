@@ -371,7 +371,7 @@ function bomb:globalcollide(a, b)
 		return true
 	end
 	
-	if a == "fireball" or a == "player" then
+	if a == "fireball" or a == "player" or a == "checkpointflag" then
 		return true
 	end
 	

@@ -2069,7 +2069,7 @@ rightclicktype["track"] = {
 		{"button", 1, {"lay tracks", function(var) allowdrag = false; startrctrack(var) end, {{1}}},
 		{"x", function() rightclickvalues2[1] = "0:0:c:c:d" end, {}, textcolor = {255, 0, 0}}},
 		{"checkbox", 2, "visible"},
-		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}},
+		{"button", 2, {"link stop ", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}},
 	}
 }
 

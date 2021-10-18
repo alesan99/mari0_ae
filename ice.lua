@@ -227,7 +227,7 @@ function ice:passivecollide(a, b)
 end
 
 function ice:globalcollide(a, b)
-	if a == "screenboundary" then
+	if a == "screenboundary" or a == "checkpointflag" then
 		return true
 	elseif (a == "fireball" and b.t == "fireball") or a == "castlefirefire" or a == "longfire" or a == "fire" or a == "plantfire" or (a == "brofireball" and b.t ~= "ice") or a == "upfire" or a == "angrysun" or b.meltsice then
 		self:meltice()

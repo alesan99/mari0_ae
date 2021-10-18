@@ -812,6 +812,10 @@ function game_update(dt)
 	for i, v in pairs(objects["funnel"]) do
 		v:update(dt)
 	end
+	--tracks
+	for i, v in pairs(tracks) do
+		v:update(dt)
+	end
 
 	--clear pipes
 	local delete = {}
@@ -5299,15 +5303,13 @@ function game_keypressed(key, textinput)
 			animationsystem_buttontrigger(i, "down")
 		end
 		
-		if controls[i]["portal1"][1] == key and objects["player"][i].portalgun then
-			net_action(i, "portal|1|" .. objects["player"][i].x+6/16 .. "|" .. objects["player"][i].y+6/16 .. "|" .. objects["player"][i].pointingangle)
-			shootportal(i, 1, objects["player"][i].x+6/16, objects["player"][i].y+6/16, objects["player"][i].pointingangle)
+		if controls[i]["portal1"][1] == key and objects["player"][i] then
+			objects["player"][i]:shootportal(1)
 			return
 		end
 		
-		if controls[i]["portal2"][1] == key and objects["player"][i].portalgun then
-			net_action(i, "portal|2|" .. objects["player"][i].x+6/16 .. "|" .. objects["player"][i].y+6/16 .. "|" .. objects["player"][i].pointingangle)
-			shootportal(i, 2, objects["player"][i].x+6/16, objects["player"][i].y+6/16, objects["player"][i].pointingangle)
+		if controls[i]["portal2"][1] == key and objects["player"][i] then
+			objects["player"][i]:shootportal(2)
 			return
 		end
 	end
@@ -5455,61 +5457,11 @@ function game_mousepressed(x, y, button)
 			editor_mousepressed(x, y, button)
 		end
 		
-		if not noupdate and objects["player"][mouseowner] and objects["player"][mouseowner].controlsenabled and objects["player"][mouseowner].vine == false and objects["player"][mouseowner].fence == false then
-			if button == "l" or button == "r" and objects["player"][mouseowner] then
-				--knockback
-				if portalknockback and objects["player"][mouseowner].portalgun then
-					local xadd = math.sin(objects["player"][mouseowner].pointingangle)*30
-					local yadd = math.cos(objects["player"][mouseowner].pointingangle)*30
-					objects["player"][mouseowner].speedx = objects["player"][mouseowner].speedx + xadd
-					objects["player"][mouseowner].speedy = objects["player"][mouseowner].speedy + yadd
-					objects["player"][mouseowner].falling = true
-					objects["player"][mouseowner].animationstate = "falling"
-					objects["player"][mouseowner]:setquad()
-				end
-			end
-		
+		if not noupdate and objects["player"][mouseowner] then
 			if button == "l" then
-				if playertype == "portal" and objects["player"][mouseowner].portalgun and (objects["player"][mouseowner].portals == "both" or objects["player"][mouseowner].portals == "1 only") then
-					local sourcex, sourcey = objects["player"][mouseowner].x+objects["player"][mouseowner].portalsourcex, objects["player"][mouseowner].y+objects["player"][mouseowner].portalsourcey
-					local direction = objects["player"][mouseowner].pointingangle
-					
-					net_action(mouseowner, "portal|1|" .. sourcex .. "|" .. sourcey .. "|" .. direction)
-					shootportal(mouseowner, 1, sourcex, sourcey, direction)
-				elseif playertype == "minecraft" then
-					local v = objects["player"][mouseowner]
-					local sourcex, sourcey = objects["player"][mouseowner].x+objects["player"][mouseowner].portalsourcex, objects["player"][mouseowner].y+objects["player"][mouseowner].portalsourcey
-					local cox, coy, side, tend, x, y = traceline(sourcex, sourcey, v.pointingangle)
-					
-					if cox then
-						local dist = math.sqrt((v.x+v.width/2 - x)^2 + (v.y+v.height/2 - y)^2)
-						if dist <= minecraftrange then
-							breakingblockX = cox
-							breakingblockY = coy
-							breakingblockprogress = 0
-						end
-					end
-				end
-				
+				objects["player"][mouseowner]:shootportal(1)
 			elseif button == "r" then
-				if playertype == "portal" and objects["player"][mouseowner].portalgun and (objects["player"][mouseowner].portals == "both" or objects["player"][mouseowner].portals == "2 only") then
-					local sourcex, sourcey = objects["player"][mouseowner].x+objects["player"][mouseowner].portalsourcex, objects["player"][mouseowner].y+objects["player"][mouseowner].portalsourcey
-					local direction = objects["player"][mouseowner].pointingangle
-					
-					net_action(mouseowner, "portal|2|" .. sourcex .. "|" .. sourcey .. "|" .. direction)
-					shootportal(mouseowner, 2, sourcex, sourcey, direction)
-				elseif playertype == "minecraft" then
-					local v = objects["player"][mouseowner]
-					local sourcex, sourcey = objects["player"][mouseowner].x+objects["player"][mouseowner].portalsourcex, objects["player"][mouseowner].y+objects["player"][mouseowner].portalsourcey
-					local cox, coy, side, tend, x, y = traceline(sourcex, sourcey, v.pointingangle)
-					
-					if cox then
-						local dist = math.sqrt((v.x+v.width/2 - x)^2 + (v.y+v.height/2 - y)^2)
-						if dist <= minecraftrange then
-							placeblock(cox, coy, side)
-						end
-					end
-				end
+				objects["player"][mouseowner]:shootportal(2)
 			end
 		end
 			
@@ -8067,9 +8019,8 @@ function game_joystickpressed( joystick, button )
 			local s = controls[i]["portal1"]
 			if s and s[1] == "joy" then
 				if s[3] == "but" then
-					if joystick == s[2] and button == s[4] and objects["player"][i].portalgun and i ~= mouseowner then
-						net_action(i, "portal|1|" .. objects["player"][i].x+6/16 .. "|" .. objects["player"][i].y+6/16 .. "|" .. objects["player"][i].pointingangle)
-						shootportal(i, 1, objects["player"][i].x+6/16, objects["player"][i].y+6/16, objects["player"][i].pointingangle)
+					if joystick == s[2] and button == s[4] and objects["player"][i] and i ~= mouseowner then
+						objects["player"][i]:shootportal(1)
 						return
 					end
 				end
@@ -8078,9 +8029,8 @@ function game_joystickpressed( joystick, button )
 			local s = controls[i]["portal2"]
 			if s and s[1] == "joy" then
 				if s[3] == "but" then
-					if joystick == tonumber(s[2]) and button == tonumber(s[4]) and objects["player"][i].portalgun and i ~= mouseowner then
-						net_action(i, "portal|2|" .. objects["player"][i].x+6/16 .. "|" .. objects["player"][i].y+6/16 .. "|" .. objects["player"][i].pointingangle)
-						shootportal(i, 2, objects["player"][i].x+6/16, objects["player"][i].y+6/16, objects["player"][i].pointingangle)
+					if joystick == tonumber(s[2]) and button == tonumber(s[4]) and objects["player"][i] and i ~= mouseowner then
+						objects["player"][i]:shootportal(2)
 						return
 					end
 				end

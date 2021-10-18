@@ -36,7 +36,7 @@
 	-Galas for power up sprites
 	-Bobthelawyer for mario's hammer physics code
 	-KGK64 for Dry beetle sprites
-	-WillWare for animated quad cache code from Mari0 SE Community Edtion
+	-Skysometric for animated quad cache code from Mari0 SE Community Edtion
 	-Oxiriar and Toonn from the Mari0 Gang Discord for smb3 item sprites
 	-NH1507 for toad and toadette character sprites
 	-HansAgain for new portal sprites, new mario sprites, and pneumatic tubes
@@ -1186,6 +1186,7 @@ function lovedraw()
 		end
 	end
 	love.graphics.setColor(255, 255, 255)
+	love.graphics.push()
 	if gamestate == "menu" or gamestate == "mappackmenu" or gamestate == "onlinemenu" or gamestate == "lobby" or gamestate == "options" then
 		menu_draw()
 	elseif gamestate == "levelscreen" or gamestate == "gameover" or gamestate == "mappackfinished" or gamestate == "dclevelscreen" then
@@ -1195,6 +1196,7 @@ function lovedraw()
 	elseif gamestate == "intro" then
 		intro_draw()
 	end
+	love.graphics.pop()
 	
 	notice.draw()
 	

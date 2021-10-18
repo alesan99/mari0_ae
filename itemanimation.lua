@@ -27,6 +27,8 @@ function itemanimation:update(dt)
 	self.timer = self.timer + dt
 	if self.timer >= mushroomtime then
 		self:spawn()
+	end
+	if self.instantdelete then
 		return true
 	end
 end

@@ -438,8 +438,8 @@ function animation:update(dt)
 						objects["player"][i].x = tonumber(v[3])
 					end
 				else
-					if objects["player"][tonumber(string.sub(v[3], -1))] then
-						objects["player"][tonumber(string.sub(v[3], -1))].x = tonumber(v[4])
+					if objects["player"][tonumber(string.sub(v[2], -1))] then
+						objects["player"][tonumber(string.sub(v[2], -1))].x = tonumber(v[3])
 					end
 				end
 			elseif v[1] == "sety" then
@@ -448,8 +448,8 @@ function animation:update(dt)
 						objects["player"][i].y = tonumber(v[3])
 					end
 				else
-					if objects["player"][tonumber(string.sub(v[3], -1))] then
-						objects["player"][tonumber(string.sub(v[3], -1))].y = tonumber(v[4])
+					if objects["player"][tonumber(string.sub(v[2], -1))] then
+						objects["player"][tonumber(string.sub(v[2], -1))].y = tonumber(v[3])
 					end
 				end
 			elseif v[1] == "playerwalk" then
