@@ -216,7 +216,7 @@ function drybones:update(dt)
 			if self.timer > 3.8 then
 				self.spiked = false
 				if self.supersized then
-					self.stompbounce = true
+					self.stompbounceifsmall = true
 				end
 				self.quad = starquad[spriteset][1]
 				if self.animationdirection == "right" then
@@ -229,12 +229,12 @@ function drybones:update(dt)
 				if self.timer < 2.7 or self.timer > 3.6 then
 					self.spiked = false
 					if self.supersized then
-						self.stompbounce = true
+						self.stompbounceifsmall = true
 					end
 					self.quad = starquad[spriteset][3]
 				else
 					self.spiked = true
-					self.stompbounce = false
+					self.stompbounceifsmall = false
 					self.quad = starquad[spriteset][4]
 				end
 				self.speedx = 0
@@ -463,6 +463,6 @@ function drybones:startfall()
 end
 
 function drybones:dosupersize()
-	self.stompbounce = true
+	self.stompbounceifsmall = true
 	self.stompbouncesound = true
 end

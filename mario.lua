@@ -4698,7 +4698,7 @@ function mario:floorcollide(a, b)
 			self.animationstate = anim
 			return false
 		elseif b.stompable then
-			if b.stompbounce then--bounce off of enemy
+			if b.stompbounce or (b.stompbounceifsmall and self.size ~= 16) then--bounce off of enemy
 				self:stompbounce(a, b)
 			else
 				self:stompenemy(a, b)
@@ -4774,7 +4774,7 @@ function mario:floorcollide(a, b)
 		return false
 	elseif (a == "goomba" and b.t ~= "spikey" and  b.t ~= "spikeyfall" and b.t ~= "spiketop" and b.t ~= "bigspikey" and (b.t ~= "shyguy" or self.groundpounding)) or a == "bulletbill" or a == "flyingfish" or a == "lakito" or a == "hammerbro" or (a == "koopa" and b.t ~= "downspikey" and b.t ~= "spikeyshell") or a == "bigbill" or a == "cannonball" or a == "splunkin" or a == "bigkoopa" or (a == "drybones" and not b.spiked) or a == "ninji" or a == "mole" or (a == "bomb" and not b.explosion)
 		or (a == "boomboom" and b.ducking == false and b.stomped == false) or (a == "squid" and b.color == "pink") or (a == "pokey" and b.t == "snowpokey") or a == "rockywrench" or (a == "koopaling" and b.stompable) or a == "magikoopa" or a == "spike" or (a == "spikeball" and b.stompable) or (a == "plantcreeper" and b.stompable) then
-		if b.stompbounce then--bounce off of enemy
+		if b.stompbounce or (b.stompbounceifsmall and self.size ~= 16) then--bounce off of enemy
 			self:stompbounce(a, b)
 		else
 			self:stompenemy(a, b)
@@ -5302,7 +5302,7 @@ function mario:rightcollide(a, b, passive)
 				end
 
 				if self.speedy > 2 and b.stompable then --not in orignal SE, stomp if speed is high
-					if b.stompbounce then--bounce off of enemy
+					if b.stompbounce or (b.stompbounceifsmall and self.size ~= 16) then--bounce off of enemy
 						self:stompbounce(a, b)
 					else
 						self:stompenemy(a, b)
@@ -5364,7 +5364,7 @@ function mario:rightcollide(a, b, passive)
 		end
 	elseif self.speedy > 2 and ((a == "goomba" and b.t ~= "spikey" and  b.t ~= "spikeyfall" and b.t ~= "spiketop" and b.t ~= "bigspikey" and b.t ~= "shyguy") or a == "bulletbill" or a == "flyingfish" or a == "lakito" or a == "hammerbro" or (a == "koopa" and b.t ~= "downspikey" and b.t ~= "spikeyshell") or a == "bigbill" or a == "cannonball" or a == "splunkin" or a == "bigkoopa" or (a == "drybones" and not b.spiked) or a == "ninji" or a == "mole"
 		or (a == "bomb" and not b.explosion) or (a == "boomboom" and b.ducking == false and b.stomped == false) or (a == "squid" and b.color == "pink") or (a == "pokey" and b.t == "snowpokey") or (a == "koopaling" and b.stompable) or a == "magikoopa" or a == "spike" or (a == "spikeball" and b.stompable) or (a == "plantcreeper" and b.dir ~= "left")) then
-		if b.stompbounce then
+		if b.stompbounce or (b.stompbounceifsmall and self.size ~= 16) then
 			self:stompbounce(a, b)
 		else
 			self:stompenemy(a, b)
@@ -5716,7 +5716,7 @@ function mario:leftcollide(a, b)
 				end
 
 				if self.speedy > 2 and b.stompable then --not in orignal SE, stomp if speed is high
-					if b.stompbounce then--bounce off of enemy
+					if b.stompbounce or (b.stompbounceifsmall and self.size ~= 16) then--bounce off of enemy
 						self:stompbounce(a, b)
 					else
 						self:stompenemy(a, b)
@@ -5777,7 +5777,7 @@ function mario:leftcollide(a, b)
 		end
 	elseif self.speedy > 2 and ((a == "goomba" and b.t ~= "spikey" and  b.t ~= "spikeyfall" and b.t ~= "spiketop" and b.t ~= "bigspikey" and b.t ~= "shyguy") or a == "bulletbill" or a == "flyingfish" or a == "lakito" or a == "hammerbro" or (a == "koopa" and b.t ~= "downspikey" and b.t ~= "spikeyshell") or a == "bigbill" or a == "cannonball" or a == "splunkin" or a == "bigkoopa" or a == "fireball" or a == "iceball" or (a == "drybones" and not b.spiked) or a == "ninji" or a == "mole" or (a == "bomb" and not b.explosion) or (a == "boomboom" and b.ducking == false and b.stomped == false)
 		or (a == "squid" and b.color == "pink") or (a == "pokey" and b.t == "snowpokey") or (a == "koopaling" and b.stompable) or a == "magikoopa" or a == "spike" or (a == "spikeball" and b.stompable) or (a == "plantcreeper" and b.dir ~= "right")) then
-		if b.stompbounce then--bounce off of enemy
+		if b.stompbounce or (b.stompbounceifsmall and self.size ~= 16) then--bounce off of enemy
 			self:stompbounce(a, b)
 		else
 			self:stompenemy(a, b)
@@ -8180,7 +8180,7 @@ function mario:axe()
 	self.static = false
 	self.animation = "axe"
 	self.fireanimationtimer = fireanimationtime
-	self.invincible = false
+	self.invincible = true--false
 	self.drawable = true
 	self.animationx = axex
 	self.animationy = axey

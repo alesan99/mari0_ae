@@ -61,8 +61,6 @@ function mole:init(x, y, r)
 		and not tilequads[map[math.floor(x+0.5)][math.floor(y+17/16)][1]].collision) then
 		self.inground = false
 		self.speedx = -molespeed
-		self.width = 12/16
-		self.height = 12/16
 		if not ground then
 			self.quad = molequad[spriteset][3]
 		else
@@ -97,16 +95,16 @@ function mole:update(dt)
 		self.speedy = 0
 		self.speedx = 0
 		self.gravity = 0
-		self.width = -1
-		self.height = -1
+		self.static = true
+		self.active = false
 		for i = 1, players do
 			local v = objects["player"][i]
 			if inrange(v.x+v.width/2, self.x+self.width/2-3, self.x+self.width/2+3) then --no player near
 				playsound(blockbreaksound)
 				self.speedx = 0
 				--self.speedx = -molespeed
-				self.width = 12/16
-				self.height = 12/16
+				self.static = false
+				self.active = true
 				self.speedy = -ninjijumpforce
 				self.quad = molequad[spriteset][2]
 				self.gravity = yacceleration

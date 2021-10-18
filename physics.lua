@@ -968,7 +968,7 @@ function checkportalHOR(self, nextY) --handles horizontal (up- and down facing) 
 				
 				local testx, testy, testspeedx, testspeedy, testrotation = portalcoords(self.x, self.y, self.speedx, self.speedy, self.width, self.height, self.rotation, self.animationdirection, entryportalX, entryportalY, entryportalfacing, exitportalX, exitportalY, exitportalfacing, self, true)
 			
-				if #checkrect(testx, testy, self.width, self.height, {"exclude", self}, false) == 0 then --Check if exit position is free
+				if self.ignoreportalspacecheck or #checkrect(testx, testy, self.width, self.height, {"exclude", self}, false) == 0 then --Check if exit position is free
 					self.x, self.y, self.speedx, self.speedy, self.rotation = testx, testy, testspeedx, testspeedy, testrotation
 				else
 					self.speedy = -self.speedy*0.95
@@ -1068,7 +1068,7 @@ function checkportalVER(self, nextX) --handles vertical (left- and right facing)
 				
 				local testx, testy, testspeedx, testspeedy, testrotation = portalcoords(self.x, self.y, self.speedx, self.speedy, self.width, self.height, self.rotation, self.animationdirection, entryportalX, entryportalY, entryportalfacing, exitportalX, exitportalY, exitportalfacing, self, true)
 			
-				if #checkrect(testx, testy, self.width, self.height, {"exclude", self}, false) == 0 then
+				if self.ignoreportalspacecheck or #checkrect(testx, testy, self.width, self.height, {"exclude", self}, false) == 0 then
 					self.x, self.y, self.speedx, self.speedy, self.rotation = testx, testy, testspeedx, testspeedy, testrotation
 				else
 					self.speedx = -self.speedx
