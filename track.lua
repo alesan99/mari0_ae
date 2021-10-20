@@ -80,9 +80,7 @@ end
 
 function track:update(dt)
 	--lazy, update any newly spawned trackcontrollers
-	print(self.trackcontrollernum)
 	if self.on == false and self.trackcontrollernum and self.trackcontrollernum ~= #objects["trackcontroller"] then
-		print("eyo")
 		self:tellcontrollers()
 	end
 	self.trackcontrollernum = #objects["trackcontroller"]
@@ -387,7 +385,7 @@ function trackcontroller:update(dt)
 				if (not w.ignoreplatform) then
 					if (not b.noplatformcarrying) and inrange(w.x, b.x-w.width, b.x+b.width) then --vertical carry
 						if ((w.y == b.y - w.height) or 
-							((w.y+w.height >= b.y-0.1 and w.y+w.height < b.y+0.1)))
+							((w.y+w.height >= b.y-0.1 and w.y+w.height < b.y+0.2+math.max(0,w.speedy or 0)*gdt)))
 							and (not w.jumping) and (not w.vine) then
 							if #checkrect(w.x+xdiff, b.y-w.height, w.width, w.height, {"exclude", w}, true, condition) == 0 then
 								if (not w.trackplatformcarriedx) or math.abs(xdiff) > math.abs(w.trackplatformcarriedx) then --don't move if already moved by another platform

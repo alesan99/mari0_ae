@@ -1206,8 +1206,7 @@ rightclicktype["musicchanger"] = {
 			local f = 1
 			local t = musictable
 			v = readlevelfilesafe(v)
-			for i = 1, #t do
-				print(v,t[i])
+			for i = 1, #t do --print(v,t[i])
 				if v == t[i] then
 					f = i
 					break

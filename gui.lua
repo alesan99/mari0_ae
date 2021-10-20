@@ -650,7 +650,6 @@ function guielement:draw(a, offx, offy)
 			if (self.cursorpos == self.maxlength+1) and (self.height > 1 or self.width >= self.maxlength) then
 				x = self.width+1
 			end
-			--print(x)
 			love.graphics.rectangle("fill", (self.x+1+self.spacing+(x-1)*8)*scale, (self.y+1+self.spacing+(y-1)*10)*scale, 2*scale, 9*scale)
 		end
 	elseif self.type == "text" then
@@ -931,7 +930,6 @@ function guielement:keypress(key,textinput)
 						local highlight = {math.min(self.highlight,self.cursorpos),math.max(self.highlight,self.cursorpos)}
 						if key == "x" and self.ctrl then
 							textclipboard = self.value:sub(highlight[1],highlight[2]-1)
-							print(textclipboard)
 						end
 						self.value = self.value:sub(1,highlight[1]-1)..self.value:sub(highlight[2])
 						self.cursorpos = highlight[1]
@@ -955,7 +953,6 @@ function guielement:keypress(key,textinput)
 				elseif key == "c" and self.ctrl then
 					local highlight = {math.min(self.highlight,self.cursorpos),math.max(self.highlight,self.cursorpos)}
 					textclipboard = self.value:sub(highlight[1],highlight[2]-1)
-					print(textclipboard)
 				else
 					if android then
 						if not (textinput and textinput == "forcetextinput") then
@@ -1062,10 +1059,6 @@ function guielement:keypress(key,textinput)
 							end
 							self.cursorblink = true
 							self.timer = 0
-
-							print(self.cursorpos)
-							print(self.textoffset)
-							print("")
 						end
 					elseif key == "v" and self.ctrl and textclipboard and #textclipboard > 0 then
 						notice.new("no room to paste!")
