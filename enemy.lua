@@ -3592,7 +3592,8 @@ function enemy:transform(t, returntransform, death)
 
 	if self.frozen and (not self.dontpassfrozen) and self.iceblock then --TODO FIX
 		self.iceblock.enemy = temp
-		temp:freeze()
+		temp:freeze("ignoretransform")
+		temp.iceblock = self.iceblock
 	end
 
 	if self.supersized then
@@ -3789,8 +3790,8 @@ function enemy:dropped(gravitydir)
 	end
 end
 
-function enemy:freeze()
-	if self.transforms and self:gettransformtrigger("freeze") then
+function enemy:freeze(ignoretransform)
+	if (not ignoretransform) and self.transforms and self:gettransformtrigger("freeze") then
 		self:transform(self:gettransformsinto("freeze"))
 		return
 	end

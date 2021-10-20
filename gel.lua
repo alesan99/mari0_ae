@@ -148,7 +148,7 @@ function gel:floorcollide(a, b)
 			if map[x][y]["gels"]["top"] == self.id or (self.id == 5 and not map[x][y]["gels"]["top"]) then
 				if self.speedx > 0 then
 					for cox = x+1, x+self.speedx*0.2 do
-						if inmap(cox, y-1) and self:geltilecheck(cox, y) and not self:geltilecheck(cox, y) then
+						if inmap(cox, y-1) and self:geltilecheck(cox, y) and not self:geltilecheck(cox, y-1) then
 							if self:applygel("top", cox, y) then
 								break
 							end
