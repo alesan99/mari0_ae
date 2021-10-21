@@ -1407,8 +1407,11 @@ function editor_draw()
 						if rightclickvalues2[5] and tostring(rightclickvalues2[5]) == "true" then --centered
 							textx = textx - ((#rightclickvalues2[1]*sizesep)/2)+.5
 						end
-						if rightclickvalues2[2] then
-							love.graphics.setColor(textcolors[rightclickobjects[4].entries[rightclickvalues2[2]]])
+						if rightclickvalues2[2] == "rgb" then
+							local col = {rightclickvalues2[7], rightclickvalues2[8], rightclickvalues2[9], rightclickvalues2[10]} or {255,255,255}
+							love.graphics.setColor(col)
+						else
+							love.graphics.setColor(textcolors[rightclickvalues2[2]])
 						end
 						if rightclickvalues2[3] and tostring(rightclickvalues2[3]) == "true" then
 							properprintbackground(rightclickvalues2[1], textx*16*scale, texty*16*scale, nil, nil, size)
