@@ -16,7 +16,7 @@ function text:init(x, y, r, text)
 		--text
 		self.text = r[1]
 		--color
-		if r[2] == "rgb" then
+		if r[7] and r[8] and r[9] and r[10] then
 			self.color = {r[7], r[8], r[9], r[10]} or {255, 255, 255}
 		else
 			self.color = textcolors[r[2]] or textcolors["white"]
