@@ -1408,11 +1408,11 @@ function editor_draw()
 							textx = textx - ((#rightclickvalues2[1]*sizesep)/2)+.5
 						end
 						if rightclickvalues2[2] then
-							if rightclickvalues2[2] == "rgb" then
+							if rightclickvalues2[7] and rightclickvalues2[8] and rightclickvalues2[9] and rightclickvalues2[10] then
 								local col = {rightclickvalues2[7], rightclickvalues2[8], rightclickvalues2[9], rightclickvalues2[10]} or {255,255,255}
 								love.graphics.setColor(col)
 							else
-								love.graphics.setColor(textcolors[rightclickvalues2[2]])
+								love.graphics.setColor(textcolors[rightclickobjects[4].entries[rightclickvalues2[2]]])
 							end
 						end
 						if rightclickvalues2[3] and tostring(rightclickvalues2[3]) == "true" then
