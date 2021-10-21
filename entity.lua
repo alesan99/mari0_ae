@@ -756,6 +756,7 @@ rightclicktype["text"] = {
 	name = "text",
 	default = "text|white|false|false|false|false|255|255|255|255",
 	objfunc = function()
+		rightclickobjects[4].coloredtext = true
 		rightclickobjects[5].backgroundcolor = {100, 0, 0}
 		rightclickobjects[6].backgroundcolor = {0, 100, 0}
 		rightclickobjects[7].backgroundcolor = {0, 0, 100}
