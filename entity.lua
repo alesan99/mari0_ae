@@ -771,16 +771,16 @@ rightclicktype["text"] = {
 	end,
 	format = {
 		"text",
-		{"input", 1, "text", 12, 50, 1, function(v) rightclickvalues2[1] = v end},
+		{"input", 1, "text", 14, 50, 1, function(v) rightclickvalues2[1] = v end}, --"input", var, default, width, maxlen, height, function
 		{"slider", 7, range = {0, 255, round = 0}},
 		{"slider", 8, range = {0, 255, round = 0}},
 		{"slider", 9, range = {0, 255, round = 0}},
 		{"slider", 10, range = {0, 255, round = 0}},
-		{"checkbox", 3, "outline", function(v) rightclickvalues2[3] = v; rightclickobjects[7].var = v end, default = false},
-		{"checkbox", 5, "centered", function(v) rightclickvalues2[5] = v; rightclickobjects[8].var = v end, default = false},
-		{"checkbox", 6, "big", function(v) rightclickvalues2[6] = v; rightclickobjects[9].var = v end, default = false},
-		{"checkbox", 4, "default off", function(v) rightclickvalues2[4] = v; rightclickobjects[10].var = v end, default = false},
-		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
+		{"checkbox", 3, "outline", default = false},
+		{"checkbox", 5, "centered", default = false},
+		{"checkbox", 6, "big", default = false},
+		{"checkbox", 4, "default off", default = false},
+		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}} --"input", var, text, function
 	}
 }
 rightclicktype["regiontrigger"] = {
