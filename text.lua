@@ -16,7 +16,11 @@ function text:init(x, y, r, text)
 		--text
 		self.text = r[1]
 		--color
-		self.color = textcolors[r[2]] or textcolors["white"]
+		if r[2] == "rgb" then
+			self.color = {r[7], r[8], r[9], r[10]} or {255, 255, 255}
+		else
+			self.color = textcolors[r[2]] or textcolors["white"]
+		end
 		--outline
 		if r[3] ~= nil then
 			self.outline = r[3]
