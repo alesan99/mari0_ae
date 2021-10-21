@@ -754,20 +754,33 @@ rightclickvalues["grinder"] = {"type", "grinder", "bumper"}
 rightclicktype = {}
 rightclicktype["text"] = {
 	name = "text",
-	default = "text|white|false|false|false|false",
+	default = "text|rgb|false|false|false|false|255|255|255|255",
 	objfunc = function()
-		rightclickobjects[4].coloredtext = true
+		rightclickobjects[3].backgroundcolor = {100, 0, 0}
+		rightclickobjects[4].backgroundcolor = {0, 100, 0}
+		rightclickobjects[5].backgroundcolor = {0, 0, 100}
+		rightclickobjects[6].backgroundcolor = {50, 50, 50}
+		if rightclickvalues2[2] ~= "rgb" then
+			local col = textcolors[rightclickvalues2[2]]
+			rightclickvalues2[7], rightclickobjects[3].value  = col[1], col[1]/255
+			rightclickvalues2[8], rightclickobjects[4].value = col[2], col[2]/255
+			rightclickvalues2[9], rightclickobjects[5].value = col[3], col[3]/255
+			rightclickvalues2[10] = 255
+			rightclickvalues2[2] = "rgb"
+		end
 	end,
 	format = {
 		"text",
-		{"input", 1, "text", 14, 50, 1, function(v) rightclickvalues2[1] = v end}, --"input", var, default, width, maxlen, height, function
-		"color",
-		{"dropdown", 2, 6, nil, {"black","blue","brown","gray","green","lime","maroon","orange","pink","purple","red","sky","white","yellow"}},
-		{"checkbox", 3, "outline", default = false},
-		{"checkbox", 5, "centered", default = false},
-		{"checkbox", 6, "big", default = false},
-		{"checkbox", 4, "default off", default = false},
-		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}} --"input", var, text, function
+		{"input", 1, "text", 12, 50, 1, function(v) rightclickvalues2[1] = v end},
+		{"slider", 7, range = {0, 255, round = 0}},
+		{"slider", 8, range = {0, 255, round = 0}},
+		{"slider", 9, range = {0, 255, round = 0}},
+		{"slider", 10, range = {0, 255, round = 0}},
+		{"checkbox", 3, "outline", function(v) rightclickvalues2[3] = v; rightclickobjects[7].var = v end, default = false},
+		{"checkbox", 5, "centered", function(v) rightclickvalues2[5] = v; rightclickobjects[8].var = v end, default = false},
+		{"checkbox", 6, "big", function(v) rightclickvalues2[6] = v; rightclickobjects[9].var = v end, default = false},
+		{"checkbox", 4, "default off", function(v) rightclickvalues2[4] = v; rightclickobjects[10].var = v end, default = false},
+		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
 	}
 }
 rightclicktype["regiontrigger"] = {
