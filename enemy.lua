@@ -164,6 +164,7 @@ function enemy:init(x, y, t, a, properties)
 	if self.customtimer then
 		self.customtimertimer = 0
 		self.currentcustomtimerstage = 1
+		self.customtimerloops = {}
 	end
 	
 	--Decide on a random movement if it's random..
@@ -2434,6 +2435,19 @@ function enemy:customtimeraction(action, arg, arg2)
 				else
 					self.trackcontroller.travel = "forward"
 				end
+			end
+		elseif action == "loopstart" then
+			table.insert(self.customtimerloops, {loopstart = self.currentcustomtimerstage, loopcount = false})
+		elseif action == "loopend" and #self.customtimerloops > 0 then
+			local ll = self.customtimerloops[#self.customtimerloops]
+			if not ll.loopcount then
+				ll.loopcount = arg
+			end
+			ll.loopcount = ll.loopcount - 1
+			if ll.loopcount > 0 then
+				self.currentcustomtimerstage = ll.loopstart
+			else
+				table.remove(self.customtimerloops, #self.customtimerloops)
 			end
 		end
 		if string.sub(action, 0, 7) == "reverse" then
