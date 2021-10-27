@@ -8158,7 +8158,7 @@ function ismaptile(x, y)
 end
 
 function playmusic()
-	if editormode and not PlayMusicInEditor then
+	if (editormode and (not PlayMusicInEditor)) or NoMusic then
 		return
 	end
 	if musici >= 7 then

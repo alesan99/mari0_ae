@@ -157,7 +157,7 @@ function koopaling:update(dt)
 	end
 	local distance = math.abs(self.x - objects["player"][closestplayer].x)
 	
-	self.jumping = not (self.speedy == 0)
+	self.jumping = (not (self.speedy == 0)) or self.bigjumpwait
 	--self.stompable = (not self.shell)
 	if self.t ~= 8 then
 		self.stompbounce = self.shell
@@ -270,16 +270,35 @@ function koopaling:update(dt)
 		if self.t == 9 then
 			--bowser 3 (jesus so much uncommented code)
 			if self.bigjump then
-				if self.bigjumptimer < self.bigjumptime then
+				local wait = 0.4
+				local fallwait = 0.4
+				local ydist = 8*(self.supersized or 1)
+				if self.bigjumptimer < wait then
+					--stand still for a while
 					self.bigjumptimer = self.bigjumptimer + dt
-					local t = math.min(1, self.bigjumptimer)/(self.bigjumptime)
-					local ydist = 8*(self.supersized or 1)
+					self.frame = 2
+				elseif self.bigjumptimer-wait < self.bigjumptime then
+					--curved jump
+					self.bigjumpwait = false
+					self.frame = 1
+					self.bigjumptimer = self.bigjumptimer + dt
+					local t = math.min(1, self.bigjumptimer-wait)/(self.bigjumptime)
 					self.x = self.jumppos[1]*(1-t)+((self.playerpos[1])*t)
 					self.y = self.jumppos[2]*(1-t)+((self.playerpos[2]-ydist)*t)
-					if self.bigjumptimer > self.bigjumptime then
+				elseif self.bigjumptimer-wait < self.bigjumptime+fallwait then
+					--stay still for a bit
+					self.bigjumptimer = self.bigjumptimer + dt
+					self.frame = 7
+					self.speedy = 0
+					local v = math.min(1,(self.bigjumptimer-wait-self.bigjumptime-0.1)/(fallwait-0.1))
+					if v > 0 then
+						self.y = (self.playerpos[2]-ydist) + math.sin(math.pi*(1+v))*0.5
+					end
+					if not (self.bigjumptimer-wait < self.bigjumptime+fallwait) then
 						self.speedy = 8
 					end
 				else
+					self.bigjumpwait = false
 					self.frame = 7
 				end
 			else
@@ -576,9 +595,9 @@ function koopaling:update(dt)
 			self.jumptimer = self.jumptimer + dt
 			if self.jumptimer > 0.6 then --jump
 				self.jumpcount = self.jumpcount + 1
-				self.speedy = -koopalinghopjumpforce[self.t]
 				if self.jumpcount > 5 and distance < 20 then
 					self.bigjump = true
+					self.bigjumpwait = true
 					self.bigjumptimer = 0
 					self.jumppos = {self.x, self.y}
 					if objects["player"][closestplayer].dead then
@@ -586,9 +605,12 @@ function koopaling:update(dt)
 					else
 						self.playerpos = {objects["player"][closestplayer].x+objects["player"][closestplayer].width/2-self.width/2, objects["player"][closestplayer].y}
 					end
+					self.frame = 2
+				else
+					self.frame = 1
+					self.speedy = -koopalinghopjumpforce[self.t]
 				end
 				self.gravity = koopalingjumpgravity
-				self.frame = 1
 				self.quad = koopalingquad[self.t][self.frame]
 				self.jumptimer = 0
 				self.jumping = true
@@ -1044,7 +1066,7 @@ function koopaling:floorcollide(a, b)
 				end
 				return false
 			end
-			if a == "tile" and self.bigjump then
+			if a == "tile" and self.bigjump and (not self.bigjumpwait) then
 				for x = math.ceil(self.x), math.ceil(self.x+self.width) do
 					for y = math.ceil(self.y+.5), math.max(b.coy, math.ceil(self.y+self.height+.5)) do
 						if ismaptile(x, y) then
@@ -1061,7 +1083,7 @@ function koopaling:floorcollide(a, b)
 				end
 			end
 			self.gravity = yacceleration
-			if self.bigjump then
+			if self.bigjump and (not self.bigjumpwait) then
 				playsound(thwompsound)
 				self.jumpcount = 0
 				self.landtimer = 0
@@ -1078,9 +1100,9 @@ function koopaling:floorcollide(a, b)
 				elseif self.x < objects["player"][closestplayer].x - 2 then
 					self.animationdirection = "right"
 				end
+				self.bigjump = false
+				self.bigjumptimer = 0
 			end
-			self.bigjump = false
-			self.bigjumptimer = 0
 		elseif self.t == 8 then --bowser jr
 			if not self.shell then
 				self.speedx = 0
