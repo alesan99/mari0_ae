@@ -528,18 +528,6 @@ function enemy:update(dt)
 	end
 
 	self.funnel = false
-	if self.lifetimer and not self.shot then
-		self.lifetimer = self.lifetimer - dt
-		if self.lifetimer <= 0 then
-			if self.transforms and self:gettransformtrigger("lifetime") then
-				self:transform(self:gettransformsinto("lifetime"))
-			end
-			self:output()
-			self.dead = true
-			
-			return true
-		end
-	end
 	
 	if self.transformkill then
 		if self.transformkilldeath then
@@ -583,6 +571,19 @@ function enemy:update(dt)
 
 	if self.frozen then
 		return false
+	end
+	
+	if self.lifetimer and not self.shot then
+		self.lifetimer = self.lifetimer - dt
+		if self.lifetimer <= 0 then
+			if self.transforms and self:gettransformtrigger("lifetime") then
+				self:transform(self:gettransformsinto("lifetime"))
+			end
+			self:output()
+			self.dead = true
+			
+			return true
+		end
 	end
 
 	if self.rotationanimation then
