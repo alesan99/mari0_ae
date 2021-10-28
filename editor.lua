@@ -4337,13 +4337,26 @@ function placetile(x, y, tilei)
 				for i = 4, #map[cox][coy] do
 					map[cox][coy][i] = nil
 				end
-			elseif tablecontains(customenemies, currenttile) and enemiesdata[currenttile] and enemiesdata[currenttile].rightclickmenu then --custom enemies
-				if enemiesdata[currenttile].rightclickmenutable then
-					map[cox][coy][3] = 2
-				else
-					local default = enemiesdata[currenttile].rightclickmenu[2]
-					local s = tostring(default)
-					default = s:gsub("-", "B")
+			elseif tablecontains(customenemies, currenttile) and enemiesdata[currenttile] and (enemiesdata[currenttile].rightclickmenu or enemiesdata[currenttile].rightclick) then --custom enemies
+				local v = enemiesdata[currenttile]
+				if v.rightclickmenu then
+					if v.rightclickmenutable then
+						map[cox][coy][3] = 2
+					else
+						local default = v.rightclickmenu[2]
+						local s = tostring(default)
+						default = s:gsub("-", "B")
+						map[cox][coy][3] = default
+					end
+				elseif v.rightclick then
+					local default = ""
+					local b = v.rightclickdefaults
+					for i = 1, #b-1 do
+						default = default .. tostring(b[i]) .. "|"
+					end
+					default = default .. b[#b]
+					default = default:gsub("-", "B")
+
 					map[cox][coy][3] = default
 				end
 				for i = 4, #map[cox][coy] do
