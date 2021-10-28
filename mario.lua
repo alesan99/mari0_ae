@@ -8947,7 +8947,7 @@ function mario:turretshot(tx, ty, sx, sy, knockback) --turret
 		return false
 	end
 	if knockback then
-		if self.speedx ~= 0 and (self.speedx < 0) ~= (sx < 0) then
+		if (self.speedx < 0) ~= (sx < 0) then
 			self.speedx = self.speedx + (sx/math.abs(sx))*9 --push back
 		end
 	end
