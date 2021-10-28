@@ -5447,6 +5447,126 @@ function openrightclickmenu(x, y, tileX, tileY)
 		if v.rightclickmenutable then
 			rightclickmenu.trustWhatStartWasSetAs = true
 		end
+	elseif tablecontains(customenemies, r[2]) and enemiesdata[r[2]] and enemiesdata[r[2]].rightclick then
+		local v = enemiesdata[r[2]]
+		rightclickmenuX = x
+		rightclickmenuY = y
+		rightclickmenucox = tileX
+		rightclickmenucoy = tileY
+		rightclickmenuopen = true
+		rightclickobjects = {width = 8, height = 6}
+		customrcopen = "custom_enemy"
+
+		local rx, ry = (x/scale)+4, (y/scale)+4
+
+		local default = ""
+		local b = v.rightclickdefaults
+		for i = 1, #b-1 do
+			default = default .. b[i] .. "|"
+		end
+		default = default .. b[#b]
+		default = default:gsub("-", "B")
+
+		local usingdefaultvalues = false
+		if not r[3] then
+			table.insert(map[rightclickmenucox][rightclickmenucoy], 3, default)
+			usingdefaultvalues = true
+		end
+
+		rightclickvalues2 = {map[rightclickmenucox][rightclickmenucoy][3]} --right-click values
+		if tostring(map[rightclickmenucox][rightclickmenucoy][3]):find("|") then
+			rightclickvalues2 = tostring(map[rightclickmenucox][rightclickmenucoy][3]):split("|") --split the values
+		end
+
+		--load in default values if there aren't enough
+		if default and tostring(default):find("|") and (not usingdefaultvalues) then
+			local defaultvalues = default:split("|")
+			local numberofdefaultvalues = #defaultvalues
+			for i = #rightclickvalues2+1, numberofdefaultvalues do
+				rightclickvalues2[i] = defaultvalues[i]
+			end
+		end
+
+		local vt = rightclickvalues2
+		local addv = 0
+		local width = 0
+		local extraobjects = 0
+		for i = 1, #v.rightclick do
+			local obj = i+extraobjects
+			width = 0
+			if v.rightclick[i][1] == "text" then
+				table.insert(rightclickobjects, guielement:new("text", rx, ry, v.rightclick[i][2], {255, 255, 255}))
+				width = 8*#v.rightclick[i][2]
+				addv = 10
+			elseif v.rightclick[i][1] == "dropdown" then
+				local index = v.rightclick[i][2]
+				local var = vt[index]
+				local ents = v.rightclick[i][5]
+				if tostring(var) then
+					local target = tostring(var):gsub("B", "-")
+					var = tablecontainsistring(ents, target)
+					vt[index] = var
+				end
+			
+				local obj = guielement:new("dropdown", rx, ry, v.rightclick[i][4], function(v) rightclickobjects[obj].var = v; vt[index] = v end, vt[index], unpack(ents))
+				if v.rightclick[i][6] then
+					obj.displayentries = deepcopy(v.rightclick[i][6])
+				end
+				table.insert(rightclickobjects, obj)
+				width = v.rightclick[i][4]*8+13
+				addv = 15
+			elseif v.rightclick[i][1] == "input" then
+				local index = v.rightclick[i][2]
+				
+				table.insert(rightclickobjects, guielement:new("input", rx, ry, v.rightclick[i][4], function(v) vt[index] = v end, vt[index], v.rightclick[i][4], 1, "rightclick"))
+				width = v.rightclick[i][4]*8+5
+				addv = 16
+			elseif v.rightclick[i][1] == "checkbox" then
+				local index = v.rightclick[i][2]
+				local var = vt[index]
+				if type(var) == "string" then
+					var = (vt[index] == "true")
+				end
+
+				table.insert(rightclickobjects, guielement:new("checkbox", rx, ry+2, function(v) vt[index] = v; rightclickobjects[obj].var = v end, var, v.rightclick[i][4] or ""))
+				width = #v.rightclick[i][4]*8+10
+				addv = 13
+			end
+
+			if width+8 > rightclickobjects.width then
+				rightclickobjects.width = width+8
+			end
+			ry = ry + addv
+			rightclickobjects.height = rightclickobjects.height + addv
+		end
+
+		--Move if out of screen
+		local scootx = ((x/scale)+rightclickobjects.width > width*16)
+		local scooty = ((y/scale)+rightclickobjects.height > height*16)
+		local shifty = ((y/scale)-rightclickobjects.height < 0)
+	
+		local truey = rightclickobjects[1].y
+			
+		if scootx or scooty then
+			for i = 1, #rightclickobjects do
+				local obj = rightclickobjects[i]
+				if scootx then
+					rightclickobjects[i].x = rightclickobjects[i].x - rightclickobjects.width
+				end
+				if scooty then
+					if shifty then
+						--neither work, just shift
+						rightclickobjects[i].y = ((height*16)-(y/scale))-rightclickobjects.height+rightclickobjects[i].y
+					else
+						--just flip
+						rightclickobjects[i].y = rightclickobjects[i].y - rightclickobjects.height
+					end
+				end
+				obj:updatePos()
+			end
+		end
+		rightclickobjects.x = rightclickobjects[1].x-4
+		rightclickobjects.y = rightclickobjects[1].y-4
 	elseif entitylist[r[2]] and rightclicktype[entitylist[r[2]].t] then --custom rightclick menu
 		rightclickmenuX = x
 		rightclickmenuY = y
@@ -5770,29 +5890,58 @@ end
 
 function closecustomrc(save)
 	if rightclickobjects and inmap(rightclickmenucox,rightclickmenucoy) then
-		--save dropdowns correctly
-		local rct = rightclicktype[entitylist[map[rightclickmenucox][rightclickmenucoy][2]].t] --custom right-click table
-		local vt = rightclickvalues2
-		if rct then
-			for i, t in pairs(rct.format) do
-				local ttype = type(t)
-				if ttype == "table" then
-					local obj = t[1]
-					if obj == "dropdown" and ((not rct.t) or t.ignorerctt) then
-						if vt[t[2]] then
-							vt[t[2]] = t[5][vt[t[2]]]
+		if customrcopen == "custom_enemy" then
+			local v = enemiesdata[map[rightclickmenucox][rightclickmenucoy][2]]
+			local vt = rightclickvalues2
+			if v then
+				local index = 0
+				for i = 1, #v.rightclick do
+					if v.rightclick[i][1] ~= "text" then
+						index = v.rightclick[i][2]
+						if v.rightclick[i][1] == "dropdown" then
+							local ents =  v.rightclick[i][5]
+							if vt[index] then
+								vt[index] = ents[vt[index]]
+								vt[index] = vt[index]:gsub("-", "B")
+							end
 						end
 					end
 				end
+			else
+				notice.new("rightclick menu error", notice.red, 3)
 			end
 		else
-			notice.new("rightclick menu error", notice.red, 3)
+			--save dropdowns correctly
+			local rct = rightclicktype[entitylist[map[rightclickmenucox][rightclickmenucoy][2]].t] --custom right-click table
+			local vt = rightclickvalues2
+			if rct then
+				for i, t in pairs(rct.format) do
+					local ttype = type(t)
+					if ttype == "table" then
+						local obj = t[1]
+						if obj == "dropdown" and ((not rct.t) or t.ignorerctt) then
+							if vt[t[2]] then
+								vt[t[2]] = t[5][vt[t[2]]]
+							end
+						end
+					end
+				end
+			else
+				notice.new("rightclick menu error", notice.red, 3)
+			end
 		end
 	end
-	if rightclicktype[customrcopen].savefunc then
+	if rightclicktype[customrcopen] and rightclicktype[customrcopen].savefunc then
 		rightclicktype[customrcopen].savefunc()
 	end
-	if save and rightclicktype[customrcopen].default then
+	if customrcopen == "custom_enemy" then
+		local s = ""
+		for i = 1, #rightclickvalues2 do
+			s = s .. tostring(rightclickvalues2[i]) .. "|"
+		end
+		s = s:sub(1, -2)
+		map[rightclickmenucox][rightclickmenucoy][3] = s
+	elseif save and rightclicktype[customrcopen].default then
 		local s = ""
 		for i = 1, #rightclickvalues2 do
 			s = s .. tostring(rightclickvalues2[i]) .. "|"
