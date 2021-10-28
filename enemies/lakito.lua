@@ -48,6 +48,7 @@ function lakito:init(x, y)
 
 	self.trackable = false
 	self.pipespawnmax = 1
+	self.ignoreplatform = true
 end
 
 function lakito:update(dt)

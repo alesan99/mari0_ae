@@ -72,6 +72,7 @@ function goomba:init(x, y, t)
 			self.speedy = -10
 			self.quadi = 3
 			self.speedx = 0
+			self.ignoreplatform = true
 		end
 		self.quad = spikeyquad[self.quadi]
 	elseif self.t == "shyguy" then
@@ -1128,6 +1129,7 @@ function goomba:floorcollide(a, b)
 	if self.t == "spikeyfall" and (not breakoutmode) then
 		self.t = "spikey"
 		self.fall = false
+		self.ignoreplatform = nil
 		self.quadi = 1
 		self.quad = spikeyquad[self.quadi]
 		self.gravity = nil

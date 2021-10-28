@@ -84,6 +84,7 @@ function bigbill:init(x, y, dir)
 	self.rotation = 0
 	self.autodelete = true
 	self.timer = 0
+	self.ignoreplatform = true
 	
 	--IMAGE STUFF
 	self.drawable = true

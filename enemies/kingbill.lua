@@ -116,6 +116,7 @@ function kingbill:init(x, y, speed, dir, parent)
 	self.portalable = false
 	self.dir = dir or "right"
 	self.parent = parent
+	self.ignoreplatform = true
 	
 	self.killzonex = 100/16--x or kill circle (middle of sprite)
 	self.killzoney = 100/16--y

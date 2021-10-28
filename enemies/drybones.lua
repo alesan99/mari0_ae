@@ -338,7 +338,7 @@ function drybones:stomp(x, b)
 		self.mask = {	false, 
 			false, true, true, true, true,
 			true, true, true, true, true,
-			true, true, true, true, true,
+			true, true, true, false, true,
 			true, true, true, true, true,
 			true, true, true, true, true,
 			true, true, true, true, true,

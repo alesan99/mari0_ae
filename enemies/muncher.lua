@@ -30,8 +30,11 @@ function muncher:init(x, y, physics, r)
 			self.height = 1
 			self.x = math.floor(self.x)
 			self.y = math.floor(self.y)
+			self.cox = self.x+1
+			self.coy = self.y+1
 			self.static = true
 			self.mask = {true}
+			blockedportaltiles[tilemap(self.cox,self.coy)] = true
 		end
 	end
 	
@@ -197,6 +200,7 @@ end
 function muncher:melt()
 	if self.frozen then
 		self.frozen = false
+		blockedportaltiles[tilemap(self.cox,self.coy)] = false
 		if self.supersized then
 			makepoof(self.x+1, self.y+1, "makerpoofbig")
 		else

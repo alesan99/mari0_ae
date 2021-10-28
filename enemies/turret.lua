@@ -19,10 +19,11 @@ function turret:init(x, y, dir, t, r)
 	self.frenzy = false
 	self.dir = dir or "left"
 	self.t = t or "turret"
+	self.knockback = true
 
 	self.r = r
 	if self.r and self.r ~= "link" then
-		local v = convertr(self.r, {"string", "string"}, true)
+		local v = convertr(self.r, {"string", "string", "bool"}, true)
 		--DIR
 		self.dir = v[1]
 
@@ -31,6 +32,15 @@ function turret:init(x, y, dir, t, r)
 			self.t = "turret2"
 		else
 			self.t = "turret"
+		end
+
+		self.knockback = v[3]
+		if v[3] == nil then
+			if mappackversion and mappackversion <= 13.0114 then
+				self.knockback = false
+			else
+				self.knockback = true
+			end
 		end
 	end
 	
@@ -206,6 +216,11 @@ function turret:ceilcollide(a, b)
 	if self:globalcollide(a,b) then
 		return false
 	end
+
+	if a == "box" and b.speedy > 2 then
+		playsound(blockhitsound)
+		self:dofrenzy()
+	end
 end
 
 function turret:passivecollide(a, b)
@@ -335,10 +350,10 @@ function turret:specifficupdate(dt)
 				self.shottimer = self.shottimer - turretshottime
 				if self.dir == "right" then
 					local cox, coy, side, tend, x, y = traceline(self.x+self.width/2, self.y+self.height/2-3/16, -self.armrotation-math.pi/2+math.random()*0.05-.025)
-					table.insert(objects["turretshot"], turretshot:new(self.x+self.width/2+0.2, self.y+self.height/2-3/16, x, y, self.armrotation))
+					table.insert(objects["turretshot"], turretshot:new(self.x+self.width/2+0.2, self.y+self.height/2-3/16, x, y, self.armrotation, self.knockback))
 				else
 					local cox, coy, side, tend, x, y = traceline(self.x+self.width/2, self.y+self.height/2-3/16, -self.armrotation+math.pi/2+math.random()*0.05-.025)
-					table.insert(objects["turretshot"], turretshot:new(self.x+self.width/2-0.2, self.y+self.height/2-3/16, x, y, self.armrotation + math.pi))
+					table.insert(objects["turretshot"], turretshot:new(self.x+self.width/2-0.2, self.y+self.height/2-3/16, x, y, self.armrotation + math.pi, self.knockback))
 				end
 				if turretshotsound:isStopped() then
 					playsound(turretshotsound)
@@ -430,7 +445,7 @@ function turret:frenzyturret(dt)
 		end
 		
 		if self.t ~= "turret2" then
-			table.insert(objects["turretshot"], turretshot:new(self.x+self.width/2, self.y+self.height/2-3/16, tx, ty, self.armrotation))
+			table.insert(objects["turretshot"], turretshot:new(self.x+self.width/2, self.y+self.height/2-3/16, tx, ty, self.armrotation, self.knockback))
 			if turretshotsound:isStopped() then
 				playsound(turretshotsound)
 			end
@@ -542,12 +557,13 @@ end
 -------------------------------------------------------------------------------------------------
 turretshot = class:new()
 
-function turretshot:init(x, y, tx, ty, r)
+function turretshot:init(x, y, tx, ty, r, knockback)
 	self.x = x
 	self.y = y
 	self.tx = tx
 	self.ty = ty
 	self.timer = 0
+	self.knockback = knockback
 	--self.hittimer = 0
 end
 
@@ -561,7 +577,7 @@ function turretshot:update(dt)
 		local endx = self.x + (self.tx - self.x)*(i+.1)
 		local endy = self.y + (self.ty - self.y)*(i+.1)
 
-		if handlePlayerCollisions(startx, starty, endx, endy) then
+		if handlePlayerCollisions(startx, starty, endx, endy, self.knockback) then
 			return true
 		end
 	--	self.hittimer = self.hittimer - turrethitdelay
@@ -589,13 +605,13 @@ function turretshot:draw()
 	love.graphics.line((startx-xscroll)*16*scale, (starty-yscroll-.5)*16*scale, (endx-xscroll)*16*scale, (endy-yscroll-.5)*16*scale)
 	if HITBOXDEBUG then
 		love.graphics.setLineWidth(1)
-		handlePlayerCollisions(startx, starty, endx, endy)
+		handlePlayerCollisions(startx, starty, endx, endy, self.knockback)
 	end
 	love.graphics.setLineStyle(linestyle)
 	love.graphics.setLineWidth(linewidth)
 end
 
-function handlePlayerCollisions(sx, sy, ex, ey)
+function handlePlayerCollisions(sx, sy, ex, ey, knockback)
 	local checktable = {"player", "box", "lightbridgebody"}
 	for i, v in pairs(checktable) do
 		for j, w in pairs(objects[v]) do
@@ -609,7 +625,7 @@ function handlePlayerCollisions(sx, sy, ex, ey)
 				end
 				if aabb(math.min(sx, ex), math.min(sy, ey), tw, th, w.x, w.y, w.width, w.height) then
 					if w.turretshot then
-						w:turretshot(math.min(sx, ex)+tw/2, math.min(sy, ey)+th/2, (ex-sx), (ey-sy))
+						w:turretshot(math.min(sx, ex)+tw/2, math.min(sy, ey)+th/2, (ex-sx), (ey-sy), knockback)
 					end
 					return true
 				end

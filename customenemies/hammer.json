@@ -35,5 +35,6 @@
 	"gravity": 25,
 	"emancipatecheck": true,
 	"autodelete": true,
-	"resistsstar": true
+	"resistsstar": true,
+	"ignoreplatform": true
 }

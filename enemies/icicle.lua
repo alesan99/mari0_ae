@@ -17,7 +17,7 @@ function icicle:init(x, y, t, respawn, r)
 	self.falling = false
 	self.killstuff = true
 	self.playernear = false
-	
+	self.ignoreplatform = true
 	
 	self.emancipatecheck = true
 	self.autodelete = true

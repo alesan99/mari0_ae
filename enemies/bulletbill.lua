@@ -80,6 +80,7 @@ function bulletbill:init(x, y, dir, t)
 	self.autodelete = true
 	self.timer = 0
 	self.t = t or false
+	self.ignoreplatform = true
 	
 	--IMAGE STUFF
 	self.drawable = true
