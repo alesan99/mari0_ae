@@ -109,6 +109,9 @@ function enemy:init(x, y, t, a, properties)
 		end
 	end
 
+	-- update qaud if quadno is changed, better than running the same check 10 times
+	local oldqaudno = (self.quadno or 1)
+
 	--right click menu
 	if self.rightclickmenu and self.a[3] then
 		local s = tostring(self.a[3])
@@ -127,9 +130,6 @@ function enemy:init(x, y, t, a, properties)
 						else
 							self[name] = value
 						end
-						if name == "quadno" then
-							self.quad = self.quadgroup[self.quadno]
-						end
 					end
 				elseif testinglevel then
 					notice.new("No rightclickmenu entry\nfor number:" .. tostring(self.a[3]), notice.red, 3)
@@ -139,9 +139,6 @@ function enemy:init(x, y, t, a, properties)
 					self[self.rightclickmenu[1]] = deepcopy(self.rightclickmenu[self.a[3]])
 				else
 					self[self.rightclickmenu[1]] = self.rightclickmenu[self.a[3]]
-				end
-				if self.rightclickmenu[1] == "quadno" then
-					self.quad = self.quadgroup[self.quadno]
 				end
 			end
 		else
@@ -155,10 +152,69 @@ function enemy:init(x, y, t, a, properties)
 			else
 				self[self.rightclickmenu[1]] = self.a[3]
 			end
-			if self.rightclickmenu[1] == "quadno" then
-				self.quad = self.quadgroup[self.quadno]
+		end
+	end
+
+	--right click
+	if self.rightclick and #self.a > 0 then
+		self.a[3] = tostring(self.a[3]):gsub("B", "-")
+		local val
+		-- types
+		if self.rightclicktypes then
+			val = convertr(self.a[3], self.rightclicktypes)
+		else
+			local types = {}
+			for i = 1, #self.rightclick do
+				if self.rightclick[i][1] ~= "text" then
+					local index = self.rightclick[i][2]
+					if self.rightclick[i][1] == "dropdown" or self.rightclick[i][1] == "input" then
+						local var = self.a[3]:split("|")
+						if tonumber(var[index]) then
+							types[index] = "num"
+						else
+							types[index] = "string"
+						end
+					elseif self.rightclick[i][1] == "checkbox" then
+						types[index] = "bool"
+					end
+				end
+			end
+			val = convertr(self.a[3], types)
+		end
+		-- actally convert
+		for i = 1, #self.rightclick do
+			if self.rightclick[i][1] ~= "text" then
+				local index = self.rightclick[i][2]
+				if type(self.rightclick[i][3]) == "table" then
+					local var = false
+					if self.rightclick[i][1] == "dropdown" then -- based on rightclickmenu
+						for b = 1, #self.rightclick[i][5] do
+							if self.rightclick[i][5][b] == val[index] or (tonumber(self.rightclick[i][5][b]) and tonumber(self.rightclick[i][5][b]) == val[index]) then
+								var = b
+							end
+						end
+					elseif self.rightclick[i][1] == "checkbox" then -- first list is for if true, second for if it is false
+						if val[index] == true then var = 1 else var = 2 end
+					elseif self.rightclick[i][1] == "input" then
+						notice.new("you can't use a list\nfor an input!", notice.red, 3)
+					end
+
+					if var then
+						for j, w in pairs(self.rightclick[i][3][var]) do
+							self[j:lower()] = w
+						end
+					end
+				else
+					self[self.rightclick[i][3]] = val[index]
+				end
 			end
 		end
+		table.remove(self.a, 1)
+	end
+	
+	-- if quadno is changed in either rightclick
+	if oldqaudno ~= self.quadno then
+		self.quad = self.quadgroup[self.quadno]
 	end
 	
 	if self.customtimer then
