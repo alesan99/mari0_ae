@@ -49,5 +49,6 @@
 	"spawnsound": "bulletbill",
 	"doesntunrotate": true,
 	
-	"ignorefaithplates": true
+	"ignorefaithplates": true,
+	"ignoreplatform": true
 }

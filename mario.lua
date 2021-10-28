@@ -2026,7 +2026,7 @@ function mario:update(dt)
 					getcollectable(x, y)
 				end
 			end
-			if self.size > 1 then
+			if self.size > 1 and not (self.ducking and self.size == 14) then
 				if inmap(x, y-1) then
 					if tilequads[map[x][y-1][1]].coin then
 						collectcoin(x, y-1)
@@ -8932,7 +8932,7 @@ function mario:dive(water)
 	end
 end
 
-function mario:turretshot(tx, ty, sx, sy) --turret
+function mario:turretshot(tx, ty, sx, sy, knockback) --turret
 	if self.pickup and not self.pickup.rigidgrab then
 		if tx > self.x+self.width/2 and self.pointingangle < 0 then --right
 			return false
@@ -8946,8 +8946,10 @@ function mario:turretshot(tx, ty, sx, sy) --turret
 	if self.dead or self.starred then 
 		return false
 	end
-	if (self.speedx < 0) ~= (sx < 0) then
-		self.speedx = self.speedx + (sx/math.abs(sx))*9 --push back
+	if knockback then
+		if self.speedx ~= 0 and (self.speedx < 0) ~= (sx < 0) then
+			self.speedx = self.speedx + (sx/math.abs(sx))*9 --push back
+		end
 	end
 	if self.invincible then 
 		return false

@@ -18,6 +18,7 @@ function boo:init(x, y, t)
 					true, false}
 	
 	self.emancipatecheck = true
+	self.ignoreplatform = true
 	self.autodelete = true
 	self.light = 1
 	

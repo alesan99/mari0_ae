@@ -1986,12 +1986,13 @@ rightclicktype["energycatcherdown"].default = "down|false"
 
 rightclicktype["turretleft"] = {
 	name = "turret",
-	default = "left|turret",
+	default = "left|turret|true",
 	format = {
 		"direction",
 		{"hordirbuttonset", 1},
 		"type",
 		{"dropdown", 2, 8, nil, {"turret", "defective"}},
+		{"checkbox", 3, "knockback"},
 	},
 }
 rightclicktype["turretright"] = deepcopy(rightclicktype["turretleft"])

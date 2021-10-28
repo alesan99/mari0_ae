@@ -1618,6 +1618,7 @@ function loadbackground(background)
 	if mappackselection and mappackdropshadow then
 		dropshadow = mappackdropshadow[mappackselection]
 	end
+	mappackversion = nil
 
 	--BLOCKTOGGLE STUFF
 	solidblockperma = {false, false, false, false}
@@ -1649,7 +1650,6 @@ function loadbackground(background)
 		love.graphics.setBackgroundColor(backgroundcolor[backgroundi])
 		portalgun = true
 		portalguni = 1
-		levelversion = VERSION
 	else
 		local s = love.filesystem.read( mappackfolder .. "/" .. mappack .. "/" .. background )
 		local s2 = s:split(";")
@@ -1762,7 +1762,6 @@ function loadbackground(background)
 		customforeground = false
 		portalgun = true
 		portalguni = 1
-		levelversion = false
 		nofunallowed = nil
 		
 		for i = 2, #s2 do
@@ -1797,6 +1796,7 @@ function loadbackground(background)
 				nofunallowed = true
 			elseif s3[1] == "vs" then
 				local vs = tonumber(s3[2])
+				mappackversion = vs
 				if vs and vs > VERSION then
 					if math.abs(vs-VERSION) < 0.1 then
 						notice.new("This map was made for a\nnew patch of mari0 ae\ndownload the new version", notice.white, 4.5)

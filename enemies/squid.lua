@@ -20,6 +20,7 @@ function squid:init(x, y, color, p)
 	
 	self.freezable = true
 	self.frozen = false
+	self.ignoreplatform = true
 	
 	--IMAGE STUFF
 	self.drawable = true

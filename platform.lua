@@ -88,7 +88,7 @@ function platform:init(x, y, dir, size, r)
 		self.y = self.starty
 	end
 
-	self.checktable = {"player", "box", "enemy"}
+	self.checktable = {"player", "box", "smallspring", "enemy"}
 	for i, v in pairs(enemies) do
 		if objects[v] and underwater == false then
 			table.insert(self.checktable, v)
