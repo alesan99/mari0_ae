@@ -443,7 +443,19 @@ function thwomp:hit(a, b)
 		return true
 	elseif a == "blocktogglebutton" then
 		return true
-	elseif a == "donut" or a == "flipblock" or a == "thwomp" or a == "snakeblock" or a == "buttonblock" or a == "belt" or a == "frozencoin" or (a == "enemy" and b.stopsthwomps) then
+	elseif a == "donut" or a == "flipblock" then
+		local x, y = b.cox, b.coy
+		--search for blocks under
+		for j, w in pairs(objects[a]) do
+			if (not w.tracked) and (not w.falling) and self.x <= w.x+w.width and w.x <= self.x+self.width then
+				if w ~= b then
+					w:ceilcollide("thwomp", self)
+				end
+			end
+		end
+		self:pound()
+		return true
+	elseif a == "thwomp" or a == "snakeblock" or a == "buttonblock" or a == "belt" or a == "frozencoin" or (a == "enemy" and b.stopsthwomps) then
 		self:pound()
 		return true
 	end
