@@ -4871,7 +4871,7 @@ function mario:floorcollide(a, b)
 		self.tileice = true
 	elseif a == "box" or a == "core" then
 		--check if box can even move
-		if (b.gravitydir and (b.gravitydir == "left" or b.gravitydir == "right")) then
+		if (b.gravitydir and (b.gravitydir == "left" or b.gravitydir == "right") and self.gravitydir == b.gravitydir) then
 			if self.speedy > maxwalkspeed/2 then
 				self.speedy = self.speedy - self.speedy * 6 * gdt
 			end
@@ -5561,7 +5561,7 @@ function mario:rightcollide(a, b, passive)
 		end
 	elseif a == "box" or a == "core" then
 		--check if box can even move
-		if not (b.gravitydir and (b.gravitydir ~= "down" and b.gravitydir ~= "up")) then
+		if not (b.gravitydir and (b.gravitydir ~= "down" and b.gravitydir ~= "up") and self.gravitydir == b.gravitydir) then
 			if self.speedx > maxwalkspeed/2 then
 				self.speedx = self.speedx - self.speedx * 6 * gdt
 			end
@@ -5603,7 +5603,7 @@ function mario:rightcollide(a, b, passive)
 		end
 	end
 
-	if self.gravitydir == "right" and a ~= "tile" and a ~= "portaltile" then
+	if self.gravitydir == "right" and a ~= "tile" and a ~= "portaltile" and (not b.doesntchangeplayergravity) then
 		self.gravitydir = "down"
 	end
 	
@@ -5960,7 +5960,7 @@ function mario:leftcollide(a, b)
 		end
 	elseif a == "box" or a == "core" then
 		--check if box can even move
-		if not (b.gravitydir and (b.gravitydir ~= "down" and b.gravitydir ~= "up")) then
+		if not (b.gravitydir and (b.gravitydir ~= "down" and b.gravitydir ~= "up") and self.gravitydir == b.gravitydir) then
 			if self.speedx < -maxwalkspeed/2 then
 				self.speedx = self.speedx + math.abs(self.speedx) * 6 * gdt
 			end
@@ -6002,7 +6002,7 @@ function mario:leftcollide(a, b)
 		end
 	end
 
-	if self.gravitydir == "left" and a ~= "tile" and a ~= "portaltile" then
+	if self.gravitydir == "left" and a ~= "tile" and a ~= "portaltile" and (not b.doesntchangeplayergravity) then
 		self.gravitydir = "down"
 	end
 	
@@ -6179,7 +6179,7 @@ function mario:ceilcollide(a, b)
 		self:die("time")
 	elseif a == "box" or a == "core" then
 		--check if box can even move
-		if (b.gravitydir and (b.gravitydir == "left" or b.gravitydir == "right")) then
+		if (b.gravitydir and (b.gravitydir == "left" or b.gravitydir == "right") and self.gravitydir == b.gravitydir) then
 			if self.speedy < -maxwalkspeed/2 then
 				self.speedy = self.speedy + math.abs(self.speedy) * 6 * gdt
 			end
@@ -6361,7 +6361,7 @@ function mario:ceilcollide(a, b)
 		self.jumping = false
 		self.falling = true
 		self.speedy = headforce
-	elseif a ~= "tile" and a ~= "portaltile" then
+	elseif a ~= "tile" and a ~= "portaltile" and (not b.doesntchangeplayergravity) then
 		self.gravitydir = "down"
 	end
 end
@@ -6472,7 +6472,7 @@ function mario:passivecollide(a, b)
 			return true
 		end
 	elseif a == "box" or a == "core" then
-		if not (b.gravitydir and (b.gravitydir ~= "down" and b.gravitydir ~= "up")) then
+		if not (b.gravitydir and (b.gravitydir ~= "down" and b.gravitydir ~= "up") and self.gravitydir == b.gravitydir) then
 			if self.speedx < 0 then
 				if self.speedx < -maxwalkspeed/2 then
 					self.speedx = self.speedx - self.speedx * 6 * gdt
