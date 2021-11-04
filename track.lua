@@ -384,8 +384,8 @@ function trackcontroller:update(dt)
 			for j, w in pairs(objects[v]) do
 				if (not w.ignoreplatform) then
 					if (not b.noplatformcarrying) and inrange(w.x, b.x-w.width, b.x+b.width) then --vertical carry
-						if ((w.y == b.y - w.height) or 
-							((w.y+w.height >= b.y-0.1 and w.y+w.height < b.y+0.2+math.max(0,w.speedy or 0)*gdt)))
+						if ( (w.y == b.y - w.height) or 
+							( (w.y+w.height >= b.y-0.1-math.max(0,math.abs(ydiff)) and w.y+w.height-math.max(0,w.speedy*dt) <= b.y+0.2-math.min(0,ydiff)) ) )
 							and (not w.jumping) and (not w.vine) then
 							if #checkrect(w.x+xdiff, b.y-w.height, w.width, w.height, {"exclude", w}, true, condition) == 0 then
 								if (not w.trackplatformcarriedx) or math.abs(xdiff) > math.abs(w.trackplatformcarriedx) then --don't move if already moved by another platform
