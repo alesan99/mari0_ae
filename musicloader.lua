@@ -107,7 +107,7 @@ function music:stop(name, isfast)
 			love.audio.stop(self.loaded[musicpath:format(name)])
 		end
 		if intromusic and name == intromusic[1] then
-			intromusic = false
+			self:disableintromusic()
 		end
 	end
 end
