@@ -4314,6 +4314,7 @@ function startlevel(level, reason)
 	spriteset = 1
 	backgroundrgb = {0, 0, 0}
 	breakoutmode = nil
+	queuelowtime = false
 	
 	--GLaDOS
 	neurotoxin = false
@@ -8178,6 +8179,7 @@ function stopmusic()
 	end
 	pbuttonsound:stop()
 	music:stop("starmusic")
+	music:disableintromusic()
 end
 	
 function updatesizes(reset)
