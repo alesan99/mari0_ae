@@ -1654,6 +1654,9 @@ function game_draw()
 			for j, w in pairs(objects["yoshi"]) do
 				w:draw()
 			end
+			--[[for j, w in pairs(objects["redseesaw"]) do --has overlapping shadows
+				w:draw()
+			end]]
 			for j, w in pairs(objects) do	
 				if j ~= "tile" and j ~= "pixeltile" then
 					for i, v in pairs(w) do

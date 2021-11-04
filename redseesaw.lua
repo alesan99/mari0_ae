@@ -148,7 +148,7 @@ function redseesaw:update(dt)
 
 	--if self.targetspeed == 0 then
 		if self.rotation > self.restrotation then
-			self.targetspeed = self.targetspeed - 80*dt
+			self.targetspeed = self.targetspeed - 80*dt --40 in 60fps
 			if self.rotation+self.speed*dt < self.restrotation then
 				self.targetspeed = self.speed/2
 			end

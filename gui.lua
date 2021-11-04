@@ -619,7 +619,7 @@ function guielement:draw(a, offx, offy)
 			end
 			local s = tostring(self.value)
 			love.graphics.setColor(self.textcolor)
-			properprint(s:sub(self.textoffset+1, self.textoffset+self.width), (self.x+1+self.spacing)*scale, (self.y+2+self.spacing)*scale)
+			properprint(string.sub(s,self.textoffset+1, self.textoffset+self.width), (self.x+1+self.spacing)*scale, (self.y+2+self.spacing)*scale)
 		else
 			local x3, x4
 			local highlight
@@ -929,16 +929,16 @@ function guielement:keypress(key,textinput)
 					if self.highlight then
 						local highlight = {math.min(self.highlight,self.cursorpos),math.max(self.highlight,self.cursorpos)}
 						if key == "x" and self.ctrl then
-							textclipboard = self.value:sub(highlight[1],highlight[2]-1)
+							textclipboard = string.sub(self.value,highlight[1],highlight[2]-1)
 						end
-						self.value = self.value:sub(1,highlight[1]-1)..self.value:sub(highlight[2])
+						self.value = string.sub(self.value,1,highlight[1]-1)..string.sub(self.value,highlight[2])
 						self.cursorpos = highlight[1]
 						self.highlight = false
 						while self.cursorpos-1 < self.textoffset do
 							self.textoffset = math.max(self.textoffset - 1, 0)
 						end
 					elseif self.cursorpos > 1 then
-						self.value = self.value:sub(1,self.cursorpos-2)..self.value:sub(self.cursorpos)
+						self.value = string.sub(self.value,1,self.cursorpos-2)..string.sub(self.value,self.cursorpos)
 						if self.cursorpos > 1 then --and self.cursorpos > string.len(self.value)+1 then
 							self.cursorpos = self.cursorpos - 1
 						end
@@ -952,7 +952,7 @@ function guielement:keypress(key,textinput)
 					self.cursorpos = #self.value + 1
 				elseif key == "c" and self.ctrl then
 					local highlight = {math.min(self.highlight,self.cursorpos),math.max(self.highlight,self.cursorpos)}
-					textclipboard = self.value:sub(highlight[1],highlight[2]-1)
+					textclipboard = string.sub(self.value,highlight[1],highlight[2]-1)
 				else
 					if android then
 						if not (textinput and textinput == "forcetextinput") then
@@ -1044,11 +1044,11 @@ function guielement:keypress(key,textinput)
 							end
 							if self.highlight and targetkey ~= "" then
 								local highlight = {math.min(self.highlight,self.cursorpos),math.max(self.highlight,self.cursorpos)}
-								self.value = self.value:sub(1,highlight[1]-1)..targetkey..self.value:sub(highlight[2])
+								self.value = string.sub(self.value,1,highlight[1]-1)..targetkey..string.sub(self.value,highlight[2])
 								self.cursorpos = highlight[1]
 								self.highlight = false
 							elseif targetkey ~= "" then
-								self.value = self.value:sub(1,self.cursorpos-1)..targetkey..self.value:sub(self.cursorpos)
+								self.value = string.sub(self.value,1,self.cursorpos-1)..targetkey..string.sub(self.value,self.cursorpos)
 							end
 
 							if self.cursorpos <= self.maxlength then
