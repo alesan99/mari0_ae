@@ -5825,6 +5825,14 @@ function getTile(x, y, portalable, portalcheck, facing, ignoregrates, dir) --ret
 			return true
 		end
 	end
+
+	if objects["tile"][tilemap(x, y)] and (objects["tile"][tilemap(x, y)].slant or objects["tile"][tilemap(x, y)].slab) then
+		if portalcheck then
+			return false, 1
+		else
+			return true, 1
+		end
+	end
 	
 	--bonusstage thing for keeping it from fucking up by allowing portals to be shot next to the vine in 4-2_2 for example
 	if bonusstage then
@@ -6293,8 +6301,12 @@ function traceline(sourcex, sourcey, radians, reportal)
 	end
 
 	local pixeltilecollide = false --TODO: fix? I don't think the +1 should be added to the x
-	if objects["tile"][tilemap(currentblock[1]+1, currentblock[2])] and objects["tile"][tilemap(currentblock[1]+1, currentblock[2])].slant then
-		pixeltilecollide = true
+	if objects["tile"][tileposition] then
+		if objects["tile"][tileposition].slant then
+			pixeltilecollide = true
+		elseif objects["tile"][tileposition].slab then
+			buttonblockcollide = true
+		end
 	end
 	
 	local buttonblockcollide = false
@@ -6424,10 +6436,12 @@ function traceline(sourcex, sourcey, radians, reportal)
 			collide = true
 		end
 
-		if objects["tile"][tileposition] and objects["tile"][tileposition].slant then
-			pixeltilecollide = true
+		if objects["tile"][tileposition] then
+			if objects["tile"][tileposition].slant or objects["tile"][tileposition].slab then
+				return false, false, false, false, x, y
+			end
 		end
-		
+			
 		--local buttonblockcollide = false
 		if objects["buttonblock"][tileposition] then
 			local v = objects["buttonblock"][tileposition]
@@ -9196,11 +9210,11 @@ end
 
 function checkfortileincoord(x, y)
 	--used for enemies that turn around ledges
-	return ((tilequads[map[x][y][1]]:getproperty("collision", x, y) and (not tilequads[map[x][y][1]]:getproperty("invisible", x, y)))
+	return ( (tilequads[map[x][y][1]]:getproperty("collision", x, y) and (not tilequads[map[x][y][1]]:getproperty("invisible", x, y)) and (not (objects["tile"][tilemap(x, y)] and objects["tile"][tilemap(x, y)].slab)) )
 		or (objects["flipblock"][tilemap(x, y)] and objects["flipblock"][tilemap(x, y)].active)
 		or (objects["buttonblock"][tilemap(x, y)] and objects["buttonblock"][tilemap(x, y)].active)
 		or (objects["frozencoin"][tilemap(x, y)])
-		or objects["clearpipesegment"][tilemap(x, y)])
+		or objects["clearpipesegment"][tilemap(x, y)] )
 end
 
 function startlowtime()
