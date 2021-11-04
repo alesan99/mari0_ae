@@ -5358,6 +5358,7 @@ function openrightclickmenu(x, y, tileX, tileY)
 		return false
 	end
 	levelmodified = true
+	local scoot = false
 	--LIST OF TILES THAT DO SHIT
 	if entitylist[r[2]] and rightclickvalues[entitylist[r[2]].t] then
 		rightclickmenuX = x
@@ -5447,7 +5448,7 @@ function openrightclickmenu(x, y, tileX, tileY)
 		if v.rightclickmenutable then
 			rightclickmenu.trustWhatStartWasSetAs = true
 		end
-	elseif tablecontains(customenemies, r[2]) and enemiesdata[r[2]] and enemiesdata[r[2]].rightclick then
+elseif tablecontains(customenemies, r[2]) and enemiesdata[r[2]] and enemiesdata[r[2]].rightclick then
 		local v = enemiesdata[r[2]]
 		rightclickmenuX = x
 		rightclickmenuY = y
@@ -5491,7 +5492,11 @@ function openrightclickmenu(x, y, tileX, tileY)
 		local addv = 0
 		local width = 0
 		local extraobjects = 0
+		local index = 0
 		for i = 1, #v.rightclick do
+			if v.rightclick[i][1] ~= "text" then
+				index = index + 1
+			end
 			local obj = i+extraobjects
 			width = 0
 			if v.rightclick[i][1] == "text" then
@@ -5499,37 +5504,36 @@ function openrightclickmenu(x, y, tileX, tileY)
 				width = 8*#v.rightclick[i][2]
 				addv = 10
 			elseif v.rightclick[i][1] == "dropdown" then
-				local index = v.rightclick[i][2]
+				local ni = index
 				local var = vt[index]
-				local ents = v.rightclick[i][5]
+				local ents = v.rightclick[i][4]
 				if tostring(var) then
 					local target = tostring(var):gsub("B", "-")
 					var = tablecontainsistring(ents, target)
 					vt[index] = var
 				end
 			
-				local obj = guielement:new("dropdown", rx, ry, v.rightclick[i][4], function(v) rightclickobjects[obj].var = v; vt[index] = v end, vt[index], unpack(ents))
-				if v.rightclick[i][6] then
-					obj.displayentries = deepcopy(v.rightclick[i][6])
+				local obj = guielement:new("dropdown", rx, ry, v.rightclick[i][3], function(v) rightclickobjects[obj].var = v; vt[ni] = v end, vt[index], unpack(ents))
+				if v.rightclick[i][5] then
+					obj.displayentries = deepcopy(v.rightclick[i][5])
 				end
 				table.insert(rightclickobjects, obj)
-				width = v.rightclick[i][4]*8+13
+				width = v.rightclick[i][3]*8+13
 				addv = 15
 			elseif v.rightclick[i][1] == "input" then
-				local index = v.rightclick[i][2]
-				
-				table.insert(rightclickobjects, guielement:new("input", rx, ry, v.rightclick[i][4], function(v) vt[index] = v end, vt[index], v.rightclick[i][4], 1, "rightclick"))
-				width = v.rightclick[i][4]*8+5
+				local ni = index
+				table.insert(rightclickobjects, guielement:new("input", rx, ry, v.rightclick[i][3], function(v) vt[ni] = v end, vt[index], v.rightclick[i][3], 1, "rightclick"))
+				width = v.rightclick[i][3]*8+5
 				addv = 16
 			elseif v.rightclick[i][1] == "checkbox" then
-				local index = v.rightclick[i][2]
+				local ni = index
 				local var = vt[index]
 				if type(var) == "string" then
 					var = (vt[index] == "true")
 				end
 
-				table.insert(rightclickobjects, guielement:new("checkbox", rx, ry+2, function(v) vt[index] = v; rightclickobjects[obj].var = v end, var, v.rightclick[i][4] or ""))
-				width = #v.rightclick[i][4]*8+10
+				table.insert(rightclickobjects, guielement:new("checkbox", rx, ry+2, function(v) rightclickobjects[obj].var = v; vt[ni] = v end, var, v.rightclick[i][3] or ""))
+				width = #v.rightclick[i][3]*8+10
 				addv = 13
 			end
 
@@ -5540,33 +5544,7 @@ function openrightclickmenu(x, y, tileX, tileY)
 			rightclickobjects.height = rightclickobjects.height + addv
 		end
 
-		--Move if out of screen
-		local scootx = ((x/scale)+rightclickobjects.width > width*16)
-		local scooty = ((y/scale)+rightclickobjects.height > height*16)
-		local shifty = ((y/scale)-rightclickobjects.height < 0)
-	
-		local truey = rightclickobjects[1].y
-			
-		if scootx or scooty then
-			for i = 1, #rightclickobjects do
-				local obj = rightclickobjects[i]
-				if scootx then
-					rightclickobjects[i].x = rightclickobjects[i].x - rightclickobjects.width
-				end
-				if scooty then
-					if shifty then
-						--neither work, just shift
-						rightclickobjects[i].y = ((height*16)-(y/scale))-rightclickobjects.height+rightclickobjects[i].y
-					else
-						--just flip
-						rightclickobjects[i].y = rightclickobjects[i].y - rightclickobjects.height
-					end
-				end
-				obj:updatePos()
-			end
-		end
-		rightclickobjects.x = rightclickobjects[1].x-4
-		rightclickobjects.y = rightclickobjects[1].y-4
+		scoot = true
 	elseif entitylist[r[2]] and rightclicktype[entitylist[r[2]].t] then --custom rightclick menu
 		rightclickmenuX = x
 		rightclickmenuY = y
@@ -5831,13 +5809,16 @@ function openrightclickmenu(x, y, tileX, tileY)
 			rct.objfunc()
 		end
 		
+		scoot = true
+	end
+	if scoot then
 		--Move if out of screen
 		local scootx = ((x/scale)+rightclickobjects.width > width*16)
 		local scooty = ((y/scale)+rightclickobjects.height > height*16)
 		local shifty = ((y/scale)-rightclickobjects.height < 0)
-
+	
 		local truey = rightclickobjects[1].y
-		
+			
 		if scootx or scooty then
 			for i = 1, #rightclickobjects do
 				local obj = rightclickobjects[i]
@@ -5897,9 +5878,9 @@ function closecustomrc(save)
 				local index = 0
 				for i = 1, #v.rightclick do
 					if v.rightclick[i][1] ~= "text" then
-						index = v.rightclick[i][2]
+						index = index + 1
 						if v.rightclick[i][1] == "dropdown" then
-							local ents =  v.rightclick[i][5]
+							local ents =  v.rightclick[i][4]
 							if vt[index] then
 								vt[index] = ents[vt[index]]
 								vt[index] = vt[index]:gsub("-", "B")
