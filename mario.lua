@@ -6871,8 +6871,13 @@ function hitblock(x, y, t, v)
 			size = 2
 		end
 	end
-	if t and (t.funnel or t.nohitsound) then
-		hitsound = false
+	if t then
+		if (t.funnel or t.nohitsound) then
+			hitsound = false
+		end
+		if t.hitsblocks and not t.breaksblocks then
+			size = 1
+		end
 	end
 	
 	if size and not v then --net hit block
