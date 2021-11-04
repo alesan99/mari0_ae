@@ -2737,9 +2737,9 @@ function enemy:breakblock(a, b)
 			destroyblock(b.cox, b.coy, "nopoints")
 		else
 			if self.breaksblocks then
-				hitblock(b.cox, b.coy, {size=2}, (self.small and math.abs(self.speedx) > 0.01))
+				hitblock(b.cox, b.coy, self, true)
 			elseif self.hitsblocks then
-				hitblock(b.cox, b.coy, {size=1}, (self.small and math.abs(self.speedx) > 0.01))
+				hitblock(b.cox, b.coy, self, (self.small and math.abs(self.speedx) > 0.01))
 			end
 		end
 	elseif a == "flipblock" then
