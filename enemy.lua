@@ -164,9 +164,10 @@ function enemy:init(x, y, t, a, properties)
 			val = convertr(self.a[3], self.rightclicktypes)
 		else
 			local types = {}
+			local index = 0
 			for i = 1, #self.rightclick do
 				if self.rightclick[i][1] ~= "text" then
-					local index = self.rightclick[i][2]
+					index = index + 1
 					if self.rightclick[i][1] == "dropdown" or self.rightclick[i][1] == "input" then
 						local var = self.a[3]:split("|")
 						if tonumber(var[index]) then
@@ -182,14 +183,15 @@ function enemy:init(x, y, t, a, properties)
 			val = convertr(self.a[3], types)
 		end
 		-- actally convert
+		local index = 0
 		for i = 1, #self.rightclick do
 			if self.rightclick[i][1] ~= "text" then
-				local index = self.rightclick[i][2]
-				if type(self.rightclick[i][3]) == "table" then
+				index = index + 1
+				if type(self.rightclick[i][2]) == "table" then
 					local var = false
 					if self.rightclick[i][1] == "dropdown" then -- based on rightclickmenu
-						for b = 1, #self.rightclick[i][5] do
-							if self.rightclick[i][5][b] == val[index] or (tonumber(self.rightclick[i][5][b]) and tonumber(self.rightclick[i][5][b]) == val[index]) then
+						for b = 1, #self.rightclick[i][4] do
+							if self.rightclick[i][4][b] == val[index] or (tonumber(self.rightclick[i][4][b]) and tonumber(self.rightclick[i][4][b]) == val[index]) then
 								var = b
 							end
 						end
@@ -200,12 +202,12 @@ function enemy:init(x, y, t, a, properties)
 					end
 
 					if var then
-						for j, w in pairs(self.rightclick[i][3][var]) do
+						for j, w in pairs(self.rightclick[i][2][var]) do
 							self[j:lower()] = w
 						end
 					end
 				else
-					self[self.rightclick[i][3]] = val[index]
+					self[self.rightclick[i][2]] = val[index]
 				end
 			end
 		end
