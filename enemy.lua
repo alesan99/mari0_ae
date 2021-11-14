@@ -2412,6 +2412,8 @@ function enemy:customtimeraction(action, arg, arg2)
 			self[p] = tonumber(self[p])
 		elseif a == "tostring" then
 			self[p] = tostring(self[p])
+		elseif a == "concat" then
+			self[p] = self[p] .. arg
 
 		elseif a == "if" then
 			self:ifstatement(action, ogarg, ogarg2)
