@@ -766,6 +766,7 @@ function animation:update(dt)
 				end
 			elseif v[1] == "togglelowgravity" then
 				lowgravity = not lowgravity
+				setphysics(currentphysics)
 			elseif v[1] == "togglelightsout" then
 				lightsout = not lightsout
 			elseif v[1] == "centercamera" then
