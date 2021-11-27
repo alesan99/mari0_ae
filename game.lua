@@ -6684,6 +6684,13 @@ function loadentity(t, x, y, r, id)
 			local type, name = t[1], t[2]
 			if (not tilequads[r[1]]["breakable"]) and (not tilequads[r[1]]["coinblock"]) then
 				local obj = enemy:new(x, y, r[2], r)
+				if r["argument"] and obj then
+					if r["argument"] == "o" then --offsetted
+						obj.x = obj.x + .5
+					elseif r["argument"] == "b" then --supersized
+						supersizeentity(obj)
+					end
+				end
 				table.insert(objects["enemy"], obj)
 				table.insert(enemiesspawned, {x, y})
 				trackobject(x, y, obj, "enemy")
