@@ -7077,6 +7077,9 @@ function spawnenemyentity(x, y)
 			if r["argument"] and obj then
 				if r["argument"] == "o" then --offsetted
 					obj.x = obj.x + .5
+					if obj.startx then
+						obj.startx = obj.startx + .5
+					end
 				elseif r["argument"] == "b" then --supersized
 					supersizeentity(obj)
 				end
