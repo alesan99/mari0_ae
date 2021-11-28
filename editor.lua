@@ -4219,7 +4219,7 @@ function placetile(x, y, tilei)
 	
 	local currenttile = tilei or currenttile
 	local argument
-	if editentities and entitylist[currenttile] and entitylist[currenttile].offset then
+	if editentities and ((entitylist[currenttile] and entitylist[currenttile].offset) or (enemiesdata[currenttile] and enemiesdata[currenttile].offsetable)) then
 		local allowoffset = true
 		--don't clip with entity on the right
 		if ismaptile(cox+1, coy) and map[cox+1][coy][2] and map[cox+1][coy][2] == currenttile and not map[cox+1][coy].argument then
@@ -4232,8 +4232,9 @@ function placetile(x, y, tilei)
 			--[[if mx < 16*0 and inmap(cox-1, coy) then
 				cox = cox - 1
 				argument = "o"
-			else]]if mx > 16*0.75 then
-				if type(entitylist[currenttile].offset) == "number" then
+			else]]
+			if mx > 16*0.75 then
+				if entitylist[currenttile] and type(entitylist[currenttile].offset) == "number" then
 					currenttile = entitylist[currenttile].offset
 				else
 					argument = "o"
