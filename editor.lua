@@ -1875,34 +1875,34 @@ function editor_draw()
 						end
 					end
 				elseif not pastingtiles then 
+					--offset enemy
+					local offsetx = 0
+					if (entitylist[currenttile] and entitylist[currenttile].offset) or (enemiesdata[currenttile] and enemiesdata[currenttile].offsetable) then
+						local allowoffset = true
+						--don't clip with entity on the right
+						if ismaptile(x+1, y+1) and map[x+1][y+1][2] and map[x+1][y+1][2] == currenttile and not map[x+1][y+1].argument then
+							allowoffset = false
+						elseif ismaptile(x, y+1) and map[x][y+1][2] and map[x][y+1][2] == currenttile and not map[x][y+1].argument then
+							allowoffset = false
+						end
+						if allowoffset then
+							local mx = ((love.mouse.getX()/scale)+(xscroll*16))%16
+							--[[if mx < 16*0 then
+								offsetx = -.5
+							else]]if mx > 16*0.75 then
+								offsetx = .5
+							end
+						end
+					end
 					if not tilequads[currenttile] and enemiesdata[currenttile] then --custom enemy
 						local v = enemiesdata[currenttile]
 						if v.showicononeditor and v.icongraphic then
-							love.graphics.draw(v.icongraphic, math.floor((x-xscroll-1)*16*scale), math.floor(((y-yscroll-0.5)*16)*scale), 0, scale, scale)
+							love.graphics.draw(v.icongraphic, math.floor((x-xscroll-1+offsetx)*16*scale), math.floor(((y-yscroll-0.5)*16)*scale), 0, scale, scale)
 						else
 							local xoff, yoff = ((0.5-v.width/2+(v.spawnoffsetx or 0))*16 + v.offsetX - v.quadcenterX)*scale, (((v.spawnoffsety or 0)-v.height+1)*16-v.offsetY - v.quadcenterY)*scale
-							love.graphics.draw(v.graphic, v.quad, math.floor((x-xscroll-1)*16*scale+xoff), math.floor(((y-yscroll)*16)*scale+yoff), 0, scale, scale)
+							love.graphics.draw(v.graphic, v.quad, math.floor((x-xscroll-1+offsetx)*16*scale+xoff), math.floor(((y-yscroll)*16)*scale+yoff), 0, scale, scale)
 						end
 					else
-						--offset enemy
-						local offsetx = 0
-						if entitylist[currenttile] and entitylist[currenttile].offset then
-							local allowoffset = true
-							--don't clip with entity on the right
-							if ismaptile(x+1, y+1) and map[x+1][y+1][2] and map[x+1][y+1][2] == currenttile and not map[x+1][y+1].argument then
-								allowoffset = false
-							elseif ismaptile(x, y+1) and map[x][y+1][2] and map[x][y+1][2] == currenttile and not map[x][y+1].argument then
-								allowoffset = false
-							end
-							if allowoffset then
-								local mx = ((love.mouse.getX()/scale)+(xscroll*16))%16
-								--[[if mx < 16*0 then
-									offsetx = -.5
-								else]]if mx > 16*0.75 then
-									offsetx = .5
-								end
-							end
-						end
 						love.graphics.draw(entityquads[currenttile].image, entityquads[currenttile].quad, math.floor((x-splitxscroll[1]-1+offsetx)*16*scale), math.floor(((y-splityscroll[1]-1)*16+8)*scale), 0, scale, scale)
 					end
 					if android then
