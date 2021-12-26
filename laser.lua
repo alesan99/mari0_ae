@@ -129,8 +129,8 @@ function laser:update(dt)
 				local biggesti
 			
 				for j = 1, #rectcol, 2 do
-					if objects[rectcol[j]][rectcol[j+1]].x > biggestx then
-						biggestx = objects[rectcol[j]][rectcol[j+1]].x
+					if objects[rectcol[j]][rectcol[j+1]].x + objects[rectcol[j]][rectcol[j+1]].width > biggestx then
+						biggestx = objects[rectcol[j]][rectcol[j+1]].x + objects[rectcol[j]][rectcol[j+1]].width
 						biggesti = j
 					end
 				end
@@ -141,8 +141,8 @@ function laser:update(dt)
 				local biggesti
 			
 				for j = 1, #rectcol, 2 do
-					if objects[rectcol[j]][rectcol[j+1]].y > biggesty then
-						biggesty = objects[rectcol[j]][rectcol[j+1]].y
+					if objects[rectcol[j]][rectcol[j+1]].y + objects[rectcol[j]][rectcol[j+1]].height > biggesty then
+						biggesty = objects[rectcol[j]][rectcol[j+1]].y + objects[rectcol[j]][rectcol[j+1]].height
 						biggesti = j
 					end
 				end
