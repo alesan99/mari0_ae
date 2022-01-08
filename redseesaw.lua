@@ -59,6 +59,7 @@ function redseesaw:update(dt)
 	--self.rotation = self.rotation + dt
 	--self.rotation = math.min(math.max(self.rotation, -math.pi*.25), math.pi*.25)
 	self.targetspeed = 0
+	local speedmultiplier = 0.005 --due to bad math, seesaws used to be frame dependent. now it isn't, but a multiplier needs to be chosen to match how it used to act at ~200fps
 
 	local sr = self.size/2 --size radius
 	local x1, x2 = self.x+math.sin(self.rotation-math.pi)*sr, self.x+math.sin(self.rotation)*sr --extents of seesaw
@@ -128,7 +129,7 @@ function redseesaw:update(dt)
 
 						if w.speedy >= 0 and hold then
 							if math.ceil(w.y+w.height) >= targety then --make objects stay on tiles
-								self.targetspeed = self.targetspeed - ( (locationn2*450*(w.weight or 1)) *dt)
+								self.targetspeed = self.targetspeed - ( (locationn2*450*(w.weight or 1))*speedmultiplier--[[ *dt]])
 							end
 							--update their posistion after the seesaw moves aswell!
 							table.insert(updatetable, {v, w, locationn})
@@ -136,7 +137,7 @@ function redseesaw:update(dt)
 								w.falloverride = true
 								w.redseesaw = 0.1
 							end
-							if (w.y <= targety-w.height and w.y+w.speedy*dt >= targety-w.height) then
+							if (w.y <= targety-w.height and w.y+w.speedy*dt >= targety-w.height) and ((not v == "thwomp") and w.speedy >= 0 and w.attack) then
 								w.speedy = math.min(0, w.speedy)
 							end
 						end
@@ -148,14 +149,16 @@ function redseesaw:update(dt)
 
 	--if self.targetspeed == 0 then
 		if self.rotation > self.restrotation then
-			self.targetspeed = self.targetspeed - 80*dt --40 in 60fps
+			self.targetspeed = self.targetspeed - 80* speedmultiplier--[[*dt]] --40 in 60fps
 			if self.rotation+self.speed*dt < self.restrotation then
 				self.targetspeed = self.speed/2
+				--self.speed = self.speed*0.9
 			end
 		elseif self.rotation < self.restrotation then
-			self.targetspeed = self.targetspeed + 80*dt
+			self.targetspeed = self.targetspeed + 80* speedmultiplier--[[*dt]]
 			if self.rotation+self.speed*dt > self.restrotation then
 				self.targetspeed = self.speed/2
+				--self.speed = self.speed*0.9
 			end
 		end
 	--else

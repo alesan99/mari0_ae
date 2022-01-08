@@ -15,6 +15,7 @@ function levelscreen_load(reason, i)
 		return
 	end
 
+	windsound:stop()
 	if not continuesublevelmusic then
 		music:disableintromusic()
 	end
