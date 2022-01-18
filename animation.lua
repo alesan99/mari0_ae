@@ -466,9 +466,16 @@ function animation:update(dt)
 					if v[2] == "star" then
 						musicname = "starmusic"
 					end
+					for i, m in pairs(music.list) do
+						if m == musicname then
+							musici = i + 1 -- plus one because of the none music being number 1
+						end
+					end
 					for i, m in pairs(custommusics) do
 						if m == mappackfolder .. "/" .. mappack .. "/" .. musicname then
 							musicname = m
+							musici = 7
+							custommusic = musicname
 						end
 					end
 					music:play(musicname)
