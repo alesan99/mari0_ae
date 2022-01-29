@@ -55,6 +55,7 @@ function physicsupdate(dt)
 			for i, v in pairs(w) do
 				if ((v.static == false) or (v.activestatic == true)) and v.active then
 					--GRAVITY
+					local oldy = v.y
 					local oldgravity
 					if (not v.activestatic) and (not v.ignoregravity) then
 						--low gravity
@@ -157,7 +158,6 @@ function physicsupdate(dt)
 						xfrom, xto = xto, xfrom
 						dir = -1
 					end
-					
 					for x = xfrom, xto, dir do
 						for y = ystart, ystart+math.ceil(v.height+0.0001) do
 							--check if invisible block
@@ -233,7 +233,7 @@ function physicsupdate(dt)
 						for h, u in pairs(emancipationgrills) do
 							if u.active and v.emancipate then
 								if u.dir == "hor" then
-									if inrange(v.x+6/16, u.startx-1, u.endx, true) and inrange(u.y-14/16, v.y, v.y+v.speedy*dt, true) then
+									if inrange(v.x+6/16, u.startx-1, u.endx, true) and inrange(u.y-14/16, oldy, v.y+v.speedy*dt, true) then
 										v:emancipate(h)
 									end
 								else

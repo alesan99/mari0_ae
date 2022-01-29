@@ -598,41 +598,40 @@ function guielement:draw(a, offx, offy)
 		love.graphics.rectangle("fill", (self.x+1)*scale, (self.y+1)*scale, (1+self.width*8+2*self.spacing)*scale, (-1+self.height*10+2*self.spacing)*scale)
 		
 		love.graphics.setColor(self.textcolor)
-		--format string
-		local oldstring = self.value--string.sub(self.value, self.textoffset+1, self.textoffset+self.width)  --old offsets
-		local newstring = {}
-		for i = 1, string.len(oldstring), self.width do
-			if math.ceil(i/self.width) > self.height then
-				break
-			end
-			table.insert(newstring, string.sub(oldstring, i, i+self.width-1))
-		end
 		
 		if self.height == 1 then
 			if self.highlight then
-				local highlight = {math.min(self.highlight,self.cursorpos),math.max(self.highlight,self.cursorpos)}
+				local highlight1,highlight2 = math.min(self.highlight,self.cursorpos),math.max(self.highlight,self.cursorpos)
 
-				love.graphics.setColor({(self.textcolor[1]-self.fillcolor[1])/2,(self.textcolor[2]-self.fillcolor[2])/2,(self.textcolor[3]-self.fillcolor[3])/2})
-				local x3 = math.max(1, highlight[1] - self.textoffset)
-				local x4 = math.min(self.width+1, highlight[2] - self.textoffset)
-				love.graphics.rectangle("fill", (self.x+2+self.spacing+(x3-1)*8)*scale, (self.y+2+self.spacing)*scale, (x4-x3)*8*scale, 7*scale)
+				love.graphics.setColor((self.textcolor[1]-self.fillcolor[1])/2,(self.textcolor[2]-self.fillcolor[2])/2,(self.textcolor[3]-self.fillcolor[3])/2)
+				local x3, x4 = math.max(1, highlight1 - self.textoffset), math.min(self.width+1, highlight2 - self.textoffset)
+				love.graphics.rectangle("fill", (self.x+2+self.spacing+(x3-1)*8)*scale, (self.y+1+self.spacing)*scale, (x4-x3)*8*scale, 9*scale)
 			end
 			local s = tostring(self.value)
 			love.graphics.setColor(self.textcolor)
 			properprint(string.sub(s,self.textoffset+1, self.textoffset+self.width), (self.x+1+self.spacing)*scale, (self.y+2+self.spacing)*scale)
 		else
+			--format string for tall text boxes
+			local oldstring = self.value--string.sub(self.value, self.textoffset+1, self.textoffset+self.width)  --old offsets
+			local newstring = {}
+			for i = 1, string.len(oldstring), self.width do
+				if math.ceil(i/self.width) > self.height then
+					break
+				end
+				table.insert(newstring, string.sub(oldstring, i, i+self.width-1))
+			end
+
 			local x3, x4
-			local highlight
+			local highlight1,highlight2
 			if self.highlight then
-				highlight = {math.min(self.highlight,self.cursorpos),math.max(self.highlight,self.cursorpos)}
+				highlight1,highlight2 = math.min(self.highlight,self.cursorpos),math.max(self.highlight,self.cursorpos)
 			end
 			for i = 1, #newstring do
 				if self.highlight then
-					love.graphics.setColor({(self.textcolor[1]-self.fillcolor[1])/2,(self.textcolor[2]-self.fillcolor[2])/2,(self.textcolor[3]-self.fillcolor[3])/2})
-					x3 = math.max(math.ceil(highlight[1]-1)+1-self.width*(i-1),1)
-					x4 = math.min(math.ceil(highlight[2]-1)+1-self.width*(i-1),self.width+1)
-					if highlight[2] >= (i-1)* self.width+1 and highlight[1] <= i * self.width then
-						love.graphics.rectangle("fill", (self.x+2+self.spacing+(x3-1)*8)*scale, (self.y+2+self.spacing+(i-1)*10)*scale, (x4-x3)*8*scale, 7*scale)
+					love.graphics.setColor((self.textcolor[1]-self.fillcolor[1])/2,(self.textcolor[2]-self.fillcolor[2])/2,(self.textcolor[3]-self.fillcolor[3])/2)
+					x3, x4 = math.max(math.ceil(highlight1-1)+1-self.width*(i-1),1), math.min(math.ceil(highlight2-1)+1-self.width*(i-1),self.width+1)
+					if highlight2 >= (i-1)* self.width+1 and highlight1 <= i * self.width then
+						love.graphics.rectangle("fill", (self.x+2+self.spacing+(x3-1)*8)*scale, (self.y+1+self.spacing+(i-1)*10)*scale, (x4-x3)*8*scale, 9*scale)
 					end
 				end
 				love.graphics.setColor(self.textcolor)
@@ -884,9 +883,9 @@ function guielement:keypress(key,textinput)
 						self.highlight = self.highlight or self.cursorpos
 					end
 					self.cursorpos = math.max(1, self.cursorpos - 1)
-					while self.cursorpos-1 < self.textoffset do
-						self.textoffset = math.max(self.textoffset - 1, 0)
-					end
+					--while self.cursorpos-1 < self.textoffset do
+						self.textoffset = math.max(math.min(self.cursorpos-1, self.textoffset), 0)
+					--end
 					self.cursorblink = true
 					self.timer = 0
 				elseif key == "right" then
@@ -900,9 +899,9 @@ function guielement:keypress(key,textinput)
 					end
 
 					self.cursorpos = math.min(#self.value + 1, self.cursorpos + 1)
-					while self.cursorpos-1 >= self.textoffset+self.width do
-						self.textoffset = math.min(self.textoffset + 1, self.maxlength - self.width)
-					end
+					--while self.cursorpos-1 >= self.textoffset+self.width do
+						self.textoffset = math.min(math.max(self.textoffset, self.cursorpos-self.width), self.maxlength - self.width)
+					--end
 					self.cursorblink = true
 					self.timer = 0
 				elseif key == "up" and self.height > 1 then
@@ -934,12 +933,12 @@ function guielement:keypress(key,textinput)
 						self.value = string.sub(self.value,1,highlight[1]-1)..string.sub(self.value,highlight[2])
 						self.cursorpos = highlight[1]
 						self.highlight = false
-						while self.cursorpos-1 < self.textoffset do
-							self.textoffset = math.max(self.textoffset - 1, 0)
-						end
+						--while self.cursorpos-1 < self.textoffset do
+							self.textoffset = math.max(math.min(self.textoffset, self.cursorpos-1), 0)
+						--end
 					elseif self.cursorpos > 1 then
 						self.value = string.sub(self.value,1,self.cursorpos-2)..string.sub(self.value,self.cursorpos)
-						if self.cursorpos > 1 then --and self.cursorpos > string.len(self.value)+1 then
+						if self.cursorpos > 1 then --and self.cursorpos > string.len(self.value)+1 then --TODO
 							self.cursorpos = self.cursorpos - 1
 						end
 						self.textoffset = math.max(self.textoffset - 1, 0)
@@ -1054,9 +1053,9 @@ function guielement:keypress(key,textinput)
 							if self.cursorpos <= self.maxlength then
 								self.cursorpos = self.cursorpos + #targetkey
 							end
-							while self.cursorpos > self.textoffset+self.width do
-								self.textoffset = self.textoffset + 1
-							end
+							--while self.cursorpos > self.textoffset+self.width do
+								self.textoffset = math.max(self.cursorpos-self.width, self.textoffset)
+							--end
 							self.cursorblink = true
 							self.timer = 0
 						end

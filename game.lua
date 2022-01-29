@@ -8110,17 +8110,9 @@ function inrange(i, a, b, include)
 	end
 	
 	if include then
-		if i >= a and i <= b then
-			return true
-		else
-			return false
-		end
+		return i >= a and i <= b
 	else
-		if i > a and i < b then
-			return true
-		else
-			return false
-		end
+		return i > a and i < b
 	end
 end
 

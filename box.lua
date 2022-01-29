@@ -1,6 +1,7 @@
 box = class:new()
 
 function box:init(x, y, t)
+	COOL = {}
 	--PHYSICS STUFF
 	self.cox = x
 	self.coy = y
@@ -464,6 +465,7 @@ function box:emancipate()
 		speedx = speedx + self.parent.speedx
 		speedy = speedy + self.parent.speedy
 	end
+	self.drawable = false
 	table.insert(emancipateanimations, emancipateanimation:new(self.x, self.y, self.width, self.height, self.graphic, self.quad, speedx, speedy, self.rotation, self.offsetX, self.offsetY, self.quadcenterX, self.quadcenterY))
 	self:destroy()
 end
