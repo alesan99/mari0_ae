@@ -1462,7 +1462,7 @@ function game_update(dt)
 	end
 	
 	--WIND
-	if not levelfinished and windstarted then
+	if windstarted and (not levelfinished) then
 		if windsound:isStopped() then --couldn't find a wind sound!!! 11/14/2015 went to the level myself and got the sound (with a beat on it but oh well)
 			playsound(windsound)
 		end
@@ -8112,17 +8112,9 @@ function inrange(i, a, b, include)
 	end
 	
 	if include then
-		if i >= a and i <= b then
-			return true
-		else
-			return false
-		end
+		return i >= a and i <= b
 	else
-		if i > a and i < b then
-			return true
-		else
-			return false
-		end
+		return i > a and i < b
 	end
 end
 

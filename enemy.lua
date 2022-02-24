@@ -508,6 +508,9 @@ function enemy:init(x, y, t, a, properties)
 	if self.animationtriggeronspawn or self.triggeranimationonspawn then
 		self:triggeranimation(self.animationtriggeronspawn or self.triggeranimationonspawn)
 	end
+	if self.transformenemyanimationonspawn then
+		transformenemyanimation(self.transformenemyanimationonspawn)
+	end
 	
 	self.outtable = {}
 end
