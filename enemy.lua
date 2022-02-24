@@ -2107,8 +2107,8 @@ function enemy:update(dt)
 			local oldy = self.y
 			
 			local offsetx = (self.carryoffsetx or 0)
-			if self.carryoffsetx then
-				if self.carryparent.pointingangle > 0 then
+			if self.carryoffsetx then --carry in the direction player is facing
+				if (self.carryparent.portalgun and self.carryparent.pointingangle > 0) or self.carryparent.animationdirection == "left" then
 					offsetx = -offsetx
 				end
 			end
@@ -3759,13 +3759,13 @@ function enemy:dropped(gravitydir)
 	end
 	self.speedy = self.thrownspeedy or 0
 	if not self.thrownignorecarryspeed then
-		if self.carryparent.pointingangle > 0 then --left
+		if (self.carryparent.portalgun and self.carryparent.pointingangle > 0) or self.carryparent.animationdirection == "left" then --left
 			self.speedx = self.carryparent.speedx-(self.thrownspeedx or 0)
 		else
 			self.speedx = self.carryparent.speedx+(self.thrownspeedx or 0)
 		end
 	else
-		if self.carryparent.pointingangle > 0 then --left
+		if (self.carryparent.portalgun and self.carryparent.pointingangle > 0) or self.carryparent.animationdirection == "left" then --left
 			self.speedx = -(self.thrownspeedx or 0)
 		else
 			self.speedx = (self.thrownspeedx or 0)
@@ -3773,7 +3773,7 @@ function enemy:dropped(gravitydir)
 	end
 
 	local offsetx = (self.carryoffsetx or 0)
-	if self.carryoffsetx and self.carryparent.pointingangle > 0 then
+	if self.carryoffsetx and ((self.carryparent.portalgun and self.carryparent.pointingangle > 0) or self.carryparent.animationdirection == "left") then
 		offsetx = -offsetx
 	end
 	self.x = (self.carryparent.x+self.carryparent.width/2-self.width/2) + offsetx
