@@ -2511,6 +2511,12 @@ function enemy:customtimeraction(action, arg, arg2)
 			self[parameter] = self[parameter] * arg
 		elseif action == "setframe" then
 			self.quad = self.quadgroup[arg]
+		elseif action == "print" then
+			if self[arg] then
+				print(self[arg])
+			else
+				print(arg)
+			end
 		elseif string.sub(action, 0, 3) == "set" then
 			self[string.sub(action, 4, string.len(action))] = arg
 		end
