@@ -2481,6 +2481,8 @@ function enemy:customtimeraction(action, arg, arg2)
 			self[p] = math.min(self[p],arg)
 		elseif a == "max" then
 			self[p] = math.max(self[p],arg)
+		elseif a == "log" then
+			self[p] = math.log(arg)
 		elseif a == "tonumber" then
 			self[p] = tonumber(self[p])
 		elseif a == "tostring" then

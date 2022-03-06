@@ -4365,15 +4365,6 @@ function startlevel(level, reason)
 	end
 	originalmapwidth = mapwidth
 	
-	if editormode or testlevel then
-		--reload custom enemies everytime level is loaded
-		enemies_load()
-	else
-		--just update spritesets
-		for name, t in pairs(enemiesdata) do
-			loadenemyquad(name, "no notices")
-		end
-	end
 	if musici > 7 then
 		custommusic = mappackfolder .. "/" .. mappack .. "/" .. musictable[musici]
 	else
@@ -4830,6 +4821,17 @@ function loadmap(filename)
 	for i = 1, #animatedtiles do
 		if animatedtiles[i].cache then
 			animatedtiles[i].cache = {}
+		end
+	end
+
+	--CUSTOM ENEMIES
+	if editormode or testlevel then
+		--reload custom enemies everytime level is loaded
+		enemies_load()
+	else
+		--just update spritesets
+		for name, t in pairs(enemiesdata) do
+			loadenemyquad(name, "no notices")
 		end
 	end
 
