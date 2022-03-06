@@ -6593,7 +6593,9 @@ end
 function mario:starcollide(a, b)
 	--enemies that die
 	if a == "enemy" then
-		if b:shotted("right", nil, nil, false, true) then
+		if b.resistsstar then
+			return true
+		elseif b:shotted("right", nil, nil, false, true) then
 			addpoints(firepoints[b.t] or 100, self.x, self.y)
 			return true
 		end

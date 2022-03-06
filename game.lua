@@ -7989,7 +7989,7 @@ function game_joystickpressed( joystick, button )
 	end
 	
 	for i = 1, players do
-		if (not noupdate) and objects and objects["player"][i].controlsenabled then --and (not objects["player"][i].vine) and (not objects["player"][i].fence) then
+		if (not noupdate) and objects then --and objects["player"][i].controlsenabled then -- and --and (not objects["player"][i].vine) and (not objects["player"][i].fence) then
 			if editormode and (editormenuopen or rightclickmenuopen) then
 				break
 			end
@@ -8077,7 +8077,7 @@ end
 
 function game_joystickreleased( joystick, button )
 	for i = 1, players do
-		if (not noupdate) and objects["player"][i].controlsenabled then --and (not objects["player"][i].vine) and (not objects["player"][i].fence) then
+		if (not noupdate) and objects then --objects["player"][i].controlsenabled then --and (not objects["player"][i].vine) and (not objects["player"][i].fence) then
 			if editormode and (editormenuopen or rightclickmenuopen) then
 				break
 			end
@@ -8118,7 +8118,7 @@ function game_joystickreleased( joystick, button )
 				objects["player"][i]:buttonrelease("down")
 				animationsystem_buttonreleasetrigger(i, "down") return
 			end
-		end
+		--end
 	end
 end
 
