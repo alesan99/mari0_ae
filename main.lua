@@ -56,8 +56,8 @@ if debugconsole then debuginputon = true; debuginput = "print()"; print("DEBUG O
 local debugGraph,fpsGraph,memGraph,drawGraph
 local debugGraphs = false
 
-VERSION = 13.0122
-VERSIONSTRING = "13d (11/4/21)"
+VERSION = 13.0123
+VERSIONSTRING = "13e (3/6/22)"
 
 android = (love.system.getOS() == "Android" or love.system.getOS() == "iOS") --[DROID]
 androidtest = false--testing android on pc
