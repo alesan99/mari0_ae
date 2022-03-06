@@ -950,8 +950,8 @@ function guielement:keypress(key,textinput)
 					self.highlight = 1
 					self.cursorpos = #self.value + 1
 				elseif key == "c" and self.ctrl then
-					local highlight = {math.min(self.highlight,self.cursorpos),math.max(self.highlight,self.cursorpos)}
-					textclipboard = string.sub(self.value,highlight[1],highlight[2]-1)
+					local highlight1, highlight2 = math.min(self.highlight,self.cursorpos),math.max(self.highlight,self.cursorpos)
+					textclipboard = string.sub(self.value,highlight1,highlight2-1)
 				else
 					if android then
 						if not (textinput and textinput == "forcetextinput") then
@@ -1042,9 +1042,9 @@ function guielement:keypress(key,textinput)
 								end
 							end
 							if self.highlight and targetkey ~= "" then
-								local highlight = {math.min(self.highlight,self.cursorpos),math.max(self.highlight,self.cursorpos)}
-								self.value = string.sub(self.value,1,highlight[1]-1)..targetkey..string.sub(self.value,highlight[2])
-								self.cursorpos = highlight[1]
+								local highlight1,highlight2 = math.min(self.highlight,self.cursorpos),math.max(self.highlight,self.cursorpos)
+								self.value = string.sub(self.value,1,highlight1-1)..targetkey..string.sub(self.value,highlight2)
+								self.cursorpos = highlight1
 								self.highlight = false
 							elseif targetkey ~= "" then
 								self.value = string.sub(self.value,1,self.cursorpos-1)..targetkey..string.sub(self.value,self.cursorpos)

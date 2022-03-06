@@ -4361,7 +4361,16 @@ function startlevel(level, reason)
 		end
 	end
 	originalmapwidth = mapwidth
-
+	
+	if editormode or testlevel then
+		--reload custom enemies everytime level is loaded
+		enemies_load()
+	else
+		--just update spritesets
+		for name, t in pairs(enemiesdata) do
+			loadenemyquad(name, "no notices")
+		end
+	end
 	if musici > 7 then
 		custommusic = mappackfolder .. "/" .. mappack .. "/" .. musictable[musici]
 	else
@@ -4811,17 +4820,6 @@ function loadmap(filename)
 			if tonumber(s3[2]) ~= nil then
 				custommusici = tonumber(s3[2])
 			end
-		end
-	end
-
-	--CUSTOM ENEMIES
-	if editormode or testlevel then
-		--reload custom enemies everytime level is loaded
-		enemies_load()
-	else
-		--just update spritesets
-		for name, t in pairs(enemiesdata) do
-			loadenemyquad(name, "no notices")
 		end
 	end
 
