@@ -31,6 +31,7 @@ icerunacceleration = 8 --^^^
 groundfreezetime = 3 --seconds stunned when sledge bro ground pounded
 goombashoehop = 8 --height of hops when mario has goomba shoe
 fencespeed = 4 --speed when climbing fence
+fencejumptime = 0.05 --how long mario jumps when holding up and jumping while climbing
 
 --STARCOLORS
 starcolors = {}

@@ -220,7 +220,7 @@ function mario:init(x, y, i, animation, size, t, properties)
 	self.climbframe = 1
 	self.fenceframe = 1
 	self.fenceanimationprogress = 1
-	self.fencetimer = 0
+	self.fencejumptimer = 0
 	self.floatframe = 1
 	self.spinframez = 1
 	self.raccoonflyframe = 1
@@ -2171,8 +2171,8 @@ function mario:update(dt)
 	else
 		local x = math.floor(self.x+self.width/2)+1
 		local y = math.floor(self.y+self.height/2)+1
-		if self.fencetimer > 0 then
-			self.fencetimer = self.fencetimer-dt
+		if self.fencejumptimer > 0 then
+			self.fencejumptimer = self.fencejumptimer - dt
 		elseif upkey(self.playernumber) and ismaptile(x,y) and tilequads[map[x][y][1]].fence then
 			if self:grabfence() then
 				return
@@ -3682,7 +3682,7 @@ function mario:jump(force)
 				
 				if self.fence then
 					self:dropfence()
-					self.fencetimer = 0.15
+					self.fencejumptimer = fencejumptime
 					self.falling = false
 				end
 				
