@@ -46,6 +46,7 @@ function game_load(suspended)
 	dropshadow = false
 	realtime = false
 	continuesublevelmusic = false
+	nolowtime = false
 	nocoinlimit = false
 	setphysics(1)
 	if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/settings.txt") and not dcplaying then
@@ -69,6 +70,8 @@ function game_load(suspended)
 				nocoinlimit = true
 			elseif s2[1] == "continuesublevelmusic" then
 				continuesublevelmusic = true
+			elseif s2[1] == "nolowtime" then
+				nolowtime = true
 			elseif s2[1] == "character" then
 				for i = 1, players do
 					setcustomplayer(s2[2], i)
@@ -358,7 +361,7 @@ function game_update(dt)
 			if queuelowtime then
 				queuelowtime = queuelowtime - 2.5*dt
 			end
-			if mariotime > 0 and mariotime + 2.5*dt >= 99 and mariotime < 99 and (not dcplaying) and (not levelfinished) then
+			if mariotime > 0 and mariotime + 2.5*dt >= 99 and mariotime < 99 and (not dcplaying) and (not levelfinished) and not nolowtime then
 				startlowtime()
 			end
 			
@@ -8186,10 +8189,10 @@ function playmusic()
 	end
 	if musici >= 7 then
 		if custommusic then
-			music:play(custommusic, (mariotime < 100 and mariotime > 0))
+			music:play(custommusic, not nolowtime and (mariotime < 100 and mariotime > 0))
 		end
 	elseif musici ~= 1 then
-		music:playIndex(musici-1, (mariotime < 100 and mariotime > 0))
+		music:playIndex(musici-1, not nolowtime and (mariotime < 100 and mariotime > 0))
 	end
 end
 
