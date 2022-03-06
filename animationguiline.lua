@@ -1615,7 +1615,7 @@ t = {
 		{
 			t="input",
 			default="myanim",
-		},
+		}
 	}
 }
 })
@@ -1765,6 +1765,45 @@ table.insert(toenter, {name = "setplayerlight",
 			{
 				t="numinput",
 				default="3.5",
+			},
+		}
+	}
+})
+
+table.insert(toenter, {name = "waitforinput", 
+	t = {
+		t="action",
+		nicename="wait for input:",
+		entries={
+			{
+				t="buttonselection",
+			},
+			
+			{
+				t="text",
+				value="by"
+			},
+			
+			{
+				t="playerselectionany",
+			},
+		}
+	}
+})
+
+
+table.insert(toenter, {name = "waitfortrigger", 
+	t = {
+		t="action",
+		nicename="wait for anim trigger:",
+		entries={
+			{
+				t="text",
+				value="with id",
+			},
+			{
+				t="input",
+				default="myanim",
 			},
 		}
 	}
