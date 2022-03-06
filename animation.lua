@@ -104,6 +104,8 @@ addtime:time						adds <seconds> time
 removetime:time						removes <seconds> time
 settime:time						sets time
 setplayerlight:blocks				sets player's light in lights out mode
+waitforinput                        waits until a spesific/any player presses a button
+waitfrotrigger                      waits until a spesific animation is triggered
 --]]
 
 function animation:init(path, name)
@@ -117,6 +119,7 @@ function animation:init(path, name)
 	self.firstupdate = true
 	self.running = false
 	self.sleep = 0
+	self.waiting = false
 	self.enabled = true
 end
 
@@ -308,10 +311,48 @@ function animation:update(dt)
 	if self.running then
 		if self.sleep > 0 then
 			self.sleep = math.max(0, self.sleep - dt)
+		elseif self.waiting then
+			if self.waiting.t == "input" then
+				local pstart, pend = 1, players
+				local button = self.waiting.button
+				if self.waiting.player ~= "everyone" then
+					local p = tonumber(string.sub(self.waiting.player, -1))
+					pstart, pend = p, p
+				end
+
+				local press = false
+				for i = pstart, pend do
+					if button == "jump" and jumpkey(i) then
+						press = true
+					elseif button == "left" and leftkey(i) then
+						press = true
+					elseif button == "right" and rightkey(i) then
+						press = true
+					elseif button == "up" and upkey(i) then
+						press = true
+					elseif button == "down" and downkey(i) then
+						press = true
+					elseif button == "run" and runkey(i) then
+						press = true
+					elseif button == "use" and usekey(i) then
+						press = true
+					elseif button == "reload" and reloadkey(i) then
+						press = true
+					end
+					if press then
+						self.waiting = false
+					end
+				end
+			elseif self.waiting.t == "trigger" then
+				if animationtriggerfuncs[self.waiting.name] then
+					self.waiting = false
+				end
+			end
 		end
 		
-		while self.sleep == 0 and self.currentaction <= #self.actions do
+		while self.sleep == 0 and (not self.waiting) and self.currentaction <= #self.actions do
 			local v = self.actions[self.currentaction]
+
 			if v[1] == "disablecontrols" then
 				if v[2] == "everyone" then
 					for i = 1, players do
@@ -336,6 +377,10 @@ function animation:update(dt)
 				end
 			elseif v[1] == "sleep" then
 				self.sleep = tonumber(v[2])
+			elseif v[1] == "waitforinput" then
+				self.waiting = {t="input", button=v[2], player=v[3]}
+			elseif v[1] == "waitfortrigger" then
+				self.waiting = {t="trigger", name=v[2]}
 			elseif v[1] == "setcamerax" then
 				xscroll = tonumber(v[2])
 			elseif v[1] == "setcameray" then
@@ -956,7 +1001,7 @@ function animation:trigger()
 	if self.enabled then
 		--check conditions
 		local pass = true
-		
+
 		for i, v in pairs(self.conditions) do
 			if v[1] == "noprevsublevel" then
 				if prevsublevel then
