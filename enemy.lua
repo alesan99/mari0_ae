@@ -2511,7 +2511,7 @@ function enemy:customtimeraction(action, arg, arg2)
 			self[parameter] = self[parameter] * arg
 		elseif action == "setframe" then
 			self.quad = self.quadgroup[arg]
-		elseif action == "print" then
+		elseif LoveConsole and action == "print" then --only for advanced users!
 			if self[arg] then
 				print(self[arg])
 			else

@@ -3537,6 +3537,7 @@ function loadnitpicks()
 			debugGraphs = t.debugGraphs
 		end
 		if t.console then
+			LoveConsole = true
 			if love._openConsole then love._openConsole() end
 		end
 	end
