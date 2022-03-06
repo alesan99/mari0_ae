@@ -421,39 +421,81 @@ function loadcustomplayers()
 	end
 end
 
+--local splitShader
 function splitimage(img, color, exclude, imagedata) --split singe image into colorable images
-	local input = love.image.newImageData(img)
-	local output = love.image.newImageData(input:getWidth(), input:getHeight())
-	for x = 0, input:getWidth()-1 do
-		for y = 0, input:getHeight()-1 do
-			local r, g, b, a = input:getPixel(x, y)
-			local place = false
-			if exclude then
-				place = true
-				for i, c in pairs(color) do
-					if r == c[1] and g == c[2] and b == c[3] then
-						place = false
-						break
+	if false then --useShader then
+		if not splitShader then
+			splitShader = love.graphics.newShader[[
+				uniform Image inputImage;
+				uniform vec3 splitColor;
+
+				#ifdef VERTEX
+				vec4 position( mat4 transform_projection, vec4 vertex_position )
+				{
+					return transform_projection * vertex_position;
+				}
+				#endif
+				#ifdef PIXEL
+				vec4 effect( vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords )
+				{
+					vec4 texcolor = Texel(inputImage, texture_coords);
+					if (abs(texcolor.r-splitColor.r) > 0.01 || abs(texcolor.g-splitColor.g) > 0.01 || abs(texcolor.b-splitColor.b) > 0.01)
+					{ discard; }
+					return vec4(1.0,1.0,1.0,1.0);
+				}
+				#endif
+			]]
+		end
+		local input = love.graphics.newImage(img)
+		local output = love.graphics.newCanvas(input:getWidth(), input:getHeight(),"rgba8")
+		if exclude then
+			local outputdata = output:newImageData()
+			return love.graphics.newImage(outputdata)
+		end
+		local c = love.graphics.getCanvas()
+		love.graphics.setCanvas(output)
+		love.graphics.setShader(splitShader)
+		splitShader:send("inputImage", input)
+		splitShader:send("splitColor", {color[1]/255,color[2]/255,color[3]/255})
+		love.graphics.draw(input,0,0)
+		love.graphics.setShader()
+		love.graphics.setCanvas(c)
+		local outputdata = output:newImageData()
+		return love.graphics.newImage(outputdata)
+	else
+		local input = love.image.newImageData(img)
+		local output = love.image.newImageData(input:getWidth(), input:getHeight())
+		for x = 0, input:getWidth()-1 do
+			for y = 0, input:getHeight()-1 do
+				local r, g, b, a = input:getPixel(x, y)
+				local place = false
+				if exclude then
+					place = true
+					for i, c in pairs(color) do
+						if r == c[1] and g == c[2] and b == c[3] then
+							place = false
+							break
+						end
+					end
+				else
+					if r == color[1] and g == color[2] and b == color[3] then
+						place = true
 					end
 				end
-			else
-				if r == color[1] and g == color[2] and b == color[3] then
-					place = true
-				end
-			end
-			if place then
-				if exclude then
-					output:setPixel(x, y, r, g, b, a)
-				else
-					output:setPixel(x, y, 255, 255, 255, a)
+				if place then
+					if exclude then
+						output:setPixel(x, y, r, g, b, a)
+					else
+						output:setPixel(x, y, 255, 255, 255, a)
+					end
 				end
 			end
 		end
-	end
-	if imagedata then
-		return output
-	else
-		return love.graphics.newImage(output)
+		if imagedata then
+			return output
+		else
+			return love.graphics.newImage(output)
+		end
 	end
 end
 
