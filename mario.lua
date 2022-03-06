@@ -220,6 +220,7 @@ function mario:init(x, y, i, animation, size, t, properties)
 	self.climbframe = 1
 	self.fenceframe = 1
 	self.fenceanimationprogress = 1
+	self.fencetimer = 0
 	self.floatframe = 1
 	self.spinframez = 1
 	self.raccoonflyframe = 1
@@ -2112,64 +2113,67 @@ function mario:update(dt)
 	--fence controls and shit :)
 	if self.fence then
 		self:updateangle()
+		--no more fence flying, actually check if we're on a fence
+		local x = math.floor(self.x+self.width/2)+1
+		local y = math.floor(self.y+self.height/2)+1
+		if not (inmap(x, y) and tilequads[map[x][y][1]]:getproperty("fence")) then
+			self:dropfence()
+			return
+		end
+
 		local targetspeedx = 0
 		local targetspeedy = 0
-		if upkey(self.playernumber) and self.controlsenabled then
-			targetspeedy = -self.characterdata.fencespeed
-		elseif downkey(self.playernumber) and self.controlsenabled then
-			targetspeedy = self.characterdata.fencespeed
-		end
-		--check for fence
-		local anim = false
-		local x = math.floor(self.x+self.width/2)+1
-		local y = math.floor(self.y+self.height/2+targetspeedy*dt)+1
-		if inmap(x, y) and tilequads[map[x][y][1]]:getproperty("fence", x, y) then
-			self.speedy = targetspeedy
-			if targetspeedy ~= 0 then
-				anim = true
-			end
-		else
-			if targetspeedy > 0 then
-				self:dropfence()
-				return
-			end
-			self.speedy = 0
-		end
-		if leftkey(self.playernumber) and self.controlsenabled  then
-			targetspeedx = -self.characterdata.fencespeed
-		elseif rightkey(self.playernumber) and self.controlsenabled then
-			targetspeedx = self.characterdata.fencespeed
-		end
-		--check for fence
-		local x = math.floor(self.x+self.width/2+targetspeedx*dt)+1
-		local y = math.floor(self.y+self.height/2)+1
-		if inmap(x, y) and tilequads[map[x][y][1]]:getproperty("fence", x, y) then
-			self.speedx = targetspeedx
-
-			if targetspeedx ~= 0 then
-				anim = true
-			end
-		else
+		if not self.controlsenabled then
 			self.speedx = 0
+			self.speedy = 0
+			return
 		end
-		
-		if anim then
+		local u,d,l,r,s = upkey(self.playernumber), downkey(self.playernumber), leftkey(self.playernumber), rightkey(self.playernumber), self.characterdata.fencespeed
+		if u and not d then
+			targetspeedy = -s
+		elseif d and not u then
+			targetspeedy = s
+		end
+		if l and not r then
+			targetspeedx = -s
+		elseif r and not l then
+			targetspeedx = s
+		end
+		local tx = math.floor(self.x+self.width/2 + targetspeedx*dt)+1
+		local ty = math.floor(self.y+self.height/2 + targetspeedy*dt)+1
+
+		if not tilequads[map[tx][y][1]]:getproperty("fence") then
+			self.x = math.max(math.min(self.x + targetspeedx*dt, x-self.width/2-0.001), x-self.width/2-0.999)
+			targetspeedx = 0
+		end
+		if not tilequads[map[x][ty][1]]:getproperty("fence") then
+			if targetspeedy <= 0 then
+				self.y = math.max(self.y + targetspeedy*dt, y-self.height/2-1)
+				targetspeedy = 0
+			else
+				self:dropfence()
+			end	
+		end
+
+		self.speedx = targetspeedx
+		self.speedy = targetspeedy
+		if targetspeedx ~= 0 or targetspeedy ~= 0 then
 			local frames = self.characterdata.fenceframes
-			if self.characterdata.fenceframes == 0 then
+			if frames == 0 then
 				frames = 2
 			end
 			self.fenceanimationprogress = ((self.fenceanimationprogress+self.characterdata.fenceanimationspeed*dt-1)%(frames))+1
 			self.fenceframe = math.floor(self.fenceanimationprogress)
 		end
 		self.animationstate = "fence"
-		self.gravity = 0
 		self:setquad()
 		return
 	else
 		local x = math.floor(self.x+self.width/2)+1
 		local y = math.floor(self.y+self.height/2)+1
-		local y2 = math.floor(self.y)+1
-		if upkey(self.playernumber) and ismaptile(x,y) and tilequads[map[x][y][1]].fence and ismaptile(x,y2) and tilequads[map[x][y2][1]].fence then
+		if self.fencetimer > 0 then
+			self.fencetimer = self.fencetimer-dt
+		elseif upkey(self.playernumber) and ismaptile(x,y) and tilequads[map[x][y][1]].fence then
 			if self:grabfence() then
 				return
 			end
@@ -3678,6 +3682,7 @@ function mario:jump(force)
 				
 				if self.fence then
 					self:dropfence()
+					self.fencetimer = 0.15
 					self.falling = false
 				end
 				
@@ -6767,13 +6772,13 @@ function mario:grabvine(b)
 end
 
 function mario:grabfence()
-	if self.ducking or self.vine or self.shoe or self.clearpipe or self.statue or self.pickup then
+	if self.ducking or self.vine or self.shoe or self.clearpipe or self.statue or self.pickup or self.fireenemyride then
 		return false
 	end
 	self.fence = true
 	self.speedx = 0
 	self.speedy = 0
-	self.gravity = 0
+	self.ignoregravity = true
 	
 	self.raccoonfly = false
 	self.capefly = false
@@ -6785,6 +6790,8 @@ function mario:grabfence()
 	self.fenceanimationprogress = 1
 	self.animationstate = "fence"
 	self:setquad()
+	self.jumping = false
+	self.falling = true
 	self.falloverride = true
 
 	net_action(self.playernumber, "grabfence")
@@ -6796,8 +6803,7 @@ function mario:dropfence()
 	self.ignoreplatform = false
 	self.animationstate = "falling"
 	self:setquad()
-	self.gravity = self.characterdata.yacceleration
-
+	self.ignoregravity = false
 	net_action(self.playernumber, "dropfence")
 end
 
