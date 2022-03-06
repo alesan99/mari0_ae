@@ -2549,6 +2549,15 @@ function tablecontainsi(t, entry)
 	return false
 end
 
+function tablecontainsistring(t, entry)
+	for i, v in pairs(t) do
+		if tostring(v) == entry then
+			return i
+		end
+	end
+	return false
+end
+
 function getaveragecolor(imgdata, cox, coy)
 	local xstart = (cox-1)*17
 	local ystart = (coy-1)*17
