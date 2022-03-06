@@ -46,6 +46,7 @@ function game_load(suspended)
 	dropshadow = false
 	realtime = false
 	continuesublevelmusic = false
+	nolowtime = false
 	nocoinlimit = false
 	setphysics(1)
 	if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/settings.txt") and not dcplaying then
@@ -69,6 +70,8 @@ function game_load(suspended)
 				nocoinlimit = true
 			elseif s2[1] == "continuesublevelmusic" then
 				continuesublevelmusic = true
+			elseif s2[1] == "nolowtime" then
+				nolowtime = true
 			elseif s2[1] == "character" then
 				for i = 1, players do
 					setcustomplayer(s2[2], i)
@@ -358,7 +361,7 @@ function game_update(dt)
 			if queuelowtime then
 				queuelowtime = queuelowtime - 2.5*dt
 			end
-			if mariotime > 0 and mariotime + 2.5*dt >= 99 and mariotime < 99 and (not dcplaying) and (not levelfinished) then
+			if mariotime > 0 and mariotime + 2.5*dt >= 99 and mariotime < 99 and (not dcplaying) and (not levelfinished) and not nolowtime then
 				startlowtime()
 			end
 			
@@ -6684,6 +6687,16 @@ function loadentity(t, x, y, r, id)
 			local type, name = t[1], t[2]
 			if (not tilequads[r[1]]["breakable"]) and (not tilequads[r[1]]["coinblock"]) then
 				local obj = enemy:new(x, y, r[2], r)
+				if r["argument"] and obj then
+					if r["argument"] == "o" then --offsetted
+						obj.x = obj.x + .5
+						if obj.startx then
+							obj.startx = obj.startx + .5
+						end
+					elseif r["argument"] == "b" then --supersized
+						supersizeentity(obj)
+					end
+				end
 				table.insert(objects["enemy"], obj)
 				table.insert(enemiesspawned, {x, y})
 				trackobject(x, y, obj, "enemy")
@@ -7067,6 +7080,9 @@ function spawnenemyentity(x, y)
 			if r["argument"] and obj then
 				if r["argument"] == "o" then --offsetted
 					obj.x = obj.x + .5
+					if obj.startx then
+						obj.startx = obj.startx + .5
+					end
 				elseif r["argument"] == "b" then --supersized
 					supersizeentity(obj)
 				end
@@ -8173,10 +8189,10 @@ function playmusic()
 	end
 	if musici >= 7 then
 		if custommusic then
-			music:play(custommusic, (mariotime < 100 and mariotime > 0))
+			music:play(custommusic, not nolowtime and (mariotime < 100 and mariotime > 0))
 		end
 	elseif musici ~= 1 then
-		music:playIndex(musici-1, (mariotime < 100 and mariotime > 0))
+		music:playIndex(musici-1, not nolowtime and (mariotime < 100 and mariotime > 0))
 	end
 end
 
@@ -9079,14 +9095,18 @@ function drawmaptiles(drawtype, xscroll, yscroll)
 						if cox == mx and coy == my then
 							alpha = 255
 						end
+						local offsetx = 0
+						if t["argument"] and t["argument"] == "o" then --offset
+							offsetx = .5
+						end
 						
 						love.graphics.setColor(255, 0, 0, alpha)
-						love.graphics.rectangle("fill", math.floor((x-1-xoff)*16*scale), math.floor(((y-1-yoff)*16-8)*scale), 16*scale, 16*scale)
+						love.graphics.rectangle("fill", math.floor((x-1-xoff+offsetx)*16*scale), math.floor(((y-1-yoff)*16-8)*scale), 16*scale, 16*scale)
 						love.graphics.setColor(255, 255, 255, alpha)
 						if v.showicononeditor and v.icongraphic then
-							love.graphics.draw(v.icongraphic, math.floor((x-1-xoff)*16*scale), ((y-1-yoff)*16-8)*scale, 0, scale, scale)
+							love.graphics.draw(v.icongraphic, math.floor((x-1-xoff+offsetx)*16*scale), ((y-1-yoff)*16-8)*scale, 0, scale, scale)
 						else
-							love.graphics.draw(v.graphic, v.quad, math.floor((x-1-xoff)*16*scale+exoff), math.floor(((y-1-yoff)*16)*scale+eyoff), 0, (v.animationscalex or 1)*scale, (v.animationscaley or 1)*scale)
+							love.graphics.draw(v.graphic, v.quad, math.floor((x-1-xoff+offsetx)*16*scale+exoff), math.floor(((y-1-yoff)*16)*scale+eyoff), 0, (v.animationscalex or 1)*scale, (v.animationscaley or 1)*scale)
 						end
 						if t["argument"] and t["argument"] == "b" then --supersize
 							love.graphics.setColor(255, 255, 255, 200)

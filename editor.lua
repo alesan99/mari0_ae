@@ -276,6 +276,8 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	guielements["realtimecheckbox"] = guielement:new("checkbox", 294, 154, togglerealtime, realtime, TEXT["real time"])
 	local _, count = TEXT["real time"]:gsub("\n", '')
 	guielements["continuemusiccheckbox"] = guielement:new("checkbox", 294, guielements["realtimecheckbox"].y+11+10*count, togglecontinuemusic, continuesublevelmusic, TEXT["cont. music"])
+	_, count = TEXT["cont. music"]:gsub("\n", '')
+	guielements["nolowtimecheckbox"] = guielement:new("checkbox", 294, guielements["continuemusiccheckbox"].y+11+10*count, togglenolowtime, nolowtime, TEXT["no low time"])
 
 	--MAPS
 	guielements["savebutton2"] = guielement:new("button", 300, 196, TEXT["save level"], guielements["savebutton"].func, 0, nil, 2.4, 94, true)
@@ -1875,34 +1877,34 @@ function editor_draw()
 						end
 					end
 				elseif not pastingtiles then 
+					--offset enemy
+					local offsetx = 0
+					if (entitylist[currenttile] and entitylist[currenttile].offset) or (enemiesdata[currenttile] and enemiesdata[currenttile].offsetable) then
+						local allowoffset = true
+						--don't clip with entity on the right
+						if ismaptile(x+1, y+1) and map[x+1][y+1][2] and map[x+1][y+1][2] == currenttile and not map[x+1][y+1].argument then
+							allowoffset = false
+						elseif ismaptile(x, y+1) and map[x][y+1][2] and map[x][y+1][2] == currenttile and not map[x][y+1].argument then
+							allowoffset = false
+						end
+						if allowoffset then
+							local mx = ((love.mouse.getX()/scale)+(xscroll*16))%16
+							--[[if mx < 16*0 then
+								offsetx = -.5
+							else]]if mx > 16*0.75 then
+								offsetx = .5
+							end
+						end
+					end
 					if not tilequads[currenttile] and enemiesdata[currenttile] then --custom enemy
 						local v = enemiesdata[currenttile]
 						if v.showicononeditor and v.icongraphic then
-							love.graphics.draw(v.icongraphic, math.floor((x-xscroll-1)*16*scale), math.floor(((y-yscroll-0.5)*16)*scale), 0, scale, scale)
+							love.graphics.draw(v.icongraphic, math.floor((x-xscroll-1+offsetx)*16*scale), math.floor(((y-yscroll-0.5)*16)*scale), 0, scale, scale)
 						else
 							local xoff, yoff = ((0.5-v.width/2+(v.spawnoffsetx or 0))*16 + v.offsetX - v.quadcenterX)*scale, (((v.spawnoffsety or 0)-v.height+1)*16-v.offsetY - v.quadcenterY)*scale
-							love.graphics.draw(v.graphic, v.quad, math.floor((x-xscroll-1)*16*scale+xoff), math.floor(((y-yscroll)*16)*scale+yoff), 0, scale, scale)
+							love.graphics.draw(v.graphic, v.quad, math.floor((x-xscroll-1+offsetx)*16*scale+xoff), math.floor(((y-yscroll)*16)*scale+yoff), 0, scale, scale)
 						end
 					else
-						--offset enemy
-						local offsetx = 0
-						if entitylist[currenttile] and entitylist[currenttile].offset then
-							local allowoffset = true
-							--don't clip with entity on the right
-							if ismaptile(x+1, y+1) and map[x+1][y+1][2] and map[x+1][y+1][2] == currenttile and not map[x+1][y+1].argument then
-								allowoffset = false
-							elseif ismaptile(x, y+1) and map[x][y+1][2] and map[x][y+1][2] == currenttile and not map[x][y+1].argument then
-								allowoffset = false
-							end
-							if allowoffset then
-								local mx = ((love.mouse.getX()/scale)+(xscroll*16))%16
-								--[[if mx < 16*0 then
-									offsetx = -.5
-								else]]if mx > 16*0.75 then
-									offsetx = .5
-								end
-							end
-						end
 						love.graphics.draw(entityquads[currenttile].image, entityquads[currenttile].quad, math.floor((x-splitxscroll[1]-1+offsetx)*16*scale), math.floor(((y-splityscroll[1]-1)*16+8)*scale), 0, scale, scale)
 					end
 					if android then
@@ -2691,6 +2693,7 @@ function editor_draw()
 			guielements["dropshadowcheckbox"]:draw()
 			guielements["realtimecheckbox"]:draw()
 			guielements["continuemusiccheckbox"]:draw()
+			guielements["nolowtimecheckbox"]:draw()
 			
 			properprintF(TEXT["lives:"], 228*scale, 106*scale)
 			guielements["livesincrease"]:draw()
@@ -3343,6 +3346,7 @@ function toolstab()
 	guielements["dropshadowcheckbox"].active = true
 	guielements["realtimecheckbox"].active = true
 	guielements["continuemusiccheckbox"].active = true
+	guielements["nolowtimecheckbox"].active = true
 end
 
 function mapstab()
@@ -4219,7 +4223,7 @@ function placetile(x, y, tilei)
 	
 	local currenttile = tilei or currenttile
 	local argument
-	if editentities and entitylist[currenttile] and entitylist[currenttile].offset then
+	if editentities and ((entitylist[currenttile] and entitylist[currenttile].offset) or (enemiesdata[currenttile] and enemiesdata[currenttile].offsetable)) then
 		local allowoffset = true
 		--don't clip with entity on the right
 		if ismaptile(cox+1, coy) and map[cox+1][coy][2] and map[cox+1][coy][2] == currenttile and not map[cox+1][coy].argument then
@@ -4232,8 +4236,9 @@ function placetile(x, y, tilei)
 			--[[if mx < 16*0 and inmap(cox-1, coy) then
 				cox = cox - 1
 				argument = "o"
-			else]]if mx > 16*0.75 then
-				if type(entitylist[currenttile].offset) == "number" then
+			else]]
+			if mx > 16*0.75 then
+				if entitylist[currenttile] and type(entitylist[currenttile].offset) == "number" then
 					currenttile = entitylist[currenttile].offset
 				else
 					argument = "o"
@@ -7397,6 +7402,9 @@ function savesettings()
 	if continuesublevelmusic then
 		s = s .. "continuesublevelmusic=t\n"
 	end
+	if nolowtime then
+		s = s .. "nolowtime=t\n"
+	end
 	
 	love.filesystem.createDirectory( mappackfolder )
 	love.filesystem.createDirectory( mappackfolder .. "/" .. mappack )
@@ -7627,6 +7635,14 @@ function togglecontinuemusic(var)
 	guielements["continuemusiccheckbox"].var = continuesublevelmusic
 end
 
+function togglenolowtime(var)
+	if var ~= nil then
+		nolowtime = var
+	else
+		nolowtime = not nolowtime
+	end
+	guielements["nolowtimecheckbox"].var = nolowtime
+end
 
 function updatescrollfactor()
 	--not a scrollfactor lol
