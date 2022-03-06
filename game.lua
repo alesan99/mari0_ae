@@ -8118,7 +8118,7 @@ function game_joystickreleased( joystick, button )
 				objects["player"][i]:buttonrelease("down")
 				animationsystem_buttonreleasetrigger(i, "down") return
 			end
-		--end
+		end
 	end
 end
 
