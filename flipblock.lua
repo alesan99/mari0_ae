@@ -1,6 +1,6 @@
 flipblock = class:new()
 
-local switchblockswitched = false
+local switchblockswitched = {false,false,false,false} --should only activate once per frame
 function flipblock:init(x, y, t, r)
 	--PHYSICS STUFF
 	self.cox = x
@@ -94,7 +94,7 @@ function flipblock:update(dt)
 	end
 
 	if self.t == "switchblock" then
-		switchblockswitched = false
+		switchblockswitched[self.color] = false
 		self.animtimer = self.animtimer + dt
 		while self.animtimer > goombaanimationspeed do
 			if self.quadi == 2 then
@@ -198,7 +198,7 @@ function flipblock:hit()
 			self.quad = goombaquad[spriteset][1]
 		end
 	elseif self.t == "switchblock" then
-		if not switchblockswitched then --only switch once if many were hit at the same time
+		if not switchblockswitched[self.color] then --only switch once if many were hit at the same time
 			self.on = not self.on
 			if self.on then
 				self.quad = flipblockquad[self.color][self.quadi]
@@ -235,7 +235,7 @@ function flipblock:hit()
 			end
 		end
 
-		switchblockswitched = true
+		switchblockswitched[self.color] = true
 	else
 		playsound(blockhitsound)
 	end
