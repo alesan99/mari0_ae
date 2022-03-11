@@ -201,9 +201,16 @@ function enemy:init(x, y, t, a, properties)
 						notice.new("you can't use a list\nfor an input!", notice.red, 3)
 					end
 
-					if var then
-						for j, w in pairs(self.rightclick[i][2][var]) do
-							self[j:lower()] = w
+					for i, v in pairs(self.rightclick[i][2][var]) do
+						local name = v[1]
+						local value = v[2]
+						if (not self.casesensitive) and (name ~= "offsetX" and name ~= "offsetY" and name ~= "quadcenterX" and name ~= "quadcenterY") then
+							value = value:lower()
+						end
+						if type(value) == "table" then
+							self[name] = deepcopy(value)
+						else
+							self[name] = value
 						end
 					end
 				else
@@ -4010,7 +4017,7 @@ function enemy:dosupersize()
 	if self.supersizeproperties then
 		for i, v in pairs(self.supersizeproperties) do
 			local name = i
-			if name ~= "offsetX" and name ~= "offsetY" and name ~= "quadcenterX" and name ~= "quadcenterY" then
+			if (not self.casesensitive) or (name ~= "offsetX" and name ~= "offsetY" and name ~= "quadcenterX" and name ~= "quadcenterY") then
 				name = name:lower()
 			end
 			self[name] = v
