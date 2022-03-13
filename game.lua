@@ -104,11 +104,19 @@ function game_load(suspended)
 	autoscrollx = true
 	autoscrolly = true
 	
-	inputs = { "door", "groundlight", "wallindicator", "cubedispenser", "walltimer", "notgate", "laser", "lightbridge", "delayer", "funnel", "portal1", "portal2", "text", "geldispenser", "tiletool", "enemytool", "randomizer", "musicchanger", "rocketturret", "checkpoint", "emancipationgrill", "belt", "animationtrigger", "faithplate", "animatedtiletrigger", "orgate", "andgate", "rsflipflop", "kingbill", "platform", "collectable", "skewer", "energylauncher", "camerastop", "laserfields", "track" }
-	inputsi = {28, 29, 30, 43, 44, 45, 46, 47, 48, 67, 74, 84, 52, 53, 54, 55, 36, 37, 38, 39, 186, 198, 197, 199, 61, 62, 63, 64, 65, 66, 71, 72, 73, 181, 182, 183, 201, 205, 206, 210, 194, 225, 226, 227, 229, 230, 231, 232, 100, 26, 27, 266, 271, 273, 274, 272, 105, 163, 248, 249, 18, 19, 259, 166, 167, 168, 169, 304, 309, 311, 306}
-	
-	outputs = { "button", "laserdetector", "box", "pushbutton", "walltimer", "notgate", "energycatcher", "squarewave", "delayer", "regiontrigger", "randomizer", "tiletool", "orgate", "andgate", "rsflipflop", "flipblock", "doorsprite", "collectablelock", "collectable", "animationoutput" }
-	outputsi = {40, 56, 57, 58, 59, 20, 68, 69, 74, 84, 165, 170, 171, 172, 173, 185, 186, 200, 206, 201, 222, 267, 268, 273, 274, 272, 275, 163, 248, 249, 277, 276, 291}
+	inputs = {"checkpoint", "pipe", "camerastop", "platform", "belt", "snakeblock", "door", "pdoor", "keydoor", "risingwater", "track", "kingbill", "skewer",
+				"musicchanger", "animatedtiletrigger", "animationtrigger", "regiontrigger", "text", "collectable", "tiletool", "enemytool", "wallindicator",
+				"timer", "notgate", "andgate", "orgate", "delayer", "rsflipflop", "randomizer", "doorver", "emancever", "lightbridgeright", "laserright",
+				"groundlightver", "groundlighthor", "groundlightupright", "groundlightrightdown", "groundlightdownleft", "groundlightleftup",
+				"faithplateup", "boxtube", "bluegeldown", "energylauncherright", "rocketturret", "portal1", "portal2", "funnelright"}
+	inputsi = {100, 21, 304, 309, 266, 290, 163, 248, 249, 285, 306, 105, 259,
+				210, 271, 270, 200, 199, 276, 201, 205, 30,
+				74, 84, 274, 273, 186, 272, 206, 28, 27, 36, 52,
+				43, 44, 45, 46, 47, 48,
+				49, 67, 61, 166, 194, 197, 198, 231}
+
+	outputs = {"button", "laserdetector", "box", "pushbutton", "walltimer", "notgate", "energycatcher", "squarewave", "delayer", "regiontrigger", "randomizer", "tiletool", "orgate", "andgate", "rsflipflop", "flipblock", "doorsprite", "collectablelock", "collectable", "animationoutput"}
+	outputsi = {21, 163, 248, 249, 275, 291, 276, 277, 201, 74, 84, 274, 273, 186, 272, 185, 206, 20, 165, 222, 40, 267, 268, 68, 56, 170}
 	
 	--purpose of enemies table:
 
