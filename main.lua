@@ -1245,7 +1245,7 @@ function saveconfig()
 			count = count + 1
 			s = s .. ","
 		end
-		s = s:sub(1,-2) .. ";"
+		s = s:sub(1,-2) .. ";\n"
 	end
 	
 	if mariocharacter then
@@ -1257,7 +1257,7 @@ function saveconfig()
 				s = s .. "mario,"
 			end
 		end
-		s = s .. ";"
+		s = s .. ";\n"
 	end
 	
 	for i = 1, #mariocolors do
@@ -1266,7 +1266,7 @@ function saveconfig()
 			for k = 1, 3 do
 				s = s .. mariocolors[i][j][k]
 				if j == #mariocolors[i] and k == 3 then
-					s = s .. ";"
+					s = s .. ";\n"
 				else
 					s = s .. ","
 				end
@@ -1276,7 +1276,7 @@ function saveconfig()
 	
 	for i = 1, #portalhues do
 		s = s .. "portalhues:" .. i .. ":"
-		s = s .. round(portalhues[i][1], 4) .. "," .. round(portalhues[i][2], 4) .. ";"
+		s = s .. round(portalhues[i][1], 4) .. "," .. round(portalhues[i][2], 4) .. ";\n"
 	end
 	
 	for i = 1, #mariohats do
@@ -1287,45 +1287,45 @@ function saveconfig()
 		for j = 1, #mariohats[i] do
 			s = s .. mariohats[i][j]
 			if j == #mariohats[i] then
-				s = s .. ";"
+				s = s .. ";\n"
 			else
 				s = s .. ","
 			end
 		end
 		
 		if #mariohats[i] == 0 then
-			s = s .. ";"
+			s = s .. ";\n"
 		end
 	end
 	
 	if resizable then
-		s = s .. "scale:2;"
+		s = s .. "scale:2;\n"
 	else
-		s = s .. "scale:" .. scale .. ";"
+		s = s .. "scale:" .. scale .. ";\n"
 	end
 
 	if letterboxfullscreen then
-		s = s .. "letterbox;"
+		s = s .. "letterbox;\n"
 	end
 	
-	s = s .. "shader1:" .. shaderlist[currentshaderi1] .. ";"
-	s = s .. "shader2:" .. shaderlist[currentshaderi2] .. ";"
+	s = s .. "shader1:" .. shaderlist[currentshaderi1] .. ";\n"
+	s = s .. "shader2:" .. shaderlist[currentshaderi2] .. ";\n"
 	
-	s = s .. "volume:" .. volume .. ";"
-	s = s .. "mouseowner:" .. mouseowner .. ";"
+	s = s .. "volume:" .. volume .. ";\n"
+	s = s .. "mouseowner:" .. mouseowner .. ";\n"
 	
 	if mappackfolder == "alesans_entities/mappacks" then
-		s = s .. "modmappacks;"
+		s = s .. "modmappacks;\n"
 	end
 	
-	s = s .. "mappack:" .. mappack .. ";"
+	s = s .. "mappack:" .. mappack .. ";\n"
 	
 	if vsync then
-		s = s .. "vsync;"
+		s = s .. "vsync;\n"
 	end
 	
 	if gamefinished then
-		s = s .. "gamefinished;"
+		s = s .. "gamefinished;\n"
 	end
 	
 	--reached worlds
@@ -1342,24 +1342,24 @@ function saveconfig()
 			end
 			
 			if j == n then
-				s = s .. ";"
+				s = s .. ";\n"
 			else
 				s = s .. ","
 			end
 		end
 	end
 	
-	s = s .. "resizable:" .. tostring(resizable) .. ";"
+	s = s .. "resizable:" .. tostring(resizable) .. ";\n"
 	if CurrentLanguage then
-		s = s .. "language:" .. CurrentLanguage .. ";"
+		s = s .. "language:" .. CurrentLanguage .. ";\n"
 	end
 	
 	if fourbythree then
-		s = s .. "fourbythree;"
+		s = s .. "fourbythree;\n"
 	end
 	
 	if localnick then
-		s = s .. "localnick:" .. localnick .. ";"
+		s = s .. "localnick:" .. localnick .. ";\n"
 	end
 	love.filesystem.write("alesans_entities/options.txt", s)
 end
@@ -1378,8 +1378,13 @@ function loadconfig(nodefaultconfig)
 	else
 		return
 	end
-	
-	s1 = s:split(";")
+
+	if s:find(";\n") then
+		s1 = s:split(";\n")
+	else
+		s1 = s:split(";")
+	end
+
 	for i = 1, #s1-1 do
 		s2 = s1[i]:split(":")
 		
