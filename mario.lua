@@ -2142,11 +2142,11 @@ function mario:update(dt)
 		local tx = math.floor(self.x+self.width/2 + targetspeedx*dt)+1
 		local ty = math.floor(self.y+self.height/2 + targetspeedy*dt)+1
 
-		if not tilequads[map[tx][y][1]]:getproperty("fence") then
+		if (not inmap(tx,y)) or (not tilequads[map[tx][y][1]]:getproperty("fence")) then
 			self.x = math.max(math.min(self.x + targetspeedx*dt, x-self.width/2-0.001), x-self.width/2-0.999)
 			targetspeedx = 0
 		end
-		if not tilequads[map[x][ty][1]]:getproperty("fence") then
+		if (not inmap(x,ty)) or (not tilequads[map[x][ty][1]]:getproperty("fence")) then
 			if targetspeedy <= 0 then
 				self.y = math.max(self.y + targetspeedy*dt, y-self.height/2-1)
 				targetspeedy = 0
