@@ -3502,6 +3502,7 @@ function enemy:triggeranimation(s)
 				anim:trigger()
 			end
 		end
+		animationtriggerfuncs[s].triggered = true
 	end
 end
 
