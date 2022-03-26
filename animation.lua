@@ -345,7 +345,7 @@ function animation:update(dt)
 				end
 			elseif self.waiting.t == "trigger" then
 				if animationtriggerfuncs[self.waiting.name] and animationtriggerfuncs[self.waiting.name].triggered then
-					animationtriggerfuncs[self.waiting.name].triggered = false
+					animationtriggerfuncs[self.waiting.name].triggered = nil
 					self.waiting = false
 				end
 			end
@@ -921,6 +921,7 @@ function animation:update(dt)
 						animationtriggerfuncs[v[2]][i]:trigger()
 					end
 				end
+				animationtriggerfuncs[v[2]].triggered = true
 				
 			elseif v[1] == "addkeys" then
 				if v[3] == "everyone" then
