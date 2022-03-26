@@ -32,6 +32,7 @@ function animationtrigger:input(t)
 		for i = 1, #animationtriggerfuncs[self.id] do
 			animationtriggerfuncs[self.id][i]:trigger()
 		end
+		animationtriggerfuncs[self.id].triggered = true
 	end
 end
 
