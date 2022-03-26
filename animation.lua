@@ -344,7 +344,8 @@ function animation:update(dt)
 					end
 				end
 			elseif self.waiting.t == "trigger" then
-				if animationtriggerfuncs[self.waiting.name] then
+				if animationtriggerfuncs[self.waiting.name] and animationtriggerfuncs[self.waiting.name].triggered then
+					animationtriggerfuncs[self.waiting.name].triggered = false
 					self.waiting = false
 				end
 			end
