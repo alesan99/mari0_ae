@@ -3519,6 +3519,7 @@ function loadnitpicks()
 		NoMusic = t.nomusic
 		EditorZoom = t.editorzoom
 		DirectDLCDownloads = t.directdlcdownloads
+		CenterCamera = t.centercamera
 		_3DMODE = t.render3d
 		HITBOXDEBUG = t.viewhitboxes
 		if t.pcversion then

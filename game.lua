@@ -79,6 +79,10 @@ function game_load(suspended)
 			end
 		end
 	end
+
+	if CenterCamera and not editormode then
+		camerasetting = 2
+	end
 	
 	if mariolivecount == 0 or dcplaying then
 		mariolivecount = false
