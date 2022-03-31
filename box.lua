@@ -1,7 +1,6 @@
 box = class:new()
 
 function box:init(x, y, t)
-	COOL = {}
 	--PHYSICS STUFF
 	self.cox = x
 	self.coy = y
