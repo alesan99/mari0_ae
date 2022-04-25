@@ -642,7 +642,7 @@ function koopa:flipshell(dir)
 end
 
 function koopa:leftcollide(a, b, passive)
-	if self:globalcollide(a, b) then
+	if self:globalcollide(a, b, "left") then
 		return false
 	end
 	if a == "tile" then--check for jump through blocks
@@ -714,25 +714,6 @@ function koopa:leftcollide(a, b, passive)
 		self.y = self.y - b.step
 		return false
 	end
-	
-	if a ~= "tile" and a ~= "portalwall" and a ~= "platform" and self.active and self.small and self.speedx ~= 0 and a ~= "player" and a ~= "spring" and a ~= "donut" and a ~= "springgreen" and a ~= "bigmole" and a ~= "muncher" and a ~= "koopaling" and a ~= "bowser" then
-		if b.shotted and (not self.staystillfall) and (not (b.resistsenemykill or b.resistseverything)) then
-			if self.combo < #koopacombo then
-				self.combo = self.combo + 1
-				addpoints(koopacombo[self.combo], b.x, b.y)
-			else
-				for i = 1, players do
-					if mariolivecount ~= false then
-						mariolives[i] = mariolives[i]+1
-						respawnplayers()
-					end
-				end
-				table.insert(scrollingscores, scrollingscore:new("1up", b.x, b.y))
-				playsound(oneupsound)
-			end
-			b:shotted("left")
-		end
-	end
 
 	if self.small == false and not self.frozen then
 		if self.t ~= "flying2" then
@@ -745,7 +726,7 @@ function koopa:leftcollide(a, b, passive)
 end
 
 function koopa:rightcollide(a, b)
-	if self:globalcollide(a, b) then
+	if self:globalcollide(a, b, "right") then
 		return false
 	end
 	if a == "tile" then--check for jump through blocks
@@ -818,25 +799,6 @@ function koopa:rightcollide(a, b)
 		self.y = self.y - b.step
 		return false
 	end
-	
-	if a ~= "tile" and a ~= "portalwall" and a ~= "platform" and self.active and self.small and self.speedx ~= 0 and a ~= "player" and a ~= "spring" and a ~= "donut" and a ~= "springgreen" and a ~= "bigmole" and a ~= "muncher" and a ~= "koopaling" and a ~= "bowser" then
-		if b.shotted and (not self.staystillfall) and (not (b.resistsenemykill or b.resistseverything)) then
-			if self.combo < #koopacombo then
-				self.combo = self.combo + 1
-				addpoints(koopacombo[self.combo], b.x, b.y)
-			else
-				for i = 1, players do
-					if mariolivecount ~= false then
-						mariolives[i] = mariolives[i]+1
-						respawnplayers()
-					end
-				end
-				table.insert(scrollingscores, scrollingscore:new("1up", b.x, b.y))
-				playsound(oneupsound)
-			end
-			b:shotted("right")
-		end
-	end
 
 	if self.small == false and not self.frozen then
 		if self.t ~= "flying2" then
@@ -861,15 +823,15 @@ function koopa:passivecollide(a, b)
 	end
 	if a ~= "clearpipesegment" then
 		if self.speedx < 0 then
-			self:leftcollide(a, b, "passive")
+			self:globalcollide(a, b, "left")
 		else
-			self:rightcollide(a, b, "passive")
+			self:globalcollide(a, b, "right")
 		end
 	end
 	return false
 end
 
-function koopa:globalcollide(a, b)
+function koopa:globalcollide(a, b, dir)
 	if a == "bulletbill" or a == "bigbill" then
 		if b.killstuff ~= false then
 			return true
@@ -877,6 +839,26 @@ function koopa:globalcollide(a, b)
 	end
 	if a == "fireball" or a == "player" or (a == "snakeblock" and self.t == "redflying" and self.flying) then
 		return true
+	end
+
+	local dontkilltable = {"tile", "portalwall", "platform", "player", "spring", "donut", "springgreen", "bigmole", "muncher", "koopaling", "bowser"}
+	if (dir ~= "ceil") and self.active and self.small and self.speedx ~= 0 and (not tablecontains(dontkilltable, a)) then
+		if b.shotted and (not self.staystillfall) and (not (b.resistsenemykill or b.resistseverything)) then
+			if self.combo < #koopacombo then
+				self.combo = self.combo + 1
+				addpoints(koopacombo[self.combo], b.x, b.y)
+			else
+				for i = 1, players do
+					if mariolivecount ~= false then
+						mariolives[i] = mariolives[i]+1
+						respawnplayers()
+					end
+				end
+				table.insert(scrollingscores, scrollingscore:new("1up", b.x, b.y))
+				playsound(oneupsound)
+			end
+			b:shotted(dir)
+		end
 	end
 end
 
@@ -936,7 +918,7 @@ function koopa:floorcollide(a, b)
 end
 
 function koopa:ceilcollide(a, b)
-	if self:globalcollide(a, b) then
+	if self:globalcollide(a, b, "ceil") then
 		return false
 	end
 	if self.t == "downbeetle" or self.t == "downspikey" then
