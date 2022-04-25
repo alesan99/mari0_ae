@@ -234,7 +234,7 @@ function bigmole:floorcollide(a, b)
 end
 
 function bigmole:passivecollide(a, b)
-	self:leftcollide(a, b)
+	--self:leftcollide(a, b)
 	return false
 end
 
