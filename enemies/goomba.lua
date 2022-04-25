@@ -1183,7 +1183,7 @@ function goomba:passivecollide(a, b)
 		end
 		return false
 	end
-	self:leftcollide(a, b, "passive")
+	--self:leftcollide(a, b, "passive")
 	return false
 end
 
