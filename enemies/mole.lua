@@ -303,7 +303,7 @@ function mole:floorcollide(a, b)
 end
 
 function mole:passivecollide(a, b)
-	self:leftcollide(a, b)
+	--self:leftcollide(a, b)
 	return false
 end
 
