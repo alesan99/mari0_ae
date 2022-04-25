@@ -405,7 +405,7 @@ function bomb:floorcollide(a, b)
 end
 
 function bomb:passivecollide(a, b)
-	self:leftcollide(a, b)
+	self:globalcollide(a, b)
 	return false
 end
 
