@@ -1132,13 +1132,13 @@ function koopaling:passivecollide(a, b)
 	if self:globalcollide(a, b) then
 		return false
 	end
-	if self.t ~= 9 then
+	--[[if self.t ~= 9 then
 		if self.speedx > 0 then
 			self:leftcollide(a, b)
 		else
 			self:rightcollide(a, b)
 		end
-	end
+	end]]
 	return false
 end
 
