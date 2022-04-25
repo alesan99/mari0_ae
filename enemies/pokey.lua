@@ -359,7 +359,7 @@ function pokey:passivecollide(a, b)
 	if a == "pixeltile" then
 		return true
 	end
-	self:leftcollide(a, b)
+	--self:leftcollide(a, b)
 	return false
 end
 
