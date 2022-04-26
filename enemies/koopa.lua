@@ -721,7 +721,7 @@ function koopa:leftcollide(a, b, passive)
 		end
 		self.speedx = math.abs(self.speedx)
 	else
-		return false
+		return true
 	end
 end
 
@@ -806,7 +806,7 @@ function koopa:rightcollide(a, b)
 		end
 		self.speedx = -math.abs(self.speedx)
 	else
-		return false
+		return true
 	end
 end
 
