@@ -858,6 +858,7 @@ function koopa:globalcollide(a, b, dir)
 				playsound(oneupsound)
 			end
 			b:shotted(dir)
+			return true
 		end
 	end
 end
