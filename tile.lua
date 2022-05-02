@@ -16,7 +16,7 @@ function tile:init(x, y)
 	if map[self.cox] and map[self.cox][self.coy] and tilequads[map[self.cox][self.coy][1]] and tilequads[map[self.cox][self.coy][1]].collision then
 		local t = tilequads[map[self.cox][self.coy][1]]
 		if t.rightslant or t.halfrightslant1 or t.halfrightslant2 or t.leftslant or t.halfleftslant1 or t.halfleftslant2 then
-			self.slants = math.min(16*3,16*scale)
+			self.slants = 16 --math.min(16*3,16*scale)
 		end
 		if (t.rightslant or t.halfrightslant1 or t.halfrightslant2) and (t.leftslant or t.halfleftslant1 or t.halfleftslant2) then
 			--slant
