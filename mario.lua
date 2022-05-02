@@ -5352,13 +5352,14 @@ function mario:rightcollide(a, b, passive)
 	elseif a == "pixeltile" then
 		if b.dir == "left" and self.y < b.y then
 			if b.step ~= 0 then
-				self.y = self.y - b.step
+				self.y = math.max(self.y - b.step, b.y - self.height)
 			end
 			if not self.jumping then
 				self.falling = false
 				self.jumping = false
 			end
 			if b.step ~= 0 then
+				self.speedy = 0
 				return false
 			end
 		elseif b.dir == "right" then
@@ -5765,13 +5766,14 @@ function mario:leftcollide(a, b)
 	elseif a == "pixeltile" then
 		if b.dir == "right" and self.y < b.y then
 			if b.step ~= 0 then
-				self.y = self.y - b.step -1/16
+				self.y = math.max(self.y - b.step, b.y - self.height)
 			end
 			if not self.jumping then
 				self.falling = false
 				self.jumping = false
 			end
 			if b.step ~= 0 then
+				self.speedy = 0
 				return false
 			end
 		elseif b.dir == "left" then
@@ -7274,9 +7276,15 @@ function mario:startfall()
 		self.falloverride = false
 	elseif self.falloverridestrict then
 	elseif self.falling == false then
-		self.falling = true
-		self.animationstate = "falling"
-		self:setquad()
+		if self.onslant then
+			self.y = self.y-self.speedy*gdt
+			self.speedy = 0
+			self.y = self.y + self.onslantstep
+		else
+			self.falling = true
+			self.animationstate = "falling"
+			self:setquad()
+		end
 	end
 end
 
