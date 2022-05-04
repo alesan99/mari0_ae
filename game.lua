@@ -1470,7 +1470,7 @@ function game_update(dt)
 	
 	--WIND
 	if windstarted and (not levelfinished) then
-		if windsound:isStopped() then --couldn't find a wind sound!!! 11/14/2015 went to the level myself and got the sound (with a beat on it but oh well)
+		if not windsound.isPlaying() then --couldn't find a wind sound!!! 11/14/2015 went to the level myself and got the sound (with a beat on it but oh well)
 			playsound(windsound)
 		end
 		local dist = windentityspeed*dt

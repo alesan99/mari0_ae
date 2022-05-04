@@ -2434,7 +2434,7 @@ function mario:update(dt)
 					self.friction = self.characterdata.icefriction
 				end
 				if self.animationstate == "sliding" then
-					if skidsound:isStopped() then
+					if not skidsound.isPlaying() then
 						playsound(skidsound)
 					end
 				end
@@ -2977,7 +2977,7 @@ function mario:movement(dt)
 					end
 					self.animationstate = "sliding"
 					if currentphysics == 3 or currentphysics == 4 or self.characterdata.skid then
-						if skidsound:isStopped() then
+						if not skidsound.isPlaying() then
 							playsound(skidsound)
 						end
 					end
@@ -3029,7 +3029,7 @@ function mario:movement(dt)
 					end
 					self.animationstate = "sliding"
 					if currentphysics == 3 or currentphysics == 4 or self.characterdata.skid then
-						if skidsound:isStopped() then
+						if not skidsound.isPlaying() then
 							playsound(skidsound)
 						end
 					end
@@ -4869,7 +4869,7 @@ function mario:floorcollide(a, b)
 	elseif a == "icicle" or (a == "tilemoving" and b.ice) or a == "ice" or (a == "muncher" and b.frozen) then
 		self.friction = self.characterdata.icefriction
 		if self.animationstate == "sliding" then
-			if skidsound:isStopped() then
+			if not skidsound.isPlaying() then
 				playsound(skidsound)
 			end
 		end

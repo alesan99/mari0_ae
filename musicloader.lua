@@ -147,7 +147,7 @@ function music:update()
 		end
 	end
 	if intromusic then
-		if self.loaded[intromusic[1]] and self.loaded[intromusic[1]]:isStopped() then
+		if self.loaded[intromusic[1]] and not self.loaded[intromusic[1]].isPlaying() then
 			music:play(intromusic[2], nil, true)
 			intromusic = false
 		end

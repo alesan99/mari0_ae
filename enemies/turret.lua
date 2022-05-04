@@ -355,7 +355,7 @@ function turret:specifficupdate(dt)
 					local cox, coy, side, tend, x, y = traceline(self.x+self.width/2, self.y+self.height/2-3/16, -self.armrotation+math.pi/2+math.random()*0.05-.025)
 					table.insert(objects["turretshot"], turretshot:new(self.x+self.width/2-0.2, self.y+self.height/2-3/16, x, y, self.armrotation + math.pi, self.knockback))
 				end
-				if turretshotsound:isStopped() then
+				if not turretshotsound.isPlaying() then
 					playsound(turretshotsound)
 				end
 			end
@@ -446,7 +446,7 @@ function turret:frenzyturret(dt)
 		
 		if self.t ~= "turret2" then
 			table.insert(objects["turretshot"], turretshot:new(self.x+self.width/2, self.y+self.height/2-3/16, tx, ty, self.armrotation, self.knockback))
-			if turretshotsound:isStopped() then
+			if not turretshotsound.isPlaying() then
 				playsound(turretshotsound)
 			end
 		end

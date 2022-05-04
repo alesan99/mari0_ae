@@ -2147,7 +2147,7 @@ function love.keypressed(key, scancode, isrepeat, textinput)
 		if key == konami[konamii] or (android and key == androidkonami[konamii]) then--[[DROID]]
 			konamii = konamii + 1
 			if konamii == #konami+1 then
-				if konamisound:isStopped() then
+				if not konamisound.isPlaying() then
 					playsound(konamisound)
 				end
 				gamefinished = true
