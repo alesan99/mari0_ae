@@ -7847,11 +7847,11 @@ function playsound(sound)
 	if soundenabled then
 		if sound.stop then --string?
 			sound:stop()
-			if sound.rewind then sound:rewind() end
+			sound:seek(0)
 			sound:play()
 		elseif _G[sound .. "sound"] then
 			_G[sound .. "sound"]:stop()
-			if sound.rewind then _G[sound .. "sound"]:rewind() end
+			_G[sound .. "sound"]:seek(0)
 			_G[sound .. "sound"]:play()
 		end
 	end
