@@ -5200,7 +5200,7 @@ function game_keypressed(key, textinput)
 		elseif (key == "return" or key == "enter" or key == "kpenter" or key == " ") then
 			if pausemenuoptions[pausemenuselected] == "resume" then
 				pausemenuopen = false
-				love.audio.resume()
+				love.audio.play()
 			elseif pausemenuoptions[pausemenuselected] == "suspend" then
 				if dcplaying then
 					pausemenuopen = false
@@ -5220,7 +5220,7 @@ function game_keypressed(key, textinput)
 			end
 		elseif key == "escape" then
 			pausemenuopen = false
-			love.audio.resume()
+			love.audio.play()
 		elseif (key == "right" or key == "d") then
 			if pausemenuoptions[pausemenuselected] == "volume" then
 				if volume < 1 then
