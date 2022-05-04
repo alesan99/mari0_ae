@@ -1522,9 +1522,9 @@ end
 
 function loadcustomtext()
 	if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/endingmusic.ogg") ~= nil then
-		endingmusic = love.audio.newSource(mappackfolder .. "/" .. mappack .. "/endingmusic.ogg");endingmusic:play();endingmusic:stop()
+		endingmusic = love.audio.newSource(mappackfolder .. "/" .. mappack .. "/endingmusic.ogg", "stream");endingmusic:play();endingmusic:stop()
 	elseif love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/endingmusic.mp3") ~= nil then
-		endingmusic = love.audio.newSource(mappackfolder .. "/" .. mappack .. "/endingmusic.mp3");endingmusic:play();endingmusic:stop()
+		endingmusic = love.audio.newSource(mappackfolder .. "/" .. mappack .. "/endingmusic.mp3", "stream");endingmusic:play();endingmusic:stop()
 	else
 		endingmusic = konamisound
 	end
