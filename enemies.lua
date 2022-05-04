@@ -41,7 +41,7 @@ function enemies_load()
 	for i = 1, #fl2 do
 		local mpepath = mappackfolder .. "/" .. mappack .. "/enemies/" .. fl2[i]
 		local mpepathinfo = love.filesystem.getInfo(mpepath)
-		if mpepathinfo ~= nil and mpepathinfo.type == FileType.directory then
+		if mpepathinfo ~= nil and mpepathinfo.type == "directory" then
 			--load enemies from folder
 			local fl3 = love.filesystem.getDirectoryItems(mpepath)
 			for i2 = 1, #fl3 do
@@ -60,7 +60,7 @@ function enemies_load()
 			for i2 = 1, #fl3 do
 				local cepath = "alesans_entities/characters/" .. mariocharacter[i] .. "/enemies/" .. fl3[i2]
 				local cepathinfo = love.filesystem.getInfo(mpepath)
-				if cepathinfo ~= nil and cepathinfo.type == FileType.Directory then
+				if cepathinfo ~= nil and cepathinfo.type == "directory" then
 					--load enemies from folder
 					local fl4 = love.filesystem.getDirectoryItems(cepath)
 					for i3 = 1, #fl4 do

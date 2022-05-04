@@ -3311,7 +3311,7 @@ function loadcustomsounds()
 
 	local soundpath = mappackfolder .. "/" .. mappack .. "/sounds"
 	local spinfo = love.filesystem.getInfo(soundpath)
-	if (spinfo ~= nil and spinfo.type == FileType.directory) or customsounds then
+	if (spinfo ~= nil and spinfo.type == "directory") or customsounds then
 		for i, j in pairs(soundliststring) do
 			if love.filesystem.getInfo(soundpath .. "/" .. j .. ".ogg") ~= nil then
 				local method = "static"
