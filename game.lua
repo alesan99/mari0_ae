@@ -9275,18 +9275,6 @@ function getdrawrange(xscroll,yscroll,spritebatch)
 end
 
 function setscreenzoom(z)
-	if z ~= 1 or (screenzoom and screenzoom ~= 1) then
-		for i = 1, #smbspritebatch do
-			smbspritebatch[i]:setBufferSize(math.max(maxtilespritebatchsprites,width*height+width+height+1))
-			portalspritebatch[i]:setBufferSize(math.max(maxtilespritebatchsprites,width*height+width+height+1))
-			if customtiles then
-				for i2 = 1, #customtilesimg do
-					customspritebatch[i][i2]:setBufferSize(math.max(maxtilespritebatchsprites,width*height+width+height+1))
-				end
-			end
-		end
-	end
-	
 	screenzoom = z
 	screenzoom2 = 1/screenzoom
 end
