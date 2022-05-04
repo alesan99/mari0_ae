@@ -2908,10 +2908,7 @@ function love.errorhandler(msg)
 	end
 	local screenshot = false
 	if love.graphics.newScreenshot then
-		local s, r = pcall(function() return love.graphics.newImage(love.graphics.newScreenshot()) end)
-		if s and r then
-			screenshot = r
-		end
+		love.graphics.captureScreenshot(function(s) screenshot = s end)
 	end
 
     -- Load.
