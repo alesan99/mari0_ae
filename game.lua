@@ -49,7 +49,7 @@ function game_load(suspended)
 	nolowtime = false
 	nocoinlimit = false
 	setphysics(1)
-	if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/settings.txt") and not dcplaying then
+	if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/settings.txt") ~= nil and not dcplaying then
 		local s = love.filesystem.read( mappackfolder .. "/" .. mappack .. "/settings.txt" )
 		local s1 = s:split("\n")
 		for j = 1, #s1 do
@@ -155,7 +155,7 @@ function game_load(suspended)
 	
 	--add custom tiles
 	local bla = love.timer.getTime()
-	if not dcplaying and love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/tiles.png") then
+	if not dcplaying and love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/tiles.png") ~= nil then
 		loadtiles("custom")
 		customtiles = true
 	else
@@ -4635,7 +4635,7 @@ function startlevel(level, reason)
 	end
 
 	--is it toad or no
-	showtoad = not (tonumber(marioworld) and marioworld >= 8 and not love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/" .. marioworld+1 .. "-1.txt"))
+	showtoad = not (tonumber(marioworld) and marioworld >= 8 and love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. marioworld+1 .. "-1.txt") == nil)
 	
 	updatespritebatch()
 
@@ -4646,7 +4646,7 @@ end
 function loadmap(filename)
 	print("Loading " .. mappackfolder .. "/" .. mappack .. "/" .. filename .. ".txt")
 	
-	if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/" .. filename .. ".txt") == false then
+	if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. filename .. ".txt") == nil then
 		print(mappackfolder .. "/" .. mappack .. "/" .. filename .. ".txt not found!")
 		return false
 	end
@@ -4655,7 +4655,7 @@ function loadmap(filename)
 	
 	if s2[2] and s2[2]:sub(1,7) == "height=" then
 		mapheight = tonumber(s2[2]:sub(8,-1)) or 15
-	elseif love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/heights/" .. marioworld .. "-" .. mariolevel .. "_" .. actualsublevel .. ".txt") then
+	elseif love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/heights/" .. marioworld .. "-" .. mariolevel .. "_" .. actualsublevel .. ".txt") ~= nil then
 		local s11 = love.filesystem.read(mappackfolder .. "/" .. mappack .. "/heights/" .. marioworld .. "-" .. mariolevel .. "_" .. actualsublevel .. ".txt")
 		mapheight = tonumber(s11)
 	else
@@ -6249,7 +6249,7 @@ function savemap(filename)
 	
 	--don't create a map height file if it's 15 (default) (Update: no more map files cause they're bad)
 	if mapheight ~= 15 then
-		if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/heights/" .. marioworld .. "-" .. mariolevel .. "_" .. actualsublevel .. ".txt") then
+		if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/heights/" .. marioworld .. "-" .. mariolevel .. "_" .. actualsublevel .. ".txt") ~= nil then
 			love.filesystem.remove(mappackfolder .. "/" .. mappack .. "/heights/" .. marioworld .. "-" .. mariolevel .. "_" .. actualsublevel .. ".txt") --remove file
 		end
 	end

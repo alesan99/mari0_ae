@@ -26,18 +26,18 @@ function music:load(musicfile) -- can take a single file string or an array of f
 		for i, v in ipairs(musicfile) do
 			self:preload(musicpath:format(v), v)
 			--load fast music
-			if love.filesystem.exists(musicpath:format(v .. "-fast")) then
+			if love.filesystem.getInfo(musicpath:format(v .. "-fast")) ~= nil then
 				self:preload(musicpath:format(v .. "-fast"), v .. "-fast")
 			end
 		end
 	else --custom music
 		self:preload(musicfile)
 		--load fast music
-		if love.filesystem.exists(musicfile:sub(1, -5) .. "-fast" .. musicfile:sub(-4, -1)) then
+		if love.filesystem.getInfo(musicfile:sub(1, -5) .. "-fast" .. musicfile:sub(-4, -1)) ~= nil then
 			self:preload(musicfile:sub(1, -5) .. "-fast" .. musicfile:sub(-4, -1))
 		end
 		--load intro music
-		if love.filesystem.exists(musicfile:sub(1, -5) .. "-intro" .. musicfile:sub(-4, -1)) then
+		if love.filesystem.getInfo(musicfile:sub(1, -5) .. "-intro" .. musicfile:sub(-4, -1)) ~= nil then
 			self:preloadintro(musicfile:sub(1, -5) .. "-intro" .. musicfile:sub(-4, -1))
 		end
 	end

@@ -6,7 +6,7 @@ function set_language(lang)
 	s = nil
 
 	if lang ~= "english" then
-		if love.filesystem.exists("languages/" .. lang .. ".json") then
+		if love.filesystem.getInfo("languages/" .. lang .. ".json") ~= nil then
 			local s = love.filesystem.read("languages/" .. lang .. ".json")
 			local t = JSON:decode(s)
 			for j, w in pairs(t) do

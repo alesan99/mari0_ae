@@ -8214,7 +8214,7 @@ function mario:axe()
 	levelfinishtype = "castle"
 	levelfinishedmisc = 0
 	levelfinishedmisc2 = 1
-	if marioworld >= 8 and not love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/" .. marioworld+1 .. "-1.txt") then --changed  since 
+	if marioworld >= 8 and love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. marioworld+1 .. "-1.txt") == nil then --changed  since
 		levelfinishedmisc2 = 2
 	end
 	bridgedisappear = false

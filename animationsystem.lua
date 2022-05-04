@@ -21,7 +21,7 @@ function animationsystem_load()
 	--custom chracters animations
 	local characterenemiesloaded = {} --don't load the same enemy multiple times
 	for i = 1, #mariocharacter do
-		if mariocharacter[i] and (not characterenemiesloaded[mariocharacter[i]]) and love.filesystem.exists("alesans_entities/characters/" .. mariocharacter[i] .. "/animations/") then
+		if mariocharacter[i] and (not characterenemiesloaded[mariocharacter[i]]) and love.filesystem.getInfo("alesans_entities/characters/" .. mariocharacter[i] .. "/animations/") ~= nil then
 			local dir = love.filesystem.getDirectoryItems("alesans_entities/characters/" .. mariocharacter[i] .. "/animations/")
 			for i2 = 1, #dir do
 				if dir[i2] and string.sub(dir[i2], -4) == "json" then

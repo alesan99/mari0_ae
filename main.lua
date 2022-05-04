@@ -159,7 +159,7 @@ function love.load()
 	love.window.setTitle( "Mari0: AE" )
 	
 	--version check by checking for a const that was added in 0.8.0
-	if love._version_major == nil then error("You have an outdated version of Love! Get 0.10.0 or higher and retry.") end
+	if love._version_major == nil then error("You have an outdated version of Love! Get 11.4 or higher and retry.") end
 	
 	love.window.setIcon(love.image.newImageData("graphics/icon.png"))
 	
@@ -242,7 +242,7 @@ function love.load()
 	fontindexOLD["D"] = "↓"
 	fontindexOLD["U"] = "↑"
 
-	if love.filesystem.exists("alesans_entities/familyfriendly.txt") then FamilyFriendly = true end
+	if love.filesystem.getInfo("alesans_entities/familyfriendly.txt") ~= nil then FamilyFriendly = true end
 	
 	math.randomseed(os.time());math.random();math.random()
 	
@@ -333,10 +333,10 @@ function love.load()
 	local zips = love.filesystem.getDirectoryItems("alesans_entities/dlc_mappacks")
 	if #zips > 0 then
 		for j, w in pairs(zips) do
-			if not love.filesystem.exists("alesans_entities/onlinemappacks/" .. w) then
+			if love.filesystem.getInfo("alesans_entities/onlinemappacks/" .. w) == nil then
 				local filedata = love.filesystem.newFileData("alesans_entities/dlc_mappacks/" .. w)
 				love.filesystem.write("alesans_entities/onlinemappacks/" .. w, filedata)
-				if j == 1 and not love.filesystem.exists("alesans_entities/onlinemappacks/" .. w) then
+				if j == 1 and love.filesystem.getInfo("alesans_entities/onlinemappacks/" .. w) == nil then
 					break
 				end
 			end
@@ -353,7 +353,7 @@ function love.load()
 		end
 	end
 	
-	if checkmappack and love.filesystem.exists(mappackfolder .. "/" .. checkmappack .. "/") then
+	if checkmappack and love.filesystem.getInfo(mappackfolder .. "/" .. checkmappack .. "/") ~= nil then
 		mappack = checkmappack
 		checkmappack = nil
 		saveconfig()
@@ -365,7 +365,7 @@ function love.load()
 	datet = {os.date("%m"),os.date("%d"),os.date("%Y")}
 	DChigh = {"-", "-", "-"}
 	DChightemp = false
-	if love.filesystem.exists("alesans_entities/dc.txt") then
+	if love.filesystem.getInfo("alesans_entities/dc.txt") ~= nil then
 		local s = love.filesystem.read("alesans_entities/dc.txt")
 		local s2 = s:split("~")
 		DCcompleted = tonumber(s2[1])
@@ -1371,9 +1371,9 @@ function loadconfig(nodefaultconfig)
 	end
 	
 	local s
-	if love.filesystem.exists("alesans_entities/options.txt") then
+	if love.filesystem.getInfo("alesans_entities/options.txt") ~= nil then
 		s = love.filesystem.read("alesans_entities/options.txt")
-	elseif love.filesystem.exists("options.txt") then
+	elseif love.filesystem.getInfo("options.txt") ~= nil then
 		s = love.filesystem.read("options.txt")
 	else
 		return
@@ -1465,7 +1465,7 @@ function loadconfig(nodefaultconfig)
 		elseif s2[1] == "mouseowner" then
 			mouseowner = tonumber(s2[2])
 		elseif s2[1] == "mappack" then
-			if love.filesystem.exists(mappackfolder .. "/" .. s2[2] .. "/") then
+			if love.filesystem.getInfo(mappackfolder .. "/" .. s2[2] .. "/") ~= nil then
 				mappack = s2[2]
 			else
 				checkmappack = s2[2]
@@ -1521,14 +1521,14 @@ function loadconfig(nodefaultconfig)
 end
 
 function loadcustomtext()
-	if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/endingmusic.ogg") then
+	if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/endingmusic.ogg") ~= nil then
 		endingmusic = love.audio.newSource(mappackfolder .. "/" .. mappack .. "/endingmusic.ogg");endingmusic:play();endingmusic:stop()
-	elseif love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/endingmusic.mp3") then
+	elseif love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/endingmusic.mp3") ~= nil then
 		endingmusic = love.audio.newSource(mappackfolder .. "/" .. mappack .. "/endingmusic.mp3");endingmusic:play();endingmusic:stop()
 	else
 		endingmusic = konamisound
 	end
-	if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/text.txt") then
+	if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/text.txt") ~= nil then
 		local s = love.filesystem.read(mappackfolder .. "/" .. mappack .. "/text.txt")
 		
 		defaultcustomtext()
@@ -1878,7 +1878,7 @@ function suspendgame()
 end
 
 function continuegame()
-	if not love.filesystem.exists("suspend") then
+	if love.filesystem.getInfo("suspend") == nil then
 		return
 	end
 	
@@ -2882,7 +2882,7 @@ local function error_printer(msg, layer)
     print((debug.traceback("Error: " .. tostring(msg), 1+(layer or 1)):gsub("\n[^\n]+$", "")))
 end
 
-function love.errhand(msg)
+function love.errorhandler(msg)
     msg = tostring(msg)
 
     error_printer(msg, 2)
@@ -3050,11 +3050,11 @@ function loadcustombackground(filename)
 		filename = false--not a string
 	end
 	
-	while love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/" .. name .. i .. ".png") do
+	while love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. name .. i .. ".png") ~= nil do
 		custombackgroundimg[i] = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/" .. name .. i .. ".png")
 		custombackgroundwidth[i] = custombackgroundimg[i]:getWidth()/16
 		custombackgroundheight[i] = custombackgroundimg[i]:getHeight()/16
-		if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/" .. name .. i .. ".json") then
+		if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. name .. i .. ".json") ~= nil then
 			--load animation
 			local data = love.filesystem.read(mappackfolder .. "/" .. mappack .. "/" .. name .. i .. ".json")
 			if not data then return	end
@@ -3068,11 +3068,11 @@ function loadcustombackground(filename)
 	end
 
 	if #custombackgroundimg == 0 then
-		if filename and love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/backgrounds/" .. filename .. ".png") then
+		if filename and love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/backgrounds/" .. filename .. ".png") ~= nil then
 			custombackgroundimg[i] = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/backgrounds/" .. filename .. ".png")
 			custombackgroundwidth[i] = custombackgroundimg[i]:getWidth()/16
 			custombackgroundheight[i] = custombackgroundimg[i]:getHeight()/16
-			if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/backgrounds/" .. filename .. ".json") then
+			if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/backgrounds/" .. filename .. ".json") ~= nil then
 				--load animation
 				local data = love.filesystem.read(mappackfolder .. "/" .. mappack .. "/backgrounds/" .. filename .. ".json")
 				if not data then return	end
@@ -3084,7 +3084,7 @@ function loadcustombackground(filename)
 			end
 			return
 		end
-		while love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/background" .. i .. ".png") do
+		while love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/background" .. i .. ".png") ~= nil do
 			custombackgroundimg[i] = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/background" .. i .. ".png")
 			custombackgroundwidth[i] = custombackgroundimg[i]:getWidth()/16
 			custombackgroundheight[i] = custombackgroundimg[i]:getHeight()/16
@@ -3122,11 +3122,11 @@ function loadcustomforeground(filename)
 		filename = false--not a string
 	end
 	
-	while love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/" .. name .. i .. ".png") do
+	while love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. name .. i .. ".png") ~= nil do
 		customforegroundimg[i] = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/" .. name .. i .. ".png")
 		customforegroundwidth[i] = customforegroundimg[i]:getWidth()/16
 		customforegroundheight[i] = customforegroundimg[i]:getHeight()/16
-		if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/" .. name .. i .. ".json") then
+		if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. name .. i .. ".json") ~= nil then
 			--load animation
 			local data = love.filesystem.read(mappackfolder .. "/" .. mappack .. "/" .. name .. i .. ".json")
 			if not data then return	end
@@ -3137,11 +3137,11 @@ function loadcustomforeground(filename)
 	end
 	
 	if #customforegroundimg == 0 then
-		if filename and love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/backgrounds/" .. filename .. ".png") then
+		if filename and love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/backgrounds/" .. filename .. ".png") ~= nil then
 			customforegroundimg[i] = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/backgrounds/" .. filename .. ".png")
 			customforegroundwidth[i] = customforegroundimg[i]:getWidth()/16
 			customforegroundheight[i] = customforegroundimg[i]:getHeight()/16
-			if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/backgrounds/" .. filename .. ".json") then
+			if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/backgrounds/" .. filename .. ".json") ~= nil then
 				--load animation
 				local data = love.filesystem.read(mappackfolder .. "/" .. mappack .. "/backgrounds/" .. filename .. ".json")
 				if not data then return	end
@@ -3150,7 +3150,7 @@ function loadcustomforeground(filename)
 			end
 			return
 		end
-		while love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/foreground" .. i .. ".png") do
+		while love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/foreground" .. i .. ".png") ~= nil do
 			customforegroundimg[i] = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/foreground" .. i .. ".png")
 			customforegroundwidth[i] = customforegroundimg[i]:getWidth()/16
 			customforegroundheight[i] = customforegroundimg[i]:getHeight()/16
@@ -3251,39 +3251,38 @@ function loadanimatedtiles() --animated
 	animatedtiles = {}
 	animatedrgblist = {}
 	animatedtilesframe = {}
-			
-	local fl = love.filesystem.getDirectoryItems(mappackfolder .. "/" .. mappack .. "/animated")
 	animatedtilecount = 0
 	
 	local i = 1
-	while love.filesystem.isFile(mappackfolder .. "/" .. mappack .. "/animated/" .. i .. ".png") do
+	while true do
 		local v = mappackfolder .. "/" .. mappack .. "/animated/" .. i .. ".png"
-		if love.filesystem.isFile(v) and string.sub(v, -4) == ".png" then
-			if love.filesystem.isFile(string.sub(v, 1, -5) .. ".txt") then
-				animatedtilecount = animatedtilecount + 1
-				local t = animatedquad:new(v, love.filesystem.read(string.sub(v, 1, -5) .. ".txt"), animatedtilecount+90000)
-				tilequads[animatedtilecount+90000] = t
-				table.insert(animatedtiles, t)
-				local image = love.image.newImageData(mappackfolder .. "/" .. mappack .. "/animated/" .. i .. ".png")
-				animatedrgblist[animatedtilecount+90000] = {}
-				local tilewidth = 16
-				if image:getHeight() > 16 then --SE Tiles
-					tilewidth = 17
-				end
-				for x = 1, math.floor(image:getWidth()/tilewidth) do
-					local r, g, b = getaveragecolor2(image, x, 1)
-					animatedrgblist[animatedtilecount+90000][x] = {r, g, b}
-				end
-				animatedtilesframe[animatedtilecount+90000] = 1
+		if love.filesystem.getInfo(v) == nil then
+			break
+		end
+		if love.filesystem.getInfo(string.sub(v, 1, -5) .. ".txt") ~= nil then
+			animatedtilecount = animatedtilecount + 1
+			local t = animatedquad:new(v, love.filesystem.read(string.sub(v, 1, -5) .. ".txt"), animatedtilecount+90000)
+			tilequads[animatedtilecount+90000] = t
+			table.insert(animatedtiles, t)
+			local image = love.image.newImageData(mappackfolder .. "/" .. mappack .. "/animated/" .. i .. ".png")
+			animatedrgblist[animatedtilecount+90000] = {}
+			local tilewidth = 16
+			if image:getHeight() > 16 then --SE Tiles
+				tilewidth = 17
 			end
+			for x = 1, math.floor(image:getWidth()/tilewidth) do
+				local r, g, b = getaveragecolor2(image, x, 1)
+				animatedrgblist[animatedtilecount+90000][x] = {r, g, b}
+			end
+			animatedtilesframe[animatedtilecount+90000] = 1
 		end
 		i = i + 1
 	end
 end
 
 function loadcustomsounds()
-	local starmusicexists = love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/sounds/starmusic.ogg")
-	local starmusicfastexists = love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/sounds/starmusic-fast.ogg")
+	local starmusicexists = love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/sounds/starmusic.ogg") ~= nil
+	local starmusicfastexists = love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/sounds/starmusic-fast.ogg") ~= nil
 	if starmusicexists and starmusicfastexists then
 		music:preload(mappackfolder .. "/" .. mappack .. "/sounds/starmusic.ogg", "starmusic")
 		music:preload(mappackfolder .. "/" .. mappack .. "/sounds/starmusic-fast.ogg", "starmusic-fast")
@@ -3300,7 +3299,7 @@ function loadcustomsounds()
 		end
 		customstarmusic = false
 	end
-	if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/sounds/princessmusic.ogg") then
+	if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/sounds/princessmusic.ogg") ~= nil then
 		music:preload(mappackfolder .. "/" .. mappack .. "/sounds/princessmusic.ogg", "princessmusic")
 		customprincessmusic = true
 	else
@@ -3309,15 +3308,17 @@ function loadcustomsounds()
 		end
 		customprincessmusic = false
 	end
-	
-	if love.filesystem.isDirectory(mappackfolder .. "/" .. mappack .. "/sounds") or customsounds then
+
+	local soundpath = mappackfolder .. "/" .. mappack .. "/sounds"
+	local spinfo = love.filesystem.getInfo(soundpath)
+	if (spinfo ~= nil and spinfo.type == FileType.directory) or customsounds then
 		for i, j in pairs(soundliststring) do
-			if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/sounds/" .. j .. ".ogg") then
+			if love.filesystem.getInfo(soundpath .. "/" .. j .. ".ogg") ~= nil then
 				local method = "static"
 				if j == "pbutton" or j == "megamushroom" then
 					method = "stream"
 				end
-				_G[j .. "sound"] = love.audio.newSource(mappackfolder .. "/" .. mappack .. "/sounds/" .. j .. ".ogg", method);_G[j .. "sound"]:setVolume(0);_G[j .. "sound"]:play();_G[j .. "sound"]:stop();_G[j .. "sound"]:setVolume(1)
+				_G[j .. "sound"] = love.audio.newSource(soundpath .. "/" .. j .. ".ogg", method);_G[j .. "sound"]:setVolume(0);_G[j .. "sound"]:play();_G[j .. "sound"]:stop();_G[j .. "sound"]:setVolume(1)
 				if j == "scorering" or j == "raccoonplane" or j == "wind" or j == "pbutton" or j == "megamushroom" then
 					_G[j .. "sound"]:setLooping(true)
 				end
@@ -3359,10 +3360,10 @@ function loadcustommusic()
 	editormusictable = {"none", "overworld", "underground", "castle", "underwater", "star", "custom"}
 	for i = 0, 99 do
 		custommusics[i] = false
-		if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/music" .. tostring(i) .. ".ogg") then
+		if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/music" .. tostring(i) .. ".ogg") ~= nil then
 			custommusics[i] = mappackfolder .. "/" .. mappack .. "/music" .. tostring(i) .. ".ogg"
 			music:load(custommusics[i])
-		elseif love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/music" .. tostring(i) .. ".mp3") then
+		elseif love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/music" .. tostring(i) .. ".mp3") ~= nil then
 			custommusics[i] = mappackfolder .. "/" .. mappack .. "/music" .. tostring(i) .. ".mp3"
 			music:load(custommusics[i])
 		elseif i > 9 then
@@ -3375,10 +3376,10 @@ function loadcustommusic()
 		table.insert(musictable, s)
 		table.insert(editormusictable, s:sub(7, -5):lower())
 	end
-	if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/music.ogg") then
+	if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/music.ogg") ~= nil then
 		custommusics[1] = mappackfolder .. "/" .. mappack .. "/music.ogg"
 		music:load(custommusics[1])
-	elseif love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/music.mp3") then
+	elseif love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/music.mp3") ~= nil then
 		custommusics[1] = mappackfolder .. "/" .. mappack .. "/music.mp3"
 		music:load(custommusics[1])
 	end
@@ -3458,7 +3459,7 @@ function loadnitpicks()
 	--shit i don't want to add
 	--if people complain about stuff they can use this
 	nitpicks = false
-	if love.filesystem.exists("alesans_entities/nitpicks.json") then
+	if love.filesystem.getInfo("alesans_entities/nitpicks.json") ~= nil then
 		local data = love.filesystem.read("alesans_entities/nitpicks.json")
 		t = JSON:decode(data or "")
 		--CASE INSENSITVE THING

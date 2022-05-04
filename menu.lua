@@ -59,7 +59,7 @@ function menu_load()
 	end
 	
 	continueavailable = false
-	if love.filesystem.exists("suspend") then
+	if love.filesystem.getInfo("suspend") ~= nil then
 		continueavailable = true
 	end
 	
@@ -1627,7 +1627,7 @@ function loadbackground(background)
 	collectablescount = {0,0,0,0,0,0,0,0,0,0}
 	animationnumbers = {}
 	
-	if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/" .. background) == false then
+	if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. background) == nil then
 	
 		map = {}
 		mapwidth = width
@@ -1664,7 +1664,7 @@ function loadbackground(background)
 		end
 		
 		--add custom tiles
-		if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/tiles.png") then
+		if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/tiles.png") ~= nil then
 			loadtiles("custom")
 			customtiles = true
 		else
@@ -1678,7 +1678,7 @@ function loadbackground(background)
 		mapheight = 15
 		if s2[2] and s2[2]:sub(1,7) == "height=" then
 			mapheight = tonumber(s2[2]:sub(8,-1)) or 15
-		elseif love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/heights/1-1_0.txt") then
+		elseif love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/heights/1-1_0.txt") ~= nil then
 			local s11 = love.filesystem.read(mappackfolder .. "/" .. mappack .. "/heights/" .. marioworld .. "-" .. mariolevel .. "_" .. mariosublevel .. ".txt")
 			mapheight = tonumber(s11)
 		end
@@ -1862,7 +1862,7 @@ function loadmappacks()
 		local zips = love.filesystem.getDirectoryItems("alesans_entities/onlinemappacks")
 		if #zips > 0 then
 			for j, w in pairs(zips) do
-				if not love.filesystem.exists(mappackfolder .. "/" .. w) then
+				if love.filesystem.getInfo(mappackfolder .. "/" .. w) == nil then
 					mountmappack(w)
 				end
 			end
@@ -1871,9 +1871,9 @@ function loadmappacks()
 	
 	local delete = {}
 	for i = 1, #mappacklist do
-		if ((not onlinedlc) and (love.filesystem.exists("alesans_entities/onlinemappacks/" .. mappacklist[i] .. ".zip") 
-		or love.filesystem.exists(mappackfolder .. "/" .. mappacklist[i] .. "/version.txt"))) 
-		or not love.filesystem.exists(mappackfolder .. "/" .. mappacklist[i] .. "/settings.txt") then
+		if ((not onlinedlc) and (love.filesystem.getInfo("alesans_entities/onlinemappacks/" .. mappacklist[i] .. ".zip") ~= nil
+		or love.filesystem.getInfo(mappackfolder .. "/" .. mappacklist[i] .. "/version.txt") ~= nil))
+		or love.filesystem.getInfo(mappackfolder .. "/" .. mappacklist[i] .. "/settings.txt") == nil then
 			table.insert(delete, i)
 		end
 	end
@@ -2027,10 +2027,10 @@ function loadonlinemappacks()
 		local zips = love.filesystem.getDirectoryItems("alesans_entities/dlc_mappacks")
 		if #zips > 0 then
 			for j, w in pairs(zips) do
-				if not love.filesystem.exists("alesans_entities/onlinemappacks/" .. w) then
+				if love.filesystem.getInfo("alesans_entities/onlinemappacks/" .. w) == nil then
 					local filedata = love.filesystem.newFileData("alesans_entities/dlc_mappacks/" .. w)
 					love.filesystem.write("alesans_entities/onlinemappacks/" .. w, filedata)
-					if j == 1 and not love.filesystem.exists("alesans_entities/onlinemappacks/" .. w) then
+					if j == 1 and love.filesystem.getInfo("alesans_entities/onlinemappacks/" .. w) == nil then
 						break
 					end
 				end
@@ -2049,7 +2049,7 @@ function loadonlinemappacks()
 		
 		local delete = {}
 		for i = 1, #onlinemappacklist do
-			if (not (love.filesystem.exists("alesans_entities/onlinemappacks/" .. onlinemappacklist[i] .. ".zip") or love.filesystem.exists(mappackfolder .. "/" .. onlinemappacklist[i] .. "/version.txt"))) or (not love.filesystem.exists( mappackfolder .. "/" .. onlinemappacklist[i] .. "/settings.txt")) then
+			if (not (love.filesystem.getInfo("alesans_entities/onlinemappacks/" .. onlinemappacklist[i] .. ".zip") ~= nil or love.filesystem.getInfo(mappackfolder .. "/" .. onlinemappacklist[i] .. "/version.txt") ~= nil)) or love.filesystem.getInfo( mappackfolder .. "/" .. onlinemappacklist[i] .. "/settings.txt") == nil then
 				table.insert(delete, i)
 			end
 		end
@@ -2071,7 +2071,7 @@ function loadonlinemappacks()
 		onlinemappackbackground = {}
 		
 		for i = 1, #onlinemappacklist do
-			if love.filesystem.exists( mappackfolder .. "/" .. onlinemappacklist[i] .. "/icon.png" ) then
+			if love.filesystem.getInfo( mappackfolder .. "/" .. onlinemappacklist[i] .. "/icon.png" ) ~= nil then
 				onlinemappackicon[i] = love.graphics.newImage(mappackfolder .. "/" .. onlinemappacklist[i] .. "/icon.png")
 			else
 				onlinemappackicon[i] = nil
@@ -2080,7 +2080,7 @@ function loadonlinemappacks()
 			onlinemappackauthor[i] = nil
 			onlinemappackdescription[i] = nil
 			onlinemappackbackground[i] = nil
-			if love.filesystem.exists( mappackfolder .. "/" .. onlinemappacklist[i] .. "/settings.txt" ) then		
+			if love.filesystem.getInfo( mappackfolder .. "/" .. onlinemappacklist[i] .. "/settings.txt" ) ~= nil then
 				local s = love.filesystem.read( mappackfolder .. "/" .. onlinemappacklist[i] .. "/settings.txt" )
 				local s1 = s:split("\n")
 				for j = 1, #s1 do
@@ -2760,7 +2760,7 @@ function menu_keypressed(key, unicode)
 						notice.new("On android use a file manager\nand go to:\nAndroid > data > Love.to.mario >\nfiles > save > mari0_android >\nalesans_entities > characters", notice.red, 15)
 						return false
 					end
-					if not love.filesystem.exists("alesans_entities/characters") then
+					if love.filesystem.getInfo("alesans_entities/characters") == nil then
 						love.filesystem.createDirectory("alesans_entities/characters")
 					end
 					love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/alesans_entities/characters")
@@ -3088,7 +3088,7 @@ function reset_mappacks()
 end
 
 function delete_mappack(pack)
-	if not love.filesystem.exists(mappackfolder .. "/" .. pack .. "/") then
+	if love.filesystem.getInfo(mappackfolder .. "/" .. pack .. "/") == nil then
 		return false
 	end
 	
@@ -3106,7 +3106,7 @@ end
 
 function createmappack()
 	local i = 1
-	while love.filesystem.exists( mappackfolder .. "/custom_mappack_" .. i .. "/") do
+	while love.filesystem.getInfo( mappackfolder .. "/custom_mappack_" .. i .. "/") ~= nil do
 		i = i + 1
 	end
 	
@@ -3167,7 +3167,7 @@ function selectworld()
 	
 	selectworldexists = {}
 	for i = 1, #mappacklevels do
-		if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/" .. i .. "-1.txt") then
+		if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. i .. "-1.txt") ~= nil then
 			selectworldexists[i] = true
 		end
 	end
@@ -3180,7 +3180,7 @@ function opendlcfolder()
 			notice.new("On android use a file manager\nand go to:\nAndroid > data > Love.to.mario >\nfiles > save > mari0_android >\nalesans_entities > characters", notice.red, 15)
 			return false
 		end
-		if not love.filesystem.exists("alesans_entities/characters") then
+		if love.filesystem.getInfo("alesans_entities/characters") == nil then
 			love.filesystem.createDirectory("alesans_entities/characters")
 		end
 		love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/alesans_entities/characters")
@@ -3189,7 +3189,7 @@ function opendlcfolder()
 			notice.new("On android use a file manager\nand go to:\nAndroid > data > Love.to.mario >\nfiles > save > mari0_android >\nalesans_entities > onlinemappacks", notice.red, 15)
 			return false
 		end
-		if not love.filesystem.exists("alesans_entities/onlinemappacks") then
+		if love.filesystem.getInfo("alesans_entities/onlinemappacks") == nil then
 			love.filesystem.createDirectory("alesans_entities/onlinemappacks")
 		end
 		love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/alesans_entities/onlinemappacks")
@@ -3213,7 +3213,7 @@ function menu_filedropped(file)
 		--drag and drop zip file
 		local filename = string.sub(file:getFilename(), (lastIndexOf(file:getFilename(), "\\") or -5)+1, -1)
 		local newfilepath = "alesans_entities/onlinemappacks/" .. filename
-		if filename:sub(-4,-1) == ".zip" and not love.filesystem.exists(newfilepath) then --only copy if file doesn't exist
+		if filename:sub(-4,-1) == ".zip" and love.filesystem.getInfo(newfilepath) == nil then --only copy if file doesn't exist
 			local filedata = love.filesystem.newFileData(file)
 			love.filesystem.write(newfilepath, filedata) --copy file
 

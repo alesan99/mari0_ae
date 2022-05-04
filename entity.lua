@@ -396,7 +396,7 @@ tooltipquad[2] = love.graphics.newQuad(64,0,64,64,128,64)
 
 for i = 1, #entitylist do
 	local path = "graphics/entitytooltips/" .. entitylist[i].t .. ".png"
-	if love.filesystem.exists(path) then
+	if love.filesystem.getInfo(path) ~= nil then
 		tooltipimages[i] = {}
 		tooltipimages[i].path = path
 	end
