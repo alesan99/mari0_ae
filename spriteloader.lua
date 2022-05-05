@@ -63,7 +63,7 @@ function loadcustomsprites(initial) --Sprite loader
 	if (not customspritesexist) and customsprites then
 		for i = 1, #imgtable do
 			if initial or loadedcustomsprites[imgtable[i]] then
-				local imgdata = love.graphics.newImageData("graphics/" .. graphicspack .. "/" .. string.gsub(string.gsub(imgtable[i], "img", ""), "image", "") .. ".png")
+				local imgdata = love.image.newImageData("graphics/" .. graphicspack .. "/" .. string.gsub(string.gsub(imgtable[i], "img", ""), "image", "") .. ".png")
 				_G[imgtable[i]] = love.graphics.newImage(imgdata)
 				_G[imgdatatable[i]] = imgdata
 				loadedcustomsprites[imgtable[i]] = nil
@@ -127,13 +127,13 @@ function loadcustomsprites(initial) --Sprite loader
 	
 	for i = 1, #imgtable do
 		if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/custom/" .. string.gsub(string.gsub(imgtable[i], "img", ""), "image", "") .. ".png") ~= nil then
-			local imgdata = love.graphics.newImageData(mappackfolder .. "/" .. mappack .. "/custom/" .. string.gsub(string.gsub(imgtable[i], "img", ""), "image", "") .. ".png")
+			local imgdata = love.image.newImageData(mappackfolder .. "/" .. mappack .. "/custom/" .. string.gsub(string.gsub(imgtable[i], "img", ""), "image", "") .. ".png")
 			_G[imgtable[i]] = love.graphics.newImage(imgdata)
 			_G[imgdatatable[i]] = imgdata
 			loadedcustomsprites[imgtable[i]] = true
 		else
 			if initial or loadedcustomsprites[imgtable[i]] then
-				local imgdata = love.graphics.newImageData("graphics/" .. graphicspack .. "/" .. string.gsub(string.gsub(imgtable[i], "img", ""), "image", "") .. ".png")
+				local imgdata = love.image.newImageData("graphics/" .. graphicspack .. "/" .. string.gsub(string.gsub(imgtable[i], "img", ""), "image", "") .. ".png")
 				_G[imgtable[i]] = love.graphics.newImage(imgdata)
 				_G[imgdatatable[i]] = imgdata
 				loadedcustomsprites[imgtable[i]] = nil
@@ -255,8 +255,8 @@ function loaddebris()
 		end
 	end
 	--custom
-	for i = 2, math.floor(blockdebrisimage:getWidth()/17) do
-		local r, g, b, a = blockdebrisimage_data:getPixel(i*17-1, 0)
+	for i = 2, math.floor(blockdebrisimage_data:getWidth()/17) do
+		local r, g, b, a = blockdebrisimage_data:getPixel((i-1)*17, 0)
 		--id of block debris is r,g,b,a
 		local name = rgbaToInt(r,g,b,a)
 		blockdebrisquads[name] = {}
