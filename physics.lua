@@ -49,13 +49,15 @@
 
 function physicsupdate(dt)
 	local lobjects = objects
-	
 	for j, w in pairs(lobjects) do
 		if j ~= "tile" and j ~= "pixeltile" and j ~= "buttonblock" and j ~= "tracksegment" then
 			for i, v in pairs(w) do
+				local oldspeedx = v.speedx
+				local oldspeedy = v.speedy
 				if ((v.static == false) or (v.activestatic == true)) and v.active then
 					--GRAVITY
 					local oldy = v.y
+					local oldx = v.x
 					local oldgravity
 					if (not v.activestatic) and (not v.ignoregravity) then
 						--low gravity
@@ -158,6 +160,7 @@ function physicsupdate(dt)
 						xfrom, xto = xto, xfrom
 						dir = -1
 					end
+					
 					for x = xfrom, xto, dir do
 						for y = ystart, ystart+math.ceil(v.height+0.0001) do
 							--check if invisible block
@@ -237,7 +240,7 @@ function physicsupdate(dt)
 										v:emancipate(h)
 									end
 								else
-									if inrange(v.y+6/16, u.starty-1, u.endy, true) and inrange(u.x-14/16, v.x, v.x+v.speedx*dt, true) then
+									if inrange(v.y+6/16, u.starty-1, u.endy, true) and inrange(u.x-14/16, oldx, v.x+v.speedx*dt, true) then
 										v:emancipate(h)
 									end
 								end
@@ -249,17 +252,19 @@ function physicsupdate(dt)
 					if vercollision == false and not v.activestatic then
 						v.y = v.y + v.speedy*dt
 						if v.gravity then
-							if v.startfall then
-								if v.gravitydir then
-									if (v.gravitydir == "down" and v.speedy == v.gravity*dt) or (v.gravitydir == "up" and v.speedy == -v.gravity*dt) then
+							if (not (v.stopjump and v.jumping)) and (not v.quicksand) then
+								if v.startfall then
+									if v.gravitydir then
+										if (v.gravitydir == "down" and v.speedy == oldspeedy + v.gravity*dt) or (v.gravitydir == "up" and v.speedy == oldspeedy - v.gravity*dt) then
+											v:startfall(i)
+										end
+									elseif v.speedy == oldspeedy + v.gravity*dt then
 										v:startfall(i)
 									end
-								elseif v.speedy == v.gravity*dt then
-									v:startfall(i)
 								end
 							end
 						else
-							if v.speedy == yacceleration*dt and v.startfall then
+							if v.speedy == oldspeedy + yacceleration*dt and v.startfall then
 								v:startfall(i)
 							end
 						end
@@ -270,7 +275,7 @@ function physicsupdate(dt)
 						if v.gravity then
 							if v.startfall then
 								if v.gravitydir then
-									if (v.gravitydir == "right" and v.speedx == v.gravity*dt) or (v.gravitydir == "left" and v.speedx == -v.gravity*dt) then
+									if (v.gravitydir == "right" and v.speedx == oldspeedx + v.gravity*dt) or (v.gravitydir == "left" and v.speedx == oldspeedx - v.gravity*dt) then
 										v:startfall(i)
 									end
 								end
@@ -427,10 +432,10 @@ function passivecollision(v, t, h, g, j, i, dt)
 				return true
 			end
 		end
-		if t.passivecollide then
+		if t.passivecollide and not v.hollow then
 			t:passivecollide(j, v)
 		end
-	else
+	elseif not t.hollow then
 		if v.floorcollide then
 			if v:floorcollide(h, t, dt) ~= false then
 				if v.speedy > 0 then
@@ -457,7 +462,9 @@ function horcollision(v, t, h, g, j, i, dt)
 	end
 	if v.speedx < 0 then
 		--move object RIGHT (because it was moving left)
-		if t.rightcollide then
+		if (v.PLATFORMRIGHT and (not v.PLATFORMLEFT)) or v.NOEXTERNALHORCOLLISIONS then
+			return false
+		elseif t.rightcollide then
 			if t:rightcollide(j, v) ~= false then
 				if t.postrightcollide then
 					t:postrightcollide(j,v)
@@ -494,7 +501,9 @@ function horcollision(v, t, h, g, j, i, dt)
 		end
 	else
 		--move object LEFT (because it was moving right)
-		if t.leftcollide then
+		if (v.PLATFORMLEFT and (not v.PLATFORMRIGHT)) or v.NOEXTERNALHORCOLLISIONS then
+			return false
+		elseif t.leftcollide then
 			if t:leftcollide(j, v) ~= false then
 				if t.postleftcollide then
 					t:postleftcollide(j,v)
@@ -540,7 +549,9 @@ function vercollision(v, t, h, g, j, i, dt)
 	end
 	if v.speedy < 0 then
 		--move object DOWN (because it was moving up)
-		if t.floorcollide then
+		if (v.PLATFORMDOWN and (not v.PLATFORM)) or v.NOEXTERNALVERCOLLISIONS then
+			return false
+		elseif t.floorcollide then
 			if t:floorcollide(j, v) ~= false then
 				if t.postfloorcollide then
 					t:postfloorcollide(j, v)
@@ -577,7 +588,9 @@ function vercollision(v, t, h, g, j, i, dt)
 		end
 	else					
 		--move object UP (because it was moving down)
-		if t.ceilcollide then
+		if (v.PLATFORM and (not v.PLATFORMDOWN)) or v.NOEXTERNALVERCOLLISIONS then
+			return false
+		elseif t.ceilcollide then
 			if t:ceilcollide(j, v) ~= false then
 				if t.postceilcollide then
 					t:postceilcollide(j, v)
