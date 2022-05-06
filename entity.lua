@@ -767,7 +767,7 @@ rightclicktype["text"] = {
 		{"checkbox", 5, "centered", default = false},
 		{"checkbox", 6, "big", default = false},
 		{"checkbox", 4, "default off", default = false},
-		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}} --"input", var, text, function
+		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {1, 0, 0}}} --"input", var, text, function
 	}
 }
 rightclicktype["regiontrigger"] = {
@@ -809,7 +809,7 @@ rightclicktype["pipe"] = {
 		{"dropdown", 2, 4, nil, {1,2,3,4,5,6,7,8,9,10}},
 		"pipe size:",
 		{"dropdown", 4, 5, nil, {"big","small","tiny","giant"}},
-		{"button", 2, {"link exit", startrclink, {"exit", "exit"}}, {"x", resetrclink, {"exit"}, textcolor = {255, 0, 0}}},
+		{"button", 2, {"link exit", startrclink, {"exit", "exit"}}, {"x", resetrclink, {"exit"}, textcolor = {1, 0, 0}}},
 	},
 	customoutputs = {"pipe", "pipe2", "pipespawn", "pipespawndown", "pipespawnhor"}
 }
@@ -943,7 +943,7 @@ rightclicktype["platformup"] = {
 		{"slider", 3, range = {-15, 15, round = 1}},
 		"duration:",
 		{"slider", 4, range = {1, 20, round = 2}},
-		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}},
+		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {1, 0, 0}}},
 	}
 }
 rightclicktype["platformright"] = deepcopy(rightclicktype["platformup"])
@@ -1005,7 +1005,7 @@ rightclicktype["delayer"] = {
 		{"checkbox", 2, "visible"},
 		"delay",
 		{"input", 1, "1", 4, 4, 1, function(v) rightclickvalues2[1] = v end},
-		{"button", 2, {"link trigger", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
+		{"button", 2, {"link trigger", startrclink}, {"x", resetrclink, textcolor = {1, 0, 0}}}
 	}
 }
 rightclicktype["squarewave"] = {
@@ -1103,7 +1103,7 @@ rightclicktype["tiletool"] = {
 				rightclickvalues2[1] = rightclicktype["tiletool"].t[rightclickobjects[2].var or 1] .. rightclickobjects[3].value
 				startrcregion(var, step)
 			end, {2, 1}}},
-		{"button", 3, {"link trigger", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
+		{"button", 3, {"link trigger", startrclink}, {"x", resetrclink, textcolor = {1, 0, 0}}}
 	},
 	t = {"change to ","set back to ","group","remove","break","hit","set gel ","check gel ","remove gel"},
 	d = {"change to:","set back to:","group","remove","break","hit","set gel:", "check gel:", "remove gel"},
@@ -1175,7 +1175,7 @@ rightclicktype["enemytool"] = {
 		"animation",
 		{"dropdown", 5, 14, nil, {"none", "block", "cannon", "pipeup", "pipedown", "pipeleft", "piperight", "poof"}, ignorerctt=true},
 		{"checkbox", 6, "only on screen"},
-		{"button", 2, {"link trigger ", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}},
+		{"button", 2, {"link trigger ", startrclink}, {"x", resetrclink, textcolor = {1, 0, 0}}},
 	},
 	t = {"goomba"},
 	entitylistlength = 1,
@@ -1195,7 +1195,7 @@ rightclicktype["kingbill"] = {
 		{"slider", 1, range = {3, 9, round = 1}},
 		"direction",
 		{"dirbuttonset", 2},
-		{"button", 2, {"link trigger", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}},
+		{"button", 2, {"link trigger", startrclink}, {"x", resetrclink, textcolor = {1, 0, 0}}},
 	},
 }
 rightclicktype["musicchanger"] = {
@@ -1233,7 +1233,7 @@ rightclicktype["musicchanger"] = {
 		{"dropdown", 1, 15, function(v) rightclickobjects[3].var = v; rightclickvalues2[1] = rightclicktype["musicchanger"].t[v] end, {"overworld", "underground", "castle", "underwater", "star", "custom", "none"}}, --"dropdown", var, width (in chars), func, {entries}
 		"custom music id",
 		{"input", 2, "1", 2, 2, 1, function(v) rightclickvalues2[2] = v end},
-		{"button", 2, {"link trigger", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}},
+		{"button", 2, {"link trigger", startrclink}, {"x", resetrclink, textcolor = {1, 0, 0}}},
 	},
 	t = {"overworld", "underground", "castle", "underwater", "star", "custom", "none"}
 }
@@ -1287,7 +1287,7 @@ rightclicktype["door"] = {
 		"exit id:",
 		{"dropdown", 2, 4, nil, {1,2,3,4,5,6,7,8,9,10}},
 		{"checkbox", 3, "visible"},
-		{"button", 2, {"link exit", startrclink, {"exit", "exit"}}, {"x", resetrclink, {"exit"}, textcolor = {255, 0, 0}}},
+		{"button", 2, {"link exit", startrclink, {"exit", "exit"}}, {"x", resetrclink, {"exit"}, textcolor = {1, 0, 0}}},
 	},
 }
 
@@ -1343,8 +1343,8 @@ rightclicktype["funnel"] = {
 		{"slider", 1, range = {0, 10, round = 4}},
 		{"checkbox", 2, "reverse"},
 		{"checkbox", 4, "default off"},
-		{"button", 2, {"link power  ", startrclink, {"power", "power"}}, {"x", resetrclink, {"power"}, textcolor = {255, 0, 0}}},
-		{"button", 2, {"link reverse", startrclink, {"reverse", "reverse"}}, {"x", resetrclink, {"reverse"}, textcolor = {255, 0, 0}}}
+		{"button", 2, {"link power  ", startrclink, {"power", "power"}}, {"x", resetrclink, {"power"}, textcolor = {1, 0, 0}}},
+		{"button", 2, {"link reverse", startrclink, {"reverse", "reverse"}}, {"x", resetrclink, {"reverse"}, textcolor = {1, 0, 0}}}
 	},
 }
 rightclicktype["funnelup"] = deepcopy(rightclicktype["funnel"])
@@ -1378,8 +1378,8 @@ rightclicktype["belt"] = {
 		"length",
 		--{"input", 2, "3", 3, 2, 1, function(v) rightclickvalues2[2] = v end},
 		{"slider", 2, range = {2, 50, round = 0}},
-		{"button", 2, {"link power  ", startrclink, {"power", "power"}}, {"x", resetrclink, {"power"}, textcolor = {255, 0, 0}}},
-		{"button", 2, {"link reverse", startrclink, {"reverse", "reverse"}}, {"x", resetrclink, {"reverse"}, textcolor = {255, 0, 0}}}
+		{"button", 2, {"link power  ", startrclink, {"power", "power"}}, {"x", resetrclink, {"power"}, textcolor = {1, 0, 0}}},
+		{"button", 2, {"link reverse", startrclink, {"reverse", "reverse"}}, {"x", resetrclink, {"reverse"}, textcolor = {1, 0, 0}}}
 	}
 }
 rightclicktype["beltswitch"] = {
@@ -1400,7 +1400,7 @@ rightclicktype["animationtrigger"] = {
 	format = {
 		"animation id",
 		{"input", 1, "", 14, 20, 1, function(v) rightclickvalues2[1] = v end},
-		{"button", 2, {"link trigger", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
+		{"button", 2, {"link trigger", startrclink}, {"x", resetrclink, textcolor = {1, 0, 0}}}
 	}
 }rightclicktype["animationoutput"] = {
 	name = "animation output",
@@ -1417,7 +1417,7 @@ rightclicktype["collectable"] = {
 	format = {
 		"collectable type",
 		{"dropdown", 1, 4, nil, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
-		{"button", 2, {"link collect", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
+		{"button", 2, {"link collect", startrclink}, {"x", resetrclink, textcolor = {1, 0, 0}}}
 	},
 }
 
@@ -1440,7 +1440,7 @@ rightclicktype["timer"] = {
 		{"checkbox", 2, "visible"},
 		"time",
 		{"slider", 1, range = {1, 20, round = 1}},
-		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
+		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {1, 0, 0}}}
 	},
 }
 rightclicktype["portal"] = {
@@ -1451,7 +1451,7 @@ rightclicktype["portal"] = {
 		"id",
 		{"dropdown", 2, 5, nil, {"1","2","3","4","5","6","7","8"}},
 		{"checkbox", 3, "default on"},
-		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
+		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {1, 0, 0}}}
 	},
 }
 
@@ -1468,7 +1468,7 @@ rightclicktype["faithplate"] = {
 		{"slider", 2, range = {1, 46, round = 4}},
 		{"checkbox", 3, "snap"},
 		{"checkbox", 4, "default off"},
-		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
+		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {1, 0, 0}}}
 	}
 }
 rightclicktype["faithplateup"] = deepcopy(rightclicktype["faithplate"])
@@ -1490,7 +1490,7 @@ rightclicktype["animatedtiletrigger"] = {
 	format = {
 		{"checkbox", 1, "visible"},
 		{"button", 1, {"select tiles", startrcregion, {2, 1}}},
-		{"button", 2, {"link trigger", startrclink, {"power"}}, {"x", resetrclink, textcolor = {255, 0, 0}}}
+		{"button", 2, {"link trigger", startrclink, {"power"}}, {"x", resetrclink, textcolor = {1, 0, 0}}}
 	}
 }
 rightclicktype["orgate"] = {
@@ -1498,10 +1498,10 @@ rightclicktype["orgate"] = {
 	default = "true",
 	format = {
 		{"checkbox", 1, "visible"},
-		{"button", 1, {"link power", startrclink, {"link 1", 1}}, {"x", resetrclink, {1}, textcolor = {255, 0, 0}}},
-		{"button", 1, {"link power", startrclink, {"link 2", 2}}, {"x", resetrclink, {2}, textcolor = {255, 0, 0}}},
-		{"button", 1, {"link power", startrclink, {"link 3", 3}}, {"x", resetrclink, {3}, textcolor = {255, 0, 0}}},
-		{"button", 1, {"link power", startrclink, {"link 4", 4}}, {"x", resetrclink, {4}, textcolor = {255, 0, 0}}}
+		{"button", 1, {"link power", startrclink, {"link 1", 1}}, {"x", resetrclink, {1}, textcolor = {1, 0, 0}}},
+		{"button", 1, {"link power", startrclink, {"link 2", 2}}, {"x", resetrclink, {2}, textcolor = {1, 0, 0}}},
+		{"button", 1, {"link power", startrclink, {"link 3", 3}}, {"x", resetrclink, {3}, textcolor = {1, 0, 0}}},
+		{"button", 1, {"link power", startrclink, {"link 4", 4}}, {"x", resetrclink, {4}, textcolor = {1, 0, 0}}}
 	}
 }
 rightclicktype["andgate"] = {
@@ -1509,10 +1509,10 @@ rightclicktype["andgate"] = {
 	default = "true",
 	format = {
 		{"checkbox", 1, "visible"},
-		{"button", 1, {"link power", startrclink, {"link 1", 1}}, {"x", resetrclink, {1}, textcolor = {255, 0, 0}}},
-		{"button", 1, {"link power", startrclink, {"link 2", 2}}, {"x", resetrclink, {2}, textcolor = {255, 0, 0}}},
-		{"button", 1, {"link power", startrclink, {"link 3", 3}}, {"x", resetrclink, {3}, textcolor = {255, 0, 0}}},
-		{"button", 1, {"link power", startrclink, {"link 4", 4}}, {"x", resetrclink, {4}, textcolor = {255, 0, 0}}}
+		{"button", 1, {"link power", startrclink, {"link 1", 1}}, {"x", resetrclink, {1}, textcolor = {1, 0, 0}}},
+		{"button", 1, {"link power", startrclink, {"link 2", 2}}, {"x", resetrclink, {2}, textcolor = {1, 0, 0}}},
+		{"button", 1, {"link power", startrclink, {"link 3", 3}}, {"x", resetrclink, {3}, textcolor = {1, 0, 0}}},
+		{"button", 1, {"link power", startrclink, {"link 4", 4}}, {"x", resetrclink, {4}, textcolor = {1, 0, 0}}}
 	}
 }
 rightclicktype["rsflipflop"] = {
@@ -1520,8 +1520,8 @@ rightclicktype["rsflipflop"] = {
 	default = "true",
 	format = {
 		{"checkbox", 1, "visible"},
-		{"button", 1, {"link set  ", startrclink, {"set", "set"}}, {"x", resetrclink, {"set"}, textcolor = {255, 0, 0}}},
-		{"button", 2, {"link reset", startrclink, {"reset", "reset"}}, {"x", resetrclink, {"reset"}, textcolor = {255, 0, 0}}}
+		{"button", 1, {"link set  ", startrclink, {"set", "set"}}, {"x", resetrclink, {"set"}, textcolor = {1, 0, 0}}},
+		{"button", 2, {"link reset", startrclink, {"reset", "reset"}}, {"x", resetrclink, {"reset"}, textcolor = {1, 0, 0}}}
 	}
 }
 
@@ -1593,7 +1593,7 @@ rightclicktype["boxtube"] = {
 		"",
 		"object:",
 		{"dropdown", 3, 13, function(v) rightclickobjects[8].var = v; rightclickvalues2[3] = rightclicktype["boxtube"].t[v] end, {}}, --"dropdown", var, width (in chars), func, {entries}
-		{"button", 2, {"link trigger", startrclink},{"x", resetrclink, textcolor = {255, 0, 0}}}
+		{"button", 2, {"link trigger", startrclink},{"x", resetrclink, textcolor = {1, 0, 0}}}
 	},
 	t = {}
 }
@@ -1629,7 +1629,7 @@ rightclicktype["doorver"] = {
 		{"orientationbuttonset",2},
 		{"checkbox", 3, "start open"},
 		{"checkbox", 1, "force close"},
-		{"button", 2, {"link open ", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}},
+		{"button", 2, {"link open ", startrclink}, {"x", resetrclink, textcolor = {1, 0, 0}}},
 	}
 }
 rightclicktype["doorhor"] = deepcopy(rightclicktype["doorver"])
@@ -1641,7 +1641,7 @@ rightclicktype["emancever"] = {
 		"direction",
 		{"orientationbuttonset",1},
 		{"checkbox", 2, "default off"},
-		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
+		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {1, 0, 0}}}
 	}
 }
 rightclicktype["emancehor"] = deepcopy(rightclicktype["emancever"])
@@ -1653,7 +1653,7 @@ rightclicktype["laserfield"] = {
 		"direction",
 		{"orientationbuttonset",1},
 		{"checkbox", 2, "default off"},
-		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
+		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {1, 0, 0}}}
 	}
 }
 rightclicktype["laser"] = {
@@ -1663,7 +1663,7 @@ rightclicktype["laser"] = {
 		"direction",
 		{"dirbuttonset",1},
 		{"checkbox", 2, "default off"},
-		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
+		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {1, 0, 0}}}
 	}
 }
 rightclicktype["laserright"] = deepcopy(rightclicktype["laser"])
@@ -1697,7 +1697,7 @@ rightclicktype["lightbridge"] = {
 		"direction",
 		{"dirbuttonset",1},
 		{"checkbox", 2, "default off"},
-		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
+		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {1, 0, 0}}}
 	}
 }
 rightclicktype["lightbridgeright"] = deepcopy(rightclicktype["lightbridge"])
@@ -1712,13 +1712,13 @@ rightclicktype["notgate"] = {
 	default = "true",
 	format = {
 		{"checkbox", 1, "visible"},
-		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
+		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {1, 0, 0}}}
 	}
 }
 rightclicktype["wallindicator"] = {name = "wallindicator", default = nil, varfunc = function(v) end,
-	format = {{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}}}
+	format = {{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {1, 0, 0}}}}}
 rightclicktype["groundlight"] = {name = "groundlight", default = nil, varfunc = function(v) end,
-	format = {{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}}}
+	format = {{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {1, 0, 0}}}}}
 rightclicktype["groundlightver"] = rightclicktype["groundlight"]
 rightclicktype["groundlighthor"] = rightclicktype["groundlight"]
 rightclicktype["groundlightupright"] = rightclicktype["groundlight"]
@@ -1726,7 +1726,7 @@ rightclicktype["groundlightrightdown"] = rightclicktype["groundlight"]
 rightclicktype["groundlightdownleft"] = rightclicktype["groundlight"]
 rightclicktype["groundlightleftup"] = rightclicktype["groundlight"]
 rightclicktype["link"] = {name = "link", default = nil, varfunc = function(v) end,
-	format = {{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}}}
+	format = {{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {1, 0, 0}}}}}
 rightclicktype["randomizer"] = {
 	name = "randomizer",
 	default = "1|true",
@@ -1734,13 +1734,13 @@ rightclicktype["randomizer"] = {
 		{"checkbox", 2, "visible"},
 		"method",
 		{"dropdown", 1, 11, nil, {1, 2, 3}, {"one output", "any output", "many outputs"}},
-		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
+		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {1, 0, 0}}}
 	},
 }
 rightclicktype["rocketturret"] = {name = "rocketturret", default = nil, varfunc = function(v) end,
-	format = {{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}}}
+	format = {{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {1, 0, 0}}}}}
 rightclicktype["checkpoint"] = {name = "checkpoint", default = nil, varfunc = function(v) end,
-	format = {{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}}}
+	format = {{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {1, 0, 0}}}}}
 rightclicktype["geldispenser"] = {
 	name = "geldispenser",
 	default = "down|1|false",
@@ -1753,7 +1753,7 @@ rightclicktype["geldispenser"] = {
 		"type",
 		{"dropdown", 2, 6, nil, {"1", "2", "3", "4", "5"}},
 		{"checkbox", 3, "default off"},
-		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
+		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {1, 0, 0}}}
 	},
 	tdisplay = {"blue","orange","white","purple","cleanse"},
 }
@@ -1819,8 +1819,8 @@ rightclicktype["risingwater"] = {
 		{"checkbox", 8, "oscillate"},
 		"wait time:",
 		{"slider", 9, range = {0, 10, round = 2}},
-		{"button", 2, {"link power  ", startrclink, {"power", "power"}}, {"x", resetrclink, {"power"}, textcolor = {255, 0, 0}}},
-		{"button", 2, {"link reverse", startrclink, {"reverse", "reverse"}}, {"x", resetrclink, {"reverse"}, textcolor = {255, 0, 0}}}
+		{"button", 2, {"link power  ", startrclink, {"power", "power"}}, {"x", resetrclink, {"power"}, textcolor = {1, 0, 0}}},
+		{"button", 2, {"link reverse", startrclink, {"reverse", "reverse"}}, {"x", resetrclink, {"reverse"}, textcolor = {1, 0, 0}}}
 	},
 }
 
@@ -1840,14 +1840,14 @@ rightclicktype["snakeblock"] = {
 		rightclickvalues2[1] = s
 	end,
 	format = {
-		{"button", 1, {"  set path  ", function(var) startrcpath(var) end, {1}}, {"x", function() rightclickvalues2[1] = "" end, {}, textcolor = {255, 0, 0}}},
+		{"button", 1, {"  set path  ", function(var) startrcpath(var) end, {1}}, {"x", function() rightclickvalues2[1] = "" end, {}, textcolor = {1, 0, 0}}},
 		"length",
 		{"slider", 2, range = {3, 20, round = 0}},
 		"speed",
 		{"slider", 3, range = {0, 6, round = 2}},
 		{"checkbox", 4, "loop"},
 		{"checkbox", 5, "respawn"},
-		{"button", 6, {"link power  ", startrclink, {"power", "power"}}, {"x", resetrclink, {"power"}, textcolor = {255, 0, 0}}},
+		{"button", 6, {"link power  ", startrclink, {"power", "power"}}, {"x", resetrclink, {"power"}, textcolor = {1, 0, 0}}},
 	}
 }
 
@@ -1907,7 +1907,7 @@ rightclicktype["skewer"] = {
 	format = {
 		"direction",
 		{"dirbuttonset", 1},
-		{"button", 2, {"link trigger", startrclink, {"trigger", "trigger"}}, {"x", resetrclink, {"trigger"}, textcolor = {255, 0, 0}}},
+		{"button", 2, {"link trigger", startrclink, {"trigger", "trigger"}}, {"x", resetrclink, {"trigger"}, textcolor = {1, 0, 0}}},
 	},
 }
 
@@ -1959,7 +1959,7 @@ rightclicktype["energylauncherright"] = {
 		{"checkbox", 2, "offset"},
 		{"checkbox", 4, "green"},
 		{"checkbox", 3, "default off"},
-		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}},
+		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {1, 0, 0}}},
 	},
 }
 rightclicktype["energylauncherleft"] = deepcopy(rightclicktype["energylauncherright"])
@@ -2016,7 +2016,7 @@ rightclicktype["camerastop"] = {
 		{"checkbox", 5, "force push"},
 		{"checkbox", 6, "ignore if"},
 		"off-screen",
-		{"button", 2, {"link off", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
+		{"button", 2, {"link off", startrclink}, {"x", resetrclink, textcolor = {1, 0, 0}}}
 	}
 }
 
@@ -2028,7 +2028,7 @@ rightclicktype["clearpipe"] = {
 	end,
 	format = {
 		{"button", 1, {"  set path  ", function(var) startrcpath(var) end, {{1, default={0,0}, pipe=true}}},
-		{"x", function() rightclickvalues2[1] = "" end, {}, textcolor = {255, 0, 0}}},
+		{"x", function() rightclickvalues2[1] = "" end, {}, textcolor = {1, 0, 0}}},
 		{"checkbox", 2, "intersection"},
 	}
 }
@@ -2040,7 +2040,7 @@ rightclicktype["pneumatictube"] = {
 	end,
 	format = {
 		{"button", 1, {"  set path  ", function(var) startrcpath(var) end, {{1, default={0,0}, pipe=true}}},
-		{"x", function() rightclickvalues2[1] = "" end, {}, textcolor = {255, 0, 0}}},
+		{"x", function() rightclickvalues2[1] = "" end, {}, textcolor = {1, 0, 0}}},
 		{"checkbox", 2, "intersection"},
 		{"checkbox", 3, "suck"},
 	}
@@ -2054,7 +2054,7 @@ rightclicktype["plantcreeper"] = {
 	end,
 	format = {
 		{"button", 1, {"  set path  ", function(var) startrcpath(var) end, {{1, default={0,0}, pipe=true}}},
-		{"x", function() rightclickvalues2[1] = "" end, {}, textcolor = {255, 0, 0}}},
+		{"x", function() rightclickvalues2[1] = "" end, {}, textcolor = {1, 0, 0}}},
 		{"checkbox", 2, "sleeping"},
 	}
 }
@@ -2067,9 +2067,9 @@ rightclicktype["track"] = {
 	end,
 	format = {
 		{"button", 1, {"lay tracks", function(var) allowdrag = false; startrctrack(var) end, {{1}}},
-		{"x", function() rightclickvalues2[1] = "0:0:c:c:d" end, {}, textcolor = {255, 0, 0}}},
+		{"x", function() rightclickvalues2[1] = "0:0:c:c:d" end, {}, textcolor = {1, 0, 0}}},
 		{"checkbox", 2, "visible"},
-		{"button", 2, {"link stop ", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}},
+		{"button", 2, {"link stop ", startrclink}, {"x", resetrclink, textcolor = {1, 0, 0}}},
 	}
 }
 

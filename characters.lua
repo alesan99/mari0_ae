@@ -1,7 +1,30 @@
 --I have no idea what i'm even doing
+local colorvariables = {"colors", "defaultcolors", "starcolors", "flowercolor", "hammersuitcolor", "frogsuitcolor", "leafcolor", "iceflowercolor", "tanookisuitcolor", "statuecolor", "superballcolor", "blueshellcolor", "boomerangcolor"}
 local animfiles = {"", "big", "fire", "ice", "superball", "hammer", "frog", "raccoon", "tiny", "tanooki", "skinny", "cape", "shell", "boomerang"}
 local blankimg = love.graphics.newImage(love.image.newImageData(1, 1))
 local splitimage
+
+local function iscolorvariable(key)
+	for i, v in ipairs(colorvariables) do
+		if v == key then
+			return true
+		end
+	end
+	return false
+end
+
+local function convertcolors(table)
+	if table == nil or #table == 0 then
+		return
+	end
+	for i, v in ipairs(table) do
+		if type(v) == "table" then
+			convertcolors(v)
+		else
+			table[i] = tonumber(v)/255
+		end
+	end
+end
 
 function loadcustomplayers()
 	characters = {list = {}, data = {}}
@@ -24,6 +47,8 @@ function loadcustomplayers()
 				i = #characters["list"]+1,
 
 				--colors
+				-- !! MAKE SURE to add any new RGB variables to `colorvariables` at the top !!
+				-- !! to ensure they get automatically converted from 0..255 to 0..1        !!
 				colorables = {"hat", "hair", "skin"},
 				colors = {},
 				defaultcolors = false,
@@ -347,6 +372,11 @@ function loadcustomplayers()
 					temp = err
 					--works! so set properties
 					for i, v in pairs(temp) do
+						-- convert numbers to 0..1
+						if iscolorvariable(i) then
+							convertcolors(v)
+						end
+						-- set properties
 						playerstuff[i] = v
 						if i == "health" or i == "fireenemy" then
 							playerstuff["advanced"] = true
@@ -422,6 +452,7 @@ function loadcustomplayers()
 end
 
 --local splitShader
+--`color` param is expected to be an array of 0..255 values (r, g, b) to maintain support for old community-created content
 function splitimage(img, color, exclude, imagedata) --split singe image into colorable images
 	if false then --useShader then
 		if not splitShader then
@@ -468,17 +499,18 @@ function splitimage(img, color, exclude, imagedata) --split singe image into col
 		for x = 0, input:getWidth()-1 do
 			for y = 0, input:getHeight()-1 do
 				local r, g, b, a = input:getPixel(x, y)
+				local rr, rg, rb = round(r*255), round(g*255), round(b*255)
 				local place = false
 				if exclude then
 					place = true
 					for i, c in pairs(color) do
-						if r == c[1] and g == c[2] and b == c[3] then
+						if rr == c[1] and rg == c[2] and rb == c[3] then
 							place = false
 							break
 						end
 					end
 				else
-					if r == color[1] and g == color[2] and b == color[3] then
+					if rr == color[1] and rg == color[2] and rb == color[3] then
 						place = true
 					end
 				end
@@ -486,7 +518,7 @@ function splitimage(img, color, exclude, imagedata) --split singe image into col
 					if exclude then
 						output:setPixel(x, y, r, g, b, a)
 					else
-						output:setPixel(x, y, 255, 255, 255, a)
+						output:setPixel(x, y, 1, 1, 1, a)
 					end
 				end
 			end

@@ -164,9 +164,9 @@ function rocketturret:draw()
 			end
 			local portalx, portaly, portalfacing, infacing = getPortal(cox, coy, opp)
 		--	if portalx or portaly then
-		--		love.graphics.setColor(101, 0, 0, 150)
+		--		love.graphics.setColor(101/255, 0, 0, 150/255)
 		--	else
-				love.graphics.setColor(101, 228, 255, 150)
+				love.graphics.setColor(101/255, 228/255, 1, 150/255)
 		--	end
 			love.graphics.setLineWidth(2)
 			love.graphics.setLineStyle("rough")
@@ -221,7 +221,7 @@ function rocketturret:draw()
 				end
 				if infacing ~= "up" or infacing ~= "down" then
 					local cox, coy, side, tend, x, y = traceline(portalx+diffx, portaly+diffy, angle)
-					love.graphics.setColor(101, 228, 255, 150)
+					love.graphics.setColor(101/255, 228/255, 1, 150/255)
 					love.graphics.line(((portalx+diffx)-xscroll)*16*scale, ((portaly+diffy)-yscroll-8/16)*16*scale, (x-xscroll)*16*scale, (y-yscroll-8/16)*16*scale)
 				end
 			end

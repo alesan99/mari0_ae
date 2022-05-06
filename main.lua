@@ -71,9 +71,9 @@ local loadingbardraw = function(add)
 	if android then
 		love.graphics.scale(winwidth/(width*16*scale), winheight/(224*scale))
 	end
-	love.graphics.setColor(150, 150, 150)
+	love.graphics.setColor(150/255, 150/255, 150/255)
 	properprint("loading mari0..", ((width*16)*scale)/2-string.len("loading mari0..")*4*scale, 20*scale)
-	love.graphics.setColor(50, 50, 50)
+	love.graphics.setColor(50/255, 50/255, 50/255)
 	local scale2 = scale
 	if scale2 <= 1 then
 		scale2 = 0.5
@@ -82,15 +82,15 @@ local loadingbardraw = function(add)
 	end
 	properprint(loadingtext, ((width*16)*scale)/2-string.len(loadingtext)*4*scale, ((height*16)*scale)/2+165*scale2)
 	if FamilyFriendly then
-		love.graphics.setColor(255, 255, 255)
+		love.graphics.setColor(1, 1, 1)
 		properprint("stys.eu", ((width*16)*scale)/2-string.len("stys.eu")*4*scale, 110*scale)
 	else
-		love.graphics.setColor(255, 255, 255)
+		love.graphics.setColor(1, 1, 1)
 		love.graphics.draw(logo, ((width*16)*scale)/2, ((height*16)*scale)/2, 0, scale2, scale2, 142, 150)
 	end
 
 	loadingbarv = loadingbarv + (add)/(8)
-	love.graphics.setColor(255,255,255)
+	love.graphics.setColor(1,1,1)
 	love.graphics.rectangle("fill", 0, (height*16-3)*scale, (width*16*loadingbarv)*scale, 3*scale)
 	love.graphics.pop()
 	love.graphics.present()
@@ -421,15 +421,15 @@ function love.load()
 	
 	--Backgroundcolors
 	backgroundcolor = {}
-	backgroundcolor[1] = {92, 148, 252}
+	backgroundcolor[1] = {92/255, 148/255, 252/255}
 	backgroundcolor[2] = {0, 0, 0}
-	backgroundcolor[3] = {32, 56, 236}
+	backgroundcolor[3] = {32/255, 56/255, 236/255}
 	backgroundcolor[4] = {0, 0, 0} --custom
-	--[[backgroundcolor[5] = {60, 188, 252}
-	backgroundcolor[6] = {168, 228, 252}
-	backgroundcolor[7] = {252, 216, 168}
-	backgroundcolor[8] = {252, 188, 176}
-	backgroundcolor[9] = {24, 60, 92}]]
+	--[[backgroundcolor[5] = {60/255, 188/255, 252/255}
+	backgroundcolor[6] = {168/255, 228/255, 252/255}
+	backgroundcolor[7] = {252/255, 216/255, 168/255}
+	backgroundcolor[8] = {252/255, 188/255, 176/255}
+	backgroundcolor[9] = {24/255, 60/255, 92/255}]]
 	
 	--IMAGES--
 	
@@ -1145,10 +1145,10 @@ function love.draw()
 				local s
 				if cw/tw > ch/th then s = tw/cw
 				else s = th/ch end
-				love.graphics.setColor(255, 255, 255)
+				love.graphics.setColor(1, 1, 1)
 				love.graphics.draw(canvas, winwidth/2, winheight/2, 0, s, s, cw/2, ch/2)
 			else
-				love.graphics.setColor(255, 255, 255)
+				love.graphics.setColor(1, 1, 1)
 				love.graphics.draw(canvas, 0, 0, 0, winwidth/(width*16*scale), winheight/(224*scale))
 			end
 
@@ -1165,7 +1165,7 @@ function love.draw()
 	
 	if debugGraphs then
 		--Draw graphs
-		love.graphics.setColor(255,255,255)
+		love.graphics.setColor(1, 1, 1)
 		local stats = love.graphics.getStats()
 		love.graphics.setLineWidth(2)
 		drawGraph.label = "Drawcalls: " .. stats.drawcalls
@@ -1185,7 +1185,7 @@ function lovedraw()
 			love.graphics.rectangle("fill", 0, 0, width*16*scale, height*16*scale)
 		end
 	end
-	love.graphics.setColor(255, 255, 255)
+	love.graphics.setColor(1, 1, 1)
 	love.graphics.push()
 	if gamestate == "menu" or gamestate == "mappackmenu" or gamestate == "onlinemenu" or gamestate == "lobby" or gamestate == "options" then
 		menu_draw()
@@ -1201,7 +1201,7 @@ function lovedraw()
 	notice.draw()
 	
 	if showfps then
-		love.graphics.setColor(255, 255, 255, 180)
+		love.graphics.setColor(1, 1, 1, 180/255)
 		properprintfast(love.timer.getFPS(), 2*scale, 2*scale)
 	end
 
@@ -1218,14 +1218,14 @@ function lovedraw()
 	if debugconsole and debuginputon then
 		love.graphics.setColor(0, 0, 0)
 		love.graphics.print(debuginput, 1, 1)
-		love.graphics.setColor(255, 255, 255)
+		love.graphics.setColor(1, 1, 1)
 		love.graphics.print(debuginput, 2, 2)
 	end
 	--testing sublevels (i KNOW you'll need this)
-	--love.graphics.setColor(255,255,255)
+	--love.graphics.setColor(1, 1, 1)
 	--properprint("mariosublevel: " .. tostring(mariosublevel) .. "\nprevsublevel: " .. tostring(prevsublevel) .. "\nactualsublevel: " .. tostring(actualsublevel), 2, 2)
 
-	love.graphics.setColor(255, 255,255)
+	love.graphics.setColor(1, 1, 1)
 end
 
 function saveconfig()
@@ -1620,6 +1620,8 @@ function loadcustomtext()
 end
 
 function defaultcustomtext(initial)
+	-- colors here have intentionally been left as 0..255 to maintain support for previous versions
+	-- the conversion to 0..1 is handled in levelscreen.lua
 	endingtextcolor = {255, 255, 255}
 	endingtextcolorname = "white"
 	endingtext = {"congratulations!", "you have finished this mappack!"}
@@ -1641,6 +1643,14 @@ function defaultcustomtext(initial)
 	hudoutline = false
 	hudsimple = false
 	hudhidecollectables = {false, false, false, false, false, false, false, false, false, false}
+end
+
+function getendingtextcolor()
+	return endingtextcolor[1] / 255, endingtextcolor[2] / 255, endingtextcolor[3] / 255
+end
+
+function gethudtextcolor()
+	return hudtextcolor[1] / 255, hudtextcolor[2] / 255, hudtextcolor[3] / 255
 end
 
 function savecustomtext()
@@ -1797,10 +1807,10 @@ function defaultconfig()
 	--3: skin (yellow-orange)
 	
 	mariocolors = {}
-	mariocolors[1] = {{224,  32,   0}, {136, 112,   0}, {252, 152,  56}}
-	mariocolors[2] = {{255, 255, 255}, {  0, 160,   0}, {252, 152,  56}}
-	mariocolors[3] = {{  0,   0,   0}, {200,  76,  12}, {252, 188, 176}}
-	mariocolors[4] = {{ 32,  56, 236}, {  0, 128, 136}, {252, 152,  56}}
+	mariocolors[1] = {{224/255,  32/255,       0}, {136/255, 112/255,       0}, {252/255, 152/255,  56/255}}
+	mariocolors[2] = {{      1,       1,       1}, {      0, 160/255,       0}, {252/255, 152/255,  56/255}}
+	mariocolors[3] = {{      0,       0,       0}, {200/255,  76/255,  12/255}, {252/255, 188/255, 176/255}}
+	mariocolors[4] = {{ 32/255,  56/255, 236/255}, {      0, 128/255, 136/255}, {252/255, 152/255,  56/255}}
 	for i = 5, players do
 		mariocolors[i] = mariocolors[math.random(4)]
 	end
@@ -2147,7 +2157,7 @@ function love.keypressed(key, scancode, isrepeat, textinput)
 		if key == konami[konamii] or (android and key == androidkonami[konamii]) then--[[DROID]]
 			konamii = konamii + 1
 			if konamii == #konami+1 then
-				if not konamisound.isPlaying() then
+				if not konamisound:isPlaying() then
 					playsound(konamisound)
 				end
 				gamefinished = true
@@ -2466,7 +2476,6 @@ function round(num, idp) --Not by me
 end
 
 function getrainbowcolor(i)
-	local whiteness = 255
 	local r, g, b
 	if i < 1/6 then
 		r = 1
@@ -2494,10 +2503,11 @@ function getrainbowcolor(i)
 		b = (1/6-(i-5/6))*6
 	end
 	
-	return {round(r*whiteness), round(g*whiteness), round(b*whiteness), 255}
+	return {r, g, b, 1}
 end
 
 function newRecoloredImage(path, tablein, tableout)
+	local minalpha = 128/255
 	local imagedata = love.image.newImageData( path )
 	local width, height = imagedata:getWidth(), imagedata:getHeight()
 	
@@ -2505,7 +2515,7 @@ function newRecoloredImage(path, tablein, tableout)
 		for x = 0, width-1 do
 			local oldr, oldg, oldb, olda = imagedata:getPixel(x, y)
 			
-			if olda > 128 then
+			if olda > minalpha then
 				for i = 1, #tablein do
 					if oldr == tablein[i][1] and oldg == tablein[i][2] and oldb == tablein[i][3] then
 						local r, g, b = unpack(tableout[i])
@@ -2559,6 +2569,7 @@ function tablecontainsistring(t, entry)
 end
 
 function getaveragecolor(imgdata, cox, coy)
+	local minalpha = 127/255
 	local xstart = (cox-1)*17
 	local ystart = (coy-1)*17
 	
@@ -2569,7 +2580,7 @@ function getaveragecolor(imgdata, cox, coy)
 	for x = xstart, xstart+15 do
 		for y = ystart, ystart+15 do
 			local pr, pg, pb, a = imgdata:getPixel(x, y)
-			if a > 127 then
+			if a > minalpha then
 				r, g, b = r+pr, g+pg, b+pb
 				count = count + 1
 			end
@@ -2582,6 +2593,7 @@ function getaveragecolor(imgdata, cox, coy)
 end
 
 function getaveragecolor2(imgdata, cox, coy)
+	local minalpha = 127/255
 	local xstart = (cox-1)*16
 	local ystart = (coy-1)*16
 	if imgdata:getHeight() > 16 then
@@ -2596,7 +2608,7 @@ function getaveragecolor2(imgdata, cox, coy)
 	for x = xstart, xstart+15 do
 		for y = ystart, ystart+15 do
 			local pr, pg, pb, a = imgdata:getPixel(x, y)
-			if a > 127 then
+			if a > minalpha then
 				r, g, b = r+pr, g+pg, b+pb
 				count = count + 1
 			end
@@ -2922,7 +2934,7 @@ function love.errorhandler(msg)
 	end
 	love.graphics.setFont(font)
 
-    love.graphics.setColor(255, 255, 255, 255)
+    love.graphics.setColor(1, 1, 1, 1)
 
     local trace = debug.traceback()
 
@@ -2976,15 +2988,15 @@ function love.errorhandler(msg)
     local function draw()
 		love.graphics.clear(love.graphics.getBackgroundColor())
 		if screenshot then
-			love.graphics.setColor(30, 30, 30)
+			love.graphics.setColor(30/255, 30/255, 30/255)
 			love.graphics.draw(screenshot, 0, 0, 0, love.graphics.getWidth()/screenshot:getWidth(), love.graphics.getHeight()/screenshot:getHeight())
 			if gradientimg and width and height then
 				love.graphics.setColor(0, 0, 0)
 				love.graphics.draw(gradientimg, 0, 0, 0, love.graphics.getWidth()/(width*16), love.graphics.getHeight()/(height*16))
 			end
 		end
-		love.graphics.setColor(255, 255, 255)
-		love.graphics.printf({{255,255,255,255},p,{255,255,255,100},p2}, 10, 10, (love.graphics.getWidth() - 10)/fontscale, nil, 0, fontscale, fontscale)
+		love.graphics.setColor(1, 1, 1)
+		love.graphics.printf({{1,1,1,1},p,{1,1,1,100/255},p2}, 10, 10, (love.graphics.getWidth() - 10)/fontscale, nil, 0, fontscale, fontscale)
 		love.graphics.print("Mari0 AE Version " .. VERSIONSTRING, love.graphics.getWidth() - font:getWidth("Mari0 AE Version " .. VERSIONSTRING)*fontscale - 5*scale, love.graphics.getHeight() - 15*scale, 0, fontscale, fontscale)
 		love.graphics.present()
     end

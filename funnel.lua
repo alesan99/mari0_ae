@@ -241,7 +241,7 @@ function funnel:update(dt)
 end
 
 function funnel:draw()
-	love.graphics.setColor(255, 255, 255)
+	love.graphics.setColor(1, 1, 1)
 	
 	if self.power then
 		local img
@@ -327,7 +327,7 @@ function funnel:draw()
 		end
 	end
 	
-	love.graphics.setColor(255, 255, 255)
+	love.graphics.setColor(1, 1, 1)
 	if self.dir == "right" then
 		love.graphics.draw(funnelbaseimg, excursionquad[self.quad], math.floor((self.cox-xscroll-1)*16*scale), math.floor((self.coy-yscroll-1.5)*16*scale), 0, scale, scale)
 	elseif self.dir == "left" then

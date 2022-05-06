@@ -118,7 +118,7 @@ function glados:update(dt)
 			nextlevel()
 			return true--EXPLODE
 		else
-			if not boomsound.isPlaying() then
+			if not boomsound:isPlaying() then
 				playsound(boomsound)
 			end
 			self.pooftimer = self.pooftimer - dt

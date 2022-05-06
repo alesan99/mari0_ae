@@ -198,8 +198,8 @@ function mario:init(x, y, i, animation, size, t, properties)
 	self.customscissor = nil
 	
 	if (players == 1 and (not CustomPortalColors)) or self.playernumber > 4 then
-		self.portal1color = {60, 188, 252}
-		self.portal2color = {232, 130, 30}
+		self.portal1color = getDefaultPortalColor(1)
+		self.portal2color = getDefaultPortalColor(2)
 	else
 		self.portal1color = portalcolor[self.playernumber][1]
 		self.portal2color = portalcolor[self.playernumber][2]
@@ -2434,7 +2434,7 @@ function mario:update(dt)
 					self.friction = self.characterdata.icefriction
 				end
 				if self.animationstate == "sliding" then
-					if not skidsound.isPlaying() then
+					if not skidsound:isPlaying() then
 						playsound(skidsound)
 					end
 				end
@@ -2977,7 +2977,7 @@ function mario:movement(dt)
 					end
 					self.animationstate = "sliding"
 					if currentphysics == 3 or currentphysics == 4 or self.characterdata.skid then
-						if not skidsound.isPlaying() then
+						if not skidsound:isPlaying() then
 							playsound(skidsound)
 						end
 					end
@@ -3029,7 +3029,7 @@ function mario:movement(dt)
 					end
 					self.animationstate = "sliding"
 					if currentphysics == 3 or currentphysics == 4 or self.characterdata.skid then
-						if not skidsound.isPlaying() then
+						if not skidsound:isPlaying() then
 							playsound(skidsound)
 						end
 					end
@@ -4869,7 +4869,7 @@ function mario:floorcollide(a, b)
 	elseif a == "icicle" or (a == "tilemoving" and b.ice) or a == "ice" or (a == "muncher" and b.frozen) then
 		self.friction = self.characterdata.icefriction
 		if self.animationstate == "sliding" then
-			if not skidsound.isPlaying() then
+			if not skidsound:isPlaying() then
 				playsound(skidsound)
 			end
 		end
@@ -8974,7 +8974,7 @@ function mario:turretshot(tx, ty, sx, sy, knockback) --turret
 		self:die("turret shots")
 		self.hitpoints = maxhitpoints / 2
 	end
-	local v = math.max(0, self.hitpoints/maxhitpoints)*255
+	local v = math.max(0, self.hitpoints/maxhitpoints)
 	makepoof(self.x+self.width/2+(8*(math.random()-.5))/16, self.y+self.height/2+(8*(math.random()-.5))/16, "turretshot", {v,v,v})
 
 	

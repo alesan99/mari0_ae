@@ -26,7 +26,7 @@ function wallindicator:update()
 end
 
 function wallindicator:draw()
-	love.graphics.setColor(255, 255, 255)
+	love.graphics.setColor(1, 1, 1)
 	local quad = 1
 	if self.lighted then
 		quad = 2

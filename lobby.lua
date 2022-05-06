@@ -29,23 +29,23 @@ function lobby_load()
 	guielements.mappack = guielement:new("button", 21, 57, mappacklist[mappackselection]:lower(),
 		function()
 			--if mappack ~= mappacklist[mappackselection] then
-				guielements.mappack.textcolor = {255, 255, 255}
+				guielements.mappack.textcolor = {1, 1, 1}
 				server_setmappack(mappacklist[mappackselection])
 			--end
 		end, 1, nil, nil, 192, true)
 	guielements.mappackleft = guielement:new("button", 7, 57, "{", 
-		function() mappackselection = math.max(1, mappackselection-1); guielements.mappack.text = mappacklist[mappackselection]:lower(); guielements.mappack.textcolor = {127, 127, 127} end, 1)
+		function() mappackselection = math.max(1, mappackselection-1); guielements.mappack.text = mappacklist[mappackselection]:lower(); guielements.mappack.textcolor = {.5, .5, .5} end, 1)
 	guielements.mappackright = guielement:new("button", 219, 57, "}", 
-		function() mappackselection = math.min(#mappacklist, mappackselection+1); guielements.mappack.text = mappacklist[mappackselection]:lower(); guielements.mappack.textcolor = {127, 127, 127} end, 1)
+		function() mappackselection = math.min(#mappacklist, mappackselection+1); guielements.mappack.text = mappacklist[mappackselection]:lower(); guielements.mappack.textcolor = {.5, .5, .5} end, 1)
 	if CLIENT then
 		guielements.infinitelives.active = false
 		guielements.infinitetime.active = false
 		guielements.mappack.active = false
-		guielements.mappack.textcolor = {127, 127, 127}
+		guielements.mappack.textcolor = {.5, .5, .5}
 		guielements.mappackleft.active = false
-		guielements.mappackleft.textcolor = {127, 127, 127}
+		guielements.mappackleft.textcolor = {.5, .5, .5}
 		guielements.mappackright.active = false
-		guielements.mappackright.textcolor = {127, 127, 127}
+		guielements.mappackright.textcolor = {.5, .5, .5}
 	end
 	if SERVER then
 		guielements.startbutton = guielement:new("button", 7, 80, "start game", server_start, 1)
@@ -91,10 +91,10 @@ end
 
 function lobby_draw()
 	--STUFF
-	love.graphics.setColor(0, 0, 0, 200)
+	love.graphics.setColor(0, 0, 0, 200/255)
 	love.graphics.rectangle("fill", 3*scale, 3*scale, 233*scale, 104*scale)
 	
-	love.graphics.setColor(255, 255, 255, 255)
+	love.graphics.setColor(1, 1, 1, 1)
 	properprintF("settings", 9*scale, 9*scale)
 	guielements.infinitelives:draw()
 	guielements.infinitetime:draw()
@@ -118,7 +118,7 @@ function lobby_draw()
 	
 	local missingpixels = math.max(0, (players*41-3)-104)
 	
-	love.graphics.setColor(0, 0, 0, 200)
+	love.graphics.setColor(0, 0, 0, 200/255)
 	love.graphics.rectangle("fill", 239*scale, 3*scale, 150*scale, 104*scale)
 	
 	love.graphics.translate(0, -missingpixels*guielements.playerscroll.value*scale)
@@ -164,9 +164,9 @@ end
 
 function lobby_drawchat()
 	--chat
-	love.graphics.setColor(0, 0, 0, 200)
+	love.graphics.setColor(0, 0, 0, 200/255)
 	love.graphics.rectangle("fill", 3*scale, 110*scale, 394*scale, 111*scale)
-	love.graphics.setColor(255, 255, 255, 255)
+	love.graphics.setColor(1, 1, 1, 1)
 	drawrectangle(4, 111, 392, 109)
 	
 	guielements.chatentry:draw()
@@ -188,7 +188,7 @@ function lobby_drawchat()
 		if pid ~= 0 then
 			local nick = playerlist[pid].nick
 
-			--[[local background = {255, 255, 255, 127}
+			--[[local background = {1, 1, 1, .5}
 			
 			local adds = 0
 			for i = 1, #playerlist[pid].colors[1] do
@@ -202,7 +202,7 @@ function lobby_drawchat()
 			love.graphics.setColor(unpack(playerlist[pid].colors[1]))
 			properprintbackground(nick, 8*scale, (196-(height*10))*scale, true)
 			
-			love.graphics.setColor(255, 255, 255)
+			love.graphics.setColor(1, 1, 1)
 			properprint(":" .. chatmessages[i].message, (8+(string.len(nick))*8)*scale, (196-(height*10))*scale)
 			height = height + 1
 		end
