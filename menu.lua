@@ -1301,14 +1301,14 @@ function menu_draw()
 			love.graphics.setColor(alpha, alpha, alpha)
 			love.graphics.draw(huebarmarkerimg, math.floor(28 + (portalhues[skinningplayer][1])*178)*scale, 160*scale, 0, scale, scale)
 			
-			alpha = 100
+			alpha = 100/255
 			if characters.data[mariocharacter[skinningplayer]].colorables then
 				if optionsselection == 10 then
-					alpha = 255
+					alpha = 1
 				end
 			else
 				if optionsselection == 6 then
-					alpha = 255
+					alpha = 1
 				end
 			end
 			
