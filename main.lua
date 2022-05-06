@@ -1395,6 +1395,8 @@ function loadconfig(nodefaultconfig)
 				for k = 2, #s4 do
 					if tonumber(s4[k]) ~= nil then
 						controls[tonumber(s2[2])][s4[1]][k-1] = tonumber(s4[k])
+					elseif s4[k] == "space" then
+						controls[tonumber(s2[2])][s4[1]][k-1] = " " -- fix imported configs from 1.6
 					else
 						controls[tonumber(s2[2])][s4[1]][k-1] = s4[k]
 					end
@@ -1766,7 +1768,7 @@ function defaultconfig()
 	controls[i]["pause"] = {""}
 	
 	for i = 2, 4 do
-		controls[i] = {}		
+		controls[i] = {}
 		controls[i]["right"] = {"joy", i-1, "hat", 1, "r"}
 		controls[i]["left"] = {"joy", i-1, "hat", 1, "l"}
 		controls[i]["down"] = {"joy", i-1, "hat", 1, "d"}
