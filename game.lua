@@ -5208,7 +5208,12 @@ function game_keypressed(key, textinput)
 		elseif (key == "return" or key == "enter" or key == "kpenter" or key == " ") then
 			if pausemenuoptions[pausemenuselected] == "resume" then
 				pausemenuopen = false
-				playmusic()
+				if pausedaudio ~= nil then
+					love.audio.play(pausedaudio)
+					pausedaudio = nil
+				else
+					playmusic()
+				end
 			elseif pausemenuoptions[pausemenuselected] == "suspend" then
 				if dcplaying then
 					pausemenuopen = false
@@ -5228,7 +5233,12 @@ function game_keypressed(key, textinput)
 			end
 		elseif key == "escape" then
 			pausemenuopen = false
-			playmusic()
+			if pausedaudio ~= nil then
+				love.audio.play(pausedaudio)
+				pausedaudio = nil
+			else
+				playmusic()
+			end
 		elseif (key == "right" or key == "d") then
 			if pausemenuoptions[pausemenuselected] == "volume" then
 				if volume < 1 then
@@ -5370,7 +5380,7 @@ function game_keypressed(key, textinput)
 		elseif not editormode and not everyonedead then
 			pausemenuopen = true
 			if not android then --doesn't work for some reason
-				love.audio.pause()
+				pausedaudio = love.audio.pause()
 			end
 			playsound(pausesound)
 		end

@@ -2659,7 +2659,7 @@ end
 function love.focus(f)
 	if (not f) and gamestate == "game"and (not editormode) and (not testlevel) and (not levelfinished) and (not everyonedead) and (not CLIENT) and (not SERVER) and (not dontPauseOnUnfocus) then
 		pausemenuopen = true
-		love.audio.pause()
+		pausedaudio = love.audio.pause()
 	end
 end
 
