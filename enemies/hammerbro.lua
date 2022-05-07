@@ -425,6 +425,8 @@ function hammerbro:globalcollide(a, b)
 		else
 			self:shotted()
 		end
+	elseif a == "player" then
+		return true
 	end
 end
 
