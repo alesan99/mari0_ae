@@ -8993,7 +8993,7 @@ end
 
 function mario:freeze() --ice ball
 	if not self.frozen then
-		self.groundfreeze = 4
+		self.groundfreeze = 1
 		self.frozen = true
 		self.speedx = 0
 		self.animationstate = "idle"
