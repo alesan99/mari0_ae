@@ -623,7 +623,7 @@ function tracksegment:init(x, y, start, ending, grab, parent)
 	self.parent = parent
 
 	self.hollow = true
-
+	self.overridesemisolids = true
 	self.NOEXTERNALHORCOLLISIONS = true
 	self.NOEXTERNALVERCOLLISIONS = true
 	
