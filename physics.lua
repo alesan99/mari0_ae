@@ -418,8 +418,29 @@ function checkcollisionslope(v, t, h, g, j, i, dt, passed) --v: b1table | t: b2t
 	return hadhorcollision, hadvercollision
 end
 
+local function getplatform(t, dir, v)
+	local u, d, l, r = t.PLATFORM, t.PLATFORMDOWN, t.PLATFORMLEFT, t.PLATFORMRIGHT
+	local conditions = {
+		any = (l or r or u or d),
+		hor = ((u or d) and not (l or r)),
+		ver = ((l or r) and not (u or d)),
+		up = (d and not u),
+		down = (u and not d),
+		left = (r and not l),
+		right = (l and not r)
+	}
+	if v then
+		if v.overridesemisolids then
+			return false
+		elseif conditions["any"] and v.ignoresemisolids then
+			return true
+		end
+	end
+	return conditions[dir]
+end
+
 function passivecollision(v, t, h, g, j, i, dt)
-	if t.PLATFORM or t.PLATFORMDOWN or t.PLATFORMLEFT or t.PLATFORMRIGHT then
+	if getplatform(t, "any", v) then
 		return false
 	end
 	if v.passivecollide then
@@ -457,12 +478,12 @@ function passivecollision(v, t, h, g, j, i, dt)
 end
 
 function horcollision(v, t, h, g, j, i, dt)
-	if (t.PLATFORM or t.PLATFORMDOWN) and not (t.PLATFORMLEFT or t.PLATFORMRIGHT) then
+	if getplatform(t, "hor", v) then
 		return false
 	end
 	if v.speedx < 0 then
 		--move object RIGHT (because it was moving left)
-		if (v.PLATFORMRIGHT and (not v.PLATFORMLEFT)) or v.NOEXTERNALHORCOLLISIONS then
+		if getplatform(v, "left", t) or v.NOEXTERNALHORCOLLISIONS then
 			return false
 		elseif t.rightcollide then
 			if t:rightcollide(j, v) ~= false then
@@ -479,7 +500,7 @@ function horcollision(v, t, h, g, j, i, dt)
 			end
 		end
 
-		if (t.PLATFORMLEFT and (not t.PLATFORMRIGHT)) or t.NOEXTERNALHORCOLLISIONS then
+		if getplatform(t, "right", v) or t.NOEXTERNALHORCOLLISIONS then
 			return false
 		elseif v.leftcollide then
 			if v:leftcollide(h, t) ~= false then
@@ -501,7 +522,7 @@ function horcollision(v, t, h, g, j, i, dt)
 		end
 	else
 		--move object LEFT (because it was moving right)
-		if (v.PLATFORMLEFT and (not v.PLATFORMRIGHT)) or v.NOEXTERNALHORCOLLISIONS then
+		if getplatform(v, "right", t) or v.NOEXTERNALHORCOLLISIONS then
 			return false
 		elseif t.leftcollide then
 			if t:leftcollide(j, v) ~= false then
@@ -518,7 +539,7 @@ function horcollision(v, t, h, g, j, i, dt)
 			end
 		end
 		
-		if (t.PLATFORMRIGHT and (not t.PLATFORMLEFT)) or t.NOEXTERNALHORCOLLISIONS then
+		if getplatform(t, "left", v) or t.NOEXTERNALHORCOLLISIONS then
 			return false
 		elseif v.rightcollide then
 			if v:rightcollide(h, t) ~= false then
@@ -544,12 +565,12 @@ function horcollision(v, t, h, g, j, i, dt)
 end
 
 function vercollision(v, t, h, g, j, i, dt)
-	if (t.PLATFORMLEFT or t.PLATFORMRIGHT) and not (t.PLATFORM or t.PLATFORMDOWN) then
+	if getplatform(t, "ver", v) then
 		return false
 	end
 	if v.speedy < 0 then
 		--move object DOWN (because it was moving up)
-		if (v.PLATFORMDOWN and (not v.PLATFORM)) or v.NOEXTERNALVERCOLLISIONS then
+		if getplatform(v, "up", t) or v.NOEXTERNALVERCOLLISIONS then
 			return false
 		elseif t.floorcollide then
 			if t:floorcollide(j, v) ~= false then
@@ -566,7 +587,7 @@ function vercollision(v, t, h, g, j, i, dt)
 			end
 		end
 		
-		if (t.PLATFORM and (not t.PLATFORMDOWN)) or t.NOEXTERNALVERCOLLISIONS then
+		if getplatform(t, "down", v) or t.NOEXTERNALVERCOLLISIONS then
 			return false
 		elseif v.ceilcollide then
 			if v:ceilcollide(h, t) ~= false then
@@ -588,7 +609,7 @@ function vercollision(v, t, h, g, j, i, dt)
 		end
 	else					
 		--move object UP (because it was moving down)
-		if (v.PLATFORM and (not v.PLATFORMDOWN)) or v.NOEXTERNALVERCOLLISIONS then
+		if getplatform(v, "down", t) or v.NOEXTERNALVERCOLLISIONS then
 			return false
 		elseif t.ceilcollide then
 			if t:ceilcollide(j, v) ~= false then
@@ -604,7 +625,7 @@ function vercollision(v, t, h, g, j, i, dt)
 				t.speedy = 0
 			end
 		end
-		if (t.PLATFORMDOWN and (not t.PLATFORM)) or t.NOEXTERNALVERCOLLISIONS then
+		if getplatform(t, "up", v) or t.NOEXTERNALVERCOLLISIONS then
 			return false
 		elseif v.floorcollide then
 			if v:floorcollide(h, t, dt) ~= false then
@@ -684,7 +705,7 @@ function checkrect(x, y, width, height, list, statics, condition)
 								skip = true
 							end
 						elseif condition == "ignoreplatforms" then
-							if w.PLATFORM or w.PLATFORMDOWN or w.PLATFORMLEFT or w.PLATFORMRIGHT then
+							if getplatform(w, "any") then
 								skip = true
 							end
 						elseif condition == "donut" then
@@ -738,7 +759,7 @@ function checkintile(x, y, width, height, list, inobj, condition)
 				end
 				if condition then
 					if condition == "ignoreplatforms" then
-						if w.PLATFORM or w.PLATFORMDOWN or w.PLATFORMLEFT or w.PLATFORMRIGHT then
+						if getplatform(w, "any") then
 							skip = true
 						end
 					elseif condition == "ignorehorplatforms" then
@@ -770,7 +791,7 @@ function checkintile(x, y, width, height, list, inobj, condition)
 					local skip = false
 					if condition then
 						if condition == "ignoreplatforms" or condition == "clearpipe" then
-							if t.PLATFORM or t.PLATFORMDOWN or t.PLATFORMLEFT or t.PLATFORMRIGHT then
+							if getplatform(t, "any") then
 								skip = true
 							end
 						elseif condition == "ignorehorplatforms" then
