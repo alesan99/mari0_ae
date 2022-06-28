@@ -608,7 +608,6 @@ function love.load()
 			"try out today's daily challenge by going to the mappack selection menu and going to the 'daily challenge' tab!",
 			"finish the super mario bros. mappack to unlock something special!",
 			"turn on assist mode in the editor by pressing the +/equal sign key!",
-			"play with friends online! press the left key to start!",
 			"enter fullscreen with alt and enter.",
 			"change your character in the settings!",
 			"add more playable characters in the 'mari0/alesans_entities/characters' folder."}
