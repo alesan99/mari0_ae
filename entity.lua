@@ -1361,6 +1361,7 @@ rightclicktype["belt"] = {
 	default = "3|3",
 	varfunc = function(v, i)
 		if i == 1 then
+			f = v -- I would have just removed all this but idk if you want to keep it or not
 			if v == "right slow" then f = 3
 			elseif v == "right fast" then f = 6
 			elseif v == "left slow" then f = -3
