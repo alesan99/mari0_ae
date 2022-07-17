@@ -1738,6 +1738,9 @@ function loadbackground(background)
 					if tonumber(r[2]) and entityquads[tonumber(r[2])] and entityquads[tonumber(r[2])].t == "spawn" then
 						startx = x
 						starty = y
+						if r[3] and r[3] == "true" then
+							startx = startx - 0.5
+						end
 					end
 				end
 
