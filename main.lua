@@ -1645,46 +1645,14 @@ end
 
 function savecustomtext()
 	local s = ""
-	if textcolorl == "red" then
-		s = s .. "endingtextcolor=216, 40, 0"
-	elseif textcolorl == "blue" then
-		s = s .. "endingtextcolor=32, 52, 236"
-	elseif textcolorl == "yellow" then
-		s = s .. "endingtextcolor=252, 221, 52"
-	elseif textcolorl == "green" then
-		s = s .. "endingtextcolor=0, 168, 0"
-	elseif textcolorl == "orange" then
-		s = s .. "endingtextcolor=252, 152, 56"
-	elseif textcolorl == "pink" then
-		s = s .. "endingtextcolor=252, 116, 180"
-	elseif textcolorl == "purple" then
-		s = s .. "endingtextcolor=116, 0, 116"
-	else
-		s = s .. "endingtextcolor=255,255,255"
-	end
+	local color = textcolors[textcolorl]
+	s = s .. string.format("endingtextcolor=%s, %s, %s", unpack(color))
 	s = s .. "\r\nendingcolorname=" .. textcolorl
 	s = s .. "\r\nendingtext=" .. guielements["editendingtext1"].value .. "," .. guielements["editendingtext2"].value
 	s = s .. "\r\nplayername=" .. guielements["editplayername"].value
 	s = s .. "\r\n"
-	if textcolorp == "red" then
-		s = s .. "hudtextcolor=216, 40, 0"
-	elseif textcolorp == "blue" then
-		s = s .. "hudtextcolor=32, 52, 236"
-	elseif textcolorp == "yellow" then
-		s = s .. "hudtextcolor=252, 221, 52"
-	elseif textcolorp == "green" then
-		s = s .. "hudtextcolor=0, 168, 0"
-	elseif textcolorp == "orange" then
-		s = s .. "hudtextcolor=252, 152, 56"
-	elseif textcolorp == "pink" then
-		s = s .. "hudtextcolor=252, 116, 180"
-	elseif textcolorp == "purple" then
-		s = s .. "hudtextcolor=116, 0, 116"
-	elseif textcolorp == "black" then
-		s = s .. "hudtextcolor=0,0,0"
-	else
-		s = s .. "hudtextcolor=255,255,255"
-	end
+	color = textcolors[textcolorp]
+	s = s .. string.format("hudtextcolor=%s, %s, %s", unpack(color))
 	s = s .. "\r\nhudcolorname=" .. textcolorp
 	s = s .. "\r\nhudvisible=" .. tostring(hudvisible)
 	s = s .. "\r\nhudworldletter=" .. tostring(hudworldletter)
