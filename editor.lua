@@ -343,6 +343,10 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	end
 	guielements["openfolderenemiescustom"] = guielement:new("button", 184, 105, TEXT["open folder"], opencustomimagefolder, 2)
 	
+	textcolorl = endingtextcolorname
+	textcolorp = hudtextcolorname
+	textstate = "hud"
+	
 	--custom text
 	guielements["savecustomtext"] = guielement:new("button", 10, 201, "save text", savecustomtext, 2)
 	guielements["savecustomtext"].bordercolor = {255, 0, 0}
@@ -356,8 +360,10 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	guielements["editendingtext1"] = guielement:new("input", 10, 67, 32, nil, endingtext[1], 32)
 	guielements["editendingtext2"] = guielement:new("input", 10, 81, 32, nil, endingtext[2], 32)
 	guielements["editplayername"] = guielement:new("input", 10, 67, 12, nil, playername, 12)
-	guielements["endingcolor<"] = guielement:new("button", 10, 97, "{", endingtextcolorleft, 1)
-	guielements["endingcolor>"] = guielement:new("button", guielements["endingcolor<"].x+guielements["endingcolor<"].width+utf8.len(TEXT["color"])*8+7, 97, "}", endingtextcolorright, 1)
+	guielements["endingcolor"] = guielement:new("dropdown", 10, 97, 7, changeendingtextcolor, tablecontainsi(textcolorsnames, textcolorl), unpack(textcolorsnames))
+	guielements["endingcolor"].coloredtext = true
+	--guielements["endingcolor<"] = guielement:new("button", 10, 97, "{", endingtextcolorleft, 1)
+	--guielements["endingcolor>"] = guielement:new("button", guielements["endingcolor<"].x+guielements["endingcolor<"].width+utf8.len(TEXT["color"])*8+7, 97, "}", endingtextcolorright, 1)
 	guielements["edittoadtext1"] = guielement:new("input", 10, 67, 32, nil, toadtext[1], 32)
 	guielements["edittoadtext2"] = guielement:new("input", 10, 81, 32, nil, toadtext[2], 32)
 	guielements["edittoadtext3"] = guielement:new("input", 10, 95, 32, nil, toadtext[3], 32)
@@ -367,17 +373,15 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	guielements["editpeachtext4"] = guielement:new("input", 10, 163, 32, nil, peachtext[4], 32)
 	guielements["editpeachtext5"] = guielement:new("input", 10, 177, 32, nil, peachtext[5], 32)
 	guielements["stevecheckbox"] = guielement:new("checkbox", 10, 191, togglesteve, pressbtosteve, "steve")
-	guielements["hudcolor<"] = guielement:new("button", 10, 83, "{", hudtextcolorleft, 1)
-	guielements["hudcolor>"] = guielement:new("button", guielements["hudcolor<"].x+guielements["hudcolor<"].width+utf8.len(TEXT["color"])*8+7, 83, "}", hudtextcolorright, 1)
+	guielements["hudcolor"] = guielement:new("dropdown", 10, 83, 7, changehudtextcolor, tablecontainsi(textcolorsnames, textcolorp), unpack(textcolorsnames))
+	guielements["hudcolor"].coloredtext = true
+	--guielements["hudcolor<"] = guielement:new("button", 10, 83, "{", hudtextcolorleft, 1)
+	--guielements["hudcolor>"] = guielement:new("button", guielements["hudcolor<"].x+guielements["hudcolor<"].width+utf8.len(TEXT["color"])*8+7, 83, "}", hudtextcolorright, 1)
 	guielements["hudworldlettercheckbox"] = guielement:new("checkbox", 10, 98, togglehudworldletter, hudworldletter, TEXT["use letters for worlds over 9"])
 	guielements["hudvisiblecheckbox"] = guielement:new("checkbox", 10, 109, togglehudvisible, hudvisible, TEXT["hud visible"])
 	guielements["hudoutlinecheckbox"] = guielement:new("checkbox", 10, 120, togglehudoutline, hudoutline, TEXT["hud outline"])
 	guielements["hudsimplecheckbox"] = guielement:new("checkbox", 10, 131, togglehudsimple, hudsimple, TEXT["simple hud"])
 	guielements["editlevelscreentext"] = guielement:new("input", 10, 81, 40, nil, levelscreentext[marioworld .. "-" .. mariolevel] or "", 45)
-	
-	textcolorl = endingtextcolorname
-	textcolorp = hudtextcolorname
-	textstate = "hud"
 	
 	--animationS
 	guielements["animationsscrollbarver"] = guielement:new("scrollbar", animationguiarea[1]-10, animationguiarea[2], animationguiarea[4]-animationguiarea[2], 10, 40, 0, "ver", nil, nil, nil, nil, true)
@@ -2901,22 +2905,24 @@ function editor_draw()
 					properprintF(TEXT["ending text"], 11*scale, 57*scale)
 					guielements["editendingtext1"]:draw()
 					guielements["editendingtext2"]:draw()
-					love.graphics.setColor(textcolors[textcolorl])
-					properprintF(TEXT["color"], 24*scale, 100*scale)
-					guielements["endingcolor<"]:draw()
-					guielements["endingcolor>"]:draw()
+					--love.graphics.setColor(textcolors[textcolorl])
+					--properprintF(TEXT["color"], 24*scale, 100*scale)
+					--guielements["endingcolor<"]:draw()
+					--guielements["endingcolor>"]:draw()
+					guielements["endingcolor"]:draw()
 				elseif textstate == "hud" then
 					love.graphics.setColor(255, 255, 255)
 					properprintF(TEXT["player name"], 11*scale, 57*scale)
 					guielements["editplayername"]:draw()
-					love.graphics.setColor(textcolors[textcolorp])
-					properprintF(TEXT["color"], 23*scale, 86*scale)
-					guielements["hudcolor<"]:draw()
-					guielements["hudcolor>"]:draw()
+					--love.graphics.setColor(textcolors[textcolorp])
+					--properprintF(TEXT["color"], 23*scale, 86*scale)
+					--guielements["hudcolor<"]:draw()
+					--guielements["hudcolor>"]:draw()
 					guielements["hudworldlettercheckbox"]:draw()
 					guielements["hudvisiblecheckbox"]:draw()
 					guielements["hudoutlinecheckbox"]:draw()
 					guielements["hudsimplecheckbox"]:draw()
+					guielements["hudcolor"]:draw()
 				elseif textstate == "castle" then
 					love.graphics.setColor(255, 255, 255)
 					properprintF(TEXT["toad"], 11*scale, 57*scale)
@@ -3516,8 +3522,9 @@ function texttabtab(t)
 	if t == "hud" then
 		guielements["hudtexttab"].textcolor = {255, 255, 255}
 		guielements["editplayername"].active = true
-		guielements["hudcolor<"].active = true
-		guielements["hudcolor>"].active = true
+		guielements["hudcolor"].active = true
+		--guielements["hudcolor<"].active = true
+		--guielements["hudcolor>"].active = true
 		guielements["hudworldlettercheckbox"].active = true
 		guielements["hudvisiblecheckbox"].active = true
 		guielements["hudoutlinecheckbox"].active = true
@@ -3526,8 +3533,9 @@ function texttabtab(t)
 		guielements["endingtexttab"].textcolor = {255, 255, 255}
 		guielements["editendingtext1"].active = true
 		guielements["editendingtext2"].active = true
-		guielements["endingcolor<"].active = true
-		guielements["endingcolor>"].active = true
+		guielements["endingcolor"].active = true
+		--guielements["endingcolor<"].active = true
+		--guielements["endingcolor>"].active = true
 	elseif t == "castle" then
 		guielements["castletexttab"].textcolor = {255, 255, 255}
 		guielements["edittoadtext1"].active = true
@@ -3610,98 +3618,18 @@ function nothingtab()
 	end
 end
 
-function endingtextcolorleft()
-	if textcolorl == "red" then
-		textcolorl = "white"
-	elseif textcolorl == "blue" then
-		textcolorl = "red"
-	elseif textcolor1 == "yellow" then
-		textcolorl = "blue"
-	elseif textcolorl == "green" then
-		textcolorl = "yellow"
-	elseif textcolorl == "orange" then
-		textcolorl = "green"
-	elseif textcolorl == "pink" then
-		textcolorl = "orange"
-	elseif textcolorl == "purple" then
-		textcolorl = "pink"
-	elseif textcolorl ~= "white" then
-		textcolorl = "blue"
-	end
+function changeendingtextcolor(var)
+	textcolorl = textcolorsnames[var]
+	guielements["endingcolor"].var = var
 end
-
-function endingtextcolorright()
-	if textcolorl == "white" then
-		textcolorl = "red"
-	elseif textcolorl == "red" then
-		textcolorl = "blue"
-	elseif textcolor1 == "blue" then
-		textcolorl = "yellow"
-	elseif textcolorl == "yellow" then
-		textcolorl = "green"
-	elseif textcolorl == "green" then
-		textcolorl = "orange"
-	elseif textcolorl == "orange" then
-		textcolorl = "pink"
-	elseif textcolorl == "pink" then
-		textcolorl = "purple"
-	elseif textcolorl ~= "purple" then
-		textcolorl = "yellow"
-	end
-end
-
-function hudtextcolorleft()
-	if textcolorp == "red" then
-		textcolorp = "white"
-	elseif textcolorp == "blue" then
-		textcolorp = "red"
-	elseif textcolor1 == "yellow" then
-		textcolorp = "blue"
-	elseif textcolorp == "green" then
-		textcolorp = "yellow"
-	elseif textcolorp == "orange" then
-		textcolorp = "green"
-	elseif textcolorp == "pink" then
-		textcolorp = "orange"
-	elseif textcolorp == "purple" then
-		textcolorp = "pink"
-	elseif textcolorp == "black" then
-		textcolorp = "purple"
-	elseif textcolorp ~= "white" then
-		textcolorp = "blue"
-	end
+function changehudtextcolor(var)
+	textcolorp = textcolorsnames[var]
 	if textcolorp == "black" then
 		togglehudoutline(false)
 	elseif textcolorp ~= "white" then
 		togglehudoutline(true)
 	end
-end
-
-function hudtextcolorright()
-	if textcolorp == "white" then
-		textcolorp = "red"
-	elseif textcolorp == "red" then
-		textcolorp = "blue"
-	elseif textcolor1 == "blue" then
-		textcolorp = "yellow"
-	elseif textcolorp == "yellow" then
-		textcolorp = "green"
-	elseif textcolorp == "green" then
-		textcolorp = "orange"
-	elseif textcolorp == "orange" then
-		textcolorp = "pink"
-	elseif textcolorp == "pink" then
-		textcolorp = "purple"
-	elseif textcolorp == "purple" then
-		textcolorp = "black"
-	elseif textcolorp ~= "black" then
-		textcolorp = "yellow"
-	end
-	if textcolorp == "black" then
-		togglehudoutline(false)
-	elseif textcolorp ~= "white" then
-		togglehudoutline(true)
-	end
+	guielements["hudcolor"].var = var
 end
 
 function generateanimationgui()
