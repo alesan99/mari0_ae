@@ -867,6 +867,7 @@ powerupslist = {"small", "big", "fire", "hammer", "frog", "raccoon", "ice", "meg
 onlysaveiflevelmodified = true
 
 --colors for text entity and hud
+textcolorsnames = {"black","blue","brown","gray","green","lime","maroon","orange","pink","purple","red","sky","white","yellow"}
 textcolors = {
 	white = {255,255,255},
 	black = {0,0,0},
