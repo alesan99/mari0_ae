@@ -152,89 +152,212 @@ function enemytool:spawn()
 		return false
 	end
 
-	--backwards compatibility fuck
-	if (not self.customenemy) and self.legacy then
-		if i == "red koopa" then
-			i = "koopared"
-		elseif i == "buzzy beetle" then
-			i = "beetle"
-		elseif i == "flying koopa" then
-			i = "koopaflying"
-		elseif i == "cheep cheep" then
-			i = "cheepred"
-		elseif i == "white cheep" then
-			i = "cheepwhite"
-		elseif i == "spiny" then
-			i = "spikey"
-		elseif i == "spiny shell" then
-			i = "spikeyshell"
-		elseif i == "lakitu" then
-			i = "lakito"
-		elseif i == "blooper" then
-			i = "squid"
-		elseif i == "crab" then
-			i = "sidestepper"
-		elseif i == "bigicicle" then
-			i = "iciclebig"
-		elseif i == "angry sun" or i == "sun" then
-			i = "angrysun"
-		elseif i == "pumpkin" then
-			i = "splunkin"
-		elseif i == "big goomba" then
-			i = "biggoomba"
-		elseif i == "big spikey" then
-			i = "bigspikey"
-		elseif i == "big koopa" then
-			i = "bigkoopa"
-		elseif i == "dry bones" then
-			i = "drybones"
-		elseif i == "big beetle" then
-			i = "bigbeetle"
-		elseif i == "dry goomba" then
-			i = "drygoomba"
-		elseif i == "bob omb" then
-			i = "bomb"
-		elseif i == "boom boom" then
-			i = "boomboom"
-		elseif i == "? ball" then
-			i = "levelball"
-		elseif i == "blue koopa" then
-			i = "koopablue"
-		elseif i == "flying koopa 2" then
-			i = "koopaflying2"
-		elseif i == "pink squid" then
-			i = "pinksquid"
-		elseif i == "rip van fish" then
-			i = "sleepfish"
-		elseif i == "shy guy" then
-			i = "shyguy"
-		elseif i == "hammer bro" then
-			i = "hammerbro"
-		elseif i == "boomerang bro" then
-			i = "boomerangbro"
-		elseif i == "fire bro" then
-			i = "firebro"
-		elseif i == "down plant" then
-			i = "downplant"
-		elseif i == "venus firetrap" then
-			i = "fireplant"
-		elseif i == "torpedo ted" then
-			i = "torpedolauncher"
-		elseif i == "podoboo" then
-			i = "upfire"
-		elseif i == "dk hammer" then
-			i = "dkhammer"
-		elseif i == "bony beetle" then
-			i = "drybeetle"
-		elseif i == "beetle shell" then
-			i = "beetleshell"
-		elseif i == "smb3 bowser" then
-			i = "bowser3"
-		end
-	end
-
-	--actually spawn the enemy
+	--spawn the enemy
 	local obj, wasenemy, objtable
+	local spawnstufftable = {
+		["groundmole"] = function()
+			obj = mole:new(x-0.5, y-1/16)
+			table.insert(objects["mole"], obj)
+		end,
+		["ground mole"] = self["groundmole"],
+		["mole"]  = function()
+			obj = mole:new(x-0.5, y-1/16)
+			table.insert(objects["mole"], obj)
+			obj.width = 12/16
+			obj.height = 12/16
+			obj.quad = molequad[spriteset][3]
+			obj.gravity = yacceleration
+			obj.mask = {	true, 
+						false, false, false, false, true,
+						false, true, false, true, false,
+						false, false, true, false, false,
+						true, true, false, false, false,
+						false, true, true, false, false,
+						true, false, true, true, true}
+			obj.inground = false
+		end,
+		["monty mole"] = self["mole"],
+		["bowser"]  = function()
+			obj = bowser:new(x-4, y-1/16)
+			table.insert(objects["bowser"], obj)
+		end,
+		["bowserfire"]  = function()
+			obj = fire:new(x,y)
+			table.insert(objects["fire"], obj)
+		end,
+		["bulletbillsingle"]  = function()
+			obj = bulletbill:new(x, y, dir)
+			table.insert(objects["bulletbill"], obj)
+		end,
+		["bulletbill"] = self["billsingle"],
+		["bullet bill"] = self["billsingle"],
+		["bulletbill right"]  = function()
+			table.insert(objects["bulletbill"], bulletbill:new(x, y, "right"))
+		end,
+		["bulletbill left"]  = function()
+			table.insert(objects["bulletbill"], bulletbill:new(x, y, "left"))
+		end,
+		["bigbillsingle"]  = function()
+			obj = bigbill:new(x, y, dir)
+			table.insert(objects["bigbill"], obj)
+		end,
+		["bigbill"] = self["billsingle"],
+		["banzai bill"] = self["billsingle"],
+		["banzai bill left"]  = function()
+			table.insert(objects["bigbill"], bigbill:new(x, y, "left"))
+		end,
+		["bigbillleft"] = self["banzai bill left"],
+		["big bill left"] = self["banzai bill left"],
+		["bigbill left"] = self["banzai bill left"],
+		["banzai bill right"]  = function()
+			table.insert(objects["bigbill"], bigbill:new(x, y, "right"))
+		end,
+		["bigbillright"] = self["banzai bill right"],
+		["big bill right"] = self["banzai bill right"],
+		["bigbill right"] = self["banzai bill right"],
+		["kingbill"]  = function()
+			table.insert(objects["kingbill"], kingbill:new(xscroll-200/16, y))
+		end,
+		["king bill"] = self["kingbill"],
+		["cannonball"]  = function()
+			table.insert(objects["cannonball"], cannonball:new(x, y, "left"))
+		end,
+		["cannonball single"] = self["cannonball"],
+		["cannon ball"] = self["cannonball"],
+		["hammer"]  = function()
+			if dir == "left" then
+				obj = hammer:new(x-1-5/16, y, "left")
+			else
+				obj = hammer:new(x, y, "right")
+			end
+			table.insert(objects["hammer"], obj)
+		end,
+		["brofireball"]  = function()
+			obj = brofireball:new(x-1, y-1, dir)
+			table.insert(objects["brofireball"], obj)
+		end,
+		["broboomerang"]  = function()
+			obj = boomerang:new(x-1, y-1, dir)
+			table.insert(objects["boomerang"], obj)
+		end,
+		["broiceball"]  = function()
+			obj = brofireball:new(x-1, y-1, dir, "ice")
+			table.insert(objects["brofireball"], obj)
+		end,
+		["flyingfish"]  = function()
+			obj = flyingfish:new()
+			table.insert(objects["flyingfish"], obj)
+		end,
+		["jumping fish"] = self["flyingfish"],
+		["meteor"]  = function()
+			obj = meteor:new()
+			table.insert(objects["meteor"], obj)
+		end,
+		["turretleft"]  = function()
+			table.insert(objects["turret"], turret:new(x, y, "left"))
+		end,
+		["turret left"] = self["turretleft"],
+		["turretright"]  = function()
+			table.insert(objects["turret"], turret:new(x, y, "right"))
+		end,
+		["turret"] = self["turretright"],
+		["turret right"] = self["turretright"],
+		["turret2left"]  = function()
+			table.insert(objects["turret"], turret:new(x, y, "left", "turret2"))
+		end,
+		["defective turret left"] = self["turret2left"],
+		["turret2right"]  = function()
+			table.insert(objects["turret"], turret:new(x, y, "right", "turret2"))
+		end,
+		["defective turret"] = self["turret2right"],
+		["spring"]  = function()
+			table.insert(objects["spring"], spring:new(x, y, nil))
+		end,
+		["moving spring"]  = function()
+			table.insert(objects["spring"], spring:new(x, y, nil, true))
+		end,
+		["greenspring"]  = function()
+			table.insert(objects["spring"], spring:new(x, y, "green"))
+		end,
+		["spring green"] = self["springgreen"],
+		["moving greenspring"]  = function()
+			table.insert(objects["spring"], spring:new(x, y, "green", true))
+		end,
+		["moving green spring"] = self["moving greenspring"],
+		["spike snow"]  = function()
+			obj = spike:new(x-0.5, y-1/16, "snow")
+			table.insert(objects["spike"], obj)
+		end,
+		["snowball"]  = function()
+			obj = spikeball:new(x-0.5, y, "snow", "left", true)
+			table.insert(objects["spikeball"], obj)
+		end,
+		["koopaling"]  = function()
+			table.insert(objects["koopaling"], koopaling:new(x-0.5, y-1/16, 1))
+		end,
+		["koopaling2"]  = function()
+			table.insert(objects["koopaling"], koopaling:new(x-0.5, y-1/16, 2))
+		end,
+		["koopaling3"]  = function()
+			table.insert(objects["koopaling"], koopaling:new(x-0.5, y-1/16, 3))
+		end,
+		["koopaling4"]  = function()
+			table.insert(objects["koopaling"], koopaling:new(x-0.5, y-1/16, 4))
+		end,
+		["koopaling5"]  = function()
+			table.insert(objects["koopaling"], koopaling:new(x-0.5, y-1/16, 5))
+		end,
+		["koopaling6"]  = function()
+			table.insert(objects["koopaling"], koopaling:new(x-0.5, y-1/16, 6))
+		end,
+		["koopaling7"]  = function()
+			table.insert(objects["koopaling"], koopaling:new(x-0.5, y-1/16, 7))
+		end,
+		["box"]  = function() --change to enemy? (be wary of region triggers)
+			obj = box:new(x, y)
+			table.insert(objects["box"], obj)
+		end,
+		["box2"]  = function()
+			obj = box:new(x, y, "box2")
+			table.insert(objects["box"], obj)
+		end,
+		["edgelessbox"]  = function()
+			obj = box:new(x, y, "edgeless")
+			table.insert(objects["box"], obj)
+		end,
+		["coin"]  = function()
+			if self.animation then
+				obj = tilemoving:new(x, y, 116)
+				table.insert(objects["tilemoving"], obj)
+			else
+				objects["coin"][tilemap(x, y)] = coin:new(x, y)
+			end
+		end,
+		["spikeyfall"]  = function()
+			obj = goomba:new(self.x+6/16, self.y, "spikeyfall")
+			table.insert(objects["goomba"], obj)
+		end,
+		["gel1"]  = function()
+			obj = gel:new(self.x+1, self.y+1, 1)
+			table.insert(objects["gel"], obj)
+		end,
+		["gel2"]  = function()
+			obj = gel:new(self.x+1, self.y+1, 2)
+			table.insert(objects["gel"], obj)
+		end,
+		["gel3"]  = function()
+			obj = gel:new(self.x+1, self.y+1, 3)
+			table.insert(objects["gel"], obj)
+		end,
+		["gel4"]  = function()
+			obj = gel:new(self.x+1, self.y+1, 4)
+			table.insert(objects["gel"], obj)
+		end,
+		["gelcleanse"]  = function()
+			obj = gel:new(self.x+1, self.y+1, 5)
+			table.insert(objects["gel"], obj)
+		end
+	}
 	if self.customenemy and tablecontains(customenemies, i) then
 		obj = enemy:new(x, y, i)
 		--turn in the right direction
@@ -244,140 +367,8 @@ function enemytool:spawn()
 			obj.animationdirection = "right"
 		end
 		table.insert(objects["enemy"], obj)
-	elseif i == "groundmole" or i == "ground mole" then
-		obj = mole:new(x-0.5, y-1/16)
-		table.insert(objects["mole"], obj)
-	elseif i == "mole" or i == "monty mole" then
-		obj = mole:new(x-0.5, y-1/16)
-		table.insert(objects["mole"], obj)
-		obj.width = 12/16
-		obj.height = 12/16
-		obj.quad = molequad[spriteset][3]
-		obj.gravity = yacceleration
-		obj.mask = {	true, 
-					false, false, false, false, true,
-					false, true, false, true, false,
-					false, false, true, false, false,
-					true, true, false, false, false,
-					false, true, true, false, false,
-					true, false, true, true, true}
-		obj.inground = false
-	elseif i == "bowser" then
-		obj = bowser:new(x-4, y-1/16)
-		table.insert(objects["bowser"], obj)
-	elseif i == "bowserfire" then
-		obj = fire:new(x,y)
-		table.insert(objects["fire"], obj)
-	elseif i == "bulletbillsingle" or i == "bulletbill" or i == "bullet bill" then
-		obj = bulletbill:new(x, y, dir)
-		table.insert(objects["bulletbill"], obj)
-	elseif i == "bulletbill right" then
-		table.insert(objects["bulletbill"], bulletbill:new(x, y, "right"))
-	elseif  i == "bulletbill left" then
-		table.insert(objects["bulletbill"], bulletbill:new(x, y, "left"))
-	elseif i == "bigbillsingle" or i == "bigbill" or i == "banzai bill" then
-		obj = bigbill:new(x, y, dir)
-		table.insert(objects["bigbill"], obj)
-	elseif i == "banzai bill left" or i == "bigbillleft" or i == "big bill left" or i == "bigbill left" then
-		table.insert(objects["bigbill"], bigbill:new(x, y, "left"))
-	elseif i == "bigbillright" or i == "bigbill right" or i == "banzai bill right" or i == "big bill right" then
-		table.insert(objects["bigbill"], bigbill:new(x, y, "right"))
-	elseif i == "kingbill" or i == "king bill" then
-		table.insert(objects["kingbill"], kingbill:new(xscroll-200/16, y))
-	elseif i == "cannonballsingle" or i == "cannonball" or i == "cannon ball" then
-		table.insert(objects["cannonball"], cannonball:new(x, y, "left"))
-	elseif i == "hammer" then
-		if dir == "left" then
-			obj = hammer:new(x-1-5/16, y, "left")
-		else
-			obj = hammer:new(x, y, "right")
-		end
-		table.insert(objects["hammer"], obj)
-	elseif i == "brofireball" then
-		obj = brofireball:new(x-1, y-1, dir)
-		table.insert(objects["brofireball"], obj)
-	elseif i == "broboomerang" then
-		obj = boomerang:new(x-1, y-1, dir)
-		table.insert(objects["boomerang"], obj)
-	elseif i == "broiceball" then
-		obj = brofireball:new(x-1, y-1, dir, "ice")
-		table.insert(objects["brofireball"], obj)
-	elseif i == "flyingfish" or i == "jumping fish" then
-		obj = flyingfish:new()
-		table.insert(objects["flyingfish"], obj)
-	elseif i == "meteor" then
-		obj = meteor:new()
-		table.insert(objects["meteor"], obj)
-	elseif i == "turretleft" or i == "turret left" then
-		table.insert(objects["turret"], turret:new(x, y, "left"))
-	elseif i == "turretright" or i == "turret" or i == "turret right" then
-		table.insert(objects["turret"], turret:new(x, y, "right"))
-	elseif i == "turret2left" or i == "defective turret left" then
-		table.insert(objects["turret"], turret:new(x, y, "left", "turret2"))
-	elseif i == "turret2right" or i == "defective turret" then
-		table.insert(objects["turret"], turret:new(x, y, "right", "turret2"))
-	elseif i == "spring" then
-		table.insert(objects["spring"], spring:new(x, y, nil))
-	elseif i == "moving spring" then
-		table.insert(objects["spring"], spring:new(x, y, nil, true))
-	elseif i == "greenspring" or i == "green spring" then
-		table.insert(objects["spring"], spring:new(x, y, "green"))
-	elseif i == "moving greenspring" or i == "moving green spring" then
-		table.insert(objects["spring"], spring:new(x, y, "green", true))
-	elseif i == "spike snow" then
-		obj = spike:new(x-0.5, y-1/16, "snow")
-		table.insert(objects["spike"], obj)
-	elseif i == "snowball" then
-		obj = spikeball:new(x-0.5, y, "snow", "left", true)
-		table.insert(objects["spikeball"], obj)
-	elseif i == "koopaling" then
-		table.insert(objects["koopaling"], koopaling:new(x-0.5, y-1/16, 1))
-	elseif i == "koopaling2" then
-		table.insert(objects["koopaling"], koopaling:new(x-0.5, y-1/16, 2))
-	elseif i == "koopaling3" then
-		table.insert(objects["koopaling"], koopaling:new(x-0.5, y-1/16, 3))
-	elseif i == "koopaling4" then
-		table.insert(objects["koopaling"], koopaling:new(x-0.5, y-1/16, 4))
-	elseif i == "koopaling5" then
-		table.insert(objects["koopaling"], koopaling:new(x-0.5, y-1/16, 5))
-	elseif i == "koopaling6" then
-		table.insert(objects["koopaling"], koopaling:new(x-0.5, y-1/16, 6))
-	elseif i == "koopaling7" then
-		table.insert(objects["koopaling"], koopaling:new(x-0.5, y-1/16, 7))
-	elseif i == "box" then --change to enemy? (be wary of region triggers)
-		obj = box:new(x, y)
-		table.insert(objects["box"], obj)
-	elseif i == "box2" then
-		obj = box:new(x, y, "box2")
-		table.insert(objects["box"], obj)
-	elseif i == "edgelessbox" then
-		obj = box:new(x, y, "edgeless")
-		table.insert(objects["box"], obj)
-	elseif i == "coin" then
-		if self.animation then
-			obj = tilemoving:new(x, y, 116)
-			table.insert(objects["tilemoving"], obj)
-		else
-			objects["coin"][tilemap(x, y)] = coin:new(x, y)
-		end
-	elseif i == "spikeyfall" then
-		obj = goomba:new(self.x+6/16, self.y, "spikeyfall")
-		table.insert(objects["goomba"], obj)
-	elseif i == "gel1" then
-		obj = gel:new(self.x+1, self.y+1, 1)
-		table.insert(objects["gel"], obj)
-	elseif i == "gel2" then
-		obj = gel:new(self.x+1, self.y+1, 2)
-		table.insert(objects["gel"], obj)
-	elseif i == "gel3" then
-		obj = gel:new(self.x+1, self.y+1, 3)
-		table.insert(objects["gel"], obj)
-	elseif i == "gel4" then
-		obj = gel:new(self.x+1, self.y+1, 4)
-		table.insert(objects["gel"], obj)
-	elseif i == "gelcleanse" then
-		obj = gel:new(self.x+1, self.y+1, 5)
-		table.insert(objects["gel"], obj)
+	elseif spawnstufftable[i] then
+		spawnstufftable[i]()
 	else
 		obj, wasenemy, objtable = spawnenemy(i, x, y, false, "spawner")
 		--turn in the right direction
@@ -442,9 +433,50 @@ function enemytool:spawn()
 end
 
 function enemytool:translateenemy()
-	local t = self.enemy
-	if t == "? ball" then
-		self.enemy = "levelball"
+	--backwards compatibility fuck
+	if (not self.customenemy) and self.legacy then
+		local compatable = { --haha get it
+			["red koopa"] = "koopared",
+			["buzzy beetle"] = "beetle",
+			["flying koopa"] = "koopaflying",
+			["cheep cheep"] = "cheepred",
+			["white cheep"] = "cheepwhite",
+			["spiny"] = "spikey",
+			["spiny shell"] = "spikeyshell",
+			["lakitu"] = "lakito",
+			["blooper"] = "squid",
+			["crab"] = "sidestepper",
+			["bigicicle"] = "iciclebig",
+			["angry sun"] = "angrysun",
+			["sun"] = "angrysun",
+			["pumpkin"] = "splunkin",
+			["big goomba"] = "biggoomba",
+			["big spikey"] = "bigspikey",
+			["big koopa"] = "bigkoopa",
+			["dry bones"] = "drybones",
+			["big beetle"] = "bigbeetle",
+			["dry goomba"] = "drygoomba",
+			["bob omb"] = "bomb",
+			["boom boom"] = "boomboom",
+			["? ball"] = "levelball",
+			["blue koopa"] = "koopablue",
+			["flying koopa 2"] = "koopaflying2",
+			["pink squid"] = "pinksquid",
+			["rip van fish"] = "sleepfish",
+			["shy guy"] = "shyguy",
+			["hammer bro"] = "hammerbro",
+			["boomerang bro"] = "boomerangbro",
+			["fire bro"] = "firebro",
+			["down plant"] = "downplant",
+			["venus firetrap"] = "fireplant",
+			["torpedo ted"] = "torpedolauncher",
+			["podoboo"] = "upfire",
+			["dk hammer"] = "dkhammer",
+			["bony beetle"] = "drybeetle",
+			["beetle shell"] = "beetleshell",
+			["smb3 bowser"] = "bowser3"
+		}
+		self.enemy = compatable[self.enemy] or self.enemy
 	end
 end
 
