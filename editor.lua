@@ -83,6 +83,7 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	levelmodified = false
 	
 	currentanimation = 1
+	animationguilines = {}
 	
 	tileselection = false
 	tileselectionants = 0
@@ -3597,7 +3598,9 @@ function animationstab()
 end
 
 function fromanimationstab()
-	saveanimation()
+	if #animationguilines > 0 then
+		saveanimation()
+	end
 end
 
 function nothingtab()
