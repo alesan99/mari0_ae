@@ -448,6 +448,17 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	guielements["savesettings"].bordercolor = {255, 0, 0}
 	guielements["savesettings"].bordercolorhigh = {255, 127, 127}
 	
+	confirmmenuopen = false
+	confirmmenuguisave = false
+	guielements["confirmsave"] = guielement:new("button", width*8, 102, "save + exit", function() savelevel(); menu_load() end, 2)
+	guielements["confirmsave"].x = guielements["confirmsave"].x - (guielements["confirmsave"].width / 2) - 3
+	guielements["confirmsave"].bordercolor = {255, 0, 0}
+	guielements["confirmsave"].bordercolorhigh = {255, 127, 127}
+	guielements["confirmmenu"] = guielement:new("button", width*8, 119, "just exit", menu_load, 2)
+	guielements["confirmmenu"].x = guielements["confirmmenu"].x - (guielements["confirmmenu"].width / 2) - 3
+	guielements["confirmcancel"] = guielement:new("button", width*8, 136, "return to editor", closeconfirmmenu, 2)
+	guielements["confirmcancel"].x = guielements["confirmcancel"].x - (guielements["confirmcancel"].width / 2) - 3
+	
 	--MISC
 	editortilemousescroll = false
 	editortilemousescrolltimer = 0
@@ -3171,6 +3182,21 @@ function editor_draw()
 				end
 			end
 		end
+		
+		if confirmmenuopen then
+			love.graphics.setColor(0,0,0,200)
+			love.graphics.rectangle("fill", 0, 0, width*16*scale, height*16*scale)
+			love.graphics.setColor(0,0,0)
+			love.graphics.rectangle("fill", 99*scale, 69*scale, 202*scale, 86*scale)
+			love.graphics.setColor(255,255,255)
+			drawrectangle(100, 70, 200, 84)
+
+			properprintF("are you sure?", (200-utf8.len("are you sure?")*4)*scale, 75*scale)
+			properprintF("progress may be lost!", (200-utf8.len("progress may be lost!")*4)*scale, 87*scale)
+			guielements["confirmsave"]:draw()
+			guielements["confirmmenu"]:draw()
+			guielements["confirmcancel"]:draw()
+		end
 	end
 end
 
@@ -3608,6 +3634,37 @@ function nothingtab()
 	for i, v in pairs(guielements) do
 		v.active = false
 	end
+end
+
+function openconfirmmenu()
+	if noExitConfirmation or love.keyboard.isDown("lshift") or levelmodified ~= true then
+		menu_load()
+		return
+	end
+	confirmmenuopen = true
+	confirmmenuguisave = {}
+	for i, v in pairs(guielements) do
+		if v.active then
+			table.insert(confirmmenuguisave, v)
+			v.active = false
+		end
+	end
+
+	guielements["confirmsave"].active = true
+	guielements["confirmmenu"].active = true
+	guielements["confirmcancel"].active = true
+end
+
+function closeconfirmmenu()
+	confirmmenuopen = false
+	for i, v in pairs(confirmmenuguisave) do
+		v.active = true
+	end
+	confirmmenuguisave = false
+
+	guielements["confirmsave"].active = false
+	guielements["confirmmenu"].active = false
+	guielements["confirmcancel"].active = false
 end
 
 function endingtextcolorleft()
