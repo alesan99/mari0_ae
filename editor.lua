@@ -181,7 +181,7 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	--guielements["portalgundropdown"].dropup = true
 	guielements["widthbutton"] = guielement:new("button", 384-(utf8.len(TEXT["change size"])*8), 200, TEXT["change size"], openchangewidth, 2)
 	guielements["savebutton"] = guielement:new("button", 10, 200, TEXT["save"], function() savelevel(); levelmodified = false end, 2)
-	guielements["menubutton"] = guielement:new("button", guielements["savebutton"].x+guielements["savebutton"].width+12, 200, TEXT["exit"], menu_load, 2)
+	guielements["menubutton"] = guielement:new("button", guielements["savebutton"].x+guielements["savebutton"].width+12, 200, TEXT["exit"], function() openconfirmmenu("exit") end, 2)
 	guielements["testbutton"] = guielement:new("button", guielements["menubutton"].x+guielements["menubutton"].width+12, 200, TEXT["test level"], test_level, 2)
 	guielements["testbuttonplayer"] = guielement:new("button", guielements["testbutton"].x+guielements["testbutton"].width+12, 200, TEXT["quick test"], function() test_level(objects["player"][1].x, objects["player"][1].y) end, 2)
 	guielements["savebutton"].bordercolor = {255, 0, 0}
@@ -450,14 +450,6 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	
 	confirmmenuopen = false
 	confirmmenuguisave = false
-	guielements["confirmsave"] = guielement:new("button", width*8, 102, "save + exit", function() savelevel(); menu_load() end, 2)
-	guielements["confirmsave"].x = guielements["confirmsave"].x - (guielements["confirmsave"].width / 2) - 3
-	guielements["confirmsave"].bordercolor = {255, 0, 0}
-	guielements["confirmsave"].bordercolorhigh = {255, 127, 127}
-	guielements["confirmmenu"] = guielement:new("button", width*8, 119, "just exit", menu_load, 2)
-	guielements["confirmmenu"].x = guielements["confirmmenu"].x - (guielements["confirmmenu"].width / 2) - 3
-	guielements["confirmcancel"] = guielement:new("button", width*8, 136, "return to editor", closeconfirmmenu, 2)
-	guielements["confirmcancel"].x = guielements["confirmcancel"].x - (guielements["confirmcancel"].width / 2) - 3
 	
 	--MISC
 	editortilemousescroll = false
@@ -3194,7 +3186,7 @@ function editor_draw()
 			properprintF("are you sure?", (200-utf8.len("are you sure?")*4)*scale, 75*scale)
 			properprintF("progress may be lost!", (200-utf8.len("progress may be lost!")*4)*scale, 87*scale)
 			guielements["confirmsave"]:draw()
-			guielements["confirmmenu"]:draw()
+			guielements["confirmexit"]:draw()
 			guielements["confirmcancel"]:draw()
 		end
 	end
@@ -3636,11 +3628,16 @@ function nothingtab()
 	end
 end
 
-function openconfirmmenu()
+function openconfirmmenu(menutype, args)
 	if noExitConfirmation or love.keyboard.isDown("lshift") or levelmodified ~= true then
-		menu_load()
+		if menutype == "exit" then
+			menu_load()
+		elseif menutype == "maps" then
+			mapnumberclick(unpack(args))
+		end
 		return
 	end
+
 	confirmmenuopen = true
 	confirmmenuguisave = {}
 	for i, v in pairs(guielements) do
@@ -3650,9 +3647,20 @@ function openconfirmmenu()
 		end
 	end
 
-	guielements["confirmsave"].active = true
-	guielements["confirmmenu"].active = true
-	guielements["confirmcancel"].active = true
+	if menutype == "exit" then
+		guielements["confirmsave"] = guielement:new("button", width*8, 102, "save + exit", function() savelevel(); menu_load() end, 2)
+		guielements["confirmexit"] = guielement:new("button", width*8, 119, "just exit", menu_load, 2)
+	elseif menutype == "maps" then
+		guielements["confirmsave"] = guielement:new("button", width*8, 102, "save + continue", function() savelevel(); mapnumberclick(unpack(args)) end, 2)
+		guielements["confirmexit"] = guielement:new("button", width*8, 119, "just continue", function() mapnumberclick(unpack(args)) end, 2)
+	end
+	guielements["confirmcancel"] = guielement:new("button", width*8, 136, "return to editor", closeconfirmmenu, 2)
+
+	guielements["confirmsave"].x = guielements["confirmsave"].x - (guielements["confirmsave"].width / 2) - 3
+	guielements["confirmexit"].x = guielements["confirmexit"].x - (guielements["confirmexit"].width / 2) - 3
+	guielements["confirmcancel"].x = guielements["confirmcancel"].x - (guielements["confirmcancel"].width / 2) - 3
+	guielements["confirmsave"].bordercolor = {255, 0, 0}
+	guielements["confirmsave"].bordercolorhigh = {255, 127, 127}
 end
 
 function closeconfirmmenu()
@@ -3662,9 +3670,9 @@ function closeconfirmmenu()
 	end
 	confirmmenuguisave = false
 
-	guielements["confirmsave"].active = false
-	guielements["confirmmenu"].active = false
-	guielements["confirmcancel"].active = false
+	guielements["confirmsave"] = nil
+	guielements["confirmexit"] = nil
+	guielements["confirmcancel"] = nil
 end
 
 function endingtextcolorleft()
@@ -4640,9 +4648,9 @@ function createlevelbuttons(i)
 		for k = 0, mappacklevels[i][j] do --sublevel
 			local name = i .. "-" .. j .. "_" .. k
 			if k == 0 then
-				guielements[name] = guielement:new("button", 104, 20+((j-1)*39), TEXT["level "] .. j, mapnumberclick, 0, {i, j, k}, 1.8, 71, true)
+				guielements[name] = guielement:new("button", 104, 20+((j-1)*39), TEXT["level "] .. j, function() openconfirmmenu("maps", {i, j, k}) end, 0, nil, 1.8, 71, true)
 			else
-				guielements[name] = guielement:new("button", 134+((k-1)*19), 41+((j-1)*39), k, mapnumberclick, 0, {i, j, k}, 1.6, 15, true)
+				guielements[name] = guielement:new("button", 134+((k-1)*19), 41+((j-1)*39), k, function() openconfirmmenu("maps", {i, j, k}) end, 0, nil, 1.6, 15, true)
 			end
 			
 			local s = i .. "-" .. j
@@ -6582,6 +6590,8 @@ function editor_keypressed(key, textinput)
 			editormenuopen = false
 		elseif changemapwidthmenu then
 			mapwidthcancel()
+		elseif confirmmenuopen then
+			closeconfirmmenu()
 		else
 			if editormenuopen then
 				editorclose()
@@ -6752,7 +6762,7 @@ function editor_keypressed(key, textinput)
 	end
 
 	--quicktest
-	if key == "\\" then
+	if key == "\\" and (not confirmmenuopen) then
 		test_level(objects["player"][1].x, objects["player"][1].y)
 		return
 	end
