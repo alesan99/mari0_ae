@@ -1812,7 +1812,7 @@ table.insert(toenter, {name = "waitfortrigger",
 table.insert(toenter, {name = "changeportal", 
 	t = {
 		t="action",
-		nicename="change avalable portals:",
+		nicename="set available portals:",
 		entries={
 			{
 				t="text",
