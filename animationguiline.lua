@@ -1809,6 +1809,29 @@ table.insert(toenter, {name = "waitfortrigger",
 	}
 })
 
+table.insert(toenter, {name = "changeportal", 
+	t = {
+		t="action",
+		nicename="change avalable portals:",
+		entries={
+			{
+				t="text",
+				value="for"
+			},
+			{
+				t="playerselection",
+			},
+			{
+				t="text",
+				value="to"
+			},
+			{
+				t="portalselection",
+			},
+		}
+	}
+})
+
 --SORT ALPHABETICALLY (I didn't even know you could greater/less compare strings.)
 table.sort(toenter, function(a, b) return a.t.nicename < b.t.nicename end)
 
@@ -2010,6 +2033,11 @@ function animationguiline:init(tabl, t2)
 					args = {"=", "+", "-"}
 					displayargs = {"=", "+", "-"}
 
+				elseif v.t == "portalselection" then
+					dropdown = true
+					dropwidth = 6
+					args = {"both","none","1 only","2 only","gel"}
+					displayargs = {"both","none","1 only","2 only","gel"}
 				end
 				
 				if dropdown then
