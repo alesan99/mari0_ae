@@ -3196,7 +3196,7 @@ function loadcustomforeground(filename)
 			end
 			if not data then return	end
 			data = data:gsub("\r", "")
-			loadcustombackgroundanim(customforegroundimg, customforegroundwidth, customforegroundheight, custombackgroundanim, i, data)
+			loadcustombackgroundanim(customforegroundimg, customforegroundwidth, customforegroundheight, customforegroundanim, i, data)
 		end
 	end
 
