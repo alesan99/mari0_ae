@@ -762,7 +762,7 @@ rightclicktype["text"] = {
 		"text",
 		{"input", 1, "text", 14, 50, 1, function(v) rightclickvalues2[1] = v end}, --"input", var, default, width, maxlen, height, function
 		"color",
-		{"dropdown", 2, 6, nil, unpack(textcolorsnames)},
+		{"dropdown", 2, 6, nil, deepcopy(textcolorsnames)},
 		{"checkbox", 3, "outline", default = false},
 		{"checkbox", 5, "centered", default = false},
 		{"checkbox", 6, "big", default = false},
