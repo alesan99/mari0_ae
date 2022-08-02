@@ -7175,10 +7175,7 @@ function changetimelimit()
 		notice.new("time limit must be a number!", notice.red, 3)
 		changetimelimituninputting()
 	else
-		mariotimelimit = math.floor(newmariotimelimit)
-		if mariotimelimit < 0 then
-			mariotimelimit = 0
-		end
+		mariotimelimit = math.max(0, math.min(math.floor(newmariotimelimit), 999999))
 		guielements["timelimitinput"].value = mariotimelimit
 		mariotime = mariotimelimit
 		guielements["timelimitincrease"].x = 33 + string.len(mariotimelimit)*8
