@@ -963,6 +963,8 @@ function animation:update(dt)
 				for i = 1, players do
 					objects["player"][i].light = tonumber(v[2])
 				end
+			elseif v[1] == "toggleswitchblock" then
+				changeswitchblock(tonumber(v[2]))
 			elseif v[1] == "setnumber" then
 				local name = tostring(v[2])
 				local operation = v[3]
