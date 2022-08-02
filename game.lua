@@ -9226,6 +9226,122 @@ function supersizeentity(v, size)
 	end
 end
 
+function changeswitchblock(color, on, perma, flipblocks)
+	for j, w in pairs(objects["buttonblock"]) do
+		if w.color == color then
+			w:change()
+		end
+	end
+	for j, w in pairs(objects["belt"]) do
+		if w.t == "switch" and w.color == color then
+			w:change()
+		end
+	end
+	if perma then
+		solidblockperma[color] = not solidblockperma[color]
+	end
+	for i = 1, #animationswitchtriggerfuncs do
+		local t = animationswitchtriggerfuncs[i]
+		if tonumber((t[2] or 0)) and tonumber((t[2] or 0)) == color then
+			t[1]:trigger()
+		end
+	end
+end
+
+function changepswitch(enable)
+	local bricki = 7
+	if spriteset == 2 then
+		bricki = 49
+	elseif spriteset == 3 then
+		bricki = 122
+	end
+	for x = 1, mapwidth do
+		for y = 1, mapheight do
+			local t = map[x][y][1]
+			if enable then
+				if map[x][y].oldtile then
+					if t == bricki or t == 116 then
+						map[x][y][1] = map[x][y].oldtile or map[x][y][1]
+						if tilequads[map[x][y][1]].collision then
+							objects["tile"][tilemap(x, y)] = tile:new(x-1, y-1, 1, 1, true)
+						else
+							objects["tile"][tilemap(x, y)] = nil
+							checkportalremove(x, y)
+							objects["tile"][tilemap(x, y)] = nil
+						end
+						map[x][y].oldtile = nil
+						if map[x][y].oldentitycoin then
+							objects["coin"][tilemap(x, y)] = coin:new(x, y)
+							map[x][y][2] = 187
+							map[x][y].oldentitycoin = nil
+						end
+					end
+				end
+				if objects["frozencoin"][tilemap(x, y)] and objects["frozencoin"][tilemap(x, y)].brick then
+					objects["frozencoin"][tilemap(x, y)].brick = false
+				end
+			else
+				if tilequads[t].breakable then
+					map[x][y][1] = 116
+					map[x][y].oldtile = t
+					objects["tile"][tilemap(x, y)] = nil
+					checkportalremove(x, y)
+					objects["tile"][tilemap(x, y)] = nil
+				elseif tilequads[t].coin then
+					map[x][y][1] = bricki
+					map[x][y].oldtile = t
+					objects["tile"][tilemap(x, y)] = tile:new(x-1, y-1, 1, 1, true)
+				elseif objects["coin"][tilemap(x, y)] then
+					objects["coin"][tilemap(x, y)] = nil
+					map[x][y][1] = bricki
+					map[x][y][2] = nil
+					map[x][y].oldtile = t
+					map[x][y].oldentitycoin = true
+					objects["tile"][tilemap(x, y)] = tile:new(x-1, y-1, 1, 1, true)
+				end
+				if objects["frozencoin"][tilemap(x, y)] then
+					objects["frozencoin"][tilemap(x, y)].brick = true
+				end
+			end
+		end
+	end
+	generatespritebatch()
+	--switch pblocks
+	for j, w in pairs(objects["buttonblock"]) do
+		if w.color == "p" then
+			w:change()
+		end
+	end
+	--open pdoors
+	local dolock = true --dont close doors if other p-switches are active
+	if enable then
+		for j, w in pairs(objects["pbutton"]) do
+			if w.timer > 0 then
+				dolock = false
+			end
+		end
+	end
+	if dolock then
+		for j, w in pairs(objects["doorsprite"]) do
+			if w.i == "pdoor" then
+				w:lock(enable)
+			end
+		end
+		for j, w in pairs(objects["belt"]) do
+			w.on = enable
+		end
+		--trigger animations while you're at it
+		for i = 1, #animationswitchtriggerfuncs do
+			local t = animationswitchtriggerfuncs[i]
+			if (not enable) and t[2] == "pswitch-on" then
+				t[1]:trigger()
+			elseif enable and t[2] == "pswitch-off" then
+				t[1]:trigger()
+			end
+		end
+	end
+end
+
 function checkfortileincoord(x, y)
 	--used for enemies that turn around ledges
 	return ( (tilequads[map[x][y][1]]:getproperty("collision", x, y) and (not tilequads[map[x][y][1]]:getproperty("invisible", x, y)) and (not (objects["tile"][tilemap(x, y)] and objects["tile"][tilemap(x, y)].slab)) )
