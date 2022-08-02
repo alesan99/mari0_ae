@@ -169,14 +169,21 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	guielements["musicdropdown"] = guielement:new("dropdown", 17, 102, 15, changemusic, musici, unpack(editormusictable))
 	guielements["custommusiciinput"] = guielement:new("input", 150, 102, 2, changemusic, custommusici, 2, 1, "music", 0)
 	guielements["spritesetdropdown"] = guielement:new("dropdown", 17, 126, 11, changespriteset, spriteset, "overworld", "underground", "castle", "underwater")
+
 	guielements["timelimitdecrease"] = guielement:new("button", 17, 152, "{", decreasetimelimit, 0)
-	guielements["timelimitincrease"] = guielement:new("button", 31 + string.len(mariotimelimit)*8, 152, "}", increasetimelimit, 0)
 	guielements["timelimitdecrease"].autorepeat = true
 	guielements["timelimitdecrease"].repeatwait = 0.3
 	guielements["timelimitdecrease"].repeatdelay = 0.08
+	guielements["timelimitinput"] = guielement:new("input", 29, 152, string.len(mariotimelimit), changetimelimit, mariotimelimit, 6, nil, nil, 0)
+	guielements["timelimitinput"].justdisplay = true
+	guielements["timelimitinput"].textoffset = 0
+	guielements["timelimitinput"].inputtingfunc = changetimelimitinputting
+	guielements["timelimitinput"].uninputtingfunc = changetimelimituninputting
+	guielements["timelimitincrease"] = guielement:new("button", 33 + string.len(mariotimelimit)*8, 152, "}", increasetimelimit, 0)
 	guielements["timelimitincrease"].autorepeat = true
 	guielements["timelimitincrease"].repeatwait = 0.3
 	guielements["timelimitincrease"].repeatdelay = 0.08
+	
 	guielements["portalgundropdown"] = guielement:new("dropdown", 17, 175, 11, changeportalgun, portalguni, "normal", "none", "1 only", "2 only", "gel")
 	--guielements["portalgundropdown"].dropup = true
 	guielements["widthbutton"] = guielement:new("button", 384-(utf8.len(TEXT["change size"])*8), 200, TEXT["change size"], openchangewidth, 2)
@@ -2502,7 +2509,8 @@ function editor_draw()
 				guielements["testbuttonplayer"]:draw()
 				guielements["widthbutton"]:draw()
 				guielements["timelimitdecrease"]:draw()
-				properprint(mariotimelimit, 29*scale, 154*scale)
+				guielements["timelimitinput"]:draw()
+				--properprint(mariotimelimit, 29*scale, 154*scale)
 				guielements["timelimitincrease"]:draw()
 				properprintF(TEXT["timelimit"], 8*scale, 142*scale)
 				
@@ -3216,6 +3224,7 @@ function maintab()
 	end
 	guielements["spritesetdropdown"].active = true
 	guielements["timelimitdecrease"].active = true
+	guielements["timelimitinput"].active = true
 	guielements["timelimitincrease"].active = true
 	guielements["portalgundropdown"].active = true
 	guielements["savebutton"].active = true
@@ -7133,14 +7142,51 @@ function decreasetimelimit()
 		mariotimelimit = 0
 	end
 	mariotime = mariotimelimit
-	guielements["timelimitincrease"].x = 31 + string.len(mariotimelimit)*8
+	guielements["timelimitincrease"].x = 33 + string.len(mariotimelimit)*8
+	guielements["timelimitinput"].width = string.len(mariotimelimit)
+	guielements["timelimitinput"].value = mariotimelimit
 end
-
 function increasetimelimit()
 	levelmodified = true
 	mariotimelimit = mariotimelimit + 10
 	mariotime = mariotimelimit
-	guielements["timelimitincrease"].x = 31 + string.len(mariotimelimit)*8
+	guielements["timelimitincrease"].x = 33 + string.len(mariotimelimit)*8
+	guielements["timelimitinput"].width = string.len(mariotimelimit)
+	guielements["timelimitinput"].value = mariotimelimit
+end
+
+function changetimelimitinputting()
+	guielements["timelimitincrease"].x = 33+6*8
+	guielements["timelimitinput"].width = 6
+	guielements["timelimitincrease"].active = false
+	guielements["timelimitdecrease"].active = false
+end
+function changetimelimituninputting()
+	guielements["timelimitinput"].value = mariotimelimit
+	guielements["timelimitincrease"].x = 33 + string.len(mariotimelimit)*8
+	guielements["timelimitinput"].width = string.len(mariotimelimit)
+	guielements["timelimitincrease"].active = true
+	guielements["timelimitdecrease"].active = true
+end
+function changetimelimit()
+	levelmodified = true
+	local newmariotimelimit = tonumber(guielements["timelimitinput"].value)
+	if type(newmariotimelimit) ~= "number" then
+		notice.new("time limit must be a number!", notice.red, 3)
+		changetimelimituninputting()
+	else
+		mariotimelimit = math.floor(newmariotimelimit)
+		if mariotimelimit < 0 then
+			mariotimelimit = 0
+		end
+		guielements["timelimitinput"].value = mariotimelimit
+		mariotime = mariotimelimit
+		guielements["timelimitincrease"].x = 33 + string.len(mariotimelimit)*8
+		guielements["timelimitinput"].width = string.len(mariotimelimit)
+	end
+	guielements["timelimitincrease"].active = true
+	guielements["timelimitdecrease"].active = true
+	guielements["timelimitinput"].inputting = false
 end
 
 function changeportalgun(var)
