@@ -1809,6 +1809,22 @@ table.insert(toenter, {name = "waitfortrigger",
 	}
 })
 
+table.insert(toenter, {name = "toggleswitchblock", 
+	t = {
+		t="action",
+		nicename="change switch state",
+		entries={
+			{
+				t="text",
+				value="with color"
+			},
+			{
+				t="switchblockselection",
+			}
+		}
+	}
+})
+
 --SORT ALPHABETICALLY (I didn't even know you could greater/less compare strings.)
 table.sort(toenter, function(a, b) return a.t.nicename < b.t.nicename end)
 
