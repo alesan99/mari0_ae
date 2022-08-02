@@ -106,6 +106,7 @@ settime:time						sets time
 setplayerlight:blocks				sets player's light in lights out mode
 waitforinput                        waits until a spesific/any player presses a button
 waitfrotrigger                      waits until a spesific animation is triggered
+toggleswitchblock:i					toggles switch block of color i
 --]]
 
 function animation:init(path, name)
