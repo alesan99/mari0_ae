@@ -418,25 +418,39 @@ function checkcollisionslope(v, t, h, g, j, i, dt, passed) --v: b1table | t: b2t
 	return hadhorcollision, hadvercollision
 end
 
-local function getplatform(t, dir, v)
-	local u, d, l, r = t.PLATFORM, t.PLATFORMDOWN, t.PLATFORMLEFT, t.PLATFORMRIGHT
-	local conditions = {
-		any = (l or r or u or d),
-		hor = ((u or d) and not (l or r)),
-		ver = ((l or r) and not (u or d)),
-		up = (d and not u),
-		down = (u and not d),
-		left = (r and not l),
-		right = (l and not r)
-	}
+local platconditions = {
+	any =   function(u,d,l,r,hr,vr) return (l or r or u or d) end,
+	hor =   function(u,d,l,r,hr,vr) return (((u or d) and not (l or r)) or hr) end,
+	ver =   function(u,d,l,r,hr,vr) return (((l or r) and not (u or d)) or vr) end,
+	up =    function(u,d,l,r,hr,vr) return (((d or l or r) and not u) or vr) end,
+	down =  function(u,d,l,r,hr,vr) return (((u or l or r) and not d) or vr) end,
+	left =  function(u,d,l,r,hr,vr) return (((r or u or d) and not l) or hr) end,
+	right = function(u,d,l,r,hr,vr) return (((l or u or d) and not r) or hr) end
+}
+local reversedirs = {
+	left = "right",
+	right = "left",
+	up = "down",
+	down = "up",
+	any = "any"
+}
+local function getplatform(t, dir, v, internal)
+	if (internal and v.onlyexternalplatform) then
+		return false
+	end
 	if v then
 		if v.overridesemisolids then
 			return false
-		elseif conditions["any"] and v.ignoresemisolids then
-			return true
+		elseif v.ignoresemisolids then
+			return (t.PLATFORM or t.PLATFORMDOWN or t.PLATFORMLEFT or t.PLATFORMRIGHT or t.NOEXTERNALHORCOLLISIONS or t.NOEXTERNALVERCOLLISIONS)
 		end
+		local u, d, l, r, hor, ver = t.PLATFORM, t.PLATFORMDOWN, t.PLATFORMLEFT, t.PLATFORMRIGHT, t.NOEXTERNALHORCOLLISIONS, t.NOEXTERNALVERCOLLISIONS
+		local vu, vd, vl, vr, vhor, vver = v.PLATFORM, v.PLATFORMDOWN, v.PLATFORMLEFT, v.PLATFORMRIGHT, v.NOEXTERNALHORCOLLISIONS, v.NOEXTERNALVERCOLLISIONS
+		return (platconditions[dir](u,d,l,r,hor,ver) or platconditions[reversedirs[dir]](vu,vd,vl,vr,vhor,vver))
+	else
+		local u, d, l, r, hor, ver = t.PLATFORM, t.PLATFORMDOWN, t.PLATFORMLEFT, t.PLATFORMRIGHT, t.NOEXTERNALHORCOLLISIONS, t.NOEXTERNALVERCOLLISIONS
+		return platconditions[dir](u,d,l,r,hor,ver)
 	end
-	return conditions[dir]
 end
 
 function passivecollision(v, t, h, g, j, i, dt)
@@ -478,86 +492,85 @@ function passivecollision(v, t, h, g, j, i, dt)
 end
 
 function horcollision(v, t, h, g, j, i, dt)
-	if getplatform(t, "hor", v) then
-		return false
-	end
 	if v.speedx < 0 then
 		--move object RIGHT (because it was moving left)
-		if getplatform(v, "left", t) or v.NOEXTERNALHORCOLLISIONS then
-			return false
-		elseif t.rightcollide then
-			if t:rightcollide(j, v) ~= false then
-				if t.postrightcollide then
-					t:postrightcollide(j,v)
+		local tplat, vplat = getplatform(t, "right", v, true), getplatform(v, "left", t, true)
+		if not vplat then
+			if t.rightcollide then
+				if t:rightcollide(j, v) ~= false then
+					if t.postrightcollide then
+						t:postrightcollide(j,v)
+					end
+					if t.speedx and t.speedx > 0 then
+						t.speedx = 0
+					end
 				end
+			else
 				if t.speedx and t.speedx > 0 then
 					t.speedx = 0
 				end
 			end
-		else
-			if t.speedx and t.speedx > 0 then
-				t.speedx = 0
-			end
 		end
 
-		if getplatform(t, "right", v) or t.NOEXTERNALHORCOLLISIONS then
-			return false
-		elseif v.leftcollide then
-			if v:leftcollide(h, t) ~= false then
-				if t.postleftcollide then
-					t:postleftcollide(h,t)
+		if not tplat then
+			if v.leftcollide then
+				if v:leftcollide(h, t) ~= false then
+					if t.postleftcollide then
+						t:postleftcollide(h,t)
+					end
+					if v.speedx < 0 then
+						v.speedx = 0
+					end
+					v.x = t.x + t.width
+					return true
 				end
+			else
 				if v.speedx < 0 then
 					v.speedx = 0
 				end
 				v.x = t.x + t.width
 				return true
 			end
-		else
-			if v.speedx < 0 then
-				v.speedx = 0
-			end
-			v.x = t.x + t.width
-			return true
 		end
 	else
 		--move object LEFT (because it was moving right)
-		if getplatform(v, "right", t) or v.NOEXTERNALHORCOLLISIONS then
-			return false
-		elseif t.leftcollide then
-			if t:leftcollide(j, v) ~= false then
-				if t.postleftcollide then
-					t:postleftcollide(j,v)
+		local tplat, vplat = getplatform(t, "left", v, true), getplatform(v, "right", t, true)
+		if not vplat then
+			if t.leftcollide then
+				if t:leftcollide(j, v) ~= false then
+					if t.postleftcollide then
+						t:postleftcollide(j,v)
+					end
+					if t.speedx and t.speedx < 0 then
+						t.speedx = 0
+					end
 				end
+			else
 				if t.speedx and t.speedx < 0 then
 					t.speedx = 0
 				end
 			end
-		else
-			if t.speedx and t.speedx < 0 then
-				t.speedx = 0
-			end
 		end
 		
-		if getplatform(t, "left", v) or t.NOEXTERNALHORCOLLISIONS then
-			return false
-		elseif v.rightcollide then
-			if v:rightcollide(h, t) ~= false then
-				if t.postrightcollide then
-					t:postrightcollide(h,t)
+		if not tplat then
+			if v.rightcollide then
+				if v:rightcollide(h, t) ~= false then
+					if t.postrightcollide then
+						t:postrightcollide(h,t)
+					end
+					if v.speedx > 0 then
+						v.speedx = 0
+					end
+					v.x = t.x - v.width
+					return true
 				end
+			else
 				if v.speedx > 0 then
 					v.speedx = 0
 				end
 				v.x = t.x - v.width
 				return true
 			end
-		else
-			if v.speedx > 0 then
-				v.speedx = 0
-			end
-			v.x = t.x - v.width
-			return true
 		end
 	end
 	
@@ -565,85 +578,85 @@ function horcollision(v, t, h, g, j, i, dt)
 end
 
 function vercollision(v, t, h, g, j, i, dt)
-	if getplatform(t, "ver", v) then
-		return false
-	end
 	if v.speedy < 0 then
 		--move object DOWN (because it was moving up)
-		if getplatform(v, "up", t) or v.NOEXTERNALVERCOLLISIONS then
-			return false
-		elseif t.floorcollide then
-			if t:floorcollide(j, v) ~= false then
-				if t.postfloorcollide then
-					t:postfloorcollide(j, v)
+		local tplat, vplat = getplatform(t, "down", v, true), getplatform(v, "up", t, true)
+		if not vplat then
+			if t.floorcollide then
+				if t:floorcollide(j, v) ~= false then
+					if t.postfloorcollide then
+						t:postfloorcollide(j, v)
+					end
+					if t.speedy and t.speedy > 0 then
+						t.speedy = 0
+					end
 				end
+			else
 				if t.speedy and t.speedy > 0 then
 					t.speedy = 0
 				end
 			end
-		else
-			if t.speedy and t.speedy > 0 then
-				t.speedy = 0
-			end
 		end
 		
-		if getplatform(t, "down", v) or t.NOEXTERNALVERCOLLISIONS then
-			return false
-		elseif v.ceilcollide then
-			if v:ceilcollide(h, t) ~= false then
-				if t.postceilcollide then
-					t:postceilcollide(h, t)
+		if not tplat then
+			if v.ceilcollide then
+				if v:ceilcollide(h, t) ~= false then
+					if t.postceilcollide then
+						t:postceilcollide(h, t)
+					end
+					if v.speedy < 0 then
+						v.speedy = 0
+					end
+					v.y = t.y  + t.height
+					return true
 				end
+			else
 				if v.speedy < 0 then
 					v.speedy = 0
 				end
 				v.y = t.y  + t.height
 				return true
 			end
-		else
-			if v.speedy < 0 then
-				v.speedy = 0
-			end
-			v.y = t.y  + t.height
-			return true
 		end
 	else					
 		--move object UP (because it was moving down)
-		if getplatform(v, "down", t) or v.NOEXTERNALVERCOLLISIONS then
-			return false
-		elseif t.ceilcollide then
-			if t:ceilcollide(j, v) ~= false then
-				if t.postceilcollide then
-					t:postceilcollide(j, v)
+		local tplat, vplat = getplatform(t, "up", v, true, true), getplatform(v, "down", t, true)
+		if not vplat then
+			if t.ceilcollide then
+				if t:ceilcollide(j, v) ~= false then
+					if t.postceilcollide then
+						t:postceilcollide(j, v)
+					end
+					if t.speedy and t.speedy < 0 then
+						t.speedy = 0
+					end
 				end
+			else
 				if t.speedy and t.speedy < 0 then
 					t.speedy = 0
 				end
 			end
-		else
-			if t.speedy and t.speedy < 0 then
-				t.speedy = 0
-			end
 		end
-		if getplatform(t, "up", v) or t.NOEXTERNALVERCOLLISIONS then
-			return false
-		elseif v.floorcollide then
-			if v:floorcollide(h, t, dt) ~= false then
-				if v.postfloorcollide then
-					v:postfloorcollide(h, t, dt)
+
+		if not tplat then
+			if v.floorcollide then
+				if v:floorcollide(h, t, dt) ~= false then
+					if v.postfloorcollide then
+						v:postfloorcollide(h, t, dt)
+					end
+					if v.speedy > 0 then
+						v.speedy = 0
+					end
+					v.y = t.y - v.height
+					return true
 				end
+			else
 				if v.speedy > 0 then
 					v.speedy = 0
 				end
 				v.y = t.y - v.height
 				return true
 			end
-		else
-			if v.speedy > 0 then
-				v.speedy = 0
-			end
-			v.y = t.y - v.height
-			return true
 		end
 	end
 	return false
