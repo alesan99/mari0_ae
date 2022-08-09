@@ -3785,12 +3785,10 @@ function drawHUD()
 		properprintfunc(playername, uispace*.5 - 24*scale, 8*scale)
 		properprintfunc(addzeros((marioscore or 0), 6), uispace*0.5-24*scale, 16*scale)
 		
-		properprintfunc("*", uispace*1.5-8*scale, 16*scale)
-		
 		love.graphics.setColor(255, 255, 255)
 		love.graphics.draw(coinanimationimage, coinanimationquads[spriteset or 1][coinframe or 1], uispace*1.5-16*scale, 16*scale, 0, scale, scale)
 		love.graphics.setColor(unpack(hudtextcolor))
-		properprintfunc(addzeros((mariocoincount or 0), 2), uispace*1.5-0*scale, 16*scale)
+		properprintfunc("*" .. addzeros((mariocoincount or 0), 2), uispace*1.5-8*scale, 16*scale)
 		
 		properprintfunc(TEXT["world"], uispace*2.5 - 20*scale, 8*scale)
 		local world = marioworld
@@ -3803,7 +3801,7 @@ function drawHUD()
 		
 		properprintfunc(TEXT["time"], uispace*3.5 - 16*scale, 8*scale)
 		if editormode then
-			if linktool then
+			if editorstate == "linktool" then
 				properprintfunc(TEXT["link"], uispace*3.5 - 16*scale, 16*scale)
 			else
 				properprintfunc(TEXT["edit"], uispace*3.5 - 16*scale, 16*scale)
