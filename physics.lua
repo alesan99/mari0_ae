@@ -434,8 +434,9 @@ local reversedirs = {
 	down = "up",
 	any = "any"
 }
-local function getplatform(t, dir, v, internal)
-	if (internal and v.onlyexternalplatform) then
+local getplatform
+local function getplatform(t, dir, v, internal, ya)
+	if (internal and v.onlyexternalplatform) and (not getplatform(t, dir)) then
 		return false
 	end
 	if v then
@@ -515,8 +516,8 @@ function horcollision(v, t, h, g, j, i, dt)
 		if not tplat then
 			if v.leftcollide then
 				if v:leftcollide(h, t) ~= false then
-					if t.postleftcollide then
-						t:postleftcollide(h,t)
+					if v.postleftcollide then
+						v:postleftcollide(h,t)
 					end
 					if v.speedx < 0 then
 						v.speedx = 0
@@ -555,8 +556,8 @@ function horcollision(v, t, h, g, j, i, dt)
 		if not tplat then
 			if v.rightcollide then
 				if v:rightcollide(h, t) ~= false then
-					if t.postrightcollide then
-						t:postrightcollide(h,t)
+					if v.postrightcollide then
+						v:postrightcollide(h,t)
 					end
 					if v.speedx > 0 then
 						v.speedx = 0
@@ -601,8 +602,8 @@ function vercollision(v, t, h, g, j, i, dt)
 		if not tplat then
 			if v.ceilcollide then
 				if v:ceilcollide(h, t) ~= false then
-					if t.postceilcollide then
-						t:postceilcollide(h, t)
+					if v.postceilcollide then
+						v:postceilcollide(h, t)
 					end
 					if v.speedy < 0 then
 						v.speedy = 0
@@ -620,7 +621,7 @@ function vercollision(v, t, h, g, j, i, dt)
 		end
 	else					
 		--move object UP (because it was moving down)
-		local tplat, vplat = getplatform(t, "up", v, true, true), getplatform(v, "down", t, true)
+		local tplat, vplat = getplatform(t, "up", v, true), getplatform(v, "down", t, true)
 		if not vplat then
 			if t.ceilcollide then
 				if t:ceilcollide(j, v) ~= false then
