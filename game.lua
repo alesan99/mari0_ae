@@ -2404,6 +2404,11 @@ function game_draw()
 				end
 			end
 			
+			love.graphics.setColor(234, 160, 45, 155)
+			for j, w in pairs(objects["regiontrigger"]) do
+				love.graphics.rectangle("fill", math.floor((w.rx-xscroll)*16*scale)+.5, math.floor((w.ry-yscroll-.5)*16*scale)+.5, w.rw*16*scale-1, w.rh*16*scale-1)
+			end
+			
 			for j, w in pairs(userects) do
 				love.graphics.setColor(0, 255, 255, 150)
 				love.graphics.rectangle("line", math.floor((w.x-xscroll)*16*scale)+.5, math.floor((w.y-yscroll-.5)*16*scale)+.5, w.width*16*scale-1, w.height*16*scale-1)
