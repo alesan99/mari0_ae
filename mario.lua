@@ -5922,7 +5922,7 @@ function mario:leftcollide(a, b)
 		end
 		
 		--Check if it's a pipe with pipe pipe.
-		if self.falling == false and self.jumping == false and (leftkey(self.playernumber) or intermission) then --but only on ground and rightkey
+		if self.falling == false and self.jumping == false and (leftkey(self.playernumber) or intermission) then --but only on ground and leftkey
 			for i, p in pairs(pipes) do
 				if p:inside("left", x, self) then
 					self.y = p.coy-self.height
@@ -6284,7 +6284,7 @@ function mario:ceilcollide(a, b)
 		end
 		
 		--Check if it's a pipe with pipe pipe.
-		if upkey(self.playernumber) and self.jumping then --but only on ground and rightkey
+		if upkey(self.playernumber) then --but only in midair and upkey
 			for i, p in pairs(pipes) do
 				if p:inside("up", y, self) then
 					self:pipe(p.cox, p.coy, "up", i)
