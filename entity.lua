@@ -740,8 +740,6 @@ rightclickvalues["pedestal"] = {"portals", "both", "1 only", "2 only", "gel"}
 rightclickvalues["pokey"] = {"height", "default", 1, 2, 3, 4, 5, 6, 7, 8}
 rightclickvalues["snowpokey"] = {"height", "default", 1, 2, 3, 4, 5, 6, 7, 8}
 
-rightclickvalues["plusclock"] = {"time", 100, 50, 10}
-
 rightclickvalues["goombashoe"] = {"type", 1, 2}
 
 rightclickvalues["yoshi"] = {"color", 1, 2, 3, 4}
@@ -2193,6 +2191,15 @@ rightclicktype["muncher"] = {
 	default = "false",
 	format = {
 		{"checkbox", 1, "frozen"},
+	}
+}
+
+rightclicktype["plusclock"] = {
+	name = "plus clock",
+	default = "100",
+	format = {
+		"time:",
+		{"input", 1, "100", 4, 10, 1, function(v) rightclickvalues2[1] = v end}
 	}
 }
 
