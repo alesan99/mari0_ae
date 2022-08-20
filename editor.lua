@@ -488,29 +488,33 @@ function editor_update(dt)
 	oldlevelmodified = levelmodified]]
 	if editormenuopen == false or minimapmoving then
 		--key scroll
-		if (not rightclickmenuopen) or customrcopen == "region" or customrcopen == "link" or customrcopen == "path" or customrcopen == "trackpath" or minimapmoving then
-			if (love.keyboard.isDown("left") or (android and leftkey(1) and not autoscroll)) and not brushsizetoggle then
+		if rightclickmenuopen or customrcopen == "region" or customrcopen == "link" or customrcopen == "path" or customrcopen == "trackpath" or minimapmoving then
+			local speed = 30
+			if love.keyboard.isDown("lalt") then
+				speed = 70
+			end
+			if (love.keyboard.isDown("left") or (android and leftkey(1) and not autoscroll)) and (rightclickmenuopen or (not brushsizetoggle)) then
 				autoscroll = false
 				guielements["autoscrollcheckbox"].var = autoscroll
-				splitxscroll[1] = splitxscroll[1] - 30*gdt
+				splitxscroll[1] = splitxscroll[1] - speed*gdt
 				if splitxscroll[1] < 0 then
 					splitxscroll[1] = 0
 				end
 				generatespritebatch()
-			elseif (love.keyboard.isDown("right") or (android and rightkey(1) and not autoscroll)) and not brushsizetoggle then
+			elseif (love.keyboard.isDown("right") or (android and rightkey(1) and not autoscroll)) and (rightclickmenuopen or (not brushsizetoggle)) then
 				autoscroll = false
 				guielements["autoscrollcheckbox"].var = autoscroll
-				splitxscroll[1] = splitxscroll[1] + 30*gdt
+				splitxscroll[1] = splitxscroll[1] + speed*gdt
 				if splitxscroll[1] > mapwidth-width then
 					splitxscroll[1] = mapwidth-width
 				end
 				generatespritebatch()
 			end
-			if mapheight ~= 15 and not brushsizetoggle then
+			if mapheight ~= 15 and (rightclickmenuopen or (not brushsizetoggle)) then
 				if (love.keyboard.isDown("up") or (android and upkey(1) and not autoscroll)) then
 					autoscroll = false
 					guielements["autoscrollcheckbox"].var = autoscroll
-					splityscroll[1] = splityscroll[1] - 30*gdt
+					splityscroll[1] = splityscroll[1] - speed*gdt
 					if splityscroll[1] < 0 then
 						splityscroll[1] = 0
 					end
@@ -518,7 +522,7 @@ function editor_update(dt)
 				elseif (love.keyboard.isDown("down") or (android and downkey(1) and not autoscroll)) then
 					autoscroll = false
 					guielements["autoscrollcheckbox"].var = autoscroll
-					splityscroll[1] = splityscroll[1] + 30*gdt
+					splityscroll[1] = splityscroll[1] + speed*gdt
 					if splityscroll[1] >= mapheight-height-1 then
 						splityscroll[1] = mapheight-height-1
 					end
