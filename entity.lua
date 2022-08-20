@@ -2199,7 +2199,15 @@ rightclicktype["plusclock"] = {
 	default = "100",
 	format = {
 		"time:",
-		{"input", 1, "100", 4, 10, 1, function(v) rightclickvalues2[1] = v end}
+		{"input", 1, "100", 4, 10, 1, function(v)
+			if tonumber(v) then
+				rightclickvalues2[1] = math.max(0,v)
+			else
+				rightclickvalues2[1] = 0
+				rightclickobjects[2].value = "0"
+				rightclickobjects[2].textoffset = 0
+			end
+		end}
 	}
 }
 
