@@ -436,7 +436,7 @@ local reversedirs = {
 }
 local getplatform
 local function getplatform(t, dir, v, internal, ya)
-	if (internal and v.onlyexternalplatform) and (not getplatform(t, dir)) then
+	if (internal and not v.nointernalplatform) and (not getplatform(t, dir)) then
 		return false
 	end
 	if v then
