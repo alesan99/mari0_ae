@@ -7136,8 +7136,8 @@ function hitontop(x, y)
 		if objects[v] then
 			for j, w in pairs(objects[v]) do
 				if w.width and (w.active or w.killedfromblocksbelownotactive) then
-					local centerX = w.x + w.width/2
-					if inrange(centerX, x-1, x, true) and y-1 == w.y+w.height then
+					local cx = math.max(x-1,math.min(x,w.x))
+					if inrange(cx, w.x, w.x+w.width, true) and inrange(w.y+w.height, y-1, y-1.125, true) then
 						--get dir
 						local dir = "right"
 						if w.x+w.width/2 < x-0.5 then
