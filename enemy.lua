@@ -1934,7 +1934,7 @@ function enemy:update(dt)
 		end
 	end
 	if self.maxyspeed or self.maxfallingspeed then
-		local speed = false
+		local speed = self.maxyspeed
 		if self.maxfallingspeed then
 			if self.speedy < 0 then
 				speed = self.maxfallingspeed
