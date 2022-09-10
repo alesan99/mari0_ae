@@ -1926,6 +1926,30 @@ function enemy:update(dt)
 		end
 	end
 
+	if self.maxxspeed then
+		if self.speedx < 0 then
+			self.speedx = math.max(self.speedx, -self.maxxspeed)
+		else
+			self.speedx = math.min(self.speedx, self.maxxspeed)
+		end
+	end
+	if self.maxyspeed or self.maxfallingspeed then
+		local speed = false
+		if self.maxfallingspeed then
+			if self.speedy < 0 then
+				speed = self.maxfallingspeed
+			elseif not self.maxyspeed then
+				speed = false
+			end
+		end
+		if speed then
+			if self.speedy < 0 then
+				self.speedy = math.max(self.speedy, -speed)
+			else
+				self.speedy = math.min(self.speedy, speed)
+			end
+		end
+	end
 	
 	if self.animationtype == "character" then
 		if self.oldx then
