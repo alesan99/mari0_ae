@@ -492,7 +492,6 @@ function editor_update(dt)
 		if love.keyboard.isDown("lalt") then
 			speed = 70
 		end
-		print(speed)
 		if (love.keyboard.isDown("left") or (android and leftkey(1) and not autoscroll)) and (rightclickmenuopen or (not brushsizetoggle)) then
 			autoscroll = false
 			guielements["autoscrollcheckbox"].var = autoscroll
