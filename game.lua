@@ -519,16 +519,25 @@ function game_update(dt)
 	--gelcannon
 	if not editormode then
 		if objects["player"][mouseowner] and (playertype == "gelcannon" or objects["player"][mouseowner].portals == "gel") and objects["player"][mouseowner].controlsenabled then
+			--Check what gamepads are connected.  Probably unneccessary but I am *not* looking through all these terrible variable names
+			local joysticklist = love.joystick.getJoysticks()
 			if gelcannontimer > 0 then
 				gelcannontimer = gelcannontimer - dt
 				if gelcannontimer < 0 then
 					gelcannontimer = 0
 				end
 			else
-				if love.mouse.isDown("l") then
+				-- Check which triggers are down, checks every controller which sucks, but better than none I guess
+				local rtdown = 0
+				local ltdown = 0
+				for _,gamepad in ipairs(joysticklist) do
+					rtdown = gamepad:getGamepadAxis("triggerright")
+					ltdown = gamepad:getGamepadAxis("triggerleft")
+				end
+				if love.mouse.isDown("l") or rtdown == 1 then
 					gelcannontimer = gelcannondelay
 					objects["player"][mouseowner]:shootgel(1)
-				elseif love.mouse.isDown("r") then
+				elseif love.mouse.isDown("r") or ltdown == 1 then
 					gelcannontimer = gelcannondelay
 					objects["player"][mouseowner]:shootgel(2)
 				elseif love.mouse.isDown("m") or love.mouse.isDown("wd") or love.mouse.isDown("wu") or love.mouse.isDown("x1") then
