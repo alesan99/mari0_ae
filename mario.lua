@@ -7131,6 +7131,7 @@ function hitblock(x, y, t, v)
 end
 
 function hitontop(x, y)
+	if breakoutmode then return end
 	--kill enemies on top
 	for i, v in pairs(enemies) do
 		if objects[v] then
