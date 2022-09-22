@@ -1229,96 +1229,53 @@ function lovedraw()
 end
 
 function saveconfig()
-	local s = ""
+	--local baf = love.timer.getTime()
+	local fstring = string.rep("playercontrols:%s:right-%s,use-%s,aimy-%s,pause-%s,up-%s,run-%s,left-%s,aimx-%s,reload-%s,portal2-%s,portal1-%s,down-%s,jump-%s;\n", 4)
+	local ctable = {}
 	for i = 1, #controls do
-		s = s .. "playercontrols:" .. i .. ":"
-		local count = 0
+		table.insert(ctable, i)
 		for j, k in pairs(controls[i]) do
-			local c = ""
-			for l = 1, #controls[i][j] do
-				c = c .. controls[i][j][l]
-				if l ~= #controls[i][j] then
-					c = c ..  "-"
-				end
-			end
-			s = s .. j .. "-" .. c
-			count = count + 1
-			s = s .. ","
+			table.insert(ctable, table.concat(k,"-"))
 		end
-		s = s:sub(1,-2) .. ";\n"
 	end
-	
-	if mariocharacter then
-		s = s .. "mariocharacter:"
-		for i = 1, 4 do
-			if mariocharacter[i] then
-				s = s .. mariocharacter[i] .. ","
-			else
-				s = s .. "mario,"
-			end
-		end
-		s = s .. ";\n"
-	end
-	
+	local s = string.format(fstring, unpack(ctable))
+
+	local s = string.format("%smariocharacter:%s;\n", s, table.concat(mariocharacter,","))
+
+	ctable = {}
+	fstring = "%s"
 	for i = 1, #mariocolors do
-		s = s .. "playercolors:" .. i .. ":"
+		fstring = string.format("%splayercolors:%s:%s;\n", fstring, i, string.rep("%s",#mariocolors[i],","))
 		for j = 1, #mariocolors[i] do
-			for k = 1, 3 do
-				s = s .. mariocolors[i][j][k]
-				if j == #mariocolors[i] and k == 3 then
-					s = s .. ";\n"
-				else
-					s = s .. ","
-				end
-			end
+			table.insert(ctable, table.concat(mariocolors[i][j],","))
 		end
 	end
-	
-	for i = 1, #portalhues do
-		s = s .. "portalhues:" .. i .. ":"
-		s = s .. round(portalhues[i][1], 4) .. "," .. round(portalhues[i][2], 4) .. ";\n"
-	end
-	
-	for i = 1, #mariohats do
-		s = s .. "mariohats:" .. i
-		if #mariohats[i] > 0 then
-			s = s .. ":"
-		end
-		for j = 1, #mariohats[i] do
-			s = s .. mariohats[i][j]
-			if j == #mariohats[i] then
-				s = s .. ";\n"
-			else
-				s = s .. ","
-			end
-		end
-		
-		if #mariohats[i] == 0 then
-			s = s .. ";\n"
-		end
-	end
+	s = string.format(fstring, s, unpack(ctable))
+
+	local p = portalhues
+	fstring = "%sportalhues:1:%.2f,%.2f;\nportalhues:2:%.2f,%.2f;\nportalhues:3:%.2f,%.2f;\nportalhues:4:%.2f,%.2f;\n"
+	s = string.format(fstring, s, p[1][1],p[1][2], p[2][1],p[2][2], p[3][1],p[3][2], p[4][1],p[4][2])
+
+	fstring = "%smariohats:1:%s;\nmariohats:2:%s;\nmariohats:3:%s;\nmariohats:4:%s;\n"
+	s = string.format(fstring, s, table.concat(mariohats[1]), table.concat(mariohats[2]), table.concat(mariohats[3]), table.concat(mariohats[4]))
 	
 	if resizable then
 		s = s .. "scale:2;\n"
 	else
-		s = s .. "scale:" .. scale .. ";\n"
+		s = string.format("%sscale:%s;\n", s, scale)
 	end
 
 	if letterboxfullscreen then
 		s = s .. "letterbox;\n"
 	end
-	
-	s = s .. "shader1:" .. shaderlist[currentshaderi1] .. ";\n"
-	s = s .. "shader2:" .. shaderlist[currentshaderi2] .. ";\n"
-	
-	s = s .. "volume:" .. volume .. ";\n"
-	s = s .. "mouseowner:" .. mouseowner .. ";\n"
+
+	s = string.format("%sshader1:%s;\nshader2:%s;\nvolume:%s;\nmouseowner:%s;\n", s, shaderlist[currentshaderi1], shaderlist[currentshaderi2], volume, mouseowner)
 	
 	if mappackfolder == "alesans_entities/mappacks" then
 		s = s .. "modmappacks;\n"
 	end
-	
-	s = s .. "mappack:" .. mappack .. ";\n"
+
+	s = string.format("%smappack:%s;\n", s, mappack)
 	
 	if vsync then
 		s = s .. "vsync;\n"
@@ -1329,29 +1286,17 @@ function saveconfig()
 	end
 	
 	--reached worlds
+	local tempstring = ""
+	fstring = "%sreachedworlds:%s:%s;\n"
 	for i, v in pairs(reachedworlds) do
-		s = s .. "reachedworlds:" .. i .. ":"
-		
-		local n = math.max(8, #reachedworlds[i])
-		
-		for j = 1, n do
-			if v[j] then
-				s = s .. 1
-			else
-				s = s .. 0
-			end
-			
-			if j == n then
-				s = s .. ";\n"
-			else
-				s = s .. ","
-			end
-		end
+		local t = string.gsub(string.gsub(string.gsub(string.format(string.rep("%s",#v,","),unpack(v)), "true", "1"), "false", "0"), "nil", "0")
+		tempstring = string.format(fstring, tempstring, i, t)
 	end
-	
-	s = s .. "resizable:" .. tostring(resizable) .. ";\n"
+	s = s .. tempstring
+
+	s = string.format("%sresizable:%s;\n", s, tostring(resizable))
 	if CurrentLanguage then
-		s = s .. "language:" .. CurrentLanguage .. ";\n"
+		s = string.format("%slanguage:%s;\n", s, CurrentLanguage)
 	end
 	
 	if fourbythree then
@@ -1359,9 +1304,10 @@ function saveconfig()
 	end
 	
 	if localnick then
-		s = s .. "localnick:" .. localnick .. ";\n"
+		s = string.format("%slocalnick:%s;\n", s, localnick)
 	end
 	love.filesystem.write("alesans_entities/options.txt", s)
+	--print("Config saved in " .. love.timer.getTime()-baf)
 end
 
 function loadconfig(nodefaultconfig)
