@@ -436,15 +436,17 @@ local reversedirs = {
 }
 local getplatform
 local function getplatform(t, dir, v, internal, ya)
-	if (internal and not v.nointernalplatform) and (not getplatform(t, dir)) then
-		return false
-	end
 	if v then
 		if v.overridesemisolids then
 			return false
 		elseif v.ignoresemisolids then
 			return (t.PLATFORM or t.PLATFORMDOWN or t.PLATFORMLEFT or t.PLATFORMRIGHT or t.NOEXTERNALHORCOLLISIONS or t.NOEXTERNALVERCOLLISIONS)
 		end
+	end
+	if (internal and not v.nointernalplatform) and (not getplatform(t, dir)) then
+		return false
+	end
+	if v then
 		local u, d, l, r, hor, ver = t.PLATFORM, t.PLATFORMDOWN, t.PLATFORMLEFT, t.PLATFORMRIGHT, t.NOEXTERNALHORCOLLISIONS, t.NOEXTERNALVERCOLLISIONS
 		local vu, vd, vl, vr, vhor, vver = v.PLATFORM, v.PLATFORMDOWN, v.PLATFORMLEFT, v.PLATFORMRIGHT, v.NOEXTERNALHORCOLLISIONS, v.NOEXTERNALVERCOLLISIONS
 		return (platconditions[dir](u,d,l,r,hor,ver) or platconditions[reversedirs[dir]](vu,vd,vl,vr,vhor,vver))
