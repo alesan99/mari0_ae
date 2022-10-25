@@ -1257,7 +1257,7 @@ function saveconfig()
 	s = string.format(fstring, s, p[1][1],p[1][2], p[2][1],p[2][2], p[3][1],p[3][2], p[4][1],p[4][2])
 
 	fstring = "%smariohats:1:%s;\nmariohats:2:%s;\nmariohats:3:%s;\nmariohats:4:%s;\n"
-	s = string.format(fstring, s, table.concat(mariohats[1]), table.concat(mariohats[2]), table.concat(mariohats[3]), table.concat(mariohats[4]))
+		s = string.format(fstring, s, table.concat(mariohats[1],","), table.concat(mariohats[2],","), table.concat(mariohats[3],","), table.concat(mariohats[4],","))
 	
 	if resizable then
 		s = s .. "scale:2;\n"
