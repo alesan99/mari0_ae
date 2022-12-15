@@ -4308,7 +4308,7 @@ function placetile(x, y, tilei)
 		local t = map[cox][coy]
 		--update track previews
 		local queuetrackpreview
-		if trackpreviews and map[cox][coy][2] and entityquads[map[cox][coy][2]] and entityquads[map[cox][coy][2]].t == "track" then
+		if trackpreviews and map[cox][coy][2] and entityquads[map[cox][coy][2]] and (entityquads[map[cox][coy][2]].t == "track" or entityquads[map[cox][coy][2]].t == "trackswitch") then
 			queuetrackpreview = true
 		end
 		if entityquads[currenttile] and entityquads[currenttile].t == "remove" then --removing tile
@@ -6094,6 +6094,7 @@ function startrctrack(var) --track path
 		y = rightclickmenucoy,--offsety
 		vars = deepcopy(rightclickvalues2),
 		drag = true, --able to add onto path currently?
+		var = var --which entity variable is the path loaded to?
 	}
 	local rcp = rightclicktrack
 
@@ -6156,7 +6157,7 @@ function setrctrack()
 	local r = map[rightclickmenucox][rightclickmenucoy]
 	customrcopen = entitylist[r[2]].t
 	if rightclicktype[customrcopen].trackfunc then
-		rightclicktype[customrcopen].trackfunc(s)
+		rightclicktype[customrcopen].trackfunc(s, rightclicktrack.var)
 	end
 	rightclicktrack = {}
 	closecustomrc(true)
@@ -6319,7 +6320,7 @@ function editor_mousereleased(x, y, button)
 									map[tx][ty] = {d[1] or map[tx][ty][1], d[2] or map[tx][ty][2], d[3] or map[tx][ty][3], back=d["back"], argument=d["argument"]}
 									map[tx][ty]["gels"] = {}
 									--generate new tracks if track moved
-									if d[2] and entityquads[d[2]] and entityquads[d[2]].t == "track" then
+									if d[2] and entityquads[d[2]] and (entityquads[d[2]].t == "track" or entityquads[d[2]].t == "trackswitch") then
 										generatetrackpreviews()
 									end
 								end
@@ -7847,28 +7848,38 @@ function generatetrackpreviews()
 			if map[mx][my]["track"] and map[mx][my]["track"].id ~= trackgenerationid then --delete old tracks
 				map[mx][my]["track"] = nil
 			end
-			if map[mx][my][2] and entityquads[map[mx][my][2]].t == "track" then
-				local v = convertr(map[mx][my][3], {"string", "bool"}, true)
-				local trackdata = v[1]
-				if trackdata then
-					local s = trackdata:gsub("n", "-")
-					local s2 = s:split("`")
-					
-					local s3
-					for i = 1, #s2 do
-						s3 = s2[i]:split(":")
-						local x, y = tonumber(s3[1]), tonumber(s3[2])
-						local start, ending, grab = s3[3], s3[4], s3[5]
+			if map[mx][my][2] and (entityquads[map[mx][my][2]].t == "track" or entityquads[map[mx][my][2]].t == "trackswitch") then
+				local v
+				local pathvars = 1 --how many track paths does the entity have?
+				if entityquads[map[mx][my][2]].t == "trackswitch" then 
+					v = convertr(map[mx][my][3], {"string", "string", "bool"}, true)
+					pathvars = 2
+				else
+					v = convertr(map[mx][my][3], {"string", "bool"}, true)
+				end
+				local trackdata
+				for pathvar = 1, pathvars do
+					trackdata = v[pathvar]
+					if trackdata then
+						local s = trackdata:gsub("n", "-")
+						local s2 = s:split("`")
 						
-						if x and y then
-							local tx, ty = mx+x, my+y
-							if ismaptile(tx,ty) then
-								map[tx][ty]["track"] = {start=start, ending=ending, grab=grab, id=trackgenerationid, cox=mx, coy=my}
+						local s3
+						for i = 1, #s2 do
+							s3 = s2[i]:split(":")
+							local x, y = tonumber(s3[1]), tonumber(s3[2])
+							local start, ending, grab = s3[3], s3[4], s3[5]
+							
+							if x and y then
+								local tx, ty = mx+x, my+y
+								if ismaptile(tx,ty) then
+									map[tx][ty]["track"] = {start=start, ending=ending, grab=grab, id=trackgenerationid, cox=mx, coy=my}
+								else
+									break
+								end
 							else
 								break
 							end
-						else
-							break
 						end
 					end
 				end

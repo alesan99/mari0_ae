@@ -330,6 +330,7 @@ entitylist = {
 	{t="mole", name="mole", spawnable=true, block=true, supersize=true},
 	{t="grinder"},
 	{t="bowserjr", spawnable=true, supersize=true},
+	{t="trackswitch"},
 }
 
 --only spawnable with spawner or by enemies
@@ -719,6 +720,7 @@ entitydescriptions = {
 	"place on empty tile - monty mole", --"mole",
 	"place anywhere - grinder", --"grinder",
 	"place on empty tile - bowser jr.", --"bowserjr",
+	"place anywhere - track switch - right click for path", --"trackswitch",
 }
 
 rightclickvalues = {}
@@ -2066,10 +2068,29 @@ rightclicktype["track"] = {
 		rightclickvalues2[1] = s
 	end,
 	format = {
-		{"button", 1, {"lay tracks", function(var) allowdrag = false; startrctrack(var) end, {{1}}},
+		{"button", 1, {"lay tracks", function(var) allowdrag = false; startrctrack(var, m) end, {{1}}},
 		{"x", function() rightclickvalues2[1] = "0:0:c:c:d" end, {}, textcolor = {255, 0, 0}}},
 		{"checkbox", 2, "visible"},
 		{"button", 2, {"link stop ", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}},
+	}
+}
+
+rightclicktype["trackswitch"] = {
+	name = "track switch",
+	default = "0:0:c:c:d|0:0:c:c:d|true|1",
+	trackfunc = function(s, var)
+		rightclickvalues2[var] = s
+	end,
+	format = {
+		{"button", 1, {"lay tracks #1", function(var) allowdrag = false; startrctrack(var) end, {{1}}},
+		{"x", function() rightclickvalues2[1] = "0:0:c:c:d" end, {}, textcolor = {255, 0, 0}}},
+		{"button", 2, {"lay tracks #2", function(var) allowdrag = false; startrctrack(var) end, {{2}}},
+		{"x", function() rightclickvalues2[2] = "0:0:c:c:d" end, {}, textcolor = {255, 0, 0}}},
+		{"checkbox", 3, "visible"},
+		"color",
+		{"dropdown", 4, 3, nil, {1,2,3,4}},
+		{"button", 3, {"link switch ", startrclink, {"switch", "switch"}}, {"x", resetrclink, textcolor = {255, 0, 0}}},
+		{"button", 3, {"link stop ", startrclink, {"stop", "power"}}, {"x", resetrclink, textcolor = {255, 0, 0}}},
 	}
 }
 

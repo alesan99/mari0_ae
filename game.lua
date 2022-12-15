@@ -1805,6 +1805,11 @@ function game_draw()
 			w:draw()
 		end
 
+		--track switches
+		for j, w in pairs(tracks) do
+			w:draw()
+		end
+
 		--checkpoint flag
 		for j, w in pairs(objects["checkpointflag"]) do
 			w:draw()
@@ -7043,7 +7048,9 @@ function spawnentity(t, x, y, r, id)
 		table.insert(objects["plantcreeper"], plantcreeper:new(x, y, r))
 
 	elseif t == "track" then
-		table.insert(tracks, track:new(x, y, r))
+		table.insert(tracks, track:new(x, y, r, false))
+	elseif t == "trackswitch" then
+		table.insert(tracks, track:new(x, y, r, "switch"))
 
 	elseif t == "grinder" then
 		table.insert(objects["grinder"] , grinder:new(x, y, r[3]))
@@ -9155,7 +9162,7 @@ function drawmaptiles(drawtype, xscroll, yscroll)
 								love.graphics.setColor(255, 255, 255, 200)
 								love.graphics.draw(entityquads[313].image, entityquads[313].quad, math.floor((x-1-xoff+offsetx)*16*scale), ((y-1-yoff)*16-8)*scale, 0, scale, scale)
 							end
-							if entityquads[tilenumber].t == "track" and not trackpreviews then
+							if (entityquads[tilenumber].t == "track" or entityquads[tilenumber].t == "trackswitch") and not trackpreviews then
 								generatetrackpreviews()
 							end
 						end

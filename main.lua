@@ -495,7 +495,7 @@ function love.load()
 			211,292,293, 178,208,279,179,180,--buttons
 			300,301, --helmet boxes
 			302,--clear pipe
-			306,--tracks!
+			306,317--tracks!
 			},
 		{name = "items",
 			--[[297,]]2,3,101,4,187,296,5, --regulars
