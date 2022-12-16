@@ -3179,15 +3179,15 @@ function editor_draw()
 			love.graphics.setColor(0,0,0,200)
 			love.graphics.rectangle("fill", 0, 0, width*16*scale, height*16*scale)
 			love.graphics.setColor(0,0,0)
-			love.graphics.rectangle("fill", 99*scale, 69*scale, 202*scale, 86*scale)
+			love.graphics.rectangle("fill", 69*scale, 71*scale, 262*scale, 82*scale)
 			love.graphics.setColor(255,255,255)
-			drawrectangle(100, 70, 200, 84)
+			drawrectangle(70, 72, 260, 80)
 
-			properprintF("are you sure?", (200-utf8.len("are you sure?")*4)*scale, 75*scale)
-			properprintF("progress may be lost!", (200-utf8.len("progress may be lost!")*4)*scale, 87*scale)
+			properprintF(TEXT["are you sure?"], (200-utf8.len(TEXT["are you sure?"])*4)*scale, 80*scale)
+			properprintF(TEXT["unsaved changes will be lost!"], (200-utf8.len(TEXT["unsaved changes will be lost!"])*4)*scale, 92*scale)
 			guielements["confirmsave"]:draw()
 			guielements["confirmexit"]:draw()
-			guielements["confirmcancel"]:draw()
+			--guielements["confirmcancel"]:draw()
 		end
 	end
 end
@@ -3648,17 +3648,17 @@ function openconfirmmenu(menutype, args)
 	end
 
 	if menutype == "exit" then
-		guielements["confirmsave"] = guielement:new("button", width*8, 102, "save + exit", function() savelevel(); menu_load() end, 2)
-		guielements["confirmexit"] = guielement:new("button", width*8, 119, "just exit", menu_load, 2)
+		guielements["confirmsave"] = guielement:new("button", width*8, 112, TEXT["save and exit"], function() savelevel(); menu_load() end, 2)
+		guielements["confirmexit"] = guielement:new("button", width*8, 129, TEXT["exit"], menu_load, 2)
 	elseif menutype == "maps" then
-		guielements["confirmsave"] = guielement:new("button", width*8, 102, "save + continue", function() savelevel(); mapnumberclick(unpack(args)) end, 2)
-		guielements["confirmexit"] = guielement:new("button", width*8, 119, "just continue", function() mapnumberclick(unpack(args)) end, 2)
+		guielements["confirmsave"] = guielement:new("button", width*8, 112, TEXT["save and continue"], function() savelevel(); mapnumberclick(unpack(args)) end, 2)
+		guielements["confirmexit"] = guielement:new("button", width*8, 129, TEXT["continue"], function() mapnumberclick(unpack(args)) end, 2)
 	end
-	guielements["confirmcancel"] = guielement:new("button", width*8, 136, "return to editor", closeconfirmmenu, 2)
+	--guielements["confirmcancel"] = guielement:new("button", width*8, 136, TEXT["cancel"], closeconfirmmenu, 2)
 
 	guielements["confirmsave"].x = guielements["confirmsave"].x - (guielements["confirmsave"].width / 2) - 3
 	guielements["confirmexit"].x = guielements["confirmexit"].x - (guielements["confirmexit"].width / 2) - 3
-	guielements["confirmcancel"].x = guielements["confirmcancel"].x - (guielements["confirmcancel"].width / 2) - 3
+	--guielements["confirmcancel"].x = guielements["confirmcancel"].x - (guielements["confirmcancel"].width / 2) - 3
 	guielements["confirmsave"].bordercolor = {255, 0, 0}
 	guielements["confirmsave"].bordercolorhigh = {255, 127, 127}
 end
@@ -3672,7 +3672,7 @@ function closeconfirmmenu()
 
 	guielements["confirmsave"] = nil
 	guielements["confirmexit"] = nil
-	guielements["confirmcancel"] = nil
+	--guielements["confirmcancel"] = nil
 end
 
 function endingtextcolorleft()
@@ -3970,7 +3970,7 @@ function openchangewidth()
 	guielements["maprightleft"].active = true
 	guielements["maprightright"].active = true
 	guielements["mapwidthapply"].active = true
-	guielements["mapwidthcancel"].active = true
+	--guielements["mapwidthcancel"].active = true
 
 	changemapwidthmenu = true
 	newmapwidth = mapwidth

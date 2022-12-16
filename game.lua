@@ -6263,7 +6263,7 @@ function savemap(filename)
 	
 	print("Map saved as " .. mappackfolder .. "/" .. filename .. ".txt")
 	if success then
-		notice.new("Map saved!", notice.white, 2)
+		notice.new(TEXT["Map saved!"], notice.white, 2)
 	else
 		notice.new("Could not save map!\n" .. message, notice.red, 4)
 	end
