@@ -957,8 +957,8 @@ function love.load()
 	collectable9sound = love.audio.newSource("sounds/collectable9.ogg", "static")
 	collectable10sound = love.audio.newSource("sounds/collectable10.ogg", "static")
 	
-	glados1sound = love.audio.newSource("sounds/glados/glados1.ogg", "stream")
-	glados2sound = love.audio.newSource("sounds/glados/glados2.ogg", "static")
+	glados1sound = love.audio.newSource("sounds/glados1.ogg", "stream")
+	glados2sound = love.audio.newSource("sounds/glados2.ogg", "static")
 	
 	portal1opensound = love.audio.newSource("sounds/portal1open.ogg", "static");portal1opensound:setVolume(0.3)
 	portal2opensound = love.audio.newSource("sounds/portal2open.ogg", "static");portal2opensound:setVolume(0.3)
@@ -974,14 +974,14 @@ function love.load()
 					raccoonplanesound, skidsound, jumptinysound, pbuttonsound, windsound, suitsound, koopalingendsound, bowserendsound, dooropensound, doorclosesound, keysound, keyopensound, weirdmushroomsound, jumpskinnysound,
 					energybouncesound, shufflesound, grabsound, throwsound, collectable1sound, collectable2sound, collectable3sound, collectable4sound, collectable5sound, collectable6sound, collectable7sound, 
 					collectable8sound, collectable9sound, collectable10sound, switchsound, iciclefallsound, helmetsound, helmethitsound, propellersound, clearpipesound, megamushroomsound, stompbigsound, thwompbigsound,
-					superballeatsound, superballsound, capeflysound, mushroombigeatsound, bumperhitsound, bumperjumpsound, cannonfastsound, powblocksound, checkpointsound, groundpoundsound}
+					superballeatsound, superballsound, capeflysound, mushroombigeatsound, bumperhitsound, bumperjumpsound, cannonfastsound, powblocksound, checkpointsound, groundpoundsound, glados1sound, glados2sound}
 		soundliststring = {"jump", "jumpbig", "stomp", "shot", "blockhit", "blockbreak", "coin", "pipe", "boom", "mushroomappear", "mushroomeat", "shrink", "death", "gameover",
 			"turretshot", "oneup", "levelend", "castleend", "scorering", "intermission", "fire", "fireball", "bridgebreak", "bowserfall", "vine", "swim", "rainboom",
 			"portal1open", "portal2open", "portalenter", "portalfizzle", "lowtime", "pause", "stab", "bulletbill", "icicle", "thwomp", "boomerang", "raccoonswing",
 			"raccoonplane", "skid", "jumptiny", "pbutton", "wind", "suit", "koopalingend", "bowserend", "dooropen", "doorclose", "key", "keyopen", "weirdmushroom", "jumpskinny",
 			"energybounce", "shuffle", "grab", "throw", "collectable1","collectable2","collectable3","collectable4","collectable5","collectable6","collectable7","collectable8", "collectable9", "collectable10",
 			"switch", "iciclefall", "helmet", "helmethit", "propeller", "clearpipe", "megamushroom", "stompbig", "thwompbig", "superballeat", "superball", "capefly", "mushroombigeat", "bumperhit",
-			"bumperjump", "cannonfast", "powblock", "checkpoint", "groundpound"}
+			"bumperjump", "cannonfast", "powblock", "checkpoint", "groundpound", "glados1", "glados2"}
 		local temptable = {} --sort the sounds
 		for i, t in pairs(soundlist) do
 		table.insert(temptable, {t, soundliststring[i]})
@@ -3314,7 +3314,7 @@ function loadcustomsounds()
 		for i, j in pairs(soundliststring) do
 			if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/sounds/" .. j .. ".ogg") then
 				local method = "static"
-				if j == "pbutton" or j == "megamushroom" then
+				if j == "pbutton" or j == "megamushroom" or j == "glados1" then
 					method = "stream"
 				end
 				_G[j .. "sound"] = love.audio.newSource(mappackfolder .. "/" .. mappack .. "/sounds/" .. j .. ".ogg", method);_G[j .. "sound"]:setVolume(0);_G[j .. "sound"]:play();_G[j .. "sound"]:stop();_G[j .. "sound"]:setVolume(1)
@@ -3328,7 +3328,7 @@ function loadcustomsounds()
 			elseif customsounds then
 				if customsounds[i] then
 					local method = "static"
-					if j == "pbutton" or j == "megamushroom" then
+					if j == "pbutton" or j == "megamushroom" or j == "glados1" then
 						method = "stream"
 					end
 					_G[j .. "sound"] = love.audio.newSource("sounds/" .. j .. ".ogg", method);_G[j .. "sound"]:setVolume(0);_G[j .. "sound"]:play();_G[j .. "sound"]:stop();_G[j .. "sound"]:setVolume(1)
