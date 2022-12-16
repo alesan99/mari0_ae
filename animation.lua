@@ -19,18 +19,21 @@ whennumber:i:>/</=:v				when a variable turns something
 --]]
 
 --[[ CONDITIONS:
-noprevsublevel						doesn't if the level was changed from another sublevel (Mario goes through pipe, lands in 1-1_1, prevsublevel was _0, no trigger.)
-worldequals:i						only triggers if current world is i
-levelequals:i						only triggers if current level is i
-sublevelequals:i					only triggers if current sublevel is i
-requirecoins:i						requires i coins to trigger (will not remove coins)
+noprevsublevel					doesn't if the level was changed from another sublevel (Mario goes through pipe, lands in 1-1_1, prevsublevel was _0, no trigger.)
+worldequals:i					only triggers if current world is i
+levelequals:i					only triggers if current level is i
+sublevelequals:i				only triggers if current sublevel is i
+requirecoins:i					requires i coins to trigger (will not remove coins)
 
 playersize[:player]:size			requires a player to be size
 requirecollectables:i				requires i collectables to trigger (will not remove coins)
-requirepoints:i						requires i points
+requirepoints:i					requires i points
 buttonhelddown:button				only if button is held down
 requirekeys[:player]:i				requires i keys
 ifnumber:i:>/</=:v				if a variable is equal/greater than something
+ifcoins:>/</=:v					if coin count is equal/greater than v
+ifcollectables:>/</=:v:i			if collectable count of a type is equal/greater than v
+ifpoints:>/</=:v				if points is equal/greater than v
 --]]
 
 --[[ ACTIONS:
@@ -1039,6 +1042,36 @@ function animation:trigger()
 				if marioscore < tonumber(v[2]) then
 					pass = false
 					break
+				end
+			elseif v[1] == "ifcoins" then
+				local value = tonumber(v[3])
+				if v[2] == "=" and mariocoincount ~= value then
+					pass = false
+				elseif v[2] == ">" and mariocoincount <= value then
+					pass = false
+				elseif v[2] == "<" and mariocoincount >= value then
+					pass = false
+				end
+			elseif v[1] == "ifcollectables" then
+				local value = tonumber(v[3])
+				local typ = tonumber(v[4])
+				if not collectablescount[typ] then
+					pass = false
+				elseif v[2] == "=" and collectablescount[typ] ~= value then
+					pass = false
+				elseif v[2] == ">" and collectablescount[typ] <= value then
+					pass = false
+				elseif v[2] == "<" and collectablescount[typ] >= value then
+					pass = false
+				end
+			elseif v[1] == "ifpoints" then
+				local value = tonumber(v[3])
+				if v[2] == "=" and marioscore ~= value then
+					pass = false
+				elseif v[2] == ">" and marioscore <= value then
+					pass = false
+				elseif v[2] == "<" and marioscore >= value then
+					pass = false
 				end
 			elseif v[1] == "requirekeys" then
 				if v[3] == "everyone" then

@@ -338,6 +338,58 @@ table.insert(toenter, {name = "requirecollectables",
 	}
 })
 
+table.insert(toenter, {name = "ifcoins",
+	t= {
+		t="condition",
+		nicename="if coins",
+		entries={
+			{
+				t="comparisonselection",
+			},
+			{
+				t="numinput",
+			}
+		}
+	}
+})
+
+table.insert(toenter, {name = "ifpoints",
+	t= {
+		t="condition",
+		nicename="if points",
+		entries={
+			{
+				t="comparisonselection",
+			},
+			{
+				t="numinput",
+			}
+		}
+	}
+})
+
+table.insert(toenter, {name = "ifcollectables",
+	t= {
+		t="condition",
+		nicename="if collectables",
+		entries={
+			{
+				t="comparisonselection",
+			},
+			{
+				t="numinput",
+			},
+			{
+				t="text",
+				value="type",
+			},
+			{
+				t="collectableselection",
+			}
+		}
+	}
+})
+
 table.insert(toenter, {name = "requirekeys",
 t= {
 	t="condition",
