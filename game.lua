@@ -4681,8 +4681,7 @@ function loadmap(filename)
 	map = {} --foreground map
 	bmap_on = false --background map on?
 	local nr, nr2 --map[x][y][1], map[x][y][2]
-	unstatics = {}
-	
+
 	for x = 1, mapwidth do
 		map[x] = {}
 		for y = 1, mapheight do
