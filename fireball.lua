@@ -261,7 +261,7 @@ function fireball:passivecollide(a, b)
 	return false
 end
 
-function fireball:hitstuff(a, b, truedir)
+function fireball:hitstuff(a, b, hitdir)
 	local dir = "right"
 	if self.x+self.width/2 > b.x+b.width/2 then
 		dir = "left"
@@ -286,7 +286,7 @@ function fireball:hitstuff(a, b, truedir)
 		
 	elseif a == "enemy" then
 		if b.reflectsfireballs then
-			if truedir == "left" or truedir == "right" then
+			if hitdir and (hitdir == "left" or hitdir == "right") then
 				self.speedx = -self.speedx
 			end
 		else
