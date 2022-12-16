@@ -8808,12 +8808,12 @@ function rendercustombackground(xsc, ysc, scrollfactor, scrollfactory)
 				if custombackgroundanim[i].staticx or custombackgroundanim[i].static then
 					xsc = 0
 				elseif custombackgroundanim[i].clamptolevelwidth then
-					xsc = ((xscroll or 0)/(mapwidth-width)) * (custombackgroundwidth[i]-width)
+					xsc = ((xscroll or 0)/(mapwidth-width+1^-10)) * (custombackgroundwidth[i]-width)
 				end
 				if custombackgroundanim[i].staticy or custombackgroundanim[i].static then
 					ysc = 0
 				elseif custombackgroundanim[i].clamptolevelheight then
-					ysc = ((yscroll or 0)/(mapheight-1-height)) * (custombackgroundheight[i]-height)
+					ysc = ((yscroll or 0)/(mapheight-1-height+1^-10)) * (custombackgroundheight[i]-height)
 				end
 			end
 
