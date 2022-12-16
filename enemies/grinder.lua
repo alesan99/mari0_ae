@@ -20,6 +20,9 @@ function grinder:init(x, y, t)
 	self.static = true
 	self.active = true
 
+	self.NOEXTERNALHORCOLLISIONS = true
+	self.NOEXTERNALVERCOLLISIONS = true
+
 	self.category = 4
 	self.gravity = 0
 	
