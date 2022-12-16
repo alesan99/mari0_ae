@@ -3541,6 +3541,7 @@ function loadnitpicks()
 			LoveConsole = true
 			if love._openConsole then love._openConsole() end
 		end
+		noExitConfirmation = t.noexitconfirmation
 	end
 end
 
