@@ -2777,7 +2777,7 @@ function enemy:globalcollide(a, b, c, d, dir)
 		end
 	end
 	
-	if a == "fireball" and self.resistsfire then
+	if a == "fireball" and (self.resistsfire or self.reflectsfireballs) then
 		return true
 	end
 	
