@@ -540,7 +540,6 @@ function trackcontroller:release(dir, soft)
 		end
 		self.b.static = false
 		self.b.gravity = self.b.trackgravity or trackgravity
-		self.b.maxyspeed = trackmaxyspeed
 		if dir == "u" or dir == "lu" or dir == "ru" then
 			self.b.speedy = -math.max(self.speed, math.abs(self.b.speedy))-8
 			self.b.speedx = 0
