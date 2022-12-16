@@ -518,25 +518,51 @@ function game_update(dt)
 	
 	--gelcannon
 	if not editormode then
-		if objects["player"][mouseowner] and (playertype == "gelcannon" or objects["player"][mouseowner].portals == "gel") and objects["player"][mouseowner].controlsenabled then
+		if objects["player"][1] and (playertype == "gelcannon" or objects["player"][1].portals == "gel") and objects["player"][1].controlsenabled then
+			--Check what gamepads are connected.  Probably unneccessary but I am *not* looking through all these terrible variable names
+			local joysticklist = love.joystick.getJoysticks()
 			if gelcannontimer > 0 then
 				gelcannontimer = gelcannontimer - dt
 				if gelcannontimer < 0 then
 					gelcannontimer = 0
 				end
 			else
-				if love.mouse.isDown("l") then
-					gelcannontimer = gelcannondelay
-					objects["player"][mouseowner]:shootgel(1)
-				elseif love.mouse.isDown("r") then
-					gelcannontimer = gelcannondelay
-					objects["player"][mouseowner]:shootgel(2)
-				elseif love.mouse.isDown("m") or love.mouse.isDown("wd") or love.mouse.isDown("wu") or love.mouse.isDown("x1") then
-					gelcannontimer = gelcannondelay
-					objects["player"][mouseowner]:shootgel(4)
-				elseif love.mouse.isDown("x2") then
-					gelcannontimer = gelcannondelay
-					objects["player"][mouseowner]:shootgel(3)
+				-- Check which triggers are down, checks every controller which sucks, but better than none I guess
+				local rtdown = 0
+				local ltdown = 0
+				local zrdown = false
+				local zldown = false
+				for _,gamepad in ipairs(joysticklist) do
+					if gamepad:isGamepad() then
+						rtdown = gamepad:getGamepadAxis("triggerright")
+						ltdown = gamepad:getGamepadAxis("triggerleft")
+					else --Assume it's a Switch controller
+						zrdown = gamepad:isDown(8)
+						zldown = gamepad:isDown(7)
+					end
+				end
+				if OldGelcannon then
+					if love.mouse.isDown("l") or rtdown == 1 or zrdown then
+						gelcannontimer = gelcannondelay
+						objects["player"][1]:shootgel(1)
+					elseif love.mouse.isDown("r") or ltdown == 1 or zldown then
+						gelcannontimer = gelcannondelay
+						objects["player"][1]:shootgel(2)
+					elseif love.mouse.isDown("m") or love.mouse.isDown("wd") or love.mouse.isDown("wu") or love.mouse.isDown("x1") then
+						gelcannontimer = gelcannondelay
+						objects["player"][1]:shootgel(4)
+					elseif love.mouse.isDown("x2") then
+						gelcannontimer = gelcannondelay
+						objects["player"][1]:shootgel(3)
+					end
+				else
+					if love.mouse.isDown("l") or rtdown == 1 or zrdown then
+						gelcannontimer = gelcannondelay
+						objects["player"][1]:shootgel(gelcannonTypes[gelTypeIndex+1])
+					elseif love.mouse.isDown("r") or ltdown == 1 or zldown then
+						gelcannontimer = gelcannondelay
+						objects["player"][1]:shootgel(5)
+					end
 				end
 			end
 		end
@@ -4073,6 +4099,13 @@ function startlevel(level, reason)
 	earthquake = 0
 	sunrot = 0
 	gelcannontimer = 0
+	--Initialize new gelcannon variables
+	gelcannonTypes = {1,2,4}
+	if GelcannonWhiteGel then
+		gelcannonTypes = {1,2,3,4}
+	end
+	gelTypeIndex = 0
+
 	pausemenuselected = 1
 	coinblocktimers = {}
 	autoscroll = true
@@ -5298,6 +5331,7 @@ function game_keypressed(key, textinput)
 				end
 				objects["player"][i]:removeportals(pi)
 			end
+			cyclegels()
 			animationsystem_buttontrigger(i, "reload")
 		elseif controls[i]["use"][1] == key then
 			objects["player"][i]:button("use")
@@ -8038,6 +8072,7 @@ function game_joystickpressed( joystick, button )
 						pi = 2
 					end
 					objects["player"][i]:removeportals(pi)
+					cyclegels()
 				end
 				animationsystem_buttontrigger(i, "reload")
 				return
@@ -9329,5 +9364,13 @@ function dchighscore()
 		s = ""
 		s = s .. tostring(DCcompleted) .. "~" .. datet[1] .. "/" .. datet[2] .. "/" .. datet[3]
 		love.filesystem.write("alesans_entities/dc.txt", s)
+	end
+end
+
+function cyclegels()
+	--Cycle gels when gelcannon is active
+	if ((playertype == "gelcannon" or objects["player"][1].portals == "gel") and objects["player"][1].controlsenabled) and not OldGelcannon then
+		gelTypeIndex = math.mod(gelTypeIndex+1,#gelcannonTypes)
+		playsound("portal2open")
 	end
 end
