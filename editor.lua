@@ -6480,7 +6480,7 @@ function editor_keypressed(key, textinput)
 			editormenuopen = false
 		end
 	end
-	if brushsizetoggle then
+	if brushsizetoggle and (not editormenuopen) then
 		if key == "up" and brushsizey > 1 then
 			brushsizey = brushsizey - 1
 		elseif key == "left" and brushsizex > 1 then
