@@ -5518,7 +5518,7 @@ function openrightclickmenu(x, y, tileX, tileY)
 		if v.rightclickmenutable then
 			rightclickmenu.trustWhatStartWasSetAs = true
 		end
-elseif tablecontains(customenemies, r[2]) and enemiesdata[r[2]] and enemiesdata[r[2]].rightclick then
+	elseif tablecontains(customenemies, r[2]) and enemiesdata[r[2]] and enemiesdata[r[2]].rightclick then
 		local v = enemiesdata[r[2]]
 		rightclickmenuX = x
 		rightclickmenuY = y
@@ -5533,7 +5533,7 @@ elseif tablecontains(customenemies, r[2]) and enemiesdata[r[2]] and enemiesdata[
 		local default = ""
 		local b = v.rightclickdefaults
 		for i = 1, #b-1 do
-			default = default .. b[i] .. "|"
+			default = default .. tostring(b[i]) .. "|"
 		end
 		default = default .. b[#b]
 		default = default:gsub("-", "B")
@@ -5952,7 +5952,7 @@ function closecustomrc(save)
 						if v.rightclick[i][1] == "dropdown" then
 							local ents =  v.rightclick[i][4]
 							if vt[index] then
-								vt[index] = ents[vt[index]]
+								vt[index] = tostring(ents[vt[index]])
 								vt[index] = vt[index]:gsub("-", "B")
 							end
 						end
