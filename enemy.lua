@@ -2554,14 +2554,14 @@ function enemy:ifstatement(t, action, arg)
 
 		--get properties needed for comparison
 		local prop1,prop2 = t[i+1], t[i+3]
-		if (type(prop1) == "string" and self[prop1]) then
-			prop1 = self[prop1]
-		elseif (type(prop1) == "table" and prop1[1] and prop1[2] and prop1[1] == "property") then
+		if (type(prop1) == "table" and prop1[1] and prop1[2] and prop1[1] == "property") then
 			prop1 = self[prop1[2]]
-		end	
-		if (type(prop2) == "string" and self[prop2]) then
+		else
+			prop1 = self[prop1]	
+		end
+		if (type(prop2) == "string" and self[prop2] ~= nil) then
 			prop2 = self[prop2]
-		elseif (type(prop2) == "table" and prop2[2] and prop2[2] and prop2[2] == "property") then
+		elseif (type(prop2) == "table" and prop2[1] and prop2[2] and prop2[1] == "property") then
 			prop2 = self[prop2[2]]
 		end
 
