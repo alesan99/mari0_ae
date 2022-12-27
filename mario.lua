@@ -9153,6 +9153,7 @@ end
 
 function mario:stopanimation()
 	self.animation = false
+	self.drawable = true
 end
 
 function mario:stopgroundpound(force)
