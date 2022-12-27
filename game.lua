@@ -5844,9 +5844,9 @@ function getTile(x, y, portalable, portalcheck, facing, ignoregrates, dir) --ret
 
 	if objects["tile"][tilemap(x, y)] and (objects["tile"][tilemap(x, y)].slant or objects["tile"][tilemap(x, y)].slab) then
 		if portalcheck then
-			return false, 1
+			return false, map[x][y][1]
 		else
-			return true, 1
+			return true, map[x][y][1]
 		end
 	end
 	
@@ -6453,7 +6453,7 @@ function traceline(sourcex, sourcey, radians, reportal)
 		end
 
 		if objects["tile"][tileposition] then
-			if objects["tile"][tileposition].slant or objects["tile"][tileposition].slab then
+			if (objects["tile"][tileposition].slant or objects["tile"][tileposition].slab) and (not tilequads[tileno].grate) then
 				return false, false, false, false, x, y
 			end
 		end
