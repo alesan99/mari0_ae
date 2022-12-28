@@ -293,6 +293,11 @@ function blocktogglebutton:changeblocks(b)
 				w:change()
 			end
 		end
+		for j, w in pairs(tracks) do
+			if w.switch and w.color == self.color then
+				w:change()
+			end
+		end
 		if self.t == "big" then
 			solidblockperma[self.color] = not solidblockperma[self.color]
 		end
@@ -300,6 +305,16 @@ function blocktogglebutton:changeblocks(b)
 			local t = animationswitchtriggerfuncs[i]
 			if tonumber((t[2] or 0)) and tonumber((t[2] or 0)) == self.color then
 				t[1]:trigger()
+			end
+		end
+		for j, w in pairs(objects["flipblock"]) do
+			if w.t == "switchblock" and w.color == self.color then
+				w.on = not w.on
+				if self.on then
+					w.quad = flipblockquad[self.color][w.quadi]
+				else
+					w.quad = flipblockquad[self.color][w.quadi+2]
+				end
 			end
 		end
 	end

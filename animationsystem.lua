@@ -9,11 +9,18 @@ function animationsystem_load()
 	animationschar = {}
 	
 	if not dcplaying then
-		local dir = love.filesystem.getDirectoryItems(mappackfolder .. "/" .. mappack .. "/animations")
-		
-		for i = 1, #dir do
-			if string.sub(dir[i], -4) == "json" then
-				table.insert(animations, animation:new(mappackfolder .. "/" .. mappack .. "/animations/" .. dir[i], dir[i]))
+		local fl = love.filesystem.getDirectoryItems(mappackfolder .. "/" .. mappack .. "/animations")
+		for i = 1, #fl do
+			if love.filesystem.isDirectory(mappackfolder .. "/" .. mappack .. "/animations/" .. fl[i]) then
+				--load animations from folder
+				local fl2 = love.filesystem.getDirectoryItems(mappackfolder .. "/" .. mappack .. "/animations/" .. fl[i])
+				for i2 = 1, #fl2 do
+					if string.sub(fl2[i2], -4) == "json" then
+						table.insert(animations, animation:new(mappackfolder .. "/" .. mappack .. "/animations/" .. fl[i] .. "/" .. fl2[i2], fl2[i2]))
+					end
+				end
+			elseif string.sub(fl[i], -4) == "json" then
+				table.insert(animations, animation:new(mappackfolder .. "/" .. mappack .. "/animations/" .. fl[i], fl[i]))
 			end
 		end
 	end

@@ -181,7 +181,7 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	--guielements["portalgundropdown"].dropup = true
 	guielements["widthbutton"] = guielement:new("button", 384-(utf8.len(TEXT["change size"])*8), 200, TEXT["change size"], openchangewidth, 2)
 	guielements["savebutton"] = guielement:new("button", 10, 200, TEXT["save"], function() savelevel(); levelmodified = false end, 2)
-	guielements["menubutton"] = guielement:new("button", guielements["savebutton"].x+guielements["savebutton"].width+12, 200, TEXT["exit"], menu_load, 2)
+	guielements["menubutton"] = guielement:new("button", guielements["savebutton"].x+guielements["savebutton"].width+12, 200, TEXT["exit"], function() openconfirmmenu("exit") end, 2)
 	guielements["testbutton"] = guielement:new("button", guielements["menubutton"].x+guielements["menubutton"].width+12, 200, TEXT["test level"], test_level, 2)
 	guielements["testbuttonplayer"] = guielement:new("button", guielements["testbutton"].x+guielements["testbutton"].width+12, 200, TEXT["quick test"], function() test_level(objects["player"][1].x, objects["player"][1].y) end, 2)
 	guielements["savebutton"].bordercolor = {255, 0, 0}
@@ -447,6 +447,9 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	guielements["savesettings"] = guielement:new("button", 5, 203, TEXT["save settings"], savesettings, 2)
 	guielements["savesettings"].bordercolor = {255, 0, 0}
 	guielements["savesettings"].bordercolorhigh = {255, 127, 127}
+	
+	confirmmenuopen = false
+	confirmmenuguisave = false
 	
 	--MISC
 	editortilemousescroll = false
@@ -3171,6 +3174,21 @@ function editor_draw()
 				end
 			end
 		end
+		
+		if confirmmenuopen then
+			love.graphics.setColor(0,0,0,200)
+			love.graphics.rectangle("fill", 0, 0, width*16*scale, height*16*scale)
+			love.graphics.setColor(0,0,0)
+			love.graphics.rectangle("fill", 69*scale, 71*scale, 262*scale, 82*scale)
+			love.graphics.setColor(255,255,255)
+			drawrectangle(70, 72, 260, 80)
+
+			properprintF(TEXT["are you sure?"], (200-utf8.len(TEXT["are you sure?"])*4)*scale, 80*scale)
+			properprintF(TEXT["unsaved changes will be lost!"], (200-utf8.len(TEXT["unsaved changes will be lost!"])*4)*scale, 92*scale)
+			guielements["confirmsave"]:draw()
+			guielements["confirmexit"]:draw()
+			--guielements["confirmcancel"]:draw()
+		end
 	end
 end
 
@@ -3610,6 +3628,53 @@ function nothingtab()
 	end
 end
 
+function openconfirmmenu(menutype, args)
+	if noExitConfirmation or love.keyboard.isDown("lshift") or levelmodified ~= true then
+		if menutype == "exit" then
+			menu_load()
+		elseif menutype == "maps" then
+			mapnumberclick(unpack(args))
+		end
+		return
+	end
+
+	confirmmenuopen = true
+	confirmmenuguisave = {}
+	for i, v in pairs(guielements) do
+		if v.active then
+			table.insert(confirmmenuguisave, v)
+			v.active = false
+		end
+	end
+
+	if menutype == "exit" then
+		guielements["confirmsave"] = guielement:new("button", width*8, 112, TEXT["save and exit"], function() savelevel(); menu_load() end, 2)
+		guielements["confirmexit"] = guielement:new("button", width*8, 129, TEXT["exit"], menu_load, 2)
+	elseif menutype == "maps" then
+		guielements["confirmsave"] = guielement:new("button", width*8, 112, TEXT["save and continue"], function() savelevel(); mapnumberclick(unpack(args)) end, 2)
+		guielements["confirmexit"] = guielement:new("button", width*8, 129, TEXT["continue"], function() mapnumberclick(unpack(args)) end, 2)
+	end
+	--guielements["confirmcancel"] = guielement:new("button", width*8, 136, TEXT["cancel"], closeconfirmmenu, 2)
+
+	guielements["confirmsave"].x = guielements["confirmsave"].x - (guielements["confirmsave"].width / 2) - 3
+	guielements["confirmexit"].x = guielements["confirmexit"].x - (guielements["confirmexit"].width / 2) - 3
+	--guielements["confirmcancel"].x = guielements["confirmcancel"].x - (guielements["confirmcancel"].width / 2) - 3
+	guielements["confirmsave"].bordercolor = {255, 0, 0}
+	guielements["confirmsave"].bordercolorhigh = {255, 127, 127}
+end
+
+function closeconfirmmenu()
+	confirmmenuopen = false
+	for i, v in pairs(confirmmenuguisave) do
+		v.active = true
+	end
+	confirmmenuguisave = false
+
+	guielements["confirmsave"] = nil
+	guielements["confirmexit"] = nil
+	--guielements["confirmcancel"] = nil
+end
+
 function endingtextcolorleft()
 	if textcolorl == "red" then
 		textcolorl = "white"
@@ -3905,7 +3970,7 @@ function openchangewidth()
 	guielements["maprightleft"].active = true
 	guielements["maprightright"].active = true
 	guielements["mapwidthapply"].active = true
-	guielements["mapwidthcancel"].active = true
+	--guielements["mapwidthcancel"].active = true
 
 	changemapwidthmenu = true
 	newmapwidth = mapwidth
@@ -4308,7 +4373,7 @@ function placetile(x, y, tilei)
 		local t = map[cox][coy]
 		--update track previews
 		local queuetrackpreview
-		if trackpreviews and map[cox][coy][2] and entityquads[map[cox][coy][2]] and entityquads[map[cox][coy][2]].t == "track" then
+		if trackpreviews and map[cox][coy][2] and entityquads[map[cox][coy][2]] and (entityquads[map[cox][coy][2]].t == "track" or entityquads[map[cox][coy][2]].t == "trackswitch") then
 			queuetrackpreview = true
 		end
 		if entityquads[currenttile] and entityquads[currenttile].t == "remove" then --removing tile
@@ -4583,9 +4648,9 @@ function createlevelbuttons(i)
 		for k = 0, mappacklevels[i][j] do --sublevel
 			local name = i .. "-" .. j .. "_" .. k
 			if k == 0 then
-				guielements[name] = guielement:new("button", 104, 20+((j-1)*39), TEXT["level "] .. j, mapnumberclick, 0, {i, j, k}, 1.8, 71, true)
+				guielements[name] = guielement:new("button", 104, 20+((j-1)*39), TEXT["level "] .. j, function() openconfirmmenu("maps", {i, j, k}) end, 0, nil, 1.8, 71, true)
 			else
-				guielements[name] = guielement:new("button", 134+((k-1)*19), 41+((j-1)*39), k, mapnumberclick, 0, {i, j, k}, 1.6, 15, true)
+				guielements[name] = guielement:new("button", 134+((k-1)*19), 41+((j-1)*39), k, function() openconfirmmenu("maps", {i, j, k}) end, 0, nil, 1.6, 15, true)
 			end
 			
 			local s = i .. "-" .. j
@@ -5453,7 +5518,7 @@ function openrightclickmenu(x, y, tileX, tileY)
 		if v.rightclickmenutable then
 			rightclickmenu.trustWhatStartWasSetAs = true
 		end
-elseif tablecontains(customenemies, r[2]) and enemiesdata[r[2]] and enemiesdata[r[2]].rightclick then
+	elseif tablecontains(customenemies, r[2]) and enemiesdata[r[2]] and enemiesdata[r[2]].rightclick then
 		local v = enemiesdata[r[2]]
 		rightclickmenuX = x
 		rightclickmenuY = y
@@ -5468,7 +5533,7 @@ elseif tablecontains(customenemies, r[2]) and enemiesdata[r[2]] and enemiesdata[
 		local default = ""
 		local b = v.rightclickdefaults
 		for i = 1, #b-1 do
-			default = default .. b[i] .. "|"
+			default = default .. tostring(b[i]) .. "|"
 		end
 		default = default .. b[#b]
 		default = default:gsub("-", "B")
@@ -5887,7 +5952,7 @@ function closecustomrc(save)
 						if v.rightclick[i][1] == "dropdown" then
 							local ents =  v.rightclick[i][4]
 							if vt[index] then
-								vt[index] = ents[vt[index]]
+								vt[index] = tostring(ents[vt[index]])
 								vt[index] = vt[index]:gsub("-", "B")
 							end
 						end
@@ -6094,6 +6159,7 @@ function startrctrack(var) --track path
 		y = rightclickmenucoy,--offsety
 		vars = deepcopy(rightclickvalues2),
 		drag = true, --able to add onto path currently?
+		var = var --which entity variable is the path loaded to?
 	}
 	local rcp = rightclicktrack
 
@@ -6156,7 +6222,7 @@ function setrctrack()
 	local r = map[rightclickmenucox][rightclickmenucoy]
 	customrcopen = entitylist[r[2]].t
 	if rightclicktype[customrcopen].trackfunc then
-		rightclicktype[customrcopen].trackfunc(s)
+		rightclicktype[customrcopen].trackfunc(s, rightclicktrack.var)
 	end
 	rightclicktrack = {}
 	closecustomrc(true)
@@ -6319,7 +6385,7 @@ function editor_mousereleased(x, y, button)
 									map[tx][ty] = {d[1] or map[tx][ty][1], d[2] or map[tx][ty][2], d[3] or map[tx][ty][3], back=d["back"], argument=d["argument"]}
 									map[tx][ty]["gels"] = {}
 									--generate new tracks if track moved
-									if d[2] and entityquads[d[2]] and entityquads[d[2]].t == "track" then
+									if d[2] and entityquads[d[2]] and (entityquads[d[2]].t == "track" or entityquads[d[2]].t == "trackswitch") then
 										generatetrackpreviews()
 									end
 								end
@@ -6479,7 +6545,7 @@ function editor_keypressed(key, textinput)
 			editormenuopen = false
 		end
 	end
-	if brushsizetoggle then
+	if brushsizetoggle and (not editormenuopen) then
 		if key == "up" and brushsizey > 1 then
 			brushsizey = brushsizey - 1
 		elseif key == "left" and brushsizex > 1 then
@@ -6525,6 +6591,8 @@ function editor_keypressed(key, textinput)
 			editormenuopen = false
 		elseif changemapwidthmenu then
 			mapwidthcancel()
+		elseif confirmmenuopen then
+			closeconfirmmenu()
 		else
 			if editormenuopen then
 				editorclose()
@@ -6695,7 +6763,7 @@ function editor_keypressed(key, textinput)
 	end
 
 	--quicktest
-	if key == "\\" then
+	if key == "\\" and (not confirmmenuopen) then
 		test_level(objects["player"][1].x, objects["player"][1].y)
 		return
 	end
@@ -7847,28 +7915,38 @@ function generatetrackpreviews()
 			if map[mx][my]["track"] and map[mx][my]["track"].id ~= trackgenerationid then --delete old tracks
 				map[mx][my]["track"] = nil
 			end
-			if map[mx][my][2] and entityquads[map[mx][my][2]].t == "track" then
-				local v = convertr(map[mx][my][3], {"string", "bool"}, true)
-				local trackdata = v[1]
-				if trackdata then
-					local s = trackdata:gsub("n", "-")
-					local s2 = s:split("`")
-					
-					local s3
-					for i = 1, #s2 do
-						s3 = s2[i]:split(":")
-						local x, y = tonumber(s3[1]), tonumber(s3[2])
-						local start, ending, grab = s3[3], s3[4], s3[5]
+			if map[mx][my][2] and (entityquads[map[mx][my][2]].t == "track" or entityquads[map[mx][my][2]].t == "trackswitch") then
+				local v
+				local pathvars = 1 --how many track paths does the entity have?
+				if entityquads[map[mx][my][2]].t == "trackswitch" then 
+					v = convertr(map[mx][my][3], {"string", "string", "bool"}, true)
+					pathvars = 2
+				else
+					v = convertr(map[mx][my][3], {"string", "bool"}, true)
+				end
+				local trackdata
+				for pathvar = 1, pathvars do
+					trackdata = v[pathvar]
+					if trackdata then
+						local s = trackdata:gsub("n", "-")
+						local s2 = s:split("`")
 						
-						if x and y then
-							local tx, ty = mx+x, my+y
-							if ismaptile(tx,ty) then
-								map[tx][ty]["track"] = {start=start, ending=ending, grab=grab, id=trackgenerationid, cox=mx, coy=my}
+						local s3
+						for i = 1, #s2 do
+							s3 = s2[i]:split(":")
+							local x, y = tonumber(s3[1]), tonumber(s3[2])
+							local start, ending, grab = s3[3], s3[4], s3[5]
+							
+							if x and y then
+								local tx, ty = mx+x, my+y
+								if ismaptile(tx,ty) then
+									map[tx][ty]["track"] = {start=start, ending=ending, grab=grab, id=trackgenerationid, cox=mx, coy=my}
+								else
+									break
+								end
 							else
 								break
 							end
-						else
-							break
 						end
 					end
 				end

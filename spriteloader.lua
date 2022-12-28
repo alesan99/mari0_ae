@@ -1317,20 +1317,31 @@ function loadquads(initial)
 	trackquad = {}
 	for x = 1, 8 do
 		trackquad[x] = {}
-		for y = 1, 8 do
+		for y = 1, 2 do
 			trackquad[x][y] = love.graphics.newQuad((x-1)*16, (y-1)*16, 16, 16, 128, 128)
 		end
 	end
+	trackquad["switch"] = {} --track switch lights
+	for color = 1, 4 do --4 colors
+		trackquad["switch"][color] = {}
+		for state = 1, 2 do
+			trackquad["switch"][color][state] = love.graphics.newQuad(((color*2-1)+state-2)*16, (3-1)*16, 16, 16, 128, 128)
+		end
+	end
+	--5th link color
+	trackquad["switch"][5] = {}
+	trackquad["switch"][5][1] = love.graphics.newQuad(((1*2-1)+1-2)*16, (4-1)*16, 16, 16, 128, 128)
+	trackquad["switch"][5][2] = love.graphics.newQuad(((1*2-1)+2-2)*16, (4-1)*16, 16, 16, 128, 128)
 
 	local t = {
 		{"r","l","d","u","rd","lu","ru","ld"},
 		{"o","c"},
-		{},
-		{},
-		{},
-		{},
-		{},
-		{},
+		--{},
+		--{},
+		--{},
+		--{},
+		--{},
+		--{},
 	}
 	trackquadids = {}
 	for y = 1, #t do

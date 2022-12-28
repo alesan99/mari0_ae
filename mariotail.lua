@@ -32,6 +32,8 @@ function mariotail:init(x, y, dir, v)
 	self.gravity = 0
 	self.rotation = 0 --for portals
 	self.player = v
+	
+	self.hits = {}
 end
 
 function mariotail:update(dt)
@@ -92,6 +94,15 @@ function mariotail:hitstuff(a, b)
 			self.playhitsound = false
 		end
 		b:hit("mariotail", self)
+	elseif a == "flipblock" then
+		if not tablecontains(self.hits, b) then
+			b:hit()
+			table.insert(self.hits, b)
+		end
+	elseif a == "powblock" then
+		if not b.explode then
+			b:hit()
+		end
 	elseif mariotailkill[a] then
 		local dir = "right"
 		if b.x+b.width/2 < self.x+self.width/2 then
