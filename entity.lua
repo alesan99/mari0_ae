@@ -1442,7 +1442,16 @@ rightclicktype["timer"] = {
 	format = {
 		{"checkbox", 2, "visible"},
 		"time",
-		{"slider", 1, range = {1, 20, round = 1}},
+		{"input", 1, "1", 5, 5, 1, function(v)
+			if tonumber(v) then
+				rightclickvalues2[1] = math.max(0,v)
+			else
+				rightclickvalues2[1] = 0
+				rightclickobjects[3].value = "0"
+				rightclickobjects[3].textoffset = 0
+			end
+		end},
+		--{"slider", 1, range = {1, 20, round = 1}},
 		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
 	},
 }
