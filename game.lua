@@ -8792,53 +8792,54 @@ function updatecustombackgrounds(dt)
 	end
 end
 
-function rendercustombackground(xsc, ysc, scrollfactor, scrollfactory)
-	local xsc, ysc = xsc or 0, ysc or 0
+function rendercustombackground(xscroll, yscroll, scrollfactor, scrollfactory)
+	local xscroll, yscroll = xscroll or 0, yscroll or 0
+	local oxscroll, oyscroll = xscroll or 0, yscroll or 0
 	local scrollfactor, scrollfactory = scrollfactor or 0, scrollfactory or 0
 	if custombackground then
 		for i = #custombackgroundimg, 1, -1  do
-			local xsc = xsc / (i * scrollfactor + 1)
-			local ysc = ysc / (i * scrollfactory + 1)
+			local xscroll = xscroll / (i * scrollfactor + 1)
+			local yscroll = yscroll / (i * scrollfactory + 1)
 			if reversescrollfactor(scrollfactor) == 1 then
-				xsc = 0
+				xscroll = 0
 			end
 			if reversescrollfactor(scrollfactory) == 1 then
-				ysc = 0
+				yscroll = 0
 			end
 
 			local quad = false
 			if custombackgroundanim[i] then
 				--animate
-				xsc = xsc - custombackgroundanim[i].x
-				ysc = ysc - custombackgroundanim[i].y
+				xscroll = xscroll - custombackgroundanim[i].x
+				yscroll = yscroll - custombackgroundanim[i].y
 				if custombackgroundanim[i].quad then
 					quad = custombackgroundanim[i].quad[custombackgroundanim[i].quadi]
 				end
 				if custombackgroundanim[i].staticx or custombackgroundanim[i].static then
-					xsc = 0
+					xscroll = 0
 				elseif custombackgroundanim[i].clamptolevelwidth then
-					xsc = ((xscroll or 0)/(mapwidth-width+1^-10)) * (custombackgroundwidth[i]-width)
+					xscroll = (oxscroll/math.max(1,mapwidth-width)) * (custombackgroundwidth[i]-width)
 				end
 				if custombackgroundanim[i].staticy or custombackgroundanim[i].static then
-					ysc = 0
+					yscroll = 0
 				elseif custombackgroundanim[i].clamptolevelheight then
-					ysc = ((yscroll or 0)/(mapheight-1-height+1^-10)) * (custombackgroundheight[i]-height)
+					yscroll = (oyscroll/math.max(1,mapheight-1-height)) * (custombackgroundheight[i]-height)
 				end
 			end
 
 			local min = 1
-			if xsc < 0 or ysc < 0 then
+			if xscroll < 0 or yscroll < 0 then
 				min = 0
 			end
 			if custombackgroundquad[i] and not SlowBackgrounds then --optimized static background
-				local x1, y1 = math.floor(xsc*16*scale)/scale, math.floor(ysc*16*scale)/scale
+				local x1, y1 = math.floor(xscroll*16*scale)/scale, math.floor(yscroll*16*scale)/scale
 				local qx, qy, qw, qh, sw, sh = custombackgroundquad[i]:getViewport()
 				custombackgroundquad[i]:setViewport( x1, y1, width*16*screenzoom2, height*16*screenzoom2, sw, sh )
 				love.graphics.draw(custombackgroundimg[i], custombackgroundquad[i], 0, 0, 0, scale, scale)
 			else
 				for y = min, math.ceil(height/custombackgroundheight[i])+1 do
 					for x = min, math.ceil(width/custombackgroundwidth[i])+1 do
-						local x1, y1 = math.floor(((x-1)*custombackgroundwidth[i])*16*scale) - math.floor(math.fmod(xsc, custombackgroundwidth[i])*16*scale), math.floor(((y-1)*custombackgroundheight[i])*16*scale) - math.floor(math.fmod(ysc, custombackgroundheight[i])*16*scale)
+						local x1, y1 = math.floor(((x-1)*custombackgroundwidth[i])*16*scale) - math.floor(math.fmod(xscroll, custombackgroundwidth[i])*16*scale), math.floor(((y-1)*custombackgroundheight[i])*16*scale) - math.floor(math.fmod(yscroll, custombackgroundheight[i])*16*scale)
 						if ondrawscreen(x1, y1, custombackgroundwidth[i]*16*scale, custombackgroundheight[i]*16*scale) then
 							if quad then
 								love.graphics.draw(custombackgroundimg[i], quad, x1, y1, 0, scale, scale)
@@ -8853,47 +8854,48 @@ function rendercustombackground(xsc, ysc, scrollfactor, scrollfactory)
 	end
 end
 
-function rendercustomforeground(xsc, ysc, scrollfactor, scrollfactory)
-	local xsc, ysc = xsc or 0, ysc or 0
+function rendercustomforeground(xscroll, yscroll, scrollfactor, scrollfactory)
+	local xscroll, yscroll = xscroll or 0, yscroll or 0
+	local oxscroll, oyscroll = xscroll or 0, yscroll or 0
 	local scrollfactor2, scrollfactor2y = scrollfactor or 0, scrollfactory or 0
 	if customforeground then
 		for i = #customforegroundimg, 1, -1  do
-			local xsc = xsc * (i*scrollfactor2 + 1)
-			local ysc = ysc * (i*scrollfactor2y + 1)
+			local xscroll = xscroll * (i*scrollfactor2 + 1)
+			local yscroll = yscroll * (i*scrollfactor2y + 1)
 			if reversescrollfactor2(scrollfactor2) == 1 then
-				xsc = 0
+				xscroll = 0
 			end
 			if reversescrollfactor2(scrollfactor2y) == 1 then
-				ysc = 0
+				yscroll = 0
 			end
 
 			local quad = false
 			if customforegroundanim[i] then
 				--animate
-				xsc = xsc - customforegroundanim[i].x
-				ysc = ysc - customforegroundanim[i].y
+				xscroll = xscroll - customforegroundanim[i].x
+				yscroll = yscroll - customforegroundanim[i].y
 				if customforegroundanim[i].quad then
 					quad = customforegroundanim[i].quad[customforegroundanim[i].quadi]
 				end
 				if customforegroundanim[i].staticx or customforegroundanim[i].static then
-					xsc = 0
+					xscroll = 0
 				elseif customforegroundanim[i].clamptolevelwidth then
-					xsc = (xscroll/(mapwidth-width)) * (customforegroundwidth[i]-width)
+					xscroll = (oxscroll/math.max(1,mapwidth-width)) * (customforegroundwidth[i]-width)
 				end
 				if customforegroundanim[i].staticy or customforegroundanim[i].static then
-					ysc = 0
+					yscroll = 0
 				elseif customforegroundanim[i].clamptolevelheight then
-					ysc = (yscroll/(mapheight-1-height)) * (customforegroundheight[i]-height)
+					yscroll = (oyscroll/math.max(1,mapheight-1-height)) * (customforegroundheight[i]-height)
 				end
 			end
 
 			local min = 1
-			if xsc < 0 or ysc < 0 then
+			if xscroll < 0 or yscroll < 0 then
 				min = 0
 			end
 			for y = min, math.ceil(height/customforegroundheight[i])+1 do
 				for x = min, math.ceil(width/customforegroundwidth[i])+1 do
-					local x1, y1 = math.floor(((x-1)*customforegroundwidth[i])*16*scale) - math.floor(math.fmod(xsc, customforegroundwidth[i])*16*scale), math.floor(((y-1)*customforegroundheight[i])*16*scale) - math.floor(math.fmod(ysc, customforegroundheight[i])*16*scale)
+					local x1, y1 = math.floor(((x-1)*customforegroundwidth[i])*16*scale) - math.floor(math.fmod(xscroll, customforegroundwidth[i])*16*scale), math.floor(((y-1)*customforegroundheight[i])*16*scale) - math.floor(math.fmod(yscroll, customforegroundheight[i])*16*scale)
 					--if ondrawscreen(x1, y1, customforegroundwidth[i]*16*scale, customforegroundheight[i]*16*scale) then
 						if quad then
 							love.graphics.draw(customforegroundimg[i], quad, x1, y1, 0, scale, scale)
