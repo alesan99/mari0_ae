@@ -469,7 +469,7 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 		editentities = false
 	end
 	
-	if persistentEditorToolsLocal and (not editorsavedata) then
+	if persistentEditorToolsLocal and (not editorsavedata) and love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/editorsave.json") then
 		local data = love.filesystem.read(mappackfolder .. "/" .. mappack .. "/editorsave.json")
 		editorsavedata = JSON:decode(data)
 	end
@@ -3672,8 +3672,8 @@ function openconfirmmenu(menutype, args)
 	end
 
 	if menutype == "exit" then
-		guielements["confirmsave"] = guielement:new("button", width*8, 112, TEXT["save and exit"], function() savelevel(); menu_load() end, 2)
-		guielements["confirmexit"] = guielement:new("button", width*8, 129, TEXT["exit"], menu_load, 2)
+		guielements["confirmsave"] = guielement:new("button", width*8, 112, TEXT["save and exit"], function() savelevel(); editorsavedata = false; menu_load() end, 2)
+		guielements["confirmexit"] = guielement:new("button", width*8, 129, TEXT["exit"], function() editorsavedata = false; menu_load() end, 2)
 	elseif menutype == "maps" then
 		guielements["confirmsave"] = guielement:new("button", width*8, 112, TEXT["save and continue"], function() savelevel(); mapnumberclick(unpack(args)) end, 2)
 		guielements["confirmexit"] = guielement:new("button", width*8, 129, TEXT["continue"], function() mapnumberclick(unpack(args)) end, 2)
