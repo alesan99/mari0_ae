@@ -483,10 +483,12 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 		customtabstate = e.customtabstate
 		assistmode = e.assistmode
 		backgroundtilemode = e.backgroundtilemode
-		currentanimation = e.currentanimation
+		
+		-- Broken with persistentEditorToolsLocal, no idea why (GUI error line 3911)
+		--[[currentanimation = e.currentanimation
 		if animations[currentanimation] then
 			selectanimation(currentanimation)
-		end
+		end]]
 
 		editorsavedata = false
 	end
@@ -7494,7 +7496,7 @@ function test_level(x, y)
 
 		if persistentEditorToolsLocal then
 			local data = JSON.encode_pretty(editorsavedata)
-			love.filesystem.write(mappackfolder .. "/" .. mappack .. "/editorsavedata.json", data)
+			love.filesystem.write(mappackfolder .. "/" .. mappack .. "/editorsave.json", data)
 		end
 	end
 	
