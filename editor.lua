@@ -18,6 +18,8 @@ local tilehotkeys = {
 local tilehotkeysindex = {}
 local tilehotkeysentityindex = {}
 
+local editorsavedata = false
+
 local trackgenerationid
 
 function editor_load(player_position) --{x, y, xscroll, yscroll}
@@ -466,7 +468,29 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 		editorstate = "main"
 		editentities = false
 	end
+	
+	if persistentEditorToolsLocal and (not editorsavedata) and love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/editorsave.json") then
+		local data = love.filesystem.read(mappackfolder .. "/" .. mappack .. "/editorsave.json")
+		editorsavedata = JSON:decode(data)
+	end
+	if editorsavedata then
+		local e = editorsavedata
+		currenttile = e.currenttile
+		editentities = e.editentities
+		brushsizex = e.brushsizex
+		brushsizey = e.brushsizey
+		editorstate = e.editorstate
+		customtabstate = e.customtabstate
+		assistmode = e.assistmode
+		backgroundtilemode = e.backgroundtilemode
+		currentanimation = e.currentanimation
+		if animations[currentanimation] then
+			selectanimation(currentanimation)
+		end
 
+		editorsavedata = false
+	end
+	
 	if player_position then
 		--test from position
 		objects["player"][1].x = player_position[1]
@@ -3648,8 +3672,8 @@ function openconfirmmenu(menutype, args)
 	end
 
 	if menutype == "exit" then
-		guielements["confirmsave"] = guielement:new("button", width*8, 112, TEXT["save and exit"], function() savelevel(); menu_load() end, 2)
-		guielements["confirmexit"] = guielement:new("button", width*8, 129, TEXT["exit"], menu_load, 2)
+		guielements["confirmsave"] = guielement:new("button", width*8, 112, TEXT["save and exit"], function() savelevel(); editorsavedata = false; menu_load() end, 2)
+		guielements["confirmexit"] = guielement:new("button", width*8, 129, TEXT["exit"], function() editorsavedata = false; menu_load() end, 2)
 	elseif menutype == "maps" then
 		guielements["confirmsave"] = guielement:new("button", width*8, 112, TEXT["save and continue"], function() savelevel(); mapnumberclick(unpack(args)) end, 2)
 		guielements["confirmexit"] = guielement:new("button", width*8, 129, TEXT["continue"], function() mapnumberclick(unpack(args)) end, 2)
@@ -7455,6 +7479,25 @@ function linkbutton()
 end
 
 function test_level(x, y)
+	if persistentEditorTools then
+		editorsavedata = {
+			currenttile = currenttile,
+			editentities = editentities,
+			brushsizex = brushsizex,
+			brushsizey = brushsizey,
+			editorstate = editorstate,
+			customtabstate = customtabstate,
+			assistmode = assistmode,
+			backgroundtilemode = backgroundtilemode,
+			currentanimation = currentanimation
+		}
+
+		if persistentEditorToolsLocal then
+			local data = JSON.encode_pretty(editorsavedata)
+			love.filesystem.write(mappackfolder .. "/" .. mappack .. "/editorsavedata.json", data)
+		end
+	end
+	
 	local targetxscroll, targetyscroll = xscroll, yscroll
 	if levelmodified and onlysaveiflevelmodified then
 		savelevel()
