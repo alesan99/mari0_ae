@@ -3542,6 +3542,11 @@ function loadnitpicks()
 			if love._openConsole then love._openConsole() end
 		end
 		noExitConfirmation = t.noexitconfirmation
+		persistentEditorTools = true
+		if t.persistenteditortools == false then
+			persistentEditorTools = false
+		end
+		persistentEditorToolsLocal = t.persistenteditortoolslocal
 	end
 end
 
