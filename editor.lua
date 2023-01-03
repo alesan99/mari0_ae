@@ -18,6 +18,8 @@ local tilehotkeys = {
 local tilehotkeysindex = {}
 local tilehotkeysentityindex = {}
 
+local editorsavedata = false
+
 local trackgenerationid
 
 function editor_load(player_position) --{x, y, xscroll, yscroll}
@@ -465,6 +467,28 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 		editorclose()
 		editorstate = "main"
 		editentities = false
+	end
+	
+	if persistentEditorTools then
+		if persistentEditorToolsLocal and (not editorsavedata) and love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/editorsave.json") then
+			local data = love.filesystem.read(mappackfolder .. "/" .. mappack .. "/editorsave.json")
+			editorsavedata = JSON:decode(data)
+		end
+		if editorsavedata then
+			local e = editorsavedata
+			currenttile = e.currenttile
+			editentities = e.editentities
+			brushsizex = e.brushsizex
+			brushsizey = e.brushsizey
+			if e.editorstate then
+				editorstate = e.editorstate
+			end
+			customtabstate = e.customtabstate
+			assistmode = e.assistmode
+			backgroundtilemode = e.backgroundtilemode
+			
+			editorsavedata = false
+		end
 	end
 
 	if player_position then
@@ -3631,8 +3655,10 @@ end
 function openconfirmmenu(menutype, args)
 	if noExitConfirmation or love.keyboard.isDown("lshift") or levelmodified ~= true then
 		if menutype == "exit" then
+			createeditorsavedata("menu")
 			menu_load()
 		elseif menutype == "maps" then
+			createeditorsavedata("changelevel")
 			mapnumberclick(unpack(args))
 		end
 		return
@@ -3648,11 +3674,11 @@ function openconfirmmenu(menutype, args)
 	end
 
 	if menutype == "exit" then
-		guielements["confirmsave"] = guielement:new("button", width*8, 112, TEXT["save and exit"], function() savelevel(); menu_load() end, 2)
-		guielements["confirmexit"] = guielement:new("button", width*8, 129, TEXT["exit"], menu_load, 2)
+		guielements["confirmsave"] = guielement:new("button", width*8, 112, TEXT["save and exit"], function() savelevel(); createeditorsavedata("menu"); menu_load() end, 2)
+		guielements["confirmexit"] = guielement:new("button", width*8, 129, TEXT["exit"], function() createeditorsavedata("menu"); menu_load() end, 2)
 	elseif menutype == "maps" then
-		guielements["confirmsave"] = guielement:new("button", width*8, 112, TEXT["save and continue"], function() savelevel(); mapnumberclick(unpack(args)) end, 2)
-		guielements["confirmexit"] = guielement:new("button", width*8, 129, TEXT["continue"], function() mapnumberclick(unpack(args)) end, 2)
+		guielements["confirmsave"] = guielement:new("button", width*8, 112, TEXT["save and continue"], function() savelevel(); createeditorsavedata("changelevel"); mapnumberclick(unpack(args)) end, 2)
+		guielements["confirmexit"] = guielement:new("button", width*8, 129, TEXT["continue"], function() createeditorsavedata("changelevel"); mapnumberclick(unpack(args)) end, 2)
 	end
 	--guielements["confirmcancel"] = guielement:new("button", width*8, 136, TEXT["cancel"], closeconfirmmenu, 2)
 
@@ -3673,6 +3699,32 @@ function closeconfirmmenu()
 	guielements["confirmsave"] = nil
 	guielements["confirmexit"] = nil
 	--guielements["confirmcancel"] = nil
+end
+
+function createeditorsavedata(t) -- "testing", "menu", "changelevel"
+	if (not persistentEditorTools) or (t == "menu" and (not persistentEditorToolsLocal)) then
+		editorsavedata = false
+		return
+	end
+
+	editorsavedata = {
+		currenttile = currenttile,
+		editentities = editentities,
+		brushsizex = brushsizex,
+		brushsizey = brushsizey,
+		customtabstate = customtabstate,
+		assistmode = assistmode,
+		backgroundtilemode = backgroundtilemode
+	}
+	if t == "changelevel" then
+		return
+	end
+
+	editorsavedata["editorstate"] = editorstate
+	if persistentEditorToolsLocal then
+		local data = JSON:encode_pretty(editorsavedata)
+		love.filesystem.write(mappackfolder .. "/" .. mappack .. "/editorsave.json", data)
+	end
 end
 
 function endingtextcolorleft()
@@ -7455,6 +7507,8 @@ function linkbutton()
 end
 
 function test_level(x, y)
+	createeditorsavedata("test")
+	
 	local targetxscroll, targetyscroll = xscroll, yscroll
 	if levelmodified and onlysaveiflevelmodified then
 		savelevel()
