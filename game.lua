@@ -1569,8 +1569,8 @@ function game_draw()
 		love.graphics.setColor(255, 255, 255, 255)
 		--tremoooor!
 		if earthquake > 0 and not pausemenuopen then
-			tremorx = (math.random()-.5)*2*earthquake
-			tremory = (math.random()-.5)*2*earthquake
+			tremorx = (math.random()-.5)*2*earthquake*scale
+			tremory = (math.random()-.5)*2*earthquake*scale
 			
 			love.graphics.translate(round(tremorx), round(tremory))
 		end
