@@ -918,6 +918,21 @@ function animation:update(dt)
 						p.disablejumping = false
 					end
 				end
+			elseif v[1] == "changeportal" then
+				local pstart, pend = 1, players
+				if v[2] ~= "everyone" then
+					pstart, pend = tonumber(string.sub(v[2], -1)), tonumber(string.sub(v[2], -1))
+				end
+				for i = pstart, pend do
+					if objects["player"][i] then
+						local p = objects["player"][i]
+						p.portalgun = (v[3] ~= "none")
+						if p.portalgun and (not p.characterdata.noportalgun) and playertype ~= "classic" and playertype ~= "cappy" then
+							p.portals = v[3]
+							p:updateportalsavailable()
+						end
+					end
+				end
 			elseif v[1] == "triggeranimation" then
 				if animationtriggerfuncs[v[2]] then
 					for i = 1, #animationtriggerfuncs[v[2]] do

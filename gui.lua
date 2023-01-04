@@ -587,16 +587,17 @@ function guielement:draw(a, offx, offy)
 		end
 		local high = self:inhighlight(love.mouse.getPosition())
 	
-		love.graphics.setColor(self.bordercolor)
-		if self.inputting or high then
-			love.graphics.setColor(self.bordercolorhigh)
+		if (not self.justdisplay) or self.inputting or high then
+			love.graphics.setColor(self.bordercolor)
+			if self.inputting or high then
+				love.graphics.setColor(self.bordercolorhigh)
+			end
+			
+			love.graphics.rectangle("fill", self.x*scale, self.y*scale, (3+self.width*8+2*self.spacing)*scale, (1+self.height*10+2*self.spacing)*scale)
+			
+			love.graphics.setColor(self.fillcolor)
+			love.graphics.rectangle("fill", (self.x+1)*scale, (self.y+1)*scale, (1+self.width*8+2*self.spacing)*scale, (-1+self.height*10+2*self.spacing)*scale)
 		end
-		
-		love.graphics.rectangle("fill", self.x*scale, self.y*scale, (3+self.width*8+2*self.spacing)*scale, (1+self.height*10+2*self.spacing)*scale)
-		
-		love.graphics.setColor(self.fillcolor)
-		love.graphics.rectangle("fill", (self.x+1)*scale, (self.y+1)*scale, (1+self.width*8+2*self.spacing)*scale, (-1+self.height*10+2*self.spacing)*scale)
-		
 		love.graphics.setColor(self.textcolor)
 		
 		if self.height == 1 then
@@ -774,6 +775,9 @@ function guielement:click(x, y, button)
 							love.mouse.setCursor(mousecursor_sizewe)
 						end
 					end
+					if self.inputtingfunc then
+						self:inputtingfunc()
+					end
 					if android then
 						love.keyboard.setTextInput(true, self.x*scale, self.y*scale, (3+self.width*8+2)*scale, (1+self.height*10+2)*scale) --[DROID]
 					end
@@ -781,6 +785,9 @@ function guielement:click(x, y, button)
 				else
 					if self.inputting then
 						love.keyboard.setKeyRepeat(false)
+					end
+					if self.uninputtingfunc then
+						self:uninputtingfunc()
 					end
 					self.inputting = false
 					self.highlight = false
