@@ -1127,6 +1127,8 @@ function editor_update(dt)
 	end
 	if musici == 7 and editorstate == "main" and guielements["custommusiciinput"].active == false then
 		guielements["custommusiciinput"].active = true
+	elseif guielements["custommusiciinput"].active == true then
+		guielements["custommusiciinput"].active = false
 	end
 	if editortilemousescroll then
 		editortilemousescrolltimer = editortilemousescrolltimer + dt
