@@ -1819,12 +1819,12 @@ function editor_draw()
 				if tileselection or ctrlpressed or tileselectionmoving then
 					local x1, y1 = x, y+1
 					local x2, y2 = x, y+1
-					if tileselection then
-						x1, y1 = math.min(tileselection[1],tileselection[3]),math.min(tileselection[2],tileselection[4])
-						x2, y2 = math.max(tileselection[1],tileselection[3]),math.max(tileselection[2],tileselection[4])
-					elseif tileselectionmoving then
+					if tileselectionmoving then
 						x1, y1 = x+pastecenter[1], y+pastecenter[2]+1
 						x2, y2 = x+pastecenter[1]+#mtclipboard-1, y+pastecenter[2]+#mtclipboard[1]
+					elseif tileselection then
+						x1, y1 = math.min(tileselection[1],tileselection[3]),math.min(tileselection[2],tileselection[4])
+						x2, y2 = math.max(tileselection[1],tileselection[3]),math.max(tileselection[2],tileselection[4])
 					end
 					x1, y1 = math.max(xscroll-1, x1), math.max(yscroll-1, y1)
 					x2, y2 = math.min(xscroll+width*screenzoom2+1, x2), math.min(yscroll+height*screenzoom2+1, y2)
@@ -5076,7 +5076,6 @@ function editor_mousepressed(x, y, button)
 					pastingtiles = true
 					editentities = false
 					tilesall()
-					resettileselection()
 					tileselectionmoving = true
 					
 					allowdrag = false
@@ -5109,16 +5108,8 @@ function editor_mousepressed(x, y, button)
 										tile1 = false --don't paste empty space
 									end
 									if not backgroundtilemode then
-										if not d[3] then
-											map[tx][ty][1] = tile1 or map[tx][ty][1]
-											map[tx][ty][2] = d[2] or map[tx][ty][2]
-											map[tx][ty]["back"] = d["back"]
-											if map[tx][ty][2] then
-												map[tx][ty]["argument"] = d["argument"]
-											end
-										else
-											map[tx][ty] = {tile1 or map[tx][ty][1], d[2] or map[tx][ty][2], d[3] or map[tx][ty][3], back=d["back"],argument=d["argument"]}
-										end
+										map[tx][ty] = shallowcopy(d)
+										map[tx][ty][1] = tile1 or map[tx][ty][1]
 									end
 									map[tx][ty]["gels"] = {}
 								end
@@ -6428,18 +6419,20 @@ function editor_mousereleased(x, y, button)
 			else
 				if pastingtiles and tileselectionmoving then
 					--PASTE TILES
+					local sx, sy = getMouseTile(x, y+8*screenzoom*scale)
+					sx = sx + pastecenter[1]-1
+					sy = sy + pastecenter[2]-1
 					for i, v in pairs(mtclipboard) do
 						for j, w in pairs(v) do
-							if w[1] == 1 and (not w[2]) and (not w["back"]) and pastemode == 1 then
-								-- nothing
-							else
-								local tx, ty = getMouseTile(x+(i-1 + pastecenter[1])*16*scale, y+(j-1 + pastecenter[2])*16*scale+8*scale)
+							if not (w[1] == 1 and (not w[2]) and (not w["back"]) and pastemode == 1) then
+								tx = sx + i
+								ty = sy + j
 								if ismaptile(tx, ty) then
 									local d = mtclipboard[i][j]
 									currenttile = d[1]
 									backgroundtilemode = false
 									placetile(x+(i-1 + pastecenter[1])*16*scale, y+(j-1 + pastecenter[2])*16*scale)
-									map[tx][ty] = {d[1] or map[tx][ty][1], d[2] or map[tx][ty][2], d[3] or map[tx][ty][3], back=d["back"], argument=d["argument"]}
+									map[tx][ty] = shallowcopy(d)
 									map[tx][ty]["gels"] = {}
 									--generate new tracks if track moved
 									if d[2] and entityquads[d[2]] and (entityquads[d[2]].t == "track" or entityquads[d[2]].t == "trackswitch") then
@@ -6449,7 +6442,23 @@ function editor_mousereleased(x, y, button)
 							end
 						end
 					end
-					local tx, ty = getMouseTile(x, y+8*scale)
+					for x = 1, mapwidth do
+						for y = 1, mapheight do
+							local d = map[x][y]
+							if tablecontains(inputsi, d[2]) then
+								for i = 3, #d do
+									if d[i] == "link" then
+										if inrange(d[i+1], tileselection[1], tileselection[3], true) and inrange(d[i+2], tileselection[2], tileselection[4], true) then
+											d[i+1] = d[i+1] + (sx-tileselection[1])+1
+											d[i+2] = d[i+2] + (sy-tileselection[2])+1
+										end
+									end
+								end
+								
+							end
+						end
+					end
+					local tx, ty = getMouseTile(x, y+8*screenzoom*scale)
 					tileselection = {tx+math.floor(pastecenter[1]), ty+math.floor(pastecenter[2]), tx+math.floor(pastecenter[1])+#mtclipboard-1, ty+math.floor(pastecenter[2])+#mtclipboard[1]-1}
 					tileselection.finished = true
 					pastingtiles = false
@@ -6903,7 +6912,7 @@ function getTilesSelection()
 	for x = math.max(1,tileselection[1]), math.min(tileselection[3],mapwidth) do
 		tx = {}
 		for y = math.max(1, tileselection[2]), math.min(tileselection[4],mapheight) do
-			table.insert(tx, {map[x][y][1],map[x][y][2],map[x][y][3],back=map[x][y]["back"],argument=map[x][y]["argument"]})
+			table.insert(tx, shallowcopy(map[x][y]))
 		end
 		table.insert(objecttable, tx)
 	end
