@@ -7289,7 +7289,7 @@ function mario:die(how)
 		return
 	end
 	
-	if how ~= "pit" and how ~= "time" and how ~= "lava" and how ~= "killscript" then
+	if how ~= "pit" and how ~= "time" and how ~= "lava" and how ~= "killscript" and not self.dead then
 		animationsystem_playerhurttrigger(self.playernumber)
 
 		if how == "Laser" then
