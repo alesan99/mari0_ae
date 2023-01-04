@@ -179,7 +179,7 @@ function drawplayercard(x, y, colortable, hattable, nick, ping, focus, character
 				love.graphics.setColor(255, 255, 255)
 			end
 			if mariocharacter[skinningplayer] then
-				love.graphics.draw(v["animations"][i], v["small"]["run"][3][runanimationframe], (x+4+v.smalloffsetX*2)*scale, (y+26-v.smalloffsetY*2)*scale, 0, scale*2, scale*2, v.smallquadcenterX, v.smallquadcenterY)
+				love.graphics.draw(v["animations"][i], v["small"]["run"][3][math.min(#v["small"]["run"],runanimationframe)], (x+4+v.smalloffsetX*2)*scale, (y+26-v.smalloffsetY*2)*scale, 0, scale*2, scale*2, v.smallquadcenterX, v.smallquadcenterY)
 			end
 		end
 		
