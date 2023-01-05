@@ -323,12 +323,18 @@ function guielement:draw(a, offx, offy)
 		love.graphics.setColor(0, 0, 0)
 		love.graphics.rectangle("fill", (self.x+1)*scale, (self.y+1)*scale, (1+self.width*8)*scale, 9*scale)
 		
+		local s = self.entries[self.var]
 		love.graphics.setColor(255, 255, 255)
 		if self.extended then
 			love.graphics.setColor(127, 127, 127)
+		elseif self.coloredtext then
+			if s == "black" then
+				love.graphics.setColor(80,80,80)
+			else
+				love.graphics.setColor(textcolors[s])
+			end
 		end
 			
-		local s = self.entries[self.var]
 		if self.displayentries then s = self.displayentries[self.var];
 			if s and s:sub(1, 6) == "_ENEMY" then s = " " .. s:sub(7, -1); love.graphics.draw(customenemyiconimg, (self.x+1)*scale, (self.y+2)*scale, 0, scale, scale) end end
 		if type(s) == "string" then s = s:sub(1, self.width) end
