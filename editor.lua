@@ -5065,29 +5065,19 @@ function editor_mousepressed(x, y, button)
 					if tablecontains( inputsi, r[2] ) then
 						--linktoolX, linktoolY = tileX, tileY
 						--syke, just open up the right click menu
-						--openrightclickmenu(x, y, tileX, tileY)
-						--double syke, please just link quickly
-
-						if not r[2] then
-							return
-						end
-						levelmodified = true
-						rightclickmenucox = tileX
-						rightclickmenucoy = tileY
-						customrcopen = false
-		
-						local h = rightclicktype[entitylist[r[2]].t].format
-						local l = {true}
-						for i = 1, #h do
-							if h[i][1] == "button" then
-								--print(tostring(h[i][3][2]))
-								if h[i][3][2] == startrclink then
-									l = h[i][3][3] or {}
-									break
-								end
+						openrightclickmenu(x, y, tileX, tileY)
+						--then automatically click the link button ONLY if there's just one
+						local count = 0
+						local button
+						for i, b in ipairs(rightclickobjects) do
+							if b and b.type == "button" and b.func == startrclink then
+								count = count + 1
+								button = b
 							end
 						end
-						startrclink(unpack(l))
+						if count == 1 and button then
+							startrclink(unpack(button.arguments))
+						end
 					end
 				end
 			elseif editorstate == "selectiontool" then
