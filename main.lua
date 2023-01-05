@@ -47,7 +47,7 @@
 	-fußmatte for helping create a TON of new characters for the font and Esperanto Translation
 	-HugoBDesigner for Portugese-Br translation
 	-Los for Russian Translation
-	-William and Kant for contributions on github
+	-WilliamFr0g and Kant for contributions on github
 	-----------------------------------------------------------------------------
 ]]
 
@@ -3434,8 +3434,7 @@ function loadnitpicks()
 			t[i:lower()] = v
 		end
 
-		--this probably doesn't work
-		dropshadow = t.dropshadow
+		ForceDropShadow = t.dropshadow or t.forcedropshadow
 		AutoAssistMode = t.assistmode
 		--also available in settings.txt
 		if t.fourbythree then
@@ -3509,12 +3508,12 @@ function loadnitpicks()
 			LoveConsole = true
 			if love._openConsole then love._openConsole() end
 		end
-		noExitConfirmation = t.noexitconfirmation
-		persistentEditorTools = true
+		NoExitConfirmation = t.noexitconfirmation
+		PersistentEditorTools = true
 		if t.persistenteditortools == false then
-			persistentEditorTools = false
+			PersistentEditorTools = false
 		end
-		persistentEditorToolsLocal = t.persistenteditortoolslocal
+		PersistentEditorToolsLocal = t.persistenteditortoolslocal
 	end
 end
 

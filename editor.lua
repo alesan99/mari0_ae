@@ -481,8 +481,8 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 		editentities = false
 	end
 	
-	if persistentEditorTools then
-		if persistentEditorToolsLocal and (not editorsavedata) and love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/editorsave.json") then
+	if PersistentEditorTools then
+		if PersistentEditorToolsLocal and (not editorsavedata) and love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/editorsave.json") then
 			local data = love.filesystem.read(mappackfolder .. "/" .. mappack .. "/editorsave.json")
 			editorsavedata = JSON:decode(data)
 		end
@@ -3682,7 +3682,7 @@ function changeendingtextcolor(var)
 end
 
 function openconfirmmenu(menutype, args)
-	if noExitConfirmation or love.keyboard.isDown("lshift") or levelmodified ~= true then
+	if NoExitConfirmation or love.keyboard.isDown("lshift") or levelmodified ~= true then
 		if menutype == "exit" then
 			createeditorsavedata("menu")
 			menu_load()
@@ -3731,7 +3731,7 @@ function closeconfirmmenu()
 end
 
 function createeditorsavedata(t) -- "testing", "menu", "changelevel"
-	if (not persistentEditorTools) or (t == "menu" and (not persistentEditorToolsLocal)) then
+	if (not PersistentEditorTools) or (t == "menu" and (not PersistentEditorToolsLocal)) then
 		editorsavedata = false
 		return
 	end
@@ -3750,7 +3750,7 @@ function createeditorsavedata(t) -- "testing", "menu", "changelevel"
 	end
 
 	editorsavedata["editorstate"] = editorstate
-	if persistentEditorToolsLocal then
+	if PersistentEditorToolsLocal then
 		local data = JSON:encode_pretty(editorsavedata)
 		love.filesystem.write(mappackfolder .. "/" .. mappack .. "/editorsave.json", data)
 	end
