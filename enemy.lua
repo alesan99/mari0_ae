@@ -2520,6 +2520,12 @@ function enemy:customtimeraction(action, arg, arg2)
 					self.trackcontroller.travel = "forward"
 				end
 			end
+		elseif action == "stopsound" then
+			if self.sound and arg == self.t then
+				self.sound:stop()
+			elseif _G[arg .. "sound"] then
+				_G[arg .. "sound"]:stop()
+			end
 		end
 		if string.sub(action, 0, 7) == "reverse" then
 			local parameter = string.sub(action, 8, string.len(action))
@@ -3488,6 +3494,14 @@ function enemy:output(transformed)
 		end
 		if self.transformenemyanimationondeath then
 			transformenemyanimation(self.transformenemyanimationondeath)
+		end
+		if self.stopsoundondeath then
+			local sound = self.stopsoundondeath
+			if self.sound and (sound == self.t or sound == true) then
+				self.sound:stop()
+			elseif _G[sound .. "sound"] then
+				_G[sound .. "sound"]:stop()
+			end
 		end
 	end
 end
