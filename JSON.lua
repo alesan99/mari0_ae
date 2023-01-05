@@ -464,6 +464,10 @@ local function grok_array(self, text, start, etc)
 
    local text_len = text:len()
    while i <= text_len do
+	  --AE Addition
+	  if text:sub(i,i) == ']' then
+		return VALUE, i + 1
+	  end
       local val, new_i = grok_one(self, text, i)
 
       table.insert(VALUE, val)

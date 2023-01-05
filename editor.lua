@@ -18,6 +18,8 @@ local tilehotkeys = {
 local tilehotkeysindex = {}
 local tilehotkeysentityindex = {}
 
+local editorsavedata = false
+
 local trackgenerationid
 
 function editor_load(player_position) --{x, y, xscroll, yscroll}
@@ -83,6 +85,7 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	levelmodified = false
 	
 	currentanimation = 1
+	animationguilines = {}
 	
 	tileselection = false
 	tileselectionants = 0
@@ -169,19 +172,26 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	guielements["musicdropdown"] = guielement:new("dropdown", 17, 102, 15, changemusic, musici, unpack(editormusictable))
 	guielements["custommusiciinput"] = guielement:new("input", 150, 102, 2, changemusic, custommusici, 2, 1, "music", 0)
 	guielements["spritesetdropdown"] = guielement:new("dropdown", 17, 126, 11, changespriteset, spriteset, "overworld", "underground", "castle", "underwater")
+
 	guielements["timelimitdecrease"] = guielement:new("button", 17, 152, "{", decreasetimelimit, 0)
-	guielements["timelimitincrease"] = guielement:new("button", 31 + string.len(mariotimelimit)*8, 152, "}", increasetimelimit, 0)
 	guielements["timelimitdecrease"].autorepeat = true
 	guielements["timelimitdecrease"].repeatwait = 0.3
 	guielements["timelimitdecrease"].repeatdelay = 0.08
+	guielements["timelimitinput"] = guielement:new("input", 29, 152, string.len(mariotimelimit), changetimelimit, mariotimelimit, 6, nil, nil, 0)
+	guielements["timelimitinput"].justdisplay = true
+	guielements["timelimitinput"].textoffset = 0
+	guielements["timelimitinput"].inputtingfunc = changetimelimitinputting
+	guielements["timelimitinput"].uninputtingfunc = changetimelimituninputting
+	guielements["timelimitincrease"] = guielement:new("button", 33 + string.len(mariotimelimit)*8, 152, "}", increasetimelimit, 0)
 	guielements["timelimitincrease"].autorepeat = true
 	guielements["timelimitincrease"].repeatwait = 0.3
 	guielements["timelimitincrease"].repeatdelay = 0.08
+	
 	guielements["portalgundropdown"] = guielement:new("dropdown", 17, 175, 11, changeportalgun, portalguni, "normal", "none", "1 only", "2 only", "gel")
 	--guielements["portalgundropdown"].dropup = true
 	guielements["widthbutton"] = guielement:new("button", 384-(utf8.len(TEXT["change size"])*8), 200, TEXT["change size"], openchangewidth, 2)
 	guielements["savebutton"] = guielement:new("button", 10, 200, TEXT["save"], function() savelevel(); levelmodified = false end, 2)
-	guielements["menubutton"] = guielement:new("button", guielements["savebutton"].x+guielements["savebutton"].width+12, 200, TEXT["exit"], menu_load, 2)
+	guielements["menubutton"] = guielement:new("button", guielements["savebutton"].x+guielements["savebutton"].width+12, 200, TEXT["exit"], function() openconfirmmenu("exit") end, 2)
 	guielements["testbutton"] = guielement:new("button", guielements["menubutton"].x+guielements["menubutton"].width+12, 200, TEXT["test level"], test_level, 2)
 	guielements["testbuttonplayer"] = guielement:new("button", guielements["testbutton"].x+guielements["testbutton"].width+12, 200, TEXT["quick test"], function() test_level(objects["player"][1].x, objects["player"][1].y) end, 2)
 	guielements["savebutton"].bordercolor = {255, 0, 0}
@@ -452,6 +462,9 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	guielements["savesettings"].bordercolor = {255, 0, 0}
 	guielements["savesettings"].bordercolorhigh = {255, 127, 127}
 	
+	confirmmenuopen = false
+	confirmmenuguisave = false
+	
 	--MISC
 	editortilemousescroll = false
 	editortilemousescrolltimer = 0
@@ -466,6 +479,28 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 		editorclose()
 		editorstate = "main"
 		editentities = false
+	end
+	
+	if persistentEditorTools then
+		if persistentEditorToolsLocal and (not editorsavedata) and love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/editorsave.json") then
+			local data = love.filesystem.read(mappackfolder .. "/" .. mappack .. "/editorsave.json")
+			editorsavedata = JSON:decode(data)
+		end
+		if editorsavedata then
+			local e = editorsavedata
+			currenttile = e.currenttile
+			editentities = e.editentities
+			brushsizex = e.brushsizex
+			brushsizey = e.brushsizey
+			if e.editorstate then
+				editorstate = e.editorstate
+			end
+			customtabstate = e.customtabstate
+			assistmode = e.assistmode
+			backgroundtilemode = e.backgroundtilemode
+			
+			editorsavedata = false
+		end
 	end
 
 	if player_position then
@@ -492,42 +527,44 @@ function editor_update(dt)
 	oldlevelmodified = levelmodified]]
 	if editormenuopen == false or minimapmoving then
 		--key scroll
-		if (not rightclickmenuopen) or customrcopen == "region" or customrcopen == "link" or customrcopen == "path" or customrcopen == "trackpath" or minimapmoving then
-			if (love.keyboard.isDown("left") or (android and leftkey(1) and not autoscroll)) and not brushsizetoggle then
-				autoscroll = false
-				guielements["autoscrollcheckbox"].var = autoscroll
-				splitxscroll[1] = splitxscroll[1] - 30*gdt
-				if splitxscroll[1] < 0 then
-					splitxscroll[1] = 0
-				end
-				generatespritebatch()
-			elseif (love.keyboard.isDown("right") or (android and rightkey(1) and not autoscroll)) and not brushsizetoggle then
-				autoscroll = false
-				guielements["autoscrollcheckbox"].var = autoscroll
-				splitxscroll[1] = splitxscroll[1] + 30*gdt
-				if splitxscroll[1] > mapwidth-width then
-					splitxscroll[1] = mapwidth-width
-				end
-				generatespritebatch()
+		local speed = 30
+		if love.keyboard.isDown("lalt") then
+			speed = 70
+		end
+		if (love.keyboard.isDown("left") or (android and leftkey(1) and not autoscroll)) and (rightclickmenuopen or (not brushsizetoggle)) then
+			autoscroll = false
+			guielements["autoscrollcheckbox"].var = autoscroll
+			splitxscroll[1] = splitxscroll[1] - speed*gdt
+			if splitxscroll[1] < 0 then
+				splitxscroll[1] = 0
 			end
-			if mapheight ~= 15 and not brushsizetoggle then
-				if (love.keyboard.isDown("up") or (android and upkey(1) and not autoscroll)) then
-					autoscroll = false
-					guielements["autoscrollcheckbox"].var = autoscroll
-					splityscroll[1] = splityscroll[1] - 30*gdt
-					if splityscroll[1] < 0 then
-						splityscroll[1] = 0
-					end
-					generatespritebatch()
-				elseif (love.keyboard.isDown("down") or (android and downkey(1) and not autoscroll)) then
-					autoscroll = false
-					guielements["autoscrollcheckbox"].var = autoscroll
-					splityscroll[1] = splityscroll[1] + 30*gdt
-					if splityscroll[1] >= mapheight-height-1 then
-						splityscroll[1] = mapheight-height-1
-					end
-					generatespritebatch()
+			generatespritebatch()
+		elseif (love.keyboard.isDown("right") or (android and rightkey(1) and not autoscroll)) and (rightclickmenuopen or (not brushsizetoggle)) then
+			autoscroll = false
+			guielements["autoscrollcheckbox"].var = autoscroll
+			splitxscroll[1] = splitxscroll[1] + speed*gdt
+			if splitxscroll[1] > mapwidth-width then
+				splitxscroll[1] = mapwidth-width
+			end
+			generatespritebatch()
+		end
+		if mapheight ~= 15 and (rightclickmenuopen or (not brushsizetoggle)) then
+			if (love.keyboard.isDown("up") or (android and upkey(1) and not autoscroll)) then
+				autoscroll = false
+				guielements["autoscrollcheckbox"].var = autoscroll
+				splityscroll[1] = splityscroll[1] - speed*gdt
+				if splityscroll[1] < 0 then
+					splityscroll[1] = 0
 				end
+				generatespritebatch()
+			elseif (love.keyboard.isDown("down") or (android and downkey(1) and not autoscroll)) then
+				autoscroll = false
+				guielements["autoscrollcheckbox"].var = autoscroll
+				splityscroll[1] = splityscroll[1] + speed*gdt
+				if splityscroll[1] >= mapheight-height-1 then
+					splityscroll[1] = mapheight-height-1
+				end
+				generatespritebatch()
 			end
 		end
 	end
@@ -1103,6 +1140,8 @@ function editor_update(dt)
 	end
 	if musici == 7 and editorstate == "main" and guielements["custommusiciinput"].active == false then
 		guielements["custommusiciinput"].active = true
+	elseif guielements["custommusiciinput"].active == true then
+		guielements["custommusiciinput"].active = false
 	end
 	if editortilemousescroll then
 		editortilemousescrolltimer = editortilemousescrolltimer + dt
@@ -1793,12 +1832,12 @@ function editor_draw()
 				if tileselection or ctrlpressed or tileselectionmoving then
 					local x1, y1 = x, y+1
 					local x2, y2 = x, y+1
-					if tileselection then
-						x1, y1 = math.min(tileselection[1],tileselection[3]),math.min(tileselection[2],tileselection[4])
-						x2, y2 = math.max(tileselection[1],tileselection[3]),math.max(tileselection[2],tileselection[4])
-					elseif tileselectionmoving then
+					if tileselectionmoving then
 						x1, y1 = x+pastecenter[1], y+pastecenter[2]+1
 						x2, y2 = x+pastecenter[1]+#mtclipboard-1, y+pastecenter[2]+#mtclipboard[1]
+					elseif tileselection then
+						x1, y1 = math.min(tileselection[1],tileselection[3]),math.min(tileselection[2],tileselection[4])
+						x2, y2 = math.max(tileselection[1],tileselection[3]),math.max(tileselection[2],tileselection[4])
 					end
 					x1, y1 = math.max(xscroll-1, x1), math.max(yscroll-1, y1)
 					x2, y2 = math.min(xscroll+width*screenzoom2+1, x2), math.min(yscroll+height*screenzoom2+1, y2)
@@ -2506,7 +2545,8 @@ function editor_draw()
 				guielements["testbuttonplayer"]:draw()
 				guielements["widthbutton"]:draw()
 				guielements["timelimitdecrease"]:draw()
-				properprint(mariotimelimit, 29*scale, 154*scale)
+				guielements["timelimitinput"]:draw()
+				--properprint(mariotimelimit, 29*scale, 154*scale)
 				guielements["timelimitincrease"]:draw()
 				properprintF(TEXT["timelimit"], 8*scale, 142*scale)
 				
@@ -3177,6 +3217,21 @@ function editor_draw()
 				end
 			end
 		end
+		
+		if confirmmenuopen then
+			love.graphics.setColor(0,0,0,200)
+			love.graphics.rectangle("fill", 0, 0, width*16*scale, height*16*scale)
+			love.graphics.setColor(0,0,0)
+			love.graphics.rectangle("fill", 69*scale, 71*scale, 262*scale, 82*scale)
+			love.graphics.setColor(255,255,255)
+			drawrectangle(70, 72, 260, 80)
+
+			properprintF(TEXT["are you sure?"], (200-utf8.len(TEXT["are you sure?"])*4)*scale, 80*scale)
+			properprintF(TEXT["unsaved changes will be lost!"], (200-utf8.len(TEXT["unsaved changes will be lost!"])*4)*scale, 92*scale)
+			guielements["confirmsave"]:draw()
+			guielements["confirmexit"]:draw()
+			--guielements["confirmcancel"]:draw()
+		end
 	end
 end
 
@@ -3222,6 +3277,7 @@ function maintab()
 	end
 	guielements["spritesetdropdown"].active = true
 	guielements["timelimitdecrease"].active = true
+	guielements["timelimitinput"].active = true
 	guielements["timelimitincrease"].active = true
 	guielements["portalgundropdown"].active = true
 	guielements["savebutton"].active = true
@@ -3605,7 +3661,9 @@ function animationstab()
 end
 
 function fromanimationstab()
-	saveanimation()
+	if #animationguilines > 0 then
+		saveanimation()
+	end
 end
 
 function nothingtab()
@@ -3622,6 +3680,82 @@ function changeendingtextcolor(var)
 	textcolorl = textcolorsnames[var]
 	guielements["endingcolor"].var = var
 end
+
+function openconfirmmenu(menutype, args)
+	if noExitConfirmation or love.keyboard.isDown("lshift") or levelmodified ~= true then
+		if menutype == "exit" then
+			createeditorsavedata("menu")
+			menu_load()
+		elseif menutype == "maps" then
+			createeditorsavedata("changelevel")
+			mapnumberclick(unpack(args))
+		end
+		return
+	end
+
+	confirmmenuopen = true
+	confirmmenuguisave = {}
+	for i, v in pairs(guielements) do
+		if v.active then
+			table.insert(confirmmenuguisave, v)
+			v.active = false
+		end
+	end
+
+	if menutype == "exit" then
+		guielements["confirmsave"] = guielement:new("button", width*8, 112, TEXT["save and exit"], function() savelevel(); createeditorsavedata("menu"); menu_load() end, 2)
+		guielements["confirmexit"] = guielement:new("button", width*8, 129, TEXT["exit"], function() createeditorsavedata("menu"); menu_load() end, 2)
+	elseif menutype == "maps" then
+		guielements["confirmsave"] = guielement:new("button", width*8, 112, TEXT["save and continue"], function() savelevel(); createeditorsavedata("changelevel"); mapnumberclick(unpack(args)) end, 2)
+		guielements["confirmexit"] = guielement:new("button", width*8, 129, TEXT["continue"], function() createeditorsavedata("changelevel"); mapnumberclick(unpack(args)) end, 2)
+	end
+	--guielements["confirmcancel"] = guielement:new("button", width*8, 136, TEXT["cancel"], closeconfirmmenu, 2)
+
+	guielements["confirmsave"].x = guielements["confirmsave"].x - (guielements["confirmsave"].width / 2) - 3
+	guielements["confirmexit"].x = guielements["confirmexit"].x - (guielements["confirmexit"].width / 2) - 3
+	--guielements["confirmcancel"].x = guielements["confirmcancel"].x - (guielements["confirmcancel"].width / 2) - 3
+	guielements["confirmsave"].bordercolor = {255, 0, 0}
+	guielements["confirmsave"].bordercolorhigh = {255, 127, 127}
+end
+
+function closeconfirmmenu()
+	confirmmenuopen = false
+	for i, v in pairs(confirmmenuguisave) do
+		v.active = true
+	end
+	confirmmenuguisave = false
+
+	guielements["confirmsave"] = nil
+	guielements["confirmexit"] = nil
+	--guielements["confirmcancel"] = nil
+end
+
+function createeditorsavedata(t) -- "testing", "menu", "changelevel"
+	if (not persistentEditorTools) or (t == "menu" and (not persistentEditorToolsLocal)) then
+		editorsavedata = false
+		return
+	end
+
+	editorsavedata = {
+		currenttile = currenttile,
+		editentities = editentities,
+		brushsizex = brushsizex,
+		brushsizey = brushsizey,
+		customtabstate = customtabstate,
+		assistmode = assistmode,
+		backgroundtilemode = backgroundtilemode
+	}
+	if t == "changelevel" then
+		return
+	end
+
+	editorsavedata["editorstate"] = editorstate
+	if persistentEditorToolsLocal then
+		local data = JSON:encode_pretty(editorsavedata)
+		love.filesystem.write(mappackfolder .. "/" .. mappack .. "/editorsave.json", data)
+	end
+end
+
 function changehudtextcolor(var)
 	textcolorp = textcolorsnames[var]
 	if textcolorp == "black" then
@@ -3833,7 +3967,7 @@ function openchangewidth()
 	guielements["maprightleft"].active = true
 	guielements["maprightright"].active = true
 	guielements["mapwidthapply"].active = true
-	guielements["mapwidthcancel"].active = true
+	--guielements["mapwidthcancel"].active = true
 
 	changemapwidthmenu = true
 	newmapwidth = mapwidth
@@ -4236,7 +4370,7 @@ function placetile(x, y, tilei)
 		local t = map[cox][coy]
 		--update track previews
 		local queuetrackpreview
-		if trackpreviews and map[cox][coy][2] and entityquads[map[cox][coy][2]] and entityquads[map[cox][coy][2]].t == "track" then
+		if trackpreviews and map[cox][coy][2] and entityquads[map[cox][coy][2]] and (entityquads[map[cox][coy][2]].t == "track" or entityquads[map[cox][coy][2]].t == "trackswitch") then
 			queuetrackpreview = true
 		end
 		if entityquads[currenttile] and entityquads[currenttile].t == "remove" then --removing tile
@@ -4511,9 +4645,9 @@ function createlevelbuttons(i)
 		for k = 0, mappacklevels[i][j] do --sublevel
 			local name = i .. "-" .. j .. "_" .. k
 			if k == 0 then
-				guielements[name] = guielement:new("button", 104, 20+((j-1)*39), TEXT["level "] .. j, mapnumberclick, 0, {i, j, k}, 1.8, 71, true)
+				guielements[name] = guielement:new("button", 104, 20+((j-1)*39), TEXT["level "] .. j, function() openconfirmmenu("maps", {i, j, k}) end, 0, nil, 1.8, 71, true)
 			else
-				guielements[name] = guielement:new("button", 134+((k-1)*19), 41+((j-1)*39), k, mapnumberclick, 0, {i, j, k}, 1.6, 15, true)
+				guielements[name] = guielement:new("button", 134+((k-1)*19), 41+((j-1)*39), k, function() openconfirmmenu("maps", {i, j, k}) end, 0, nil, 1.6, 15, true)
 			end
 			
 			local s = i .. "-" .. j
@@ -4861,6 +4995,18 @@ function editor_mousepressed(x, y, button)
 						--linktoolX, linktoolY = tileX, tileY
 						--syke, just open up the right click menu
 						openrightclickmenu(x, y, tileX, tileY)
+						--then automatically click the link button ONLY if there's just one
+						local count = 0
+						local button
+						for i, b in ipairs(rightclickobjects) do
+							if b and b.type == "button" and b.func == startrclink then
+								count = count + 1
+								button = b
+							end
+						end
+						if count == 1 and button then
+							startrclink(unpack(button.arguments))
+						end
 					end
 				end
 			elseif editorstate == "selectiontool" then
@@ -4882,7 +5028,6 @@ function editor_mousepressed(x, y, button)
 					pastingtiles = true
 					editentities = false
 					tilesall()
-					resettileselection()
 					tileselectionmoving = true
 					
 					allowdrag = false
@@ -4915,16 +5060,8 @@ function editor_mousepressed(x, y, button)
 										tile1 = false --don't paste empty space
 									end
 									if not backgroundtilemode then
-										if not d[3] then
-											map[tx][ty][1] = tile1 or map[tx][ty][1]
-											map[tx][ty][2] = d[2] or map[tx][ty][2]
-											map[tx][ty]["back"] = d["back"]
-											if map[tx][ty][2] then
-												map[tx][ty]["argument"] = d["argument"]
-											end
-										else
-											map[tx][ty] = {tile1 or map[tx][ty][1], d[2] or map[tx][ty][2], d[3] or map[tx][ty][3], back=d["back"],argument=d["argument"]}
-										end
+										map[tx][ty] = shallowcopy(d)
+										map[tx][ty][1] = tile1 or map[tx][ty][1]
 									end
 									map[tx][ty]["gels"] = {}
 								end
@@ -5381,7 +5518,7 @@ function openrightclickmenu(x, y, tileX, tileY)
 		if v.rightclickmenutable then
 			rightclickmenu.trustWhatStartWasSetAs = true
 		end
-elseif tablecontains(customenemies, r[2]) and enemiesdata[r[2]] and enemiesdata[r[2]].rightclick then
+	elseif tablecontains(customenemies, r[2]) and enemiesdata[r[2]] and enemiesdata[r[2]].rightclick then
 		local v = enemiesdata[r[2]]
 		rightclickmenuX = x
 		rightclickmenuY = y
@@ -5396,7 +5533,7 @@ elseif tablecontains(customenemies, r[2]) and enemiesdata[r[2]] and enemiesdata[
 		local default = ""
 		local b = v.rightclickdefaults
 		for i = 1, #b-1 do
-			default = default .. b[i] .. "|"
+			default = default .. tostring(b[i]) .. "|"
 		end
 		default = default .. b[#b]
 		default = default:gsub("-", "B")
@@ -5803,6 +5940,9 @@ function rightclickmenuclick(i)
 end
 
 function closecustomrc(save)
+	if customrcopen == false then
+		return
+	end
 	if rightclickobjects and inmap(rightclickmenucox,rightclickmenucoy) then
 		if customrcopen == "custom_enemy" then
 			local v = enemiesdata[map[rightclickmenucox][rightclickmenucoy][2]]
@@ -5815,7 +5955,7 @@ function closecustomrc(save)
 						if v.rightclick[i][1] == "dropdown" then
 							local ents =  v.rightclick[i][4]
 							if vt[index] then
-								vt[index] = ents[vt[index]]
+								vt[index] = tostring(ents[vt[index]])
 								vt[index] = vt[index]:gsub("-", "B")
 							end
 						end
@@ -6022,6 +6162,7 @@ function startrctrack(var) --track path
 		y = rightclickmenucoy,--offsety
 		vars = deepcopy(rightclickvalues2),
 		drag = true, --able to add onto path currently?
+		var = var --which entity variable is the path loaded to?
 	}
 	local rcp = rightclicktrack
 
@@ -6084,7 +6225,7 @@ function setrctrack()
 	local r = map[rightclickmenucox][rightclickmenucoy]
 	customrcopen = entitylist[r[2]].t
 	if rightclicktype[customrcopen].trackfunc then
-		rightclicktype[customrcopen].trackfunc(s)
+		rightclicktype[customrcopen].trackfunc(s, rightclicktrack.var)
 	end
 	rightclicktrack = {}
 	closecustomrc(true)
@@ -6233,28 +6374,46 @@ function editor_mousereleased(x, y, button)
 			else
 				if pastingtiles and tileselectionmoving then
 					--PASTE TILES
+					local sx, sy = getMouseTile(x, y+8*screenzoom*scale)
+					sx = sx + pastecenter[1]-1
+					sy = sy + pastecenter[2]-1
 					for i, v in pairs(mtclipboard) do
 						for j, w in pairs(v) do
-							if w[1] == 1 and (not w[2]) and (not w["back"]) and pastemode == 1 then
-								-- nothing
-							else
-								local tx, ty = getMouseTile(x+(i-1 + pastecenter[1])*16*scale, y+(j-1 + pastecenter[2])*16*scale+8*scale)
+							if not (w[1] == 1 and (not w[2]) and (not w["back"]) and pastemode == 1) then
+								tx = sx + i
+								ty = sy + j
 								if ismaptile(tx, ty) then
 									local d = mtclipboard[i][j]
 									currenttile = d[1]
 									backgroundtilemode = false
 									placetile(x+(i-1 + pastecenter[1])*16*scale, y+(j-1 + pastecenter[2])*16*scale)
-									map[tx][ty] = {d[1] or map[tx][ty][1], d[2] or map[tx][ty][2], d[3] or map[tx][ty][3], back=d["back"], argument=d["argument"]}
+									map[tx][ty] = shallowcopy(d)
 									map[tx][ty]["gels"] = {}
 									--generate new tracks if track moved
-									if d[2] and entityquads[d[2]] and entityquads[d[2]].t == "track" then
+									if d[2] and entityquads[d[2]] and (entityquads[d[2]].t == "track" or entityquads[d[2]].t == "trackswitch") then
 										generatetrackpreviews()
 									end
 								end
 							end
 						end
 					end
-					local tx, ty = getMouseTile(x, y+8*scale)
+					for x = 1, mapwidth do
+						for y = 1, mapheight do
+							local d = map[x][y]
+							if tablecontains(inputsi, d[2]) then
+								for i = 3, #d do
+									if d[i] == "link" then
+										if inrange(d[i+1], tileselection[1], tileselection[3], true) and inrange(d[i+2], tileselection[2], tileselection[4], true) then
+											d[i+1] = d[i+1] + (sx-tileselection[1])+1
+											d[i+2] = d[i+2] + (sy-tileselection[2])+1
+										end
+									end
+								end
+								
+							end
+						end
+					end
+					local tx, ty = getMouseTile(x, y+8*screenzoom*scale)
 					tileselection = {tx+math.floor(pastecenter[1]), ty+math.floor(pastecenter[2]), tx+math.floor(pastecenter[1])+#mtclipboard-1, ty+math.floor(pastecenter[2])+#mtclipboard[1]-1}
 					tileselection.finished = true
 					pastingtiles = false
@@ -6407,7 +6566,7 @@ function editor_keypressed(key, textinput)
 			editormenuopen = false
 		end
 	end
-	if brushsizetoggle then
+	if brushsizetoggle and (not editormenuopen) then
 		if key == "up" and brushsizey > 1 then
 			brushsizey = brushsizey - 1
 		elseif key == "left" and brushsizex > 1 then
@@ -6453,6 +6612,8 @@ function editor_keypressed(key, textinput)
 			editormenuopen = false
 		elseif changemapwidthmenu then
 			mapwidthcancel()
+		elseif confirmmenuopen then
+			closeconfirmmenu()
 		else
 			if editormenuopen then
 				editorclose()
@@ -6623,7 +6784,7 @@ function editor_keypressed(key, textinput)
 	end
 
 	--quicktest
-	if key == "\\" then
+	if key == "\\" and (not confirmmenuopen) then
 		test_level(objects["player"][1].x, objects["player"][1].y)
 		return
 	end
@@ -6706,7 +6867,7 @@ function getTilesSelection()
 	for x = math.max(1,tileselection[1]), math.min(tileselection[3],mapwidth) do
 		tx = {}
 		for y = math.max(1, tileselection[2]), math.min(tileselection[4],mapheight) do
-			table.insert(tx, {map[x][y][1],map[x][y][2],map[x][y][3],back=map[x][y]["back"],argument=map[x][y]["argument"]})
+			table.insert(tx, shallowcopy(map[x][y]))
 		end
 		table.insert(objecttable, tx)
 	end
@@ -7061,14 +7222,48 @@ function decreasetimelimit()
 		mariotimelimit = 0
 	end
 	mariotime = mariotimelimit
-	guielements["timelimitincrease"].x = 31 + string.len(mariotimelimit)*8
+	guielements["timelimitincrease"].x = 33 + string.len(mariotimelimit)*8
+	guielements["timelimitinput"].width = string.len(mariotimelimit)
+	guielements["timelimitinput"].value = mariotimelimit
 end
-
 function increasetimelimit()
 	levelmodified = true
 	mariotimelimit = mariotimelimit + 10
 	mariotime = mariotimelimit
-	guielements["timelimitincrease"].x = 31 + string.len(mariotimelimit)*8
+	guielements["timelimitincrease"].x = 33 + string.len(mariotimelimit)*8
+	guielements["timelimitinput"].width = string.len(mariotimelimit)
+	guielements["timelimitinput"].value = mariotimelimit
+end
+
+function changetimelimitinputting()
+	guielements["timelimitincrease"].x = 33+6*8
+	guielements["timelimitinput"].width = 6
+	guielements["timelimitincrease"].active = false
+	guielements["timelimitdecrease"].active = false
+end
+function changetimelimituninputting()
+	guielements["timelimitinput"].value = mariotimelimit
+	guielements["timelimitincrease"].x = 33 + string.len(mariotimelimit)*8
+	guielements["timelimitinput"].width = string.len(mariotimelimit)
+	guielements["timelimitincrease"].active = true
+	guielements["timelimitdecrease"].active = true
+end
+function changetimelimit()
+	levelmodified = true
+	local newmariotimelimit = tonumber(guielements["timelimitinput"].value)
+	if type(newmariotimelimit) ~= "number" then
+		notice.new("time limit must be a number!", notice.red, 3)
+		changetimelimituninputting()
+	else
+		mariotimelimit = math.max(0, math.min(math.floor(newmariotimelimit), 999999))
+		guielements["timelimitinput"].value = mariotimelimit
+		mariotime = mariotimelimit
+		guielements["timelimitincrease"].x = 33 + string.len(mariotimelimit)*8
+		guielements["timelimitinput"].width = string.len(mariotimelimit)
+	end
+	guielements["timelimitincrease"].active = true
+	guielements["timelimitdecrease"].active = true
+	guielements["timelimitinput"].inputting = false
 end
 
 function changeportalgun(var)
@@ -7315,6 +7510,8 @@ function linkbutton()
 end
 
 function test_level(x, y)
+	createeditorsavedata("test")
+	
 	local targetxscroll, targetyscroll = xscroll, yscroll
 	if levelmodified and onlysaveiflevelmodified then
 		savelevel()
@@ -7775,28 +7972,38 @@ function generatetrackpreviews()
 			if map[mx][my]["track"] and map[mx][my]["track"].id ~= trackgenerationid then --delete old tracks
 				map[mx][my]["track"] = nil
 			end
-			if map[mx][my][2] and entityquads[map[mx][my][2]].t == "track" then
-				local v = convertr(map[mx][my][3], {"string", "bool"}, true)
-				local trackdata = v[1]
-				if trackdata then
-					local s = trackdata:gsub("n", "-")
-					local s2 = s:split("`")
-					
-					local s3
-					for i = 1, #s2 do
-						s3 = s2[i]:split(":")
-						local x, y = tonumber(s3[1]), tonumber(s3[2])
-						local start, ending, grab = s3[3], s3[4], s3[5]
+			if map[mx][my][2] and (entityquads[map[mx][my][2]].t == "track" or entityquads[map[mx][my][2]].t == "trackswitch") then
+				local v
+				local pathvars = 1 --how many track paths does the entity have?
+				if entityquads[map[mx][my][2]].t == "trackswitch" then 
+					v = convertr(map[mx][my][3], {"string", "string", "bool"}, true)
+					pathvars = 2
+				else
+					v = convertr(map[mx][my][3], {"string", "bool"}, true)
+				end
+				local trackdata
+				for pathvar = 1, pathvars do
+					trackdata = v[pathvar]
+					if trackdata then
+						local s = trackdata:gsub("n", "-")
+						local s2 = s:split("`")
 						
-						if x and y then
-							local tx, ty = mx+x, my+y
-							if ismaptile(tx,ty) then
-								map[tx][ty]["track"] = {start=start, ending=ending, grab=grab, id=trackgenerationid, cox=mx, coy=my}
+						local s3
+						for i = 1, #s2 do
+							s3 = s2[i]:split(":")
+							local x, y = tonumber(s3[1]), tonumber(s3[2])
+							local start, ending, grab = s3[3], s3[4], s3[5]
+							
+							if x and y then
+								local tx, ty = mx+x, my+y
+								if ismaptile(tx,ty) then
+									map[tx][ty]["track"] = {start=start, ending=ending, grab=grab, id=trackgenerationid, cox=mx, coy=my}
+								else
+									break
+								end
 							else
 								break
 							end
-						else
-							break
 						end
 					end
 				end

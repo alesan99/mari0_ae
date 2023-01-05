@@ -1569,8 +1569,8 @@ function game_draw()
 		love.graphics.setColor(255, 255, 255, 255)
 		--tremoooor!
 		if earthquake > 0 and not pausemenuopen then
-			tremorx = (math.random()-.5)*2*earthquake
-			tremory = (math.random()-.5)*2*earthquake
+			tremorx = (math.random()-.5)*2*earthquake*scale
+			tremory = (math.random()-.5)*2*earthquake*scale
 			
 			love.graphics.translate(round(tremorx), round(tremory))
 		end
@@ -1802,6 +1802,11 @@ function game_draw()
 		
 		--door sprites
 		for j, w in pairs(objects["doorsprite"]) do
+			w:draw()
+		end
+
+		--track switches
+		for j, w in pairs(tracks) do
 			w:draw()
 		end
 
@@ -2402,6 +2407,11 @@ function game_draw()
 						end
 					end
 				end
+			end
+			
+			love.graphics.setColor(234, 160, 45, 155)
+			for j, w in pairs(objects["regiontrigger"]) do
+				love.graphics.rectangle("fill", math.floor((w.rx-xscroll)*16*scale)+.5, math.floor((w.ry-yscroll-.5)*16*scale)+.5, w.rw*16*scale-1, w.rh*16*scale-1)
 			end
 			
 			for j, w in pairs(userects) do
@@ -3784,13 +3794,11 @@ function drawHUD()
 	else
 		properprintfunc(playername, uispace*.5 - 24*scale, 8*scale)
 		properprintfunc(addzeros((marioscore or 0), 6), uispace*0.5-24*scale, 16*scale)
-			
-		properprintfunc("*", uispace*1.5-8*scale, 16*scale)
 		
 		love.graphics.setColor(255, 255, 255)
 		love.graphics.draw(coinanimationimage, coinanimationquads[spriteset or 1][coinframe or 1], uispace*1.5-16*scale, 16*scale, 0, scale, scale)
 		love.graphics.setColor(unpack(hudtextcolor))
-		properprintfunc(addzeros((mariocoincount or 0), 2), uispace*1.5-0*scale, 16*scale)
+		properprintfunc("*" .. addzeros((mariocoincount or 0), 2), uispace*1.5-8*scale, 16*scale)
 		
 		properprintfunc(TEXT["world"], uispace*2.5 - 20*scale, 8*scale)
 		local world = marioworld
@@ -3803,7 +3811,7 @@ function drawHUD()
 		
 		properprintfunc(TEXT["time"], uispace*3.5 - 16*scale, 8*scale)
 		if editormode then
-			if linktool then
+			if editorstate == "linktool" then
 				properprintfunc(TEXT["link"], uispace*3.5 - 16*scale, 16*scale)
 			else
 				properprintfunc(TEXT["edit"], uispace*3.5 - 16*scale, 16*scale)
@@ -4676,8 +4684,7 @@ function loadmap(filename)
 	map = {} --foreground map
 	bmap_on = false --background map on?
 	local nr, nr2 --map[x][y][1], map[x][y][2]
-	unstatics = {}
-	
+
 	for x = 1, mapwidth do
 		map[x] = {}
 		for y = 1, mapheight do
@@ -5837,9 +5844,9 @@ function getTile(x, y, portalable, portalcheck, facing, ignoregrates, dir) --ret
 
 	if objects["tile"][tilemap(x, y)] and (objects["tile"][tilemap(x, y)].slant or objects["tile"][tilemap(x, y)].slab) then
 		if portalcheck then
-			return false, 1
+			return false, map[x][y][1]
 		else
-			return true, 1
+			return true, map[x][y][1]
 		end
 	end
 	
@@ -6256,7 +6263,7 @@ function savemap(filename)
 	
 	print("Map saved as " .. mappackfolder .. "/" .. filename .. ".txt")
 	if success then
-		notice.new("Map saved!", notice.white, 2)
+		notice.new(TEXT["Map saved!"], notice.white, 2)
 	else
 		notice.new("Could not save map!\n" .. message, notice.red, 4)
 	end
@@ -6446,7 +6453,7 @@ function traceline(sourcex, sourcey, radians, reportal)
 		end
 
 		if objects["tile"][tileposition] then
-			if objects["tile"][tileposition].slant or objects["tile"][tileposition].slab then
+			if (objects["tile"][tileposition].slant or objects["tile"][tileposition].slab) and (not tilequads[tileno].grate) then
 				return false, false, false, false, x, y
 			end
 		end
@@ -7043,7 +7050,9 @@ function spawnentity(t, x, y, r, id)
 		table.insert(objects["plantcreeper"], plantcreeper:new(x, y, r))
 
 	elseif t == "track" then
-		table.insert(tracks, track:new(x, y, r))
+		table.insert(tracks, track:new(x, y, r, false))
+	elseif t == "trackswitch" then
+		table.insert(tracks, track:new(x, y, r, "switch"))
 
 	elseif t == "grinder" then
 		table.insert(objects["grinder"] , grinder:new(x, y, r[3]))
@@ -8785,6 +8794,7 @@ end
 
 function rendercustombackground(xscroll, yscroll, scrollfactor, scrollfactory)
 	local xscroll, yscroll = xscroll or 0, yscroll or 0
+	local oxscroll, oyscroll = xscroll or 0, yscroll or 0
 	local scrollfactor, scrollfactory = scrollfactor or 0, scrollfactory or 0
 	if custombackground then
 		for i = #custombackgroundimg, 1, -1  do
@@ -8808,12 +8818,12 @@ function rendercustombackground(xscroll, yscroll, scrollfactor, scrollfactory)
 				if custombackgroundanim[i].staticx or custombackgroundanim[i].static then
 					xscroll = 0
 				elseif custombackgroundanim[i].clamptolevelwidth then
-					xscroll = (xscroll/(mapwidth-width)) * (custombackgroundwidth[i]-width)
+					xscroll = (oxscroll/math.max(1,mapwidth-width)) * (custombackgroundwidth[i]-width)
 				end
 				if custombackgroundanim[i].staticy or custombackgroundanim[i].static then
 					yscroll = 0
 				elseif custombackgroundanim[i].clamptolevelheight then
-					yscroll = (yscroll/(mapheight-1-height)) * (custombackgroundheight[i]-height)
+					yscroll = (oyscroll/math.max(1,mapheight-1-height)) * (custombackgroundheight[i]-height)
 				end
 			end
 
@@ -8846,6 +8856,7 @@ end
 
 function rendercustomforeground(xscroll, yscroll, scrollfactor, scrollfactory)
 	local xscroll, yscroll = xscroll or 0, yscroll or 0
+	local oxscroll, oyscroll = xscroll or 0, yscroll or 0
 	local scrollfactor2, scrollfactor2y = scrollfactor or 0, scrollfactory or 0
 	if customforeground then
 		for i = #customforegroundimg, 1, -1  do
@@ -8869,12 +8880,12 @@ function rendercustomforeground(xscroll, yscroll, scrollfactor, scrollfactory)
 				if customforegroundanim[i].staticx or customforegroundanim[i].static then
 					xscroll = 0
 				elseif customforegroundanim[i].clamptolevelwidth then
-					xscroll = (xscroll/(mapwidth-width)) * (customforegroundwidth[i]-width)
+					xscroll = (oxscroll/math.max(1,mapwidth-width)) * (customforegroundwidth[i]-width)
 				end
 				if customforegroundanim[i].staticy or customforegroundanim[i].static then
 					yscroll = 0
 				elseif customforegroundanim[i].clamptolevelheight then
-					yscroll = (yscroll/(mapheight-1-height)) * (customforegroundheight[i]-height)
+					yscroll = (oyscroll/math.max(1,mapheight-1-height)) * (customforegroundheight[i]-height)
 				end
 			end
 
@@ -9155,7 +9166,7 @@ function drawmaptiles(drawtype, xscroll, yscroll)
 								love.graphics.setColor(255, 255, 255, 200)
 								love.graphics.draw(entityquads[313].image, entityquads[313].quad, math.floor((x-1-xoff+offsetx)*16*scale), ((y-1-yoff)*16-8)*scale, 0, scale, scale)
 							end
-							if entityquads[tilenumber].t == "track" and not trackpreviews then
+							if (entityquads[tilenumber].t == "track" or entityquads[tilenumber].t == "trackswitch") and not trackpreviews then
 								generatetrackpreviews()
 							end
 						end
