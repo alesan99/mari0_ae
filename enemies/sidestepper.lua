@@ -219,7 +219,7 @@ function sidestepper:floorcollide(a, b)
 end
 
 function sidestepper:passivecollide(a, b)
-	self:leftcollide(a, b)
+	--self:leftcollide(a, b)
 	return false
 end
 

@@ -262,6 +262,8 @@ function bowser:floorcollide(a, b)
 	end
 end
 
+function bowser:passivecollide(a, b)end
+
 function bowser:startfall()
 	self.jump = true
 end

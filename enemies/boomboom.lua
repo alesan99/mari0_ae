@@ -560,6 +560,6 @@ function boomboom:floorcollide(a, b)
 end
 
 function boomboom:passivecollide(a, b)
-	self:leftcollide(a, b)
+	--self:leftcollide(a, b)
 	return false
 end

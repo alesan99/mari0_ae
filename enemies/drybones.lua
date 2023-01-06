@@ -416,7 +416,7 @@ function drybones:rightcollide(a, b)
 end
 
 function drybones:passivecollide(a, b)
-	self:leftcollide(a, b)
+	--self:leftcollide(a, b)
 	return false
 end
 

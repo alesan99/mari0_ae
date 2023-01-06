@@ -451,7 +451,7 @@ function chainchomp:floorcollide(a, b)
 end
 
 function chainchomp:passivecollide(a, b)
-	self:leftcollide(a, b)
+	--self:leftcollide(a, b)
 	return false
 end
 

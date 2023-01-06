@@ -271,7 +271,7 @@ function splunkin:floorcollide(a, b)
 end
 
 function splunkin:passivecollide(a, b)
-	self:leftcollide(a, b)
+	--self:leftcollide(a, b)
 	return false
 end
 
