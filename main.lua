@@ -28,9 +28,8 @@
 	
 	OTHER COOL DUDES
 	-Maurice and Fakeuser for regular turrets
-	-Hans1998 for the banzai bill sprite
 	-Automatik for helping me with the poison mushroom
-	-Superjustinbros for some sprites
+	-Superjustinbros for some SMBS sprites
 	-Qcode for some code and advice
 	-Trosh for raccoon sprites from SE
 	-Galas for power up sprites
@@ -39,7 +38,7 @@
 	-Skysometric for animated quad cache code from Mari0 SE Community Edtion
 	-Oxiriar and Toonn from the Mari0 Gang Discord for smb3 item sprites
 	-NH1507 for toad and toadette character sprites
-	-HansAgain for new portal sprites, new mario sprites, and pneumatic tubes
+	-HansAgain for new portal sprites, new mario sprites, banzai bills, and pneumatic tubes
 	-Subpixel for bowser3, rotodiscs, ninji, and splunkin sprites
 	-Critfish for overgrown portal sprites
 	-Aidan for general bugtesting and misc. contributions on github
