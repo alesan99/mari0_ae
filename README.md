@@ -226,26 +226,8 @@ It even has bonus features like online multiplayer, custom characters, custom en
   > - Have both left and right slants enabled to make a slab
 </details>
 
-## 💌 Credits
-Special thanks to:
-- [***ME***](https://alesan99.blogspot.com) (check out my [Youtube](https://www.youtube.com/channel/UClCb0X0Yd36KgGnJwhIrcQw))
-- **Maurice** and **Fakeuser** for regular turrets
-- **Hans1998** for player sprite help and the banzai bill sprite
-- **Automatik** for helping me with the poison mushroom
-- **Superjustinbros** for helping with SMBS enemies and some sprites
-- **Qcode** for some code
-- **Trosh** for Raccoon Sprites (They're in SE)
-- [**Galas**](http://www.spriters-resource.com/custom_edited/mario/sheet/17965) for some power up sprites
-- **Bobthelawyer** for mario's hammer physics code
-- **KGK64** for Dry beetle sprites
-- **Skysometric** for animated quad cache code from Mari0 SE Community Edtion
-- **Oxiriar** and Toonn from the Mari0 Gang Discord for smb3 item sprites
-- **NH1507** for toad and toadette character sprites
-- **HansAgain** for new portal sprites, new mario sprites, and pneumatic tubes
-- **Subpixel** for bowser3, rotodiscs, ninji, and splunkin sprites
-- **Critfish** for overgrown portal sprites
-- **MadNyle** for propeller sound effect and mega mushroom
-- **qixils** for the automatic GitHub workflows
-- **All you guys** for reporting bugs and making maps
+## 💌 Credits and more Information
+Please see: https://forum.stabyourself.net/viewtopic.php?f=13&t=3636
+Or the top of main.lua
 
-- And thanks to [**NNB**](https://github.com/NNBnh) for this GitHub README page
+- thanks to [**NNB**](https://github.com/NNBnh) for this GitHub README page
