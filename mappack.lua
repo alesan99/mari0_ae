@@ -32,6 +32,36 @@ function loadmappacksettings()
 	end
 end
 
+function updatemappacksettings()
+	--after settings are loaded, changes may have to be made
+	if CenterCamera and not editormode then
+		camerasetting = 2
+	end
+	if ForceDropShadow and not editormode then
+		dropshadow = true
+	end
+	
+	if mariolivecount == 0 or dcplaying then
+		mariolivecount = false
+	end
+	
+	if InfiniteLivesMultiplayer and (not (SERVER or CLIENT)) and players > 1 then
+		infinitelives = true
+	end
+	
+	mariolives = {}
+	for i = 1, players do
+		mariolives[i] = mariolivecount
+	end
+	
+	mariosizes = {}
+	for i = 1, players do
+		mariosizes[i] = 1
+	end
+	
+	updateplayerproperties()
+end
+
 function loadcustomtext()
 	if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/endingmusic.ogg") then
 		endingmusic = love.audio.newSource(mappackfolder .. "/" .. mappack .. "/endingmusic.ogg");endingmusic:play();endingmusic:stop()

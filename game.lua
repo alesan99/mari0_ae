@@ -53,32 +53,7 @@ function game_load(suspended)
 		loadmappacksettings()
 	end
 
-	if CenterCamera and not editormode then
-		camerasetting = 2
-	end
-	if ForceDropShadow and not editormode then
-		dropshadow = true
-	end
-	
-	if mariolivecount == 0 or dcplaying then
-		mariolivecount = false
-	end
-	
-	if InfiniteLivesMultiplayer and (not (SERVER or CLIENT)) and players > 1 then
-		infinitelives = true
-	end
-	
-	mariolives = {}
-	for i = 1, players do
-		mariolives[i] = mariolivecount
-	end
-	
-	mariosizes = {}
-	for i = 1, players do
-		mariosizes[i] = 1
-	end
-	
-	updateplayerproperties()
+	updatemappacksettings()
 	
 	autoscroll = true
 	autoscrollx = true
@@ -116,6 +91,8 @@ function game_load(suspended)
 	objects = nil
 	if suspended == true then
 		continuegame()
+		loadmappacksettings()
+		updatemappacksettings()
 	elseif suspended then
 		marioworld = suspended
 	end

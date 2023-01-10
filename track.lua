@@ -57,24 +57,26 @@ function track:init(x, y, r, switch)
 		end
 		--path
 		for path = 1, paths do
-			local s = v[path]:gsub("n", "-")
-			local s2 = s:split("`")
-			
-			local s3
-			for i = 1, #s2 do
-				s3 = s2[i]:split(":")
-				local x, y = tonumber(s3[1]), tonumber(s3[2])
-				local start, ending, grab = s3[3], s3[4], s3[5]
+			if v[path] ~= nil then	
+				local s = v[path]:gsub("n", "-")
+				local s2 = s:split("`")
 				
-				if x and y then
-					local tx, ty = self.cox+x, self.coy+y
-					if ismaptile(tx,ty) and ((not map[tx][ty]["track"]) or map[tx][ty]["track"].switch or self.switch) then
-						table.insert(self.path[path], {tx, ty, start, ending, grab})
+				local s3
+				for i = 1, #s2 do
+					s3 = s2[i]:split(":")
+					local x, y = tonumber(s3[1]), tonumber(s3[2])
+					local start, ending, grab = s3[3], s3[4], s3[5]
+					
+					if x and y then
+						local tx, ty = self.cox+x, self.coy+y
+						if ismaptile(tx,ty) and ((not map[tx][ty]["track"]) or map[tx][ty]["track"].switch or self.switch) then
+							table.insert(self.path[path], {tx, ty, start, ending, grab})
+						else
+							break
+						end
 					else
 						break
 					end
-				else
-					break
 				end
 			end
 		end
