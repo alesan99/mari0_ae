@@ -1867,7 +1867,7 @@ function continuegame()
 	mariocharacter = st.character
 	for i = 1, #mariocharacter do
 		if mariocharacter[i] then
-			setcustomplayer(mariocharacter[i], i)
+			setcustomplayer(mariocharacter[i], i, "keep colors")
 		end
 	end
 	--[[for i, shoe in pairs(st.shoe) do
