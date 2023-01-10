@@ -24,7 +24,7 @@ function loadMappackInfo(url)
 	t[3] = ""--t.mappackdescription = ""
 	t[4] = "1-1"--t.mappackbackground = "1-1"
 	t[5] = false--icon
-	t[6] = false
+	t[6] = false--dropshadow
 	
 	if love.filesystem.exists(url .. "/icon.png") then
 		local ok, data = pcall(love.image.newImageData, url .. "/icon.png")

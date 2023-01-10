@@ -1616,7 +1616,9 @@ function loadbackground(background)
 
 	--dropshadow
 	if mappackselection and mappackdropshadow then
-		dropshadow = mappackdropshadow[mappackselection]
+		local sel = mappackselection
+		for i = 1, #mappacklist do if mappacklist[i] == mappack then sel = i break end end
+		dropshadow = mappackdropshadow[sel]
 	end
 	mappackversion = nil
 

@@ -49,35 +49,8 @@ function game_load(suspended)
 	nolowtime = false
 	nocoinlimit = false
 	setphysics(1)
-	if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/settings.txt") and not dcplaying then
-		local s = love.filesystem.read( mappackfolder .. "/" .. mappack .. "/settings.txt" )
-		local s1 = s:split("\n")
-		for j = 1, #s1 do
-			local s2 = s1[j]:split("=")
-			if s2[1] == "lives" then
-				mariolivecount = tonumber(s2[2])
-			elseif s2[1] == "physics" then
-				currentphysics = tonumber(s2[2]) or 1
-				setphysics(currentphysics)
-			elseif s2[1] == "camera" then
-				camerasetting = tonumber(s2[2]) or 1
-				setcamerasetting(camerasetting)
-			elseif s2[1] == "dropshadow" then
-				dropshadow = true
-			elseif s2[1] == "realtime" then
-				realtime = true
-			elseif s2[1] == "nocoinlimit" then
-				nocoinlimit = true
-			elseif s2[1] == "continuesublevelmusic" then
-				continuesublevelmusic = true
-			elseif s2[1] == "nolowtime" then
-				nolowtime = true
-			elseif s2[1] == "character" then
-				for i = 1, players do
-					setcustomplayer(s2[2], i)
-				end
-			end
-		end
+	if not dcplaying then
+		loadmappacksettings()
 	end
 
 	if CenterCamera and not editormode then
