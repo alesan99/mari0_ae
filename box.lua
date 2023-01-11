@@ -62,6 +62,7 @@ function box:init(x, y, t)
 	self.pipespawnmax = 1
 
 	self.gravitydir = "down"
+	self.doesntchangeplayergravity = true
 end
 
 function box:update(dt)
@@ -205,6 +206,9 @@ function box:leftcollide(a, b)
 	if self:globalcollide(a, b) then
 		return false
 	end
+	if self.falling and self.gravitydir == "left" then
+		self.falling = false
+	end
 	if self.gel == 1 then
 		self:bluegel("right")
 	end
@@ -234,6 +238,9 @@ end
 function box:rightcollide(a, b)
 	if self:globalcollide(a, b) then
 		return false
+	end
+	if self.falling and self.gravitydir == "right" then
+		self.falling = false
 	end
 	if self.gel == 1 then
 		self:bluegel("left")
@@ -265,7 +272,7 @@ function box:floorcollide(a, b)
 	if self:globalcollide(a, b) then
 		return false
 	end
-	if self.falling then
+	if self.falling and self.gravitydir == "down" then
 		self.falling = false
 	end
 	
@@ -322,6 +329,10 @@ function box:ceilcollide(a, b)
 	if self:globalcollide(a, b) then
 		return false
 	end
+	if self.falling and self.gravitydir == "up" then
+		self.falling = false
+	end
+
 	if a == "player" then
 		if self.gravitydir == "right" or self.gravity == "left" then
 			self.pushed = true
@@ -331,7 +342,7 @@ function box:ceilcollide(a, b)
 		if inmap(b.cox, b.coy) and map[b.cox][b.coy]["gels"] and 
 		map[b.cox][b.coy]["gels"]["bottom"] then
 			if map[b.cox][b.coy]["gels"]["bottom"] == 4 then
-				self:purplegel("up")
+				self:purplegel("top")
 			end
 		end
 	end
@@ -420,21 +431,23 @@ function box:bluegel(dir)
 end
 
 function box:purplegel(dir)
+	local oldgravitydir = self.gravitydir
 	if dir == "top" then
 		self.gravitydir = "up"
 	elseif dir == "bottom" then
 		self.gravitydir = "down"
 	elseif dir == "left" then
 		if self.gravitydir ~= "left" then
-			self.speedx = self.speedy/2
+			self.speedy = self.speedy/2
 		end
 		self.gravitydir = "left"
 	elseif dir == "right" then
 		if self.gravitydir ~= "right" then
-			self.speedx = self.speedy/2
+			self.speedy = self.speedy/2
 		end
 		self.gravitydir = "right"
 	end
+	self.falling = false
 end
 
 function box:startfall()
@@ -451,6 +464,7 @@ function box:emancipate()
 		speedx = speedx + self.parent.speedx
 		speedy = speedy + self.parent.speedy
 	end
+	self.drawable = false
 	table.insert(emancipateanimations, emancipateanimation:new(self.x, self.y, self.width, self.height, self.graphic, self.quad, speedx, speedy, self.rotation, self.offsetX, self.offsetY, self.quadcenterX, self.quadcenterY))
 	self:destroy()
 end

@@ -15,6 +15,7 @@ function levelscreen_load(reason, i)
 		return
 	end
 
+	windsound:stop()
 	if not continuesublevelmusic then
 		music:disableintromusic()
 	end
@@ -236,6 +237,10 @@ function levelscreen_draw()
 	if hudoutline then
 		properprintfunc = properprintFbackground
 	end
+	local properprintbasicfunc = properprint
+	if hudoutline then
+		properprintbasicfunc = properprintbackground
+	end
 	if levelscreentimer < blacktime - blacktimesub and levelscreentimer > blacktimesub then
 		love.graphics.setColor(255, 255, 255, 255)
 		
@@ -328,7 +333,7 @@ function levelscreen_draw()
 				properprintfunc(s, (width/2*16)*scale-string.len(s)*4*scale, 200*scale)
 			elseif levelscreentext[marioworld .. "-" .. mariolevel] then
 				local s = levelscreentext[marioworld .. "-" .. mariolevel]
-				properprintfunc(s, (width/2*16)*scale-string.len(s)*4*scale, 200*scale)
+				properprintbasicfunc(s, (width/2*16)*scale-string.len(s)*4*scale, 200*scale)
 			end
 			
 		elseif gamestate == "mappackfinished" then

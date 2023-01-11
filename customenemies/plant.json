@@ -40,5 +40,6 @@
 	"dontpistondist": 3,
 	"inactiveonretracted": true,
 	
-	"ignorefaithplates": true
+	"ignorefaithplates": true,
+	"ignoreplatform": true
 }

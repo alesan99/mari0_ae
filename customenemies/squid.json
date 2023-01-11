@@ -50,5 +50,6 @@
 	
 	"portalable": false,
 	
-	"ignorefaithplates": true
+	"ignorefaithplates": true,
+	"ignoreplatform": true
 }

@@ -136,6 +136,12 @@ function bomb:update(dt)
 			end
 		end
 	else
+		
+		if self.speedx > 0 then
+			self.animationdirection = "left"
+		elseif self.speedx < 0 then
+			self.animationdirection = "right"
+		end
 		self.animationtimer = self.animationtimer + dt
 		while self.animationtimer > goombaanimationspeed do
 			self.animationtimer = self.animationtimer - goombaanimationspeed
@@ -371,7 +377,7 @@ function bomb:globalcollide(a, b)
 		return true
 	end
 	
-	if a == "fireball" or a == "player" then
+	if a == "fireball" or a == "player" or a == "checkpointflag" then
 		return true
 	end
 	

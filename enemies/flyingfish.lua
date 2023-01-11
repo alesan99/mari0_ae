@@ -44,6 +44,7 @@ function flyingfish:init()
 	end
 
 	self.freezable = true
+	self.ignoreplatform = true
 	
 	if self.speedx > 0 then
 		self.animationdirection = "left"

@@ -1,15 +1,28 @@
 track = class:new()
 
-function track:init(x, y, r)
+function track:init(x, y, r, switch)
 	--path
 	self.cox = x
 	self.coy = y
 
+	self.switch = switch
 	self.r = {unpack(r)}
 	table.remove(self.r, 1)
 	table.remove(self.r, 1)
 
-	self.path = {{self.cox, self.coy}}
+	local paths = 1
+	if self.switch then --switch tracks have to store two alternate paths
+		paths = 2
+		
+		self.timer = 0
+		self.color = 1
+	end
+
+	self.path = {}
+	for path = 1, paths do
+		self.path[path] = {}
+	end
+	self.activepath = 1
 
 	self.static = true
 	self.active = false
@@ -19,46 +32,105 @@ function track:init(x, y, r)
 	
 	if #self.r > 0 and self.r[1] ~= "link" then
 		--rightclick things
-		local v = convertr(self.r[1], {"string", "bool"}, true)
+		local v
+		if self.switch then
+			v = convertr(self.r[1], {"string", "string", "bool", "num"}, true)
+		else
+			v = convertr(self.r[1], {"string", "bool"}, true)
+		end
 		
 		--visible?
-		if v[2] ~= nil then	
-			self.visible = v[2]
+		if self.switch then
+			if v[3] ~= nil then	
+				self.visible = v[3]
+			end
+		else
+			if v[2] ~= nil then	
+				self.visible = v[2]
+			end
+		end
+		--color?
+		if self.switch then
+			if v[4] ~= nil then	
+				self.color = v[4]
+			end
 		end
 		--path
-		local s = v[1]:gsub("n", "-")
-		local s2 = s:split("`")
-		
-		local s3
-		for i = 1, #s2 do
-			s3 = s2[i]:split(":")
-			local x, y = tonumber(s3[1]), tonumber(s3[2])
-			local start, ending, grab = s3[3], s3[4], s3[5]
-			
-			if x and y then
-				local tx, ty = self.cox+x, self.coy+y
-				if ismaptile(tx,ty) and not map[tx][ty]["track"] then
-					table.insert(self.path, {tx, ty, start, ending, grab})
-				else
-					break
+		for path = 1, paths do
+			if v[path] ~= nil then	
+				local s = v[path]:gsub("n", "-")
+				local s2 = s:split("`")
+				
+				local s3
+				for i = 1, #s2 do
+					s3 = s2[i]:split(":")
+					local x, y = tonumber(s3[1]), tonumber(s3[2])
+					local start, ending, grab = s3[3], s3[4], s3[5]
+					
+					if x and y then
+						local tx, ty = self.cox+x, self.coy+y
+						if ismaptile(tx,ty) and ((not map[tx][ty]["track"]) or map[tx][ty]["track"].switch or self.switch) then
+							table.insert(self.path[path], {tx, ty, start, ending, grab})
+						else
+							break
+						end
+					else
+						break
+					end
 				end
-			else
-				break
 			end
 		end
 		table.remove(self.r, 1)
 	end
-	for i = 1, #self.path do
-		local t = self.path[i]
+	self:makepath(self.activepath, "initial")
+	--self.delete = true
+end
+
+function track:makepath(path, initial)
+	if not initial then
+		for i = 1, #self.path[self.activepath] do
+			local t = self.path[self.activepath][i]
+			local ctrack = map[t[1]][t[2]]["track"]
+			if i == 1 and ctrack and ctrack.start ~= "c" and ctrack.start ~= "o" then --connect to the end of another track
+				map[t[1]][t[2]]["track"].ending = "o"
+			elseif i == #self.path[self.activepath] and ctrack and (ctrack.ending ~= "c" and ctrack.ending ~= "o") then
+				map[t[1]][t[2]]["track"].start = "o"
+			else
+				map[t[1]][t[2]]["track"] = nil
+				local s = objects["tracksegment"][tilemap(t[1], t[2])]
+				if s then
+					s.active = false
+					s.delete = true
+					s = nil
+					objects["tracksegment"][tilemap(t[1], t[2])] = nil 
+				end
+			end
+		end
+	end
+	self.activepath = path
+	for i = 1, #self.path[self.activepath] do
+		local t = self.path[self.activepath][i]
 		if map[t[1]][t[2]] == emptytile then map[t[1]][t[2]] = shallowcopy(emptytile) end
-		map[t[1]][t[2]]["track"] = {start=t[3], ending=t[4], grab=t[5]}
+		--if switch track exists in current tile, connect
+		local ctrack = map[t[1]][t[2]]["track"]
+		if i == 1 and ctrack and (ctrack.switch or self.switch) and (ctrack.ending == "c" or ctrack.ending == "o") then --connect to the end of another track
+			map[t[1]][t[2]]["track"].ending=t[4]
+		elseif i == #self.path[self.activepath] and ctrack and (ctrack.switch or self.switch) and (ctrack.start == "c" or ctrack.start == "o") then --connect to the end of another track
+			map[t[1]][t[2]]["track"].start=t[3]
+		--otherwise, overwrite empty tile with track
+		else
+			map[t[1]][t[2]]["track"] = {start=t[3], ending=t[4], grab=t[5]}
+			if self.switch then
+				map[t[1]][t[2]]["track"].switch = true
+			end
+		end
 		if self.visible == false then
 			map[t[1]][t[2]]["track"].invisible = true
 		end
 		objects["tracksegment"][tilemap(t[1], t[2])] = tracksegment:new(t[1], t[2], t[3], t[4], t[5], self)
 
 		--MOVING TILES!!!
-		if t[5] == "t" or t[5] == "tr" or t[5] == "tf" or t[5] == "tfr" then
+		if initial and (t[5] == "t" or t[5] == "tr" or t[5] == "tf" or t[5] == "tfr") then
 			local x, y = t[1], t[2]
 			if ismaptile(x,y) and (tilequads[map[x][y][1]].collision or tilequads[map[x][y][1]].coin) then
 				local obj = tilemoving:new(t[1], t[2])
@@ -75,35 +147,92 @@ function track:init(x, y, r)
 			end
 		end
 	end
-	--self.delete = true
 end
 
 function track:update(dt)
+	--lazy, update any newly spawned trackcontrollers
+	if self.on == false and self.trackcontrollernum and self.trackcontrollernum ~= #objects["trackcontroller"] then
+		self:tellcontrollers()
+	end
+	self.trackcontrollernum = #objects["trackcontroller"]
+
 	if self.delete then
 		return true
 	end
 end
 
+function track:draw()
+	if self.switch then
+		--draw switch light
+		local color = self.color
+		love.graphics.draw(trackimg, trackquad["switch"][self.color][self.activepath], math.floor(((self.cox-xscroll-.5)*16)*scale), math.floor(((self.coy-yscroll-1.5)*16+8)*scale), 0, scale, scale, 8, 8)
+	end
+end
+
 function track:link()
-	if #self.r >= 3 then
+	if self.switch then
 		for j, w in pairs(outputs) do
 			for i, v in pairs(objects[w]) do
 				if tonumber(self.r[2]) == v.cox and tonumber(self.r[3]) == v.coy then
-					v:addoutput(self)
+					local t = self.r[4] or "switch"
+					if t == "switch" then
+						self.color = 5 --linked, so no color
+					end
+					v:addoutput(self, t)
+				end
+			end
+		end
+		
+		table.remove(self.r, 1)
+		table.remove(self.r, 1)
+		table.remove(self.r, 1)
+		table.remove(self.r, 1)
+	else
+		if #self.r >= 3 then
+			for j, w in pairs(outputs) do
+				for i, v in pairs(objects[w]) do
+					if tonumber(self.r[2]) == v.cox and tonumber(self.r[3]) == v.coy then
+						v:addoutput(self)
+					end
 				end
 			end
 		end
 	end
 end
 
-function track:input(t)
-	if t == "on" then
-		self.on = false
-	elseif t == "off" then
-		self.on = true
-	elseif t == "toggle" then
-		self.on = not self.on
+function track:change()
+	self:input("toggle", "switch")
+end
+
+function track:input(t, input)
+	if input == "switch" then
+		local newpath
+		if t == "on" then
+			newpath = 2
+		elseif t == "off" then
+			newpath = 1
+		elseif t == "toggle" then
+			newpath = 2
+			if self.activepath == 2 then
+				newpath = 1
+			end
+		end
+		if self.activepath ~= newpath then
+			self:makepath(newpath)
+		end
+	else--if input == "power" then
+		if t == "on" then
+			self.on = false
+		elseif t == "off" then
+			self.on = true
+		elseif t == "toggle" then
+			self.on = not self.on
+		end
 	end
+	self:tellcontrollers()
+end
+
+function track:tellcontrollers()
 	local trackcontrollers = {}
 	for i, v in pairs(objects["trackcontroller"]) do
 		if not trackcontrollers[v.x .. "-" .. v.y] then
@@ -111,8 +240,8 @@ function track:input(t)
 		end
 		table.insert(trackcontrollers[v.x .. "-" .. v.y], v)
 	end
-	for i = 1, #self.path do
-		local t = self.path[i]
+	for i = 1, #self.path[self.activepath] do
+		local t = self.path[self.activepath][i]
 		local t = trackcontrollers[t[1] .. "-" .. t[2]]
 		if t then
 			for i, v in pairs(t) do
@@ -312,9 +441,16 @@ function trackcontroller:update(dt)
 	local addx, addy = 0, 0
 	local t = map[x][y]["track"]
 	if (not t) then
-		self:release("forward")
+		local releasedir = "r"
+		if self.oldxdiff then
+			if self.oldxdiff < 0 then releasedir = "l"
+			elseif self.oldxdiff == 0 then releasedir = "d" end
+		end
+		self:release(releasedir)
 		return true
 	end
+	self.oldstart = t.start
+	self.oldending = t.ending
 	local dir, sdir, edir, v = self:getdirection(t, self.v) --start direction, end direction
 	--get offset
 	if dir == "l" then
@@ -361,6 +497,7 @@ function trackcontroller:update(dt)
 		local angle = -math.atan2(b.x-oldx, b.y-oldy)-math.pi/2
 		b.rotation = angle+(b.rotatetowardstrackpathoffset or 0)
 	end
+	self.oldxdiff = b.x-oldx--used to release entity in the correct direction if track dissapears
 	--Update Speed
 	if b.trackplatform and b.active then --hold enemies
 		local checktable = {"player", "mushroom", "oneup"}
@@ -374,8 +511,8 @@ function trackcontroller:update(dt)
 			for j, w in pairs(objects[v]) do
 				if (not w.ignoreplatform) then
 					if (not b.noplatformcarrying) and inrange(w.x, b.x-w.width, b.x+b.width) then --vertical carry
-						if ((w.y == b.y - w.height) or 
-							((w.y+w.height >= b.y-0.1 and w.y+w.height < b.y+0.1)))
+						if ( (w.y == b.y - w.height) or 
+							( (w.y+w.height >= b.y-0.1-math.max(0,math.abs(ydiff)) and w.y+w.height-math.max(0,w.speedy*dt) <= b.y+0.2-math.min(0,ydiff)) ) )
 							and (not w.jumping) and (not w.vine) then
 							if #checkrect(w.x+xdiff, b.y-w.height, w.width, w.height, {"exclude", w}, true, condition) == 0 then
 								if (not w.trackplatformcarriedx) or math.abs(xdiff) > math.abs(w.trackplatformcarriedx) then --don't move if already moved by another platform

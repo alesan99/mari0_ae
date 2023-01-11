@@ -114,7 +114,7 @@ function laser:update(dt)
 		
 			local obj
 			if self.lasertable[i] == "right" then
-				local smallestx = mapwidth+1
+				local smallestx = math.huge
 				local smallesti
 			
 				for j = 1, #rectcol, 2 do
@@ -125,31 +125,31 @@ function laser:update(dt)
 				end
 				obj = objects[rectcol[smallesti]][rectcol[smallesti+1]]
 			elseif self.lasertable[i] == "left" then
-				local biggestx = -1
+				local biggestx = -math.huge
 				local biggesti
 			
 				for j = 1, #rectcol, 2 do
-					if objects[rectcol[j]][rectcol[j+1]].x > biggestx then
-						biggestx = objects[rectcol[j]][rectcol[j+1]].x
+					if objects[rectcol[j]][rectcol[j+1]].x + objects[rectcol[j]][rectcol[j+1]].width > biggestx then
+						biggestx = objects[rectcol[j]][rectcol[j+1]].x + objects[rectcol[j]][rectcol[j+1]].width
 						biggesti = j
 					end
 				end
 				
 				obj = objects[rectcol[biggesti]][rectcol[biggesti+1]]
 			elseif self.lasertable[i] == "up" then
-				local biggesty = -1
+				local biggesty = -math.huge
 				local biggesti
 			
 				for j = 1, #rectcol, 2 do
-					if objects[rectcol[j]][rectcol[j+1]].y > biggesty then
-						biggesty = objects[rectcol[j]][rectcol[j+1]].y
+					if objects[rectcol[j]][rectcol[j+1]].y + objects[rectcol[j]][rectcol[j+1]].height > biggesty then
+						biggesty = objects[rectcol[j]][rectcol[j+1]].y + objects[rectcol[j]][rectcol[j+1]].height
 						biggesti = j
 					end
 				end
 				
 				obj = objects[rectcol[biggesti]][rectcol[biggesti+1]]
 			elseif self.lasertable[i] == "down" then
-				local smallesty = mapheight+1
+				local smallesty = math.huge
 				local smallesti
 			
 				for j = 1, #rectcol, 2 do

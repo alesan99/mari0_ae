@@ -12,6 +12,7 @@ function ice:init(x, y, w, h, a, enemy)
 	
 	self.active = true
 	self.static = false
+	self.activestatic = false
 	self.category = 32
 
 	self.mask = {true}
@@ -20,7 +21,7 @@ function ice:init(x, y, w, h, a, enemy)
 	self.timer = 0
 
 	self.offsetX = 0
-	self.shaketimer = 0 
+	self.shaketimer = 0
 
 	self.a = a
 	self.enemy = enemy
@@ -33,6 +34,7 @@ function ice:init(x, y, w, h, a, enemy)
 	end
 	if enemy.static or math.abs(enemy.speedy) > 2 or (enemy.gravity and enemy.gravity == 0) then
 		self.static = true
+		self.activestatic = true
 		self.y = enemy.y+enemy.height/2-self.height/2
 		self.dontfallafterfreeze = enemy.dontfallafterfreeze
 	end
@@ -54,6 +56,7 @@ function ice:update(dt)
 	if self.funnel then
 		if self.static then
 			self.static = false
+			self.activestatic = false
 		end
 		self.gravity = yacceleration
 		self.funnel = false
@@ -75,6 +78,7 @@ function ice:update(dt)
 		--start falling if static
 		if self.timer > iceblockairtime then
 			self.static = false
+			self.activestatic = false
 			self.falling = true
 		elseif self.timer > iceblockairtime-1 then
 			self.shaketimer = (self.shaketimer + 8*dt)%1
@@ -90,7 +94,7 @@ function ice:update(dt)
 		end
 	end
 
-	--hold player if falling
+	--[[hold player if falling
 	if self.falling then
 		local ydiff = self.speedy*dt
 		local condition = false
@@ -111,7 +115,7 @@ function ice:update(dt)
 				end
 			end
 		end
-	end
+	end]]
 end
 
 function ice:draw(enemylayer)
@@ -210,7 +214,7 @@ function ice:floorcollide(a, b)
 		return false
 	end
 
-	if self.falling then
+	if self.falling and (not (self.speedy > 0 and self.speedy <= yacceleration*gdt)) then
 		self:meltice("destroy")
 		return false
 	end
@@ -227,7 +231,7 @@ function ice:passivecollide(a, b)
 end
 
 function ice:globalcollide(a, b)
-	if a == "screenboundary" then
+	if a == "screenboundary" or a == "checkpointflag" then
 		return true
 	elseif (a == "fireball" and b.t == "fireball") or a == "castlefirefire" or a == "longfire" or a == "fire" or a == "plantfire" or (a == "brofireball" and b.t ~= "ice") or a == "upfire" or a == "angrysun" or b.meltsice then
 		self:meltice()

@@ -18,6 +18,8 @@ local tilehotkeys = {
 local tilehotkeysindex = {}
 local tilehotkeysentityindex = {}
 
+local editorsavedata = false
+
 local trackgenerationid
 
 function editor_load(player_position) --{x, y, xscroll, yscroll}
@@ -83,6 +85,7 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	levelmodified = false
 	
 	currentanimation = 1
+	animationguilines = {}
 	
 	tileselection = false
 	tileselectionants = 0
@@ -169,19 +172,26 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	guielements["musicdropdown"] = guielement:new("dropdown", 17, 102, 15, changemusic, musici, unpack(editormusictable))
 	guielements["custommusiciinput"] = guielement:new("input", 150, 102, 2, changemusic, custommusici, 2, 1, "music", 0)
 	guielements["spritesetdropdown"] = guielement:new("dropdown", 17, 126, 11, changespriteset, spriteset, "overworld", "underground", "castle", "underwater")
+
 	guielements["timelimitdecrease"] = guielement:new("button", 17, 152, "{", decreasetimelimit, 0)
-	guielements["timelimitincrease"] = guielement:new("button", 31 + string.len(mariotimelimit)*8, 152, "}", increasetimelimit, 0)
 	guielements["timelimitdecrease"].autorepeat = true
 	guielements["timelimitdecrease"].repeatwait = 0.3
 	guielements["timelimitdecrease"].repeatdelay = 0.08
+	guielements["timelimitinput"] = guielement:new("input", 29, 152, string.len(mariotimelimit), changetimelimit, mariotimelimit, 6, nil, nil, 0)
+	guielements["timelimitinput"].justdisplay = true
+	guielements["timelimitinput"].textoffset = 0
+	guielements["timelimitinput"].inputtingfunc = changetimelimitinputting
+	guielements["timelimitinput"].uninputtingfunc = changetimelimituninputting
+	guielements["timelimitincrease"] = guielement:new("button", 33 + string.len(mariotimelimit)*8, 152, "}", increasetimelimit, 0)
 	guielements["timelimitincrease"].autorepeat = true
 	guielements["timelimitincrease"].repeatwait = 0.3
 	guielements["timelimitincrease"].repeatdelay = 0.08
+	
 	guielements["portalgundropdown"] = guielement:new("dropdown", 17, 175, 11, changeportalgun, portalguni, "normal", "none", "1 only", "2 only", "gel")
 	--guielements["portalgundropdown"].dropup = true
 	guielements["widthbutton"] = guielement:new("button", 384-(utf8.len(TEXT["change size"])*8), 200, TEXT["change size"], openchangewidth, 2)
 	guielements["savebutton"] = guielement:new("button", 10, 200, TEXT["save"], function() savelevel(); levelmodified = false end, 2)
-	guielements["menubutton"] = guielement:new("button", guielements["savebutton"].x+guielements["savebutton"].width+12, 200, TEXT["exit"], menu_load, 2)
+	guielements["menubutton"] = guielement:new("button", guielements["savebutton"].x+guielements["savebutton"].width+12, 200, TEXT["exit"], function() openconfirmmenu("exit") end, 2)
 	guielements["testbutton"] = guielement:new("button", guielements["menubutton"].x+guielements["menubutton"].width+12, 200, TEXT["test level"], test_level, 2)
 	guielements["testbuttonplayer"] = guielement:new("button", guielements["testbutton"].x+guielements["testbutton"].width+12, 200, TEXT["quick test"], function() test_level(objects["player"][1].x, objects["player"][1].y) end, 2)
 	guielements["savebutton"].bordercolor = {255, 0, 0}
@@ -276,6 +286,8 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	guielements["realtimecheckbox"] = guielement:new("checkbox", 294, 154, togglerealtime, realtime, TEXT["real time"])
 	local _, count = TEXT["real time"]:gsub("\n", '')
 	guielements["continuemusiccheckbox"] = guielement:new("checkbox", 294, guielements["realtimecheckbox"].y+11+10*count, togglecontinuemusic, continuesublevelmusic, TEXT["cont. music"])
+	_, count = TEXT["cont. music"]:gsub("\n", '')
+	guielements["nolowtimecheckbox"] = guielement:new("checkbox", 294, guielements["continuemusiccheckbox"].y+11+10*count, togglenolowtime, nolowtime, TEXT["no low time"])
 
 	--MAPS
 	guielements["savebutton2"] = guielement:new("button", 300, 196, TEXT["save level"], guielements["savebutton"].func, 0, nil, 2.4, 94, true)
@@ -341,6 +353,10 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	end
 	guielements["openfolderenemiescustom"] = guielement:new("button", 184, 105, TEXT["open folder"], opencustomimagefolder, 2)
 	
+	textcolorl = endingtextcolorname
+	textcolorp = hudtextcolorname
+	textstate = "hud"
+	
 	--custom text
 	guielements["savecustomtext"] = guielement:new("button", 10, 201, "save text", savecustomtext, 2)
 	guielements["savecustomtext"].bordercolor = {255, 0, 0}
@@ -354,8 +370,10 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	guielements["editendingtext1"] = guielement:new("input", 10, 67, 32, nil, endingtext[1], 32)
 	guielements["editendingtext2"] = guielement:new("input", 10, 81, 32, nil, endingtext[2], 32)
 	guielements["editplayername"] = guielement:new("input", 10, 67, 12, nil, playername, 12)
-	guielements["endingcolor<"] = guielement:new("button", 10, 97, "{", endingtextcolorleft, 1)
-	guielements["endingcolor>"] = guielement:new("button", guielements["endingcolor<"].x+guielements["endingcolor<"].width+utf8.len(TEXT["color"])*8+7, 97, "}", endingtextcolorright, 1)
+	guielements["endingcolor"] = guielement:new("dropdown", 10, 97, 7, changeendingtextcolor, tablecontainsi(textcolorsnames, textcolorl), unpack(textcolorsnames))
+	guielements["endingcolor"].coloredtext = true
+	--guielements["endingcolor<"] = guielement:new("button", 10, 97, "{", endingtextcolorleft, 1)
+	--guielements["endingcolor>"] = guielement:new("button", guielements["endingcolor<"].x+guielements["endingcolor<"].width+utf8.len(TEXT["color"])*8+7, 97, "}", endingtextcolorright, 1)
 	guielements["edittoadtext1"] = guielement:new("input", 10, 67, 32, nil, toadtext[1], 32)
 	guielements["edittoadtext2"] = guielement:new("input", 10, 81, 32, nil, toadtext[2], 32)
 	guielements["edittoadtext3"] = guielement:new("input", 10, 95, 32, nil, toadtext[3], 32)
@@ -365,17 +383,15 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	guielements["editpeachtext4"] = guielement:new("input", 10, 163, 32, nil, peachtext[4], 32)
 	guielements["editpeachtext5"] = guielement:new("input", 10, 177, 32, nil, peachtext[5], 32)
 	guielements["stevecheckbox"] = guielement:new("checkbox", 10, 191, togglesteve, pressbtosteve, "steve")
-	guielements["hudcolor<"] = guielement:new("button", 10, 83, "{", hudtextcolorleft, 1)
-	guielements["hudcolor>"] = guielement:new("button", guielements["hudcolor<"].x+guielements["hudcolor<"].width+utf8.len(TEXT["color"])*8+7, 83, "}", hudtextcolorright, 1)
+	guielements["hudcolor"] = guielement:new("dropdown", 10, 83, 7, changehudtextcolor, tablecontainsi(textcolorsnames, textcolorp), unpack(textcolorsnames))
+	guielements["hudcolor"].coloredtext = true
+	--guielements["hudcolor<"] = guielement:new("button", 10, 83, "{", hudtextcolorleft, 1)
+	--guielements["hudcolor>"] = guielement:new("button", guielements["hudcolor<"].x+guielements["hudcolor<"].width+utf8.len(TEXT["color"])*8+7, 83, "}", hudtextcolorright, 1)
 	guielements["hudworldlettercheckbox"] = guielement:new("checkbox", 10, 98, togglehudworldletter, hudworldletter, TEXT["use letters for worlds over 9"])
 	guielements["hudvisiblecheckbox"] = guielement:new("checkbox", 10, 109, togglehudvisible, hudvisible, TEXT["hud visible"])
 	guielements["hudoutlinecheckbox"] = guielement:new("checkbox", 10, 120, togglehudoutline, hudoutline, TEXT["hud outline"])
 	guielements["hudsimplecheckbox"] = guielement:new("checkbox", 10, 131, togglehudsimple, hudsimple, TEXT["simple hud"])
 	guielements["editlevelscreentext"] = guielement:new("input", 10, 81, 40, nil, levelscreentext[marioworld .. "-" .. mariolevel] or "", 45)
-	
-	textcolorl = endingtextcolorname
-	textcolorp = hudtextcolorname
-	textstate = "hud"
 	
 	--animationS
 	guielements["animationsscrollbarver"] = guielement:new("scrollbar", animationguiarea[1]-10, animationguiarea[2], animationguiarea[4]-animationguiarea[2], 10, 40, 0, "ver", nil, nil, nil, nil, true)
@@ -446,6 +462,9 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	guielements["savesettings"].bordercolor = {255, 0, 0}
 	guielements["savesettings"].bordercolorhigh = {255, 127, 127}
 	
+	confirmmenuopen = false
+	confirmmenuguisave = false
+	
 	--MISC
 	editortilemousescroll = false
 	editortilemousescrolltimer = 0
@@ -460,6 +479,28 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 		editorclose()
 		editorstate = "main"
 		editentities = false
+	end
+	
+	if PersistentEditorTools then
+		if PersistentEditorToolsLocal and (not editorsavedata) and love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/editorsave.json") then
+			local data = love.filesystem.read(mappackfolder .. "/" .. mappack .. "/editorsave.json")
+			editorsavedata = JSON:decode(data)
+		end
+		if editorsavedata then
+			local e = editorsavedata
+			currenttile = e.currenttile
+			editentities = e.editentities
+			brushsizex = e.brushsizex
+			brushsizey = e.brushsizey
+			if e.editorstate then
+				editorstate = e.editorstate
+			end
+			customtabstate = e.customtabstate
+			assistmode = e.assistmode
+			backgroundtilemode = e.backgroundtilemode
+			
+			editorsavedata = false
+		end
 	end
 
 	if player_position then
@@ -486,42 +527,44 @@ function editor_update(dt)
 	oldlevelmodified = levelmodified]]
 	if editormenuopen == false or minimapmoving then
 		--key scroll
-		if (not rightclickmenuopen) or customrcopen == "region" or customrcopen == "link" or customrcopen == "path" or customrcopen == "trackpath" or minimapmoving then
-			if (love.keyboard.isDown("left") or (android and leftkey(1) and not autoscroll)) and not brushsizetoggle then
-				autoscroll = false
-				guielements["autoscrollcheckbox"].var = autoscroll
-				splitxscroll[1] = splitxscroll[1] - 30*gdt
-				if splitxscroll[1] < 0 then
-					splitxscroll[1] = 0
-				end
-				generatespritebatch()
-			elseif (love.keyboard.isDown("right") or (android and rightkey(1) and not autoscroll)) and not brushsizetoggle then
-				autoscroll = false
-				guielements["autoscrollcheckbox"].var = autoscroll
-				splitxscroll[1] = splitxscroll[1] + 30*gdt
-				if splitxscroll[1] > mapwidth-width then
-					splitxscroll[1] = mapwidth-width
-				end
-				generatespritebatch()
+		local speed = 30
+		if love.keyboard.isDown("lalt") then
+			speed = 70
+		end
+		if (love.keyboard.isDown("left") or (android and leftkey(1) and not autoscroll)) and (rightclickmenuopen or (not brushsizetoggle)) then
+			autoscroll = false
+			guielements["autoscrollcheckbox"].var = autoscroll
+			splitxscroll[1] = splitxscroll[1] - speed*gdt
+			if splitxscroll[1] < 0 then
+				splitxscroll[1] = 0
 			end
-			if mapheight ~= 15 and not brushsizetoggle then
-				if (love.keyboard.isDown("up") or (android and upkey(1) and not autoscroll)) then
-					autoscroll = false
-					guielements["autoscrollcheckbox"].var = autoscroll
-					splityscroll[1] = splityscroll[1] - 30*gdt
-					if splityscroll[1] < 0 then
-						splityscroll[1] = 0
-					end
-					generatespritebatch()
-				elseif (love.keyboard.isDown("down") or (android and downkey(1) and not autoscroll)) then
-					autoscroll = false
-					guielements["autoscrollcheckbox"].var = autoscroll
-					splityscroll[1] = splityscroll[1] + 30*gdt
-					if splityscroll[1] >= mapheight-height-1 then
-						splityscroll[1] = mapheight-height-1
-					end
-					generatespritebatch()
+			generatespritebatch()
+		elseif (love.keyboard.isDown("right") or (android and rightkey(1) and not autoscroll)) and (rightclickmenuopen or (not brushsizetoggle)) then
+			autoscroll = false
+			guielements["autoscrollcheckbox"].var = autoscroll
+			splitxscroll[1] = splitxscroll[1] + speed*gdt
+			if splitxscroll[1] > mapwidth-width then
+				splitxscroll[1] = mapwidth-width
+			end
+			generatespritebatch()
+		end
+		if mapheight ~= 15 and (rightclickmenuopen or (not brushsizetoggle)) then
+			if (love.keyboard.isDown("up") or (android and upkey(1) and not autoscroll)) then
+				autoscroll = false
+				guielements["autoscrollcheckbox"].var = autoscroll
+				splityscroll[1] = splityscroll[1] - speed*gdt
+				if splityscroll[1] < 0 then
+					splityscroll[1] = 0
 				end
+				generatespritebatch()
+			elseif (love.keyboard.isDown("down") or (android and downkey(1) and not autoscroll)) then
+				autoscroll = false
+				guielements["autoscrollcheckbox"].var = autoscroll
+				splityscroll[1] = splityscroll[1] + speed*gdt
+				if splityscroll[1] >= mapheight-height-1 then
+					splityscroll[1] = mapheight-height-1
+				end
+				generatespritebatch()
 			end
 		end
 	end
@@ -1097,6 +1140,8 @@ function editor_update(dt)
 	end
 	if musici == 7 and editorstate == "main" and guielements["custommusiciinput"].active == false then
 		guielements["custommusiciinput"].active = true
+	elseif guielements["custommusiciinput"].active == true then
+		guielements["custommusiciinput"].active = false
 	end
 	if editortilemousescroll then
 		editortilemousescrolltimer = editortilemousescrolltimer + dt
@@ -1340,6 +1385,46 @@ function editor_draw()
 							love.graphics.draw(platformimg, platformquad[3], math.floor((x+platwidth-2-xscroll+offx)*16*scale), math.floor((y-yscroll-23/16+offy)*16*scale), 0, scale, scale)
 							love.graphics.setColor(255,255,255,100)
 							love.graphics.draw(platformimg, platformquad[3], math.floor((x+dx+platwidth-2-xscroll+offx)*16*scale), math.floor((y+dy-yscroll-23/16+offy)*16*scale), 0, scale, scale)
+						end
+					end
+				elseif customrcopen == "platformspawnerup" or customrcopen == "platformspawnerdown" then
+					local t = rightclickvalues2
+					if t[1] then
+						local platwidth = math.floor((rightclickobjects[5].value*9+1)*2)/2
+						local dx, dy = 0, 0
+						local x, y = rightclickmenucox, rightclickmenucoy
+						local offx, offy = 0, -0.5
+						if platwidth ~= math.floor(platwidth) then
+							offx = -platwidth/2+0.5
+						end
+
+						local transparent = false
+						while (t[4] == "down" and y+offy < mapheight+0.5) or (t[4] == "up" and y+offy > 0) do
+							love.graphics.setColor(255,255,255,255)
+							if transparent then
+								love.graphics.setColor(255, 255, 255, 100)
+							end
+							for i = 1, platwidth do
+								local q = 2
+								if i == 1 then
+									q = 1
+								elseif i == platwidth then
+									q = 3
+								end
+								love.graphics.draw(platformimg, platformquad[q], math.floor((x+i-2-xscroll+offx)*16*scale), math.floor((y-yscroll-23/16+offy)*16*scale), 0, scale, scale)
+							end
+							if math.ceil(platwidth) ~= platwidth then
+								love.graphics.draw(platformimg, platformquad[3], math.floor((x+platwidth-2-xscroll+offx)*16*scale), math.floor((y-yscroll-23/16+offy)*16*scale), 0, scale, scale)
+							end
+
+							if t[4] == "down" then
+								offy = offy + ((rightclickobjects[9].value*9+1) * (((rightclickobjects[7].value*19.5)/2)+0.5))
+							elseif t[4] == "up" then
+								offy = offy - ((rightclickobjects[9].value*9+1) * (((rightclickobjects[7].value*19.5)/2)+0.5))
+							end
+							if not transparent then
+								transparent = true
+							end
 						end
 					end
 				elseif customrcopen == "belt" or customrcopen == "beltswitch" then
@@ -1747,12 +1832,12 @@ function editor_draw()
 				if tileselection or ctrlpressed or tileselectionmoving then
 					local x1, y1 = x, y+1
 					local x2, y2 = x, y+1
-					if tileselection then
-						x1, y1 = math.min(tileselection[1],tileselection[3]),math.min(tileselection[2],tileselection[4])
-						x2, y2 = math.max(tileselection[1],tileselection[3]),math.max(tileselection[2],tileselection[4])
-					elseif tileselectionmoving then
+					if tileselectionmoving then
 						x1, y1 = x+pastecenter[1], y+pastecenter[2]+1
 						x2, y2 = x+pastecenter[1]+#mtclipboard-1, y+pastecenter[2]+#mtclipboard[1]
+					elseif tileselection then
+						x1, y1 = math.min(tileselection[1],tileselection[3]),math.min(tileselection[2],tileselection[4])
+						x2, y2 = math.max(tileselection[1],tileselection[3]),math.max(tileselection[2],tileselection[4])
 					end
 					x1, y1 = math.max(xscroll-1, x1), math.max(yscroll-1, y1)
 					x2, y2 = math.min(xscroll+width*screenzoom2+1, x2), math.min(yscroll+height*screenzoom2+1, y2)
@@ -1835,34 +1920,34 @@ function editor_draw()
 						end
 					end
 				elseif not pastingtiles then 
+					--offset enemy
+					local offsetx = 0
+					if (entitylist[currenttile] and entitylist[currenttile].offset) or (enemiesdata[currenttile] and enemiesdata[currenttile].offsetable) then
+						local allowoffset = true
+						--don't clip with entity on the right
+						if ismaptile(x+1, y+1) and map[x+1][y+1][2] and map[x+1][y+1][2] == currenttile and not map[x+1][y+1].argument then
+							allowoffset = false
+						elseif ismaptile(x, y+1) and map[x][y+1][2] and map[x][y+1][2] == currenttile and not map[x][y+1].argument then
+							allowoffset = false
+						end
+						if allowoffset then
+							local mx = ((love.mouse.getX()/scale)+(xscroll*16))%16
+							--[[if mx < 16*0 then
+								offsetx = -.5
+							else]]if mx > 16*0.75 then
+								offsetx = .5
+							end
+						end
+					end
 					if not tilequads[currenttile] and enemiesdata[currenttile] then --custom enemy
 						local v = enemiesdata[currenttile]
 						if v.showicononeditor and v.icongraphic then
-							love.graphics.draw(v.icongraphic, math.floor((x-xscroll-1)*16*scale), math.floor(((y-yscroll-0.5)*16)*scale), 0, scale, scale)
+							love.graphics.draw(v.icongraphic, math.floor((x-xscroll-1+offsetx)*16*scale), math.floor(((y-yscroll-0.5)*16)*scale), 0, scale, scale)
 						else
 							local xoff, yoff = ((0.5-v.width/2+(v.spawnoffsetx or 0))*16 + v.offsetX - v.quadcenterX)*scale, (((v.spawnoffsety or 0)-v.height+1)*16-v.offsetY - v.quadcenterY)*scale
-							love.graphics.draw(v.graphic, v.quad, math.floor((x-xscroll-1)*16*scale+xoff), math.floor(((y-yscroll)*16)*scale+yoff), 0, scale, scale)
+							love.graphics.draw(v.graphic, v.quad, math.floor((x-xscroll-1+offsetx)*16*scale+xoff), math.floor(((y-yscroll)*16)*scale+yoff), 0, scale, scale)
 						end
 					else
-						--offset enemy
-						local offsetx = 0
-						if entitylist[currenttile] and entitylist[currenttile].offset then
-							local allowoffset = true
-							--don't clip with entity on the right
-							if ismaptile(x+1, y+1) and map[x+1][y+1][2] and map[x+1][y+1][2] == currenttile and not map[x+1][y+1].argument then
-								allowoffset = false
-							elseif ismaptile(x, y+1) and map[x][y+1][2] and map[x][y+1][2] == currenttile and not map[x][y+1].argument then
-								allowoffset = false
-							end
-							if allowoffset then
-								local mx = ((love.mouse.getX()/scale)+(xscroll*16))%16
-								--[[if mx < 16*0 then
-									offsetx = -.5
-								else]]if mx > 16*0.75 then
-									offsetx = .5
-								end
-							end
-						end
 						love.graphics.draw(entityquads[currenttile].image, entityquads[currenttile].quad, math.floor((x-splitxscroll[1]-1+offsetx)*16*scale), math.floor(((y-splityscroll[1]-1)*16+8)*scale), 0, scale, scale)
 					end
 					if android then
@@ -2460,7 +2545,8 @@ function editor_draw()
 				guielements["testbuttonplayer"]:draw()
 				guielements["widthbutton"]:draw()
 				guielements["timelimitdecrease"]:draw()
-				properprint(mariotimelimit, 29*scale, 154*scale)
+				guielements["timelimitinput"]:draw()
+				--properprint(mariotimelimit, 29*scale, 154*scale)
 				guielements["timelimitincrease"]:draw()
 				properprintF(TEXT["timelimit"], 8*scale, 142*scale)
 				
@@ -2651,6 +2737,7 @@ function editor_draw()
 			guielements["dropshadowcheckbox"]:draw()
 			guielements["realtimecheckbox"]:draw()
 			guielements["continuemusiccheckbox"]:draw()
+			guielements["nolowtimecheckbox"]:draw()
 			
 			properprintF(TEXT["lives:"], 228*scale, 106*scale)
 			guielements["livesincrease"]:draw()
@@ -2858,22 +2945,24 @@ function editor_draw()
 					properprintF(TEXT["ending text"], 11*scale, 57*scale)
 					guielements["editendingtext1"]:draw()
 					guielements["editendingtext2"]:draw()
-					love.graphics.setColor(textcolors[textcolorl])
-					properprintF(TEXT["color"], 24*scale, 100*scale)
-					guielements["endingcolor<"]:draw()
-					guielements["endingcolor>"]:draw()
+					--love.graphics.setColor(textcolors[textcolorl])
+					--properprintF(TEXT["color"], 24*scale, 100*scale)
+					--guielements["endingcolor<"]:draw()
+					--guielements["endingcolor>"]:draw()
+					guielements["endingcolor"]:draw()
 				elseif textstate == "hud" then
 					love.graphics.setColor(255, 255, 255)
 					properprintF(TEXT["player name"], 11*scale, 57*scale)
 					guielements["editplayername"]:draw()
-					love.graphics.setColor(textcolors[textcolorp])
-					properprintF(TEXT["color"], 23*scale, 86*scale)
-					guielements["hudcolor<"]:draw()
-					guielements["hudcolor>"]:draw()
+					--love.graphics.setColor(textcolors[textcolorp])
+					--properprintF(TEXT["color"], 23*scale, 86*scale)
+					--guielements["hudcolor<"]:draw()
+					--guielements["hudcolor>"]:draw()
 					guielements["hudworldlettercheckbox"]:draw()
 					guielements["hudvisiblecheckbox"]:draw()
 					guielements["hudoutlinecheckbox"]:draw()
 					guielements["hudsimplecheckbox"]:draw()
+					guielements["hudcolor"]:draw()
 				elseif textstate == "castle" then
 					love.graphics.setColor(255, 255, 255)
 					properprintF(TEXT["toad"], 11*scale, 57*scale)
@@ -3128,6 +3217,21 @@ function editor_draw()
 				end
 			end
 		end
+		
+		if confirmmenuopen then
+			love.graphics.setColor(0,0,0,200)
+			love.graphics.rectangle("fill", 0, 0, width*16*scale, height*16*scale)
+			love.graphics.setColor(0,0,0)
+			love.graphics.rectangle("fill", 69*scale, 71*scale, 262*scale, 82*scale)
+			love.graphics.setColor(255,255,255)
+			drawrectangle(70, 72, 260, 80)
+
+			properprintF(TEXT["are you sure?"], (200-utf8.len(TEXT["are you sure?"])*4)*scale, 80*scale)
+			properprintF(TEXT["unsaved changes will be lost!"], (200-utf8.len(TEXT["unsaved changes will be lost!"])*4)*scale, 92*scale)
+			guielements["confirmsave"]:draw()
+			guielements["confirmexit"]:draw()
+			--guielements["confirmcancel"]:draw()
+		end
 	end
 end
 
@@ -3173,6 +3277,7 @@ function maintab()
 	end
 	guielements["spritesetdropdown"].active = true
 	guielements["timelimitdecrease"].active = true
+	guielements["timelimitinput"].active = true
 	guielements["timelimitincrease"].active = true
 	guielements["portalgundropdown"].active = true
 	guielements["savebutton"].active = true
@@ -3303,6 +3408,7 @@ function toolstab()
 	guielements["dropshadowcheckbox"].active = true
 	guielements["realtimecheckbox"].active = true
 	guielements["continuemusiccheckbox"].active = true
+	guielements["nolowtimecheckbox"].active = true
 end
 
 function mapstab()
@@ -3472,8 +3578,9 @@ function texttabtab(t)
 	if t == "hud" then
 		guielements["hudtexttab"].textcolor = {255, 255, 255}
 		guielements["editplayername"].active = true
-		guielements["hudcolor<"].active = true
-		guielements["hudcolor>"].active = true
+		guielements["hudcolor"].active = true
+		--guielements["hudcolor<"].active = true
+		--guielements["hudcolor>"].active = true
 		guielements["hudworldlettercheckbox"].active = true
 		guielements["hudvisiblecheckbox"].active = true
 		guielements["hudoutlinecheckbox"].active = true
@@ -3482,8 +3589,9 @@ function texttabtab(t)
 		guielements["endingtexttab"].textcolor = {255, 255, 255}
 		guielements["editendingtext1"].active = true
 		guielements["editendingtext2"].active = true
-		guielements["endingcolor<"].active = true
-		guielements["endingcolor>"].active = true
+		guielements["endingcolor"].active = true
+		--guielements["endingcolor<"].active = true
+		--guielements["endingcolor>"].active = true
 	elseif t == "castle" then
 		guielements["castletexttab"].textcolor = {255, 255, 255}
 		guielements["edittoadtext1"].active = true
@@ -3553,7 +3661,9 @@ function animationstab()
 end
 
 function fromanimationstab()
-	saveanimation()
+	if #animationguilines > 0 then
+		saveanimation()
+	end
 end
 
 function nothingtab()
@@ -3566,98 +3676,94 @@ function nothingtab()
 	end
 end
 
-function endingtextcolorleft()
-	if textcolorl == "red" then
-		textcolorl = "white"
-	elseif textcolorl == "blue" then
-		textcolorl = "red"
-	elseif textcolor1 == "yellow" then
-		textcolorl = "blue"
-	elseif textcolorl == "green" then
-		textcolorl = "yellow"
-	elseif textcolorl == "orange" then
-		textcolorl = "green"
-	elseif textcolorl == "pink" then
-		textcolorl = "orange"
-	elseif textcolorl == "purple" then
-		textcolorl = "pink"
-	elseif textcolorl ~= "white" then
-		textcolorl = "blue"
+function changeendingtextcolor(var)
+	textcolorl = textcolorsnames[var]
+	guielements["endingcolor"].var = var
+end
+
+function openconfirmmenu(menutype, args)
+	if NoExitConfirmation or love.keyboard.isDown("lshift") or levelmodified ~= true then
+		if menutype == "exit" then
+			createeditorsavedata("menu")
+			menu_load()
+		elseif menutype == "maps" then
+			createeditorsavedata("changelevel")
+			mapnumberclick(unpack(args))
+		end
+		return
+	end
+
+	confirmmenuopen = true
+	confirmmenuguisave = {}
+	for i, v in pairs(guielements) do
+		if v.active then
+			table.insert(confirmmenuguisave, v)
+			v.active = false
+		end
+	end
+
+	if menutype == "exit" then
+		guielements["confirmsave"] = guielement:new("button", width*8, 112, TEXT["save and exit"], function() savelevel(); createeditorsavedata("menu"); menu_load() end, 2)
+		guielements["confirmexit"] = guielement:new("button", width*8, 129, TEXT["exit"], function() createeditorsavedata("menu"); menu_load() end, 2)
+	elseif menutype == "maps" then
+		guielements["confirmsave"] = guielement:new("button", width*8, 112, TEXT["save and continue"], function() savelevel(); createeditorsavedata("changelevel"); mapnumberclick(unpack(args)) end, 2)
+		guielements["confirmexit"] = guielement:new("button", width*8, 129, TEXT["continue"], function() createeditorsavedata("changelevel"); mapnumberclick(unpack(args)) end, 2)
+	end
+	--guielements["confirmcancel"] = guielement:new("button", width*8, 136, TEXT["cancel"], closeconfirmmenu, 2)
+
+	guielements["confirmsave"].x = guielements["confirmsave"].x - (guielements["confirmsave"].width / 2) - 3
+	guielements["confirmexit"].x = guielements["confirmexit"].x - (guielements["confirmexit"].width / 2) - 3
+	--guielements["confirmcancel"].x = guielements["confirmcancel"].x - (guielements["confirmcancel"].width / 2) - 3
+	guielements["confirmsave"].bordercolor = {255, 0, 0}
+	guielements["confirmsave"].bordercolorhigh = {255, 127, 127}
+end
+
+function closeconfirmmenu()
+	confirmmenuopen = false
+	for i, v in pairs(confirmmenuguisave) do
+		v.active = true
+	end
+	confirmmenuguisave = false
+
+	guielements["confirmsave"] = nil
+	guielements["confirmexit"] = nil
+	--guielements["confirmcancel"] = nil
+end
+
+function createeditorsavedata(t) -- "testing", "menu", "changelevel"
+	if (not PersistentEditorTools) or (t == "menu" and (not PersistentEditorToolsLocal)) then
+		editorsavedata = false
+		return
+	end
+
+	editorsavedata = {
+		currenttile = currenttile,
+		editentities = editentities,
+		brushsizex = brushsizex,
+		brushsizey = brushsizey,
+		customtabstate = customtabstate,
+		assistmode = assistmode,
+		backgroundtilemode = backgroundtilemode
+	}
+	if t == "changelevel" then
+		return
+	end
+
+	editorsavedata["editorstate"] = editorstate
+	if PersistentEditorToolsLocal then
+		local data = JSON:encode_pretty(editorsavedata)
+		love.filesystem.write(mappackfolder .. "/" .. mappack .. "/editorsave.json", data)
 	end
 end
 
-function endingtextcolorright()
-	if textcolorl == "white" then
-		textcolorl = "red"
-	elseif textcolorl == "red" then
-		textcolorl = "blue"
-	elseif textcolor1 == "blue" then
-		textcolorl = "yellow"
-	elseif textcolorl == "yellow" then
-		textcolorl = "green"
-	elseif textcolorl == "green" then
-		textcolorl = "orange"
-	elseif textcolorl == "orange" then
-		textcolorl = "pink"
-	elseif textcolorl == "pink" then
-		textcolorl = "purple"
-	elseif textcolorl ~= "purple" then
-		textcolorl = "yellow"
-	end
-end
-
-function hudtextcolorleft()
-	if textcolorp == "red" then
-		textcolorp = "white"
-	elseif textcolorp == "blue" then
-		textcolorp = "red"
-	elseif textcolor1 == "yellow" then
-		textcolorp = "blue"
-	elseif textcolorp == "green" then
-		textcolorp = "yellow"
-	elseif textcolorp == "orange" then
-		textcolorp = "green"
-	elseif textcolorp == "pink" then
-		textcolorp = "orange"
-	elseif textcolorp == "purple" then
-		textcolorp = "pink"
-	elseif textcolorp == "black" then
-		textcolorp = "purple"
-	elseif textcolorp ~= "white" then
-		textcolorp = "blue"
-	end
+function changehudtextcolor(var)
+	textcolorp = textcolorsnames[var]
 	if textcolorp == "black" then
 		togglehudoutline(false)
 	elseif textcolorp ~= "white" then
 		togglehudoutline(true)
 	end
-end
-
-function hudtextcolorright()
-	if textcolorp == "white" then
-		textcolorp = "red"
-	elseif textcolorp == "red" then
-		textcolorp = "blue"
-	elseif textcolor1 == "blue" then
-		textcolorp = "yellow"
-	elseif textcolorp == "yellow" then
-		textcolorp = "green"
-	elseif textcolorp == "green" then
-		textcolorp = "orange"
-	elseif textcolorp == "orange" then
-		textcolorp = "pink"
-	elseif textcolorp == "pink" then
-		textcolorp = "purple"
-	elseif textcolorp == "purple" then
-		textcolorp = "black"
-	elseif textcolorp ~= "black" then
-		textcolorp = "yellow"
-	end
-	if textcolorp == "black" then
-		togglehudoutline(false)
-	elseif textcolorp ~= "white" then
-		togglehudoutline(true)
-	end
+	guielements["hudcolor"].var = var
 end
 
 function generateanimationgui()
@@ -3861,7 +3967,7 @@ function openchangewidth()
 	guielements["maprightleft"].active = true
 	guielements["maprightright"].active = true
 	guielements["mapwidthapply"].active = true
-	guielements["mapwidthcancel"].active = true
+	--guielements["mapwidthcancel"].active = true
 
 	changemapwidthmenu = true
 	newmapwidth = mapwidth
@@ -4179,7 +4285,7 @@ function placetile(x, y, tilei)
 	
 	local currenttile = tilei or currenttile
 	local argument
-	if editentities and entitylist[currenttile] and entitylist[currenttile].offset then
+	if editentities and ((entitylist[currenttile] and entitylist[currenttile].offset) or (enemiesdata[currenttile] and enemiesdata[currenttile].offsetable)) then
 		local allowoffset = true
 		--don't clip with entity on the right
 		if ismaptile(cox+1, coy) and map[cox+1][coy][2] and map[cox+1][coy][2] == currenttile and not map[cox+1][coy].argument then
@@ -4192,8 +4298,9 @@ function placetile(x, y, tilei)
 			--[[if mx < 16*0 and inmap(cox-1, coy) then
 				cox = cox - 1
 				argument = "o"
-			else]]if mx > 16*0.75 then
-				if type(entitylist[currenttile].offset) == "number" then
+			else]]
+			if mx > 16*0.75 then
+				if entitylist[currenttile] and type(entitylist[currenttile].offset) == "number" then
 					currenttile = entitylist[currenttile].offset
 				else
 					argument = "o"
@@ -4263,7 +4370,7 @@ function placetile(x, y, tilei)
 		local t = map[cox][coy]
 		--update track previews
 		local queuetrackpreview
-		if trackpreviews and map[cox][coy][2] and entityquads[map[cox][coy][2]] and entityquads[map[cox][coy][2]].t == "track" then
+		if trackpreviews and map[cox][coy][2] and entityquads[map[cox][coy][2]] and (entityquads[map[cox][coy][2]].t == "track" or entityquads[map[cox][coy][2]].t == "trackswitch") then
 			queuetrackpreview = true
 		end
 		if entityquads[currenttile] and entityquads[currenttile].t == "remove" then --removing tile
@@ -4297,13 +4404,26 @@ function placetile(x, y, tilei)
 				for i = 4, #map[cox][coy] do
 					map[cox][coy][i] = nil
 				end
-			elseif tablecontains(customenemies, currenttile) and enemiesdata[currenttile] and enemiesdata[currenttile].rightclickmenu then --custom enemies
-				if enemiesdata[currenttile].rightclickmenutable then
-					map[cox][coy][3] = 2
-				else
-					local default = enemiesdata[currenttile].rightclickmenu[2]
-					local s = tostring(default)
-					default = s:gsub("-", "B")
+			elseif tablecontains(customenemies, currenttile) and enemiesdata[currenttile] and (enemiesdata[currenttile].rightclickmenu or enemiesdata[currenttile].rightclick) then --custom enemies
+				local v = enemiesdata[currenttile]
+				if v.rightclickmenu then
+					if v.rightclickmenutable then
+						map[cox][coy][3] = 2
+					else
+						local default = v.rightclickmenu[2]
+						local s = tostring(default)
+						default = s:gsub("-", "B")
+						map[cox][coy][3] = default
+					end
+				elseif v.rightclick then
+					local default = ""
+					local b = v.rightclickdefaults
+					for i = 1, #b-1 do
+						default = default .. tostring(b[i]) .. "|"
+					end
+					default = default .. b[#b]
+					default = default:gsub("-", "B")
+
 					map[cox][coy][3] = default
 				end
 				for i = 4, #map[cox][coy] do
@@ -4525,9 +4645,9 @@ function createlevelbuttons(i)
 		for k = 0, mappacklevels[i][j] do --sublevel
 			local name = i .. "-" .. j .. "_" .. k
 			if k == 0 then
-				guielements[name] = guielement:new("button", 104, 20+((j-1)*39), TEXT["level "] .. j, mapnumberclick, 0, {i, j, k}, 1.8, 71, true)
+				guielements[name] = guielement:new("button", 104, 20+((j-1)*39), TEXT["level "] .. j, function() openconfirmmenu("maps", {i, j, k}) end, 0, nil, 1.8, 71, true)
 			else
-				guielements[name] = guielement:new("button", 134+((k-1)*19), 41+((j-1)*39), k, mapnumberclick, 0, {i, j, k}, 1.6, 15, true)
+				guielements[name] = guielement:new("button", 134+((k-1)*19), 41+((j-1)*39), k, function() openconfirmmenu("maps", {i, j, k}) end, 0, nil, 1.6, 15, true)
 			end
 			
 			local s = i .. "-" .. j
@@ -4875,6 +4995,18 @@ function editor_mousepressed(x, y, button)
 						--linktoolX, linktoolY = tileX, tileY
 						--syke, just open up the right click menu
 						openrightclickmenu(x, y, tileX, tileY)
+						--then automatically click the link button ONLY if there's just one
+						local count = 0
+						local button
+						for i, b in ipairs(rightclickobjects) do
+							if b and b.type == "button" and b.func == startrclink then
+								count = count + 1
+								button = b
+							end
+						end
+						if count == 1 and button then
+							startrclink(unpack(button.arguments))
+						end
 					end
 				end
 			elseif editorstate == "selectiontool" then
@@ -4896,7 +5028,6 @@ function editor_mousepressed(x, y, button)
 					pastingtiles = true
 					editentities = false
 					tilesall()
-					resettileselection()
 					tileselectionmoving = true
 					
 					allowdrag = false
@@ -4929,16 +5060,8 @@ function editor_mousepressed(x, y, button)
 										tile1 = false --don't paste empty space
 									end
 									if not backgroundtilemode then
-										if not d[3] then
-											map[tx][ty][1] = tile1 or map[tx][ty][1]
-											map[tx][ty][2] = d[2] or map[tx][ty][2]
-											map[tx][ty]["back"] = d["back"]
-											if map[tx][ty][2] then
-												map[tx][ty]["argument"] = d["argument"]
-											end
-										else
-											map[tx][ty] = {tile1 or map[tx][ty][1], d[2] or map[tx][ty][2], d[3] or map[tx][ty][3], back=d["back"],argument=d["argument"]}
-										end
+										map[tx][ty] = shallowcopy(d)
+										map[tx][ty][1] = tile1 or map[tx][ty][1]
 									end
 									map[tx][ty]["gels"] = {}
 								end
@@ -5305,6 +5428,7 @@ function openrightclickmenu(x, y, tileX, tileY)
 		return false
 	end
 	levelmodified = true
+	local scoot = false
 	--LIST OF TILES THAT DO SHIT
 	if entitylist[r[2]] and rightclickvalues[entitylist[r[2]].t] then
 		rightclickmenuX = x
@@ -5394,6 +5518,103 @@ function openrightclickmenu(x, y, tileX, tileY)
 		if v.rightclickmenutable then
 			rightclickmenu.trustWhatStartWasSetAs = true
 		end
+	elseif tablecontains(customenemies, r[2]) and enemiesdata[r[2]] and enemiesdata[r[2]].rightclick then
+		local v = enemiesdata[r[2]]
+		rightclickmenuX = x
+		rightclickmenuY = y
+		rightclickmenucox = tileX
+		rightclickmenucoy = tileY
+		rightclickmenuopen = true
+		rightclickobjects = {width = 8, height = 6}
+		customrcopen = "custom_enemy"
+
+		local rx, ry = (x/scale)+4, (y/scale)+4
+
+		local default = ""
+		local b = v.rightclickdefaults
+		for i = 1, #b-1 do
+			default = default .. tostring(b[i]) .. "|"
+		end
+		default = default .. b[#b]
+		default = default:gsub("-", "B")
+
+		local usingdefaultvalues = false
+		if not r[3] then
+			table.insert(map[rightclickmenucox][rightclickmenucoy], 3, default)
+			usingdefaultvalues = true
+		end
+
+		rightclickvalues2 = {map[rightclickmenucox][rightclickmenucoy][3]} --right-click values
+		if tostring(map[rightclickmenucox][rightclickmenucoy][3]):find("|") then
+			rightclickvalues2 = tostring(map[rightclickmenucox][rightclickmenucoy][3]):split("|") --split the values
+		end
+
+		--load in default values if there aren't enough
+		if default and tostring(default):find("|") and (not usingdefaultvalues) then
+			local defaultvalues = default:split("|")
+			local numberofdefaultvalues = #defaultvalues
+			for i = #rightclickvalues2+1, numberofdefaultvalues do
+				rightclickvalues2[i] = defaultvalues[i]
+			end
+		end
+
+		local vt = rightclickvalues2
+		local addv = 0
+		local width = 0
+		local extraobjects = 0
+		local index = 0
+		for i = 1, #v.rightclick do
+			if v.rightclick[i][1] ~= "text" then
+				index = index + 1
+			end
+			local obj = i+extraobjects
+			width = 0
+			if v.rightclick[i][1] == "text" then
+				table.insert(rightclickobjects, guielement:new("text", rx, ry, v.rightclick[i][2], {255, 255, 255}))
+				width = 8*#v.rightclick[i][2]
+				addv = 10
+			elseif v.rightclick[i][1] == "dropdown" then
+				local ni = index
+				local var = vt[index]
+				local ents = v.rightclick[i][4]
+				if tostring(var) then
+					local target = tostring(var):gsub("B", "-")
+					var = tablecontainsistring(ents, target)
+					vt[index] = var
+				end
+			
+				local obj = guielement:new("dropdown", rx, ry, v.rightclick[i][3], function(v) rightclickobjects[obj].var = v; vt[ni] = v end, vt[index], unpack(ents))
+				if v.rightclick[i][5] then
+					obj.displayentries = deepcopy(v.rightclick[i][5])
+				end
+				table.insert(rightclickobjects, obj)
+				width = v.rightclick[i][3]*8+13
+				addv = 15
+			elseif v.rightclick[i][1] == "input" then
+				local ni = index
+				table.insert(rightclickobjects, guielement:new("input", rx, ry, v.rightclick[i][3], function(v) vt[ni] = v end, vt[index], v.rightclick[i][3], 1, "rightclick"))
+				width = v.rightclick[i][3]*8+5
+				addv = 16
+			elseif v.rightclick[i][1] == "checkbox" then
+				local ni = index
+				local var = vt[index]
+				if type(var) == "string" then
+					var = (vt[index] == "true")
+				end
+
+				table.insert(rightclickobjects, guielement:new("checkbox", rx, ry+2, function(v) rightclickobjects[obj].var = v; vt[ni] = v end, var, v.rightclick[i][3] or ""))
+				width = #v.rightclick[i][3]*8+10
+				addv = 13
+			end
+
+			if width+8 > rightclickobjects.width then
+				rightclickobjects.width = width+8
+			end
+			ry = ry + addv
+			rightclickobjects.height = rightclickobjects.height + addv
+		end
+
+		scoot = true
 	elseif entitylist[r[2]] and rightclicktype[entitylist[r[2]].t] then --custom rightclick menu
 		rightclickmenuX = x
 		rightclickmenuY = y
@@ -5658,13 +5879,16 @@ function openrightclickmenu(x, y, tileX, tileY)
 			rct.objfunc()
 		end
 		
+		scoot = true
+	end
+	if scoot then
 		--Move if out of screen
 		local scootx = ((x/scale)+rightclickobjects.width > width*16)
 		local scooty = ((y/scale)+rightclickobjects.height > height*16)
 		local shifty = ((y/scale)-rightclickobjects.height < 0)
-
+	
 		local truey = rightclickobjects[1].y
-		
+			
 		if scootx or scooty then
 			for i = 1, #rightclickobjects do
 				local obj = rightclickobjects[i]
@@ -5716,30 +5940,62 @@ function rightclickmenuclick(i)
 end
 
 function closecustomrc(save)
+	if customrcopen == false then
+		return
+	end
 	if rightclickobjects and inmap(rightclickmenucox,rightclickmenucoy) then
-		--save dropdowns correctly
-		local rct = rightclicktype[entitylist[map[rightclickmenucox][rightclickmenucoy][2]].t] --custom right-click table
-		local vt = rightclickvalues2
-		if rct then
-			for i, t in pairs(rct.format) do
-				local ttype = type(t)
-				if ttype == "table" then
-					local obj = t[1]
-					if obj == "dropdown" and ((not rct.t) or t.ignorerctt) then
-						if vt[t[2]] then
-							vt[t[2]] = t[5][vt[t[2]]]
+		if customrcopen == "custom_enemy" then
+			local v = enemiesdata[map[rightclickmenucox][rightclickmenucoy][2]]
+			local vt = rightclickvalues2
+			if v then
+				local index = 0
+				for i = 1, #v.rightclick do
+					if v.rightclick[i][1] ~= "text" then
+						index = index + 1
+						if v.rightclick[i][1] == "dropdown" then
+							local ents =  v.rightclick[i][4]
+							if vt[index] then
+								vt[index] = tostring(ents[vt[index]])
+								vt[index] = vt[index]:gsub("-", "B")
+							end
 						end
 					end
 				end
+			else
+				notice.new("rightclick menu error", notice.red, 3)
 			end
 		else
-			notice.new("rightclick menu error", notice.red, 3)
+			--save dropdowns correctly
+			local rct = rightclicktype[entitylist[map[rightclickmenucox][rightclickmenucoy][2]].t] --custom right-click table
+			local vt = rightclickvalues2
+			if rct then
+				for i, t in pairs(rct.format) do
+					local ttype = type(t)
+					if ttype == "table" then
+						local obj = t[1]
+						if obj == "dropdown" and ((not rct.t) or t.ignorerctt) then
+							if vt[t[2]] then
+								vt[t[2]] = t[5][vt[t[2]]]
+							end
+						end
+					end
+				end
+			else
+				notice.new("rightclick menu error", notice.red, 3)
+			end
 		end
 	end
-	if rightclicktype[customrcopen].savefunc then
+	if rightclicktype[customrcopen] and rightclicktype[customrcopen].savefunc then
 		rightclicktype[customrcopen].savefunc()
 	end
-	if save and rightclicktype[customrcopen].default then
+	if customrcopen == "custom_enemy" then
+		local s = ""
+		for i = 1, #rightclickvalues2 do
+			s = s .. tostring(rightclickvalues2[i]) .. "|"
+		end
+		s = s:sub(1, -2)
+		map[rightclickmenucox][rightclickmenucoy][3] = s
+	elseif save and rightclicktype[customrcopen].default then
 		local s = ""
 		for i = 1, #rightclickvalues2 do
 			s = s .. tostring(rightclickvalues2[i]) .. "|"
@@ -5906,6 +6162,7 @@ function startrctrack(var) --track path
 		y = rightclickmenucoy,--offsety
 		vars = deepcopy(rightclickvalues2),
 		drag = true, --able to add onto path currently?
+		var = var --which entity variable is the path loaded to?
 	}
 	local rcp = rightclicktrack
 
@@ -5968,7 +6225,7 @@ function setrctrack()
 	local r = map[rightclickmenucox][rightclickmenucoy]
 	customrcopen = entitylist[r[2]].t
 	if rightclicktype[customrcopen].trackfunc then
-		rightclicktype[customrcopen].trackfunc(s)
+		rightclicktype[customrcopen].trackfunc(s, rightclicktrack.var)
 	end
 	rightclicktrack = {}
 	closecustomrc(true)
@@ -6117,28 +6374,46 @@ function editor_mousereleased(x, y, button)
 			else
 				if pastingtiles and tileselectionmoving then
 					--PASTE TILES
+					local sx, sy = getMouseTile(x, y+8*screenzoom*scale)
+					sx = sx + pastecenter[1]-1
+					sy = sy + pastecenter[2]-1
 					for i, v in pairs(mtclipboard) do
 						for j, w in pairs(v) do
-							if w[1] == 1 and (not w[2]) and (not w["back"]) and pastemode == 1 then
-								-- nothing
-							else
-								local tx, ty = getMouseTile(x+(i-1 + pastecenter[1])*16*scale, y+(j-1 + pastecenter[2])*16*scale+8*scale)
+							if not (w[1] == 1 and (not w[2]) and (not w["back"]) and pastemode == 1) then
+								tx = sx + i
+								ty = sy + j
 								if ismaptile(tx, ty) then
 									local d = mtclipboard[i][j]
 									currenttile = d[1]
 									backgroundtilemode = false
 									placetile(x+(i-1 + pastecenter[1])*16*scale, y+(j-1 + pastecenter[2])*16*scale)
-									map[tx][ty] = {d[1] or map[tx][ty][1], d[2] or map[tx][ty][2], d[3] or map[tx][ty][3], back=d["back"], argument=d["argument"]}
+									map[tx][ty] = shallowcopy(d)
 									map[tx][ty]["gels"] = {}
 									--generate new tracks if track moved
-									if d[2] and entityquads[d[2]] and entityquads[d[2]].t == "track" then
+									if d[2] and entityquads[d[2]] and (entityquads[d[2]].t == "track" or entityquads[d[2]].t == "trackswitch") then
 										generatetrackpreviews()
 									end
 								end
 							end
 						end
 					end
-					local tx, ty = getMouseTile(x, y+8*scale)
+					for x = 1, mapwidth do
+						for y = 1, mapheight do
+							local d = map[x][y]
+							if tablecontains(inputsi, d[2]) then
+								for i = 3, #d do
+									if d[i] == "link" then
+										if inrange(d[i+1], tileselection[1], tileselection[3], true) and inrange(d[i+2], tileselection[2], tileselection[4], true) then
+											d[i+1] = d[i+1] + (sx-tileselection[1])+1
+											d[i+2] = d[i+2] + (sy-tileselection[2])+1
+										end
+									end
+								end
+								
+							end
+						end
+					end
+					local tx, ty = getMouseTile(x, y+8*screenzoom*scale)
 					tileselection = {tx+math.floor(pastecenter[1]), ty+math.floor(pastecenter[2]), tx+math.floor(pastecenter[1])+#mtclipboard-1, ty+math.floor(pastecenter[2])+#mtclipboard[1]-1}
 					tileselection.finished = true
 					pastingtiles = false
@@ -6291,7 +6566,7 @@ function editor_keypressed(key, textinput)
 			editormenuopen = false
 		end
 	end
-	if brushsizetoggle then
+	if brushsizetoggle and (not editormenuopen) then
 		if key == "up" and brushsizey > 1 then
 			brushsizey = brushsizey - 1
 		elseif key == "left" and brushsizex > 1 then
@@ -6337,6 +6612,8 @@ function editor_keypressed(key, textinput)
 			editormenuopen = false
 		elseif changemapwidthmenu then
 			mapwidthcancel()
+		elseif confirmmenuopen then
+			closeconfirmmenu()
 		else
 			if editormenuopen then
 				editorclose()
@@ -6507,7 +6784,7 @@ function editor_keypressed(key, textinput)
 	end
 
 	--quicktest
-	if key == "\\" then
+	if key == "\\" and (not confirmmenuopen) then
 		test_level(objects["player"][1].x, objects["player"][1].y)
 		return
 	end
@@ -6590,7 +6867,7 @@ function getTilesSelection()
 	for x = math.max(1,tileselection[1]), math.min(tileselection[3],mapwidth) do
 		tx = {}
 		for y = math.max(1, tileselection[2]), math.min(tileselection[4],mapheight) do
-			table.insert(tx, {map[x][y][1],map[x][y][2],map[x][y][3],back=map[x][y]["back"],argument=map[x][y]["argument"]})
+			table.insert(tx, shallowcopy(map[x][y]))
 		end
 		table.insert(objecttable, tx)
 	end
@@ -6945,14 +7222,48 @@ function decreasetimelimit()
 		mariotimelimit = 0
 	end
 	mariotime = mariotimelimit
-	guielements["timelimitincrease"].x = 31 + string.len(mariotimelimit)*8
+	guielements["timelimitincrease"].x = 33 + string.len(mariotimelimit)*8
+	guielements["timelimitinput"].width = string.len(mariotimelimit)
+	guielements["timelimitinput"].value = mariotimelimit
 end
-
 function increasetimelimit()
 	levelmodified = true
 	mariotimelimit = mariotimelimit + 10
 	mariotime = mariotimelimit
-	guielements["timelimitincrease"].x = 31 + string.len(mariotimelimit)*8
+	guielements["timelimitincrease"].x = 33 + string.len(mariotimelimit)*8
+	guielements["timelimitinput"].width = string.len(mariotimelimit)
+	guielements["timelimitinput"].value = mariotimelimit
+end
+
+function changetimelimitinputting()
+	guielements["timelimitincrease"].x = 33+6*8
+	guielements["timelimitinput"].width = 6
+	guielements["timelimitincrease"].active = false
+	guielements["timelimitdecrease"].active = false
+end
+function changetimelimituninputting()
+	guielements["timelimitinput"].value = mariotimelimit
+	guielements["timelimitincrease"].x = 33 + string.len(mariotimelimit)*8
+	guielements["timelimitinput"].width = string.len(mariotimelimit)
+	guielements["timelimitincrease"].active = true
+	guielements["timelimitdecrease"].active = true
+end
+function changetimelimit()
+	levelmodified = true
+	local newmariotimelimit = tonumber(guielements["timelimitinput"].value)
+	if type(newmariotimelimit) ~= "number" then
+		notice.new("time limit must be a number!", notice.red, 3)
+		changetimelimituninputting()
+	else
+		mariotimelimit = math.max(0, math.min(math.floor(newmariotimelimit), 999999))
+		guielements["timelimitinput"].value = mariotimelimit
+		mariotime = mariotimelimit
+		guielements["timelimitincrease"].x = 33 + string.len(mariotimelimit)*8
+		guielements["timelimitinput"].width = string.len(mariotimelimit)
+	end
+	guielements["timelimitincrease"].active = true
+	guielements["timelimitdecrease"].active = true
+	guielements["timelimitinput"].inputting = false
 end
 
 function changeportalgun(var)
@@ -7199,6 +7510,8 @@ function linkbutton()
 end
 
 function test_level(x, y)
+	createeditorsavedata("test")
+	
 	local targetxscroll, targetyscroll = xscroll, yscroll
 	if levelmodified and onlysaveiflevelmodified then
 		savelevel()
@@ -7356,6 +7669,9 @@ function savesettings()
 	end
 	if continuesublevelmusic then
 		s = s .. "continuesublevelmusic=t\n"
+	end
+	if nolowtime then
+		s = s .. "nolowtime=t\n"
 	end
 	
 	love.filesystem.createDirectory( mappackfolder )
@@ -7587,6 +7903,14 @@ function togglecontinuemusic(var)
 	guielements["continuemusiccheckbox"].var = continuesublevelmusic
 end
 
+function togglenolowtime(var)
+	if var ~= nil then
+		nolowtime = var
+	else
+		nolowtime = not nolowtime
+	end
+	guielements["nolowtimecheckbox"].var = nolowtime
+end
 
 function updatescrollfactor()
 	--not a scrollfactor lol
@@ -7648,28 +7972,38 @@ function generatetrackpreviews()
 			if map[mx][my]["track"] and map[mx][my]["track"].id ~= trackgenerationid then --delete old tracks
 				map[mx][my]["track"] = nil
 			end
-			if map[mx][my][2] and entityquads[map[mx][my][2]].t == "track" then
-				local v = convertr(map[mx][my][3], {"string", "bool"}, true)
-				local trackdata = v[1]
-				if trackdata then
-					local s = trackdata:gsub("n", "-")
-					local s2 = s:split("`")
-					
-					local s3
-					for i = 1, #s2 do
-						s3 = s2[i]:split(":")
-						local x, y = tonumber(s3[1]), tonumber(s3[2])
-						local start, ending, grab = s3[3], s3[4], s3[5]
+			if map[mx][my][2] and (entityquads[map[mx][my][2]].t == "track" or entityquads[map[mx][my][2]].t == "trackswitch") then
+				local v
+				local pathvars = 1 --how many track paths does the entity have?
+				if entityquads[map[mx][my][2]].t == "trackswitch" then 
+					v = convertr(map[mx][my][3], {"string", "string", "bool"}, true)
+					pathvars = 2
+				else
+					v = convertr(map[mx][my][3], {"string", "bool"}, true)
+				end
+				local trackdata
+				for pathvar = 1, pathvars do
+					trackdata = v[pathvar]
+					if trackdata then
+						local s = trackdata:gsub("n", "-")
+						local s2 = s:split("`")
 						
-						if x and y then
-							local tx, ty = mx+x, my+y
-							if ismaptile(tx,ty) then
-								map[tx][ty]["track"] = {start=start, ending=ending, grab=grab, id=trackgenerationid, cox=mx, coy=my}
+						local s3
+						for i = 1, #s2 do
+							s3 = s2[i]:split(":")
+							local x, y = tonumber(s3[1]), tonumber(s3[2])
+							local start, ending, grab = s3[3], s3[4], s3[5]
+							
+							if x and y then
+								local tx, ty = mx+x, my+y
+								if ismaptile(tx,ty) then
+									map[tx][ty]["track"] = {start=start, ending=ending, grab=grab, id=trackgenerationid, cox=mx, coy=my}
+								else
+									break
+								end
 							else
 								break
 							end
-						else
-							break
 						end
 					end
 				end

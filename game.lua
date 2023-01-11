@@ -46,63 +46,21 @@ function game_load(suspended)
 	dropshadow = false
 	realtime = false
 	continuesublevelmusic = false
+	nolowtime = false
 	nocoinlimit = false
 	setphysics(1)
-	if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/settings.txt") and not dcplaying then
-		local s = love.filesystem.read( mappackfolder .. "/" .. mappack .. "/settings.txt" )
-		local s1 = s:split("\n")
-		for j = 1, #s1 do
-			local s2 = s1[j]:split("=")
-			if s2[1] == "lives" then
-				mariolivecount = tonumber(s2[2])
-			elseif s2[1] == "physics" then
-				currentphysics = tonumber(s2[2]) or 1
-				setphysics(currentphysics)
-			elseif s2[1] == "camera" then
-				camerasetting = tonumber(s2[2]) or 1
-				setcamerasetting(camerasetting)
-			elseif s2[1] == "dropshadow" then
-				dropshadow = true
-			elseif s2[1] == "realtime" then
-				realtime = true
-			elseif s2[1] == "nocoinlimit" then
-				nocoinlimit = true
-			elseif s2[1] == "continuesublevelmusic" then
-				continuesublevelmusic = true
-			elseif s2[1] == "character" then
-				for i = 1, players do
-					setcustomplayer(s2[2], i)
-				end
-			end
-		end
+	if not dcplaying then
+		loadmappacksettings()
 	end
-	
-	if mariolivecount == 0 or dcplaying then
-		mariolivecount = false
-	end
-	
-	if InfiniteLivesMultiplayer and (not (SERVER or CLIENT)) and players > 1 then
-		infinitelives = true
-	end
-	
-	mariolives = {}
-	for i = 1, players do
-		mariolives[i] = mariolivecount
-	end
-	
-	mariosizes = {}
-	for i = 1, players do
-		mariosizes[i] = 1
-	end
-	
-	updateplayerproperties()
+
+	updatemappacksettings()
 	
 	autoscroll = true
 	autoscrollx = true
 	autoscrolly = true
 	
-	inputs = { "door", "groundlight", "wallindicator", "cubedispenser", "walltimer", "notgate", "laser", "lightbridge", "delayer", "funnel", "portal1", "portal2", "text", "geldispenser", "tiletool", "enemytool", "randomizer", "musicchanger", "rocketturret", "checkpoint", "emancipationgrill", "belt", "animationtrigger", "faithplate", "animatedtiletrigger", "orgate", "andgate", "rsflipflop", "kingbill", "platform", "collectable", "skewer", "energylauncher", "camerastop", "laserfields", "track" }
-	inputsi = {28, 29, 30, 43, 44, 45, 46, 47, 48, 67, 74, 84, 52, 53, 54, 55, 36, 37, 38, 39, 186, 198, 197, 199, 61, 62, 63, 64, 65, 66, 71, 72, 73, 181, 182, 183, 201, 205, 206, 210, 194, 225, 226, 227, 229, 230, 231, 232, 100, 26, 27, 266, 271, 273, 274, 272, 105, 163, 248, 249, 18, 19, 259, 166, 167, 168, 169, 304, 309, 311, 306}
+	inputs = { "door", "groundlight", "wallindicator", "cubedispenser", "walltimer", "notgate", "laser", "lightbridge", "delayer", "funnel", "portal1", "portal2", "text", "geldispenser", "tiletool", "enemytool", "randomizer", "musicchanger", "rocketturret", "checkpoint", "emancipationgrill", "belt", "animationtrigger", "faithplate", "animatedtiletrigger", "orgate", "andgate", "rsflipflop", "kingbill", "platform", "collectable", "skewer", "energylauncher", "camerastop", "laserfields", "track", "animationtrigger", "snakeblock", "risingwater", "trackswitch" }
+	inputsi = {28, 29, 30, 43, 44, 45, 46, 47, 48, 67, 74, 84, 49, 50, 51, 52, 53, 54, 55, 36, 37, 38, 39, 186, 198, 197, 199, 61, 62, 63, 64, 65, 66, 71, 72, 73, 181, 182, 183, 201, 205, 206, 210, 194, 225, 226, 227, 229, 230, 231, 232, 100, 26, 27, 266, 271, 273, 274, 272, 105, 163, 248, 249, 18, 19, 259, 166, 167, 168, 169, 304, 309, 311, 306, 270, 317, 290, 285}
 	
 	outputs = { "button", "laserdetector", "box", "pushbutton", "walltimer", "notgate", "energycatcher", "squarewave", "delayer", "regiontrigger", "randomizer", "tiletool", "orgate", "andgate", "rsflipflop", "flipblock", "doorsprite", "collectablelock", "collectable", "animationoutput" }
 	outputsi = {40, 56, 57, 58, 59, 20, 68, 69, 74, 84, 165, 170, 171, 172, 173, 185, 186, 200, 206, 201, 222, 267, 268, 273, 274, 272, 275, 163, 248, 249, 277, 276, 291}
@@ -133,6 +91,8 @@ function game_load(suspended)
 	objects = nil
 	if suspended == true then
 		continuegame()
+		loadmappacksettings()
+		updatemappacksettings()
 	elseif suspended then
 		marioworld = suspended
 	end
@@ -358,7 +318,7 @@ function game_update(dt)
 			if queuelowtime then
 				queuelowtime = queuelowtime - 2.5*dt
 			end
-			if mariotime > 0 and mariotime + 2.5*dt >= 99 and mariotime < 99 and (not dcplaying) and (not levelfinished) then
+			if mariotime > 0 and mariotime + 2.5*dt >= 99 and mariotime < 99 and (not dcplaying) and (not levelfinished) and not nolowtime then
 				startlowtime()
 			end
 			
@@ -810,6 +770,10 @@ function game_update(dt)
 	end
 	--funnel
 	for i, v in pairs(objects["funnel"]) do
+		v:update(dt)
+	end
+	--tracks
+	for i, v in pairs(tracks) do
 		v:update(dt)
 	end
 
@@ -1458,7 +1422,7 @@ function game_update(dt)
 	end
 	
 	--WIND
-	if not levelfinished and windstarted then
+	if windstarted and (not levelfinished) then
 		if windsound:isStopped() then --couldn't find a wind sound!!! 11/14/2015 went to the level myself and got the sound (with a beat on it but oh well)
 			playsound(windsound)
 		end
@@ -1558,8 +1522,8 @@ function game_draw()
 		love.graphics.setColor(255, 255, 255, 255)
 		--tremoooor!
 		if earthquake > 0 and not pausemenuopen then
-			tremorx = (math.random()-.5)*2*earthquake
-			tremory = (math.random()-.5)*2*earthquake
+			tremorx = (math.random()-.5)*2*earthquake*scale
+			tremory = (math.random()-.5)*2*earthquake*scale
 			
 			love.graphics.translate(round(tremorx), round(tremory))
 		end
@@ -1650,6 +1614,9 @@ function game_draw()
 			for j, w in pairs(objects["yoshi"]) do
 				w:draw()
 			end
+			--[[for j, w in pairs(objects["redseesaw"]) do --has overlapping shadows
+				w:draw()
+			end]]
 			for j, w in pairs(objects) do	
 				if j ~= "tile" and j ~= "pixeltile" then
 					for i, v in pairs(w) do
@@ -1788,6 +1755,11 @@ function game_draw()
 		
 		--door sprites
 		for j, w in pairs(objects["doorsprite"]) do
+			w:draw()
+		end
+
+		--track switches
+		for j, w in pairs(tracks) do
 			w:draw()
 		end
 
@@ -2388,6 +2360,11 @@ function game_draw()
 						end
 					end
 				end
+			end
+			
+			love.graphics.setColor(234, 160, 45, 155)
+			for j, w in pairs(objects["regiontrigger"]) do
+				love.graphics.rectangle("fill", math.floor((w.rx-xscroll)*16*scale)+.5, math.floor((w.ry-yscroll-.5)*16*scale)+.5, w.rw*16*scale-1, w.rh*16*scale-1)
 			end
 			
 			for j, w in pairs(userects) do
@@ -3770,13 +3747,11 @@ function drawHUD()
 	else
 		properprintfunc(playername, uispace*.5 - 24*scale, 8*scale)
 		properprintfunc(addzeros((marioscore or 0), 6), uispace*0.5-24*scale, 16*scale)
-			
-		properprintfunc("*", uispace*1.5-8*scale, 16*scale)
 		
 		love.graphics.setColor(255, 255, 255)
 		love.graphics.draw(coinanimationimage, coinanimationquads[spriteset or 1][coinframe or 1], uispace*1.5-16*scale, 16*scale, 0, scale, scale)
 		love.graphics.setColor(unpack(hudtextcolor))
-		properprintfunc(addzeros((mariocoincount or 0), 2), uispace*1.5-0*scale, 16*scale)
+		properprintfunc("*" .. addzeros((mariocoincount or 0), 2), uispace*1.5-8*scale, 16*scale)
 		
 		properprintfunc(TEXT["world"], uispace*2.5 - 20*scale, 8*scale)
 		local world = marioworld
@@ -3789,7 +3764,7 @@ function drawHUD()
 		
 		properprintfunc(TEXT["time"], uispace*3.5 - 16*scale, 8*scale)
 		if editormode then
-			if linktool then
+			if editorstate == "linktool" then
 				properprintfunc(TEXT["link"], uispace*3.5 - 16*scale, 16*scale)
 			else
 				properprintfunc(TEXT["edit"], uispace*3.5 - 16*scale, 16*scale)
@@ -4310,6 +4285,7 @@ function startlevel(level, reason)
 	spriteset = 1
 	backgroundrgb = {0, 0, 0}
 	breakoutmode = nil
+	queuelowtime = false
 	
 	--GLaDOS
 	neurotoxin = false
@@ -4354,15 +4330,6 @@ function startlevel(level, reason)
 	end
 	originalmapwidth = mapwidth
 	
-	if editormode or testlevel then
-		--reload custom enemies everytime level is loaded
-		enemies_load()
-	else
-		--just update spritesets
-		for name, t in pairs(enemiesdata) do
-			loadenemyquad(name, "no notices")
-		end
-	end
 	if musici > 7 then
 		custommusic = mappackfolder .. "/" .. mappack .. "/" .. musictable[musici]
 	else
@@ -4670,8 +4637,7 @@ function loadmap(filename)
 	map = {} --foreground map
 	bmap_on = false --background map on?
 	local nr, nr2 --map[x][y][1], map[x][y][2]
-	unstatics = {}
-	
+
 	for x = 1, mapwidth do
 		map[x] = {}
 		for y = 1, mapheight do
@@ -4819,6 +4785,17 @@ function loadmap(filename)
 	for i = 1, #animatedtiles do
 		if animatedtiles[i].cache then
 			animatedtiles[i].cache = {}
+		end
+	end
+
+	--CUSTOM ENEMIES
+	if editormode or testlevel then
+		--reload custom enemies everytime level is loaded
+		enemies_load()
+	else
+		--just update spritesets
+		for name, t in pairs(enemiesdata) do
+			loadenemyquad(name, "no notices")
 		end
 	end
 
@@ -5299,15 +5276,13 @@ function game_keypressed(key, textinput)
 			animationsystem_buttontrigger(i, "down")
 		end
 		
-		if controls[i]["portal1"][1] == key and objects["player"][i].portalgun then
-			net_action(i, "portal|1|" .. objects["player"][i].x+6/16 .. "|" .. objects["player"][i].y+6/16 .. "|" .. objects["player"][i].pointingangle)
-			shootportal(i, 1, objects["player"][i].x+6/16, objects["player"][i].y+6/16, objects["player"][i].pointingangle)
+		if controls[i]["portal1"][1] == key and objects["player"][i] then
+			objects["player"][i]:shootportal(1)
 			return
 		end
 		
-		if controls[i]["portal2"][1] == key and objects["player"][i].portalgun then
-			net_action(i, "portal|2|" .. objects["player"][i].x+6/16 .. "|" .. objects["player"][i].y+6/16 .. "|" .. objects["player"][i].pointingangle)
-			shootportal(i, 2, objects["player"][i].x+6/16, objects["player"][i].y+6/16, objects["player"][i].pointingangle)
+		if controls[i]["portal2"][1] == key and objects["player"][i] then
+			objects["player"][i]:shootportal(2)
 			return
 		end
 	end
@@ -5455,61 +5430,11 @@ function game_mousepressed(x, y, button)
 			editor_mousepressed(x, y, button)
 		end
 		
-		if not noupdate and objects["player"][mouseowner] and objects["player"][mouseowner].controlsenabled and objects["player"][mouseowner].vine == false and objects["player"][mouseowner].fence == false then
-			if button == "l" or button == "r" and objects["player"][mouseowner] then
-				--knockback
-				if portalknockback and objects["player"][mouseowner].portalgun then
-					local xadd = math.sin(objects["player"][mouseowner].pointingangle)*30
-					local yadd = math.cos(objects["player"][mouseowner].pointingangle)*30
-					objects["player"][mouseowner].speedx = objects["player"][mouseowner].speedx + xadd
-					objects["player"][mouseowner].speedy = objects["player"][mouseowner].speedy + yadd
-					objects["player"][mouseowner].falling = true
-					objects["player"][mouseowner].animationstate = "falling"
-					objects["player"][mouseowner]:setquad()
-				end
-			end
-		
+		if not noupdate and objects["player"][mouseowner] then
 			if button == "l" then
-				if playertype == "portal" and objects["player"][mouseowner].portalgun and (objects["player"][mouseowner].portals == "both" or objects["player"][mouseowner].portals == "1 only") then
-					local sourcex, sourcey = objects["player"][mouseowner].x+objects["player"][mouseowner].portalsourcex, objects["player"][mouseowner].y+objects["player"][mouseowner].portalsourcey
-					local direction = objects["player"][mouseowner].pointingangle
-					
-					net_action(mouseowner, "portal|1|" .. sourcex .. "|" .. sourcey .. "|" .. direction)
-					shootportal(mouseowner, 1, sourcex, sourcey, direction)
-				elseif playertype == "minecraft" then
-					local v = objects["player"][mouseowner]
-					local sourcex, sourcey = objects["player"][mouseowner].x+objects["player"][mouseowner].portalsourcex, objects["player"][mouseowner].y+objects["player"][mouseowner].portalsourcey
-					local cox, coy, side, tend, x, y = traceline(sourcex, sourcey, v.pointingangle)
-					
-					if cox then
-						local dist = math.sqrt((v.x+v.width/2 - x)^2 + (v.y+v.height/2 - y)^2)
-						if dist <= minecraftrange then
-							breakingblockX = cox
-							breakingblockY = coy
-							breakingblockprogress = 0
-						end
-					end
-				end
-				
+				objects["player"][mouseowner]:shootportal(1)
 			elseif button == "r" then
-				if playertype == "portal" and objects["player"][mouseowner].portalgun and (objects["player"][mouseowner].portals == "both" or objects["player"][mouseowner].portals == "2 only") then
-					local sourcex, sourcey = objects["player"][mouseowner].x+objects["player"][mouseowner].portalsourcex, objects["player"][mouseowner].y+objects["player"][mouseowner].portalsourcey
-					local direction = objects["player"][mouseowner].pointingangle
-					
-					net_action(mouseowner, "portal|2|" .. sourcex .. "|" .. sourcey .. "|" .. direction)
-					shootportal(mouseowner, 2, sourcex, sourcey, direction)
-				elseif playertype == "minecraft" then
-					local v = objects["player"][mouseowner]
-					local sourcex, sourcey = objects["player"][mouseowner].x+objects["player"][mouseowner].portalsourcex, objects["player"][mouseowner].y+objects["player"][mouseowner].portalsourcey
-					local cox, coy, side, tend, x, y = traceline(sourcex, sourcey, v.pointingangle)
-					
-					if cox then
-						local dist = math.sqrt((v.x+v.width/2 - x)^2 + (v.y+v.height/2 - y)^2)
-						if dist <= minecraftrange then
-							placeblock(cox, coy, side)
-						end
-					end
-				end
+				objects["player"][mouseowner]:shootportal(2)
 			end
 		end
 			
@@ -5867,6 +5792,14 @@ function getTile(x, y, portalable, portalcheck, facing, ignoregrates, dir) --ret
 			return false
 		else
 			return true
+		end
+	end
+
+	if objects["tile"][tilemap(x, y)] and (objects["tile"][tilemap(x, y)].slant or objects["tile"][tilemap(x, y)].slab) then
+		if portalcheck then
+			return false, map[x][y][1]
+		else
+			return true, map[x][y][1]
 		end
 	end
 	
@@ -6283,7 +6216,7 @@ function savemap(filename)
 	
 	print("Map saved as " .. mappackfolder .. "/" .. filename .. ".txt")
 	if success then
-		notice.new("Map saved!", notice.white, 2)
+		notice.new(TEXT["Map saved!"], notice.white, 2)
 	else
 		notice.new("Could not save map!\n" .. message, notice.red, 4)
 	end
@@ -6337,8 +6270,12 @@ function traceline(sourcex, sourcey, radians, reportal)
 	end
 
 	local pixeltilecollide = false --TODO: fix? I don't think the +1 should be added to the x
-	if objects["tile"][tilemap(currentblock[1]+1, currentblock[2])] and objects["tile"][tilemap(currentblock[1]+1, currentblock[2])].slant then
-		pixeltilecollide = true
+	if objects["tile"][tileposition] then
+		if objects["tile"][tileposition].slant then
+			pixeltilecollide = true
+		elseif objects["tile"][tileposition].slab then
+			buttonblockcollide = true
+		end
 	end
 	
 	local buttonblockcollide = false
@@ -6468,10 +6405,12 @@ function traceline(sourcex, sourcey, radians, reportal)
 			collide = true
 		end
 
-		if objects["tile"][tileposition] and objects["tile"][tileposition].slant then
-			pixeltilecollide = true
+		if objects["tile"][tileposition] then
+			if (objects["tile"][tileposition].slant or objects["tile"][tileposition].slab) and (not tilequads[tileno].grate) then
+				return false, false, false, false, x, y
+			end
 		end
-		
+			
 		--local buttonblockcollide = false
 		if objects["buttonblock"][tileposition] then
 			local v = objects["buttonblock"][tileposition]
@@ -6714,6 +6653,16 @@ function loadentity(t, x, y, r, id)
 			local type, name = t[1], t[2]
 			if (not tilequads[r[1]]["breakable"]) and (not tilequads[r[1]]["coinblock"]) then
 				local obj = enemy:new(x, y, r[2], r)
+				if r["argument"] and obj then
+					if r["argument"] == "o" then --offsetted
+						obj.x = obj.x + .5
+						if obj.startx then
+							obj.startx = obj.startx + .5
+						end
+					elseif r["argument"] == "b" then --supersized
+						supersizeentity(obj)
+					end
+				end
 				table.insert(objects["enemy"], obj)
 				table.insert(enemiesspawned, {x, y})
 				trackobject(x, y, obj, "enemy")
@@ -7054,7 +7003,9 @@ function spawnentity(t, x, y, r, id)
 		table.insert(objects["plantcreeper"], plantcreeper:new(x, y, r))
 
 	elseif t == "track" then
-		table.insert(tracks, track:new(x, y, r))
+		table.insert(tracks, track:new(x, y, r, false))
+	elseif t == "trackswitch" then
+		table.insert(tracks, track:new(x, y, r, "switch"))
 
 	elseif t == "grinder" then
 		table.insert(objects["grinder"] , grinder:new(x, y, r[3]))
@@ -7097,6 +7048,9 @@ function spawnenemyentity(x, y)
 			if r["argument"] and obj then
 				if r["argument"] == "o" then --offsetted
 					obj.x = obj.x + .5
+					if obj.startx then
+						obj.startx = obj.startx + .5
+					end
 				elseif r["argument"] == "b" then --supersized
 					supersizeentity(obj)
 				end
@@ -8001,7 +7955,7 @@ function game_joystickpressed( joystick, button )
 	end
 	
 	for i = 1, players do
-		if (not noupdate) and objects and objects["player"][i].controlsenabled then --and (not objects["player"][i].vine) and (not objects["player"][i].fence) then
+		if (not noupdate) and objects then --and objects["player"][i].controlsenabled then -- and --and (not objects["player"][i].vine) and (not objects["player"][i].fence) then
 			if editormode and (editormenuopen or rightclickmenuopen) then
 				break
 			end
@@ -8067,9 +8021,8 @@ function game_joystickpressed( joystick, button )
 			local s = controls[i]["portal1"]
 			if s and s[1] == "joy" then
 				if s[3] == "but" then
-					if joystick == s[2] and button == s[4] and objects["player"][i].portalgun and i ~= mouseowner then
-						net_action(i, "portal|1|" .. objects["player"][i].x+6/16 .. "|" .. objects["player"][i].y+6/16 .. "|" .. objects["player"][i].pointingangle)
-						shootportal(i, 1, objects["player"][i].x+6/16, objects["player"][i].y+6/16, objects["player"][i].pointingangle)
+					if joystick == s[2] and button == s[4] and objects["player"][i] and i ~= mouseowner then
+						objects["player"][i]:shootportal(1)
 						return
 					end
 				end
@@ -8078,9 +8031,8 @@ function game_joystickpressed( joystick, button )
 			local s = controls[i]["portal2"]
 			if s and s[1] == "joy" then
 				if s[3] == "but" then
-					if joystick == tonumber(s[2]) and button == tonumber(s[4]) and objects["player"][i].portalgun and i ~= mouseowner then
-						net_action(i, "portal|2|" .. objects["player"][i].x+6/16 .. "|" .. objects["player"][i].y+6/16 .. "|" .. objects["player"][i].pointingangle)
-						shootportal(i, 2, objects["player"][i].x+6/16, objects["player"][i].y+6/16, objects["player"][i].pointingangle)
+					if joystick == tonumber(s[2]) and button == tonumber(s[4]) and objects["player"][i] and i ~= mouseowner then
+						objects["player"][i]:shootportal(2)
 						return
 					end
 				end
@@ -8091,7 +8043,7 @@ end
 
 function game_joystickreleased( joystick, button )
 	for i = 1, players do
-		if (not noupdate) and objects["player"][i].controlsenabled then --and (not objects["player"][i].vine) and (not objects["player"][i].fence) then
+		if (not noupdate) and objects then --objects["player"][i].controlsenabled then --and (not objects["player"][i].vine) and (not objects["player"][i].fence) then
 			if editormode and (editormenuopen or rightclickmenuopen) then
 				break
 			end
@@ -8142,17 +8094,9 @@ function inrange(i, a, b, include)
 	end
 	
 	if include then
-		if i >= a and i <= b then
-			return true
-		else
-			return false
-		end
+		return i >= a and i <= b
 	else
-		if i > a and i < b then
-			return true
-		else
-			return false
-		end
+		return i > a and i < b
 	end
 end
 
@@ -8208,15 +8152,15 @@ function ismaptile(x, y)
 end
 
 function playmusic()
-	if editormode and not PlayMusicInEditor then
+	if (editormode and (not PlayMusicInEditor)) or NoMusic then
 		return
 	end
 	if musici >= 7 then
 		if custommusic then
-			music:play(custommusic, (mariotime < 100 and mariotime > 0))
+			music:play(custommusic, not nolowtime and (mariotime < 100 and mariotime > 0))
 		end
 	elseif musici ~= 1 then
-		music:playIndex(musici-1, (mariotime < 100 and mariotime > 0))
+		music:playIndex(musici-1, not nolowtime and (mariotime < 100 and mariotime > 0))
 	end
 end
 
@@ -8228,6 +8172,7 @@ function stopmusic()
 	end
 	pbuttonsound:stop()
 	music:stop("starmusic")
+	music:disableintromusic()
 end
 	
 function updatesizes(reset)
@@ -8802,6 +8747,7 @@ end
 
 function rendercustombackground(xscroll, yscroll, scrollfactor, scrollfactory)
 	local xscroll, yscroll = xscroll or 0, yscroll or 0
+	local oxscroll, oyscroll = xscroll or 0, yscroll or 0
 	local scrollfactor, scrollfactory = scrollfactor or 0, scrollfactory or 0
 	if custombackground then
 		for i = #custombackgroundimg, 1, -1  do
@@ -8825,12 +8771,12 @@ function rendercustombackground(xscroll, yscroll, scrollfactor, scrollfactory)
 				if custombackgroundanim[i].staticx or custombackgroundanim[i].static then
 					xscroll = 0
 				elseif custombackgroundanim[i].clamptolevelwidth then
-					xscroll = (xscroll/(mapwidth-width)) * (custombackgroundwidth[i]-width)
+					xscroll = (oxscroll/math.max(1,mapwidth-width)) * (custombackgroundwidth[i]-width)
 				end
 				if custombackgroundanim[i].staticy or custombackgroundanim[i].static then
 					yscroll = 0
 				elseif custombackgroundanim[i].clamptolevelheight then
-					yscroll = (yscroll/(mapheight-1-height)) * (custombackgroundheight[i]-height)
+					yscroll = (oyscroll/math.max(1,mapheight-1-height)) * (custombackgroundheight[i]-height)
 				end
 			end
 
@@ -8863,6 +8809,7 @@ end
 
 function rendercustomforeground(xscroll, yscroll, scrollfactor, scrollfactory)
 	local xscroll, yscroll = xscroll or 0, yscroll or 0
+	local oxscroll, oyscroll = xscroll or 0, yscroll or 0
 	local scrollfactor2, scrollfactor2y = scrollfactor or 0, scrollfactory or 0
 	if customforeground then
 		for i = #customforegroundimg, 1, -1  do
@@ -8886,12 +8833,12 @@ function rendercustomforeground(xscroll, yscroll, scrollfactor, scrollfactory)
 				if customforegroundanim[i].staticx or customforegroundanim[i].static then
 					xscroll = 0
 				elseif customforegroundanim[i].clamptolevelwidth then
-					xscroll = (xscroll/(mapwidth-width)) * (customforegroundwidth[i]-width)
+					xscroll = (oxscroll/math.max(1,mapwidth-width)) * (customforegroundwidth[i]-width)
 				end
 				if customforegroundanim[i].staticy or customforegroundanim[i].static then
 					yscroll = 0
 				elseif customforegroundanim[i].clamptolevelheight then
-					yscroll = (yscroll/(mapheight-1-height)) * (customforegroundheight[i]-height)
+					yscroll = (oyscroll/math.max(1,mapheight-1-height)) * (customforegroundheight[i]-height)
 				end
 			end
 
@@ -9118,14 +9065,18 @@ function drawmaptiles(drawtype, xscroll, yscroll)
 						if cox == mx and coy == my then
 							alpha = 255
 						end
+						local offsetx = 0
+						if t["argument"] and t["argument"] == "o" then --offset
+							offsetx = .5
+						end
 						
 						love.graphics.setColor(255, 0, 0, alpha)
-						love.graphics.rectangle("fill", math.floor((x-1-xoff)*16*scale), math.floor(((y-1-yoff)*16-8)*scale), 16*scale, 16*scale)
+						love.graphics.rectangle("fill", math.floor((x-1-xoff+offsetx)*16*scale), math.floor(((y-1-yoff)*16-8)*scale), 16*scale, 16*scale)
 						love.graphics.setColor(255, 255, 255, alpha)
 						if v.showicononeditor and v.icongraphic then
-							love.graphics.draw(v.icongraphic, math.floor((x-1-xoff)*16*scale), ((y-1-yoff)*16-8)*scale, 0, scale, scale)
+							love.graphics.draw(v.icongraphic, math.floor((x-1-xoff+offsetx)*16*scale), ((y-1-yoff)*16-8)*scale, 0, scale, scale)
 						else
-							love.graphics.draw(v.graphic, v.quad, math.floor((x-1-xoff)*16*scale+exoff), math.floor(((y-1-yoff)*16)*scale+eyoff), 0, (v.animationscalex or 1)*scale, (v.animationscaley or 1)*scale)
+							love.graphics.draw(v.graphic, v.quad, math.floor((x-1-xoff+offsetx)*16*scale+exoff), math.floor(((y-1-yoff)*16)*scale+eyoff), 0, (v.animationscalex or 1)*scale, (v.animationscaley or 1)*scale)
 						end
 						if t["argument"] and t["argument"] == "b" then --supersize
 							love.graphics.setColor(255, 255, 255, 200)
@@ -9168,7 +9119,7 @@ function drawmaptiles(drawtype, xscroll, yscroll)
 								love.graphics.setColor(255, 255, 255, 200)
 								love.graphics.draw(entityquads[313].image, entityquads[313].quad, math.floor((x-1-xoff+offsetx)*16*scale), ((y-1-yoff)*16-8)*scale, 0, scale, scale)
 							end
-							if entityquads[tilenumber].t == "track" and not trackpreviews then
+							if (entityquads[tilenumber].t == "track" or entityquads[tilenumber].t == "trackswitch") and not trackpreviews then
 								generatetrackpreviews()
 							end
 						end
@@ -9241,11 +9192,11 @@ end
 
 function checkfortileincoord(x, y)
 	--used for enemies that turn around ledges
-	return ((tilequads[map[x][y][1]]:getproperty("collision", x, y) and (not tilequads[map[x][y][1]]:getproperty("invisible", x, y)))
+	return ( (tilequads[map[x][y][1]]:getproperty("collision", x, y) and (not tilequads[map[x][y][1]]:getproperty("invisible", x, y)) and (not (objects["tile"][tilemap(x, y)] and objects["tile"][tilemap(x, y)].slab)) )
 		or (objects["flipblock"][tilemap(x, y)] and objects["flipblock"][tilemap(x, y)].active)
 		or (objects["buttonblock"][tilemap(x, y)] and objects["buttonblock"][tilemap(x, y)].active)
 		or (objects["frozencoin"][tilemap(x, y)])
-		or objects["clearpipesegment"][tilemap(x, y)])
+		or objects["clearpipesegment"][tilemap(x, y)] )
 end
 
 function startlowtime()

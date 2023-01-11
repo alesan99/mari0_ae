@@ -28,6 +28,7 @@ function fire:init(x, y)
 	self.light = 2
 	self.gravity = 0
 	self.category = 17
+	self.ignoreplatform = true
 	
 	self.mask = {	true,
 					true, false, true, true, true,

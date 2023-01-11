@@ -176,6 +176,12 @@
 		"quick test": "quick test",
 		"change size": "change size",
 		"toggle minimap with m": "toggle minimap with m",
+		"are you sure?": "are you sure?",
+		"unsaved changes will be lost!": "unsaved changes will be lost!",
+		"save and exit": "save and exit",
+		"save and continue": "save and continue",
+		"continue": "continue",
+		"cancel": "cancel",
 	"^_Change Size":"",
 		"old width: ": "old width: ",
 		"old height: ": "old height: ",
@@ -224,6 +230,7 @@
 		"drop shadow may\nreduce performance!": "drop shadow may\nreduce performance!",
 		"real time": "real time",
 		"cont. music": "cont. music",
+		"no low time": "no low time",
 		"save settings": "save settings",
 		"tool descriptions": [
 			"to link testing equipment, drag\na line from the red devices to\na yellow activator to turn them\ngreen and connected.",
@@ -326,4 +333,7 @@
 		"portal gun": "portal gun",
 		"selection tool": "selection tool",
 		"power line draw": "power line draw",
+
+"^_Notices":"",
+	"Map saved!": "Map saved!",
 }

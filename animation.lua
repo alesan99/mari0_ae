@@ -19,18 +19,21 @@ whennumber:i:>/</=:v				when a variable turns something
 --]]
 
 --[[ CONDITIONS:
-noprevsublevel						doesn't if the level was changed from another sublevel (Mario goes through pipe, lands in 1-1_1, prevsublevel was _0, no trigger.)
-worldequals:i						only triggers if current world is i
-levelequals:i						only triggers if current level is i
-sublevelequals:i					only triggers if current sublevel is i
-requirecoins:i						requires i coins to trigger (will not remove coins)
+noprevsublevel					doesn't if the level was changed from another sublevel (Mario goes through pipe, lands in 1-1_1, prevsublevel was _0, no trigger.)
+worldequals:i					only triggers if current world is i
+levelequals:i					only triggers if current level is i
+sublevelequals:i				only triggers if current sublevel is i
+requirecoins:i					requires i coins to trigger (will not remove coins)
 
 playersize[:player]:size			requires a player to be size
 requirecollectables:i				requires i collectables to trigger (will not remove coins)
-requirepoints:i						requires i points
+requirepoints:i					requires i points
 buttonhelddown:button				only if button is held down
 requirekeys[:player]:i				requires i keys
 ifnumber:i:>/</=:v				if a variable is equal/greater than something
+ifcoins:>/</=:v					if coin count is equal/greater than v
+ifcollectables:>/</=:v:i			if collectable count of a type is equal/greater than v
+ifpoints:>/</=:v				if points is equal/greater than v
 --]]
 
 --[[ ACTIONS:
@@ -104,6 +107,8 @@ addtime:time						adds <seconds> time
 removetime:time						removes <seconds> time
 settime:time						sets time
 setplayerlight:blocks				sets player's light in lights out mode
+waitforinput                        waits until a spesific/any player presses a button
+waitfrotrigger                      waits until a spesific animation is triggered
 --]]
 
 function animation:init(path, name)
@@ -117,6 +122,7 @@ function animation:init(path, name)
 	self.firstupdate = true
 	self.running = false
 	self.sleep = 0
+	self.waiting = false
 	self.enabled = true
 end
 
@@ -308,10 +314,49 @@ function animation:update(dt)
 	if self.running then
 		if self.sleep > 0 then
 			self.sleep = math.max(0, self.sleep - dt)
+		elseif self.waiting then
+			if self.waiting.t == "input" then
+				local pstart, pend = 1, players
+				local button = self.waiting.button
+				if self.waiting.player ~= "everyone" then
+					local p = tonumber(string.sub(self.waiting.player, -1))
+					pstart, pend = p, p
+				end
+
+				local press = false
+				for i = pstart, pend do
+					if button == "jump" and jumpkey(i) then
+						press = true
+					elseif button == "left" and leftkey(i) then
+						press = true
+					elseif button == "right" and rightkey(i) then
+						press = true
+					elseif button == "up" and upkey(i) then
+						press = true
+					elseif button == "down" and downkey(i) then
+						press = true
+					elseif button == "run" and runkey(i) then
+						press = true
+					elseif button == "use" and usekey(i) then
+						press = true
+					elseif button == "reload" and reloadkey(i) then
+						press = true
+					end
+					if press then
+						self.waiting = false
+					end
+				end
+			elseif self.waiting.t == "trigger" then
+				if animationtriggerfuncs[self.waiting.name] and animationtriggerfuncs[self.waiting.name].triggered then
+					animationtriggerfuncs[self.waiting.name].triggered = nil
+					self.waiting = false
+				end
+			end
 		end
 		
-		while self.sleep == 0 and self.currentaction <= #self.actions do
+		while self.sleep == 0 and (not self.waiting) and self.currentaction <= #self.actions do
 			local v = self.actions[self.currentaction]
+
 			if v[1] == "disablecontrols" then
 				if v[2] == "everyone" then
 					for i = 1, players do
@@ -336,6 +381,10 @@ function animation:update(dt)
 				end
 			elseif v[1] == "sleep" then
 				self.sleep = tonumber(v[2])
+			elseif v[1] == "waitforinput" then
+				self.waiting = {t="input", button=v[2], player=v[3]}
+			elseif v[1] == "waitfortrigger" then
+				self.waiting = {t="trigger", name=v[2]}
 			elseif v[1] == "setcamerax" then
 				xscroll = tonumber(v[2])
 			elseif v[1] == "setcameray" then
@@ -393,8 +442,8 @@ function animation:update(dt)
 						objects["player"][i].x = tonumber(v[3])
 					end
 				else
-					if objects["player"][tonumber(string.sub(v[3], -1))] then
-						objects["player"][tonumber(string.sub(v[3], -1))].x = tonumber(v[4])
+					if objects["player"][tonumber(string.sub(v[2], -1))] then
+						objects["player"][tonumber(string.sub(v[2], -1))].x = tonumber(v[3])
 					end
 				end
 			elseif v[1] == "sety" then
@@ -403,8 +452,8 @@ function animation:update(dt)
 						objects["player"][i].y = tonumber(v[3])
 					end
 				else
-					if objects["player"][tonumber(string.sub(v[3], -1))] then
-						objects["player"][tonumber(string.sub(v[3], -1))].y = tonumber(v[4])
+					if objects["player"][tonumber(string.sub(v[2], -1))] then
+						objects["player"][tonumber(string.sub(v[2], -1))].y = tonumber(v[3])
 					end
 				end
 			elseif v[1] == "playerwalk" then
@@ -466,9 +515,16 @@ function animation:update(dt)
 					if v[2] == "star" then
 						musicname = "starmusic"
 					end
+					for i, m in pairs(music.list) do
+						if m == musicname then
+							musici = i + 1 -- plus one because of the none music being number 1
+						end
+					end
 					for i, m in pairs(custommusics) do
 						if m == mappackfolder .. "/" .. mappack .. "/" .. musicname then
 							musicname = m
+							musici = 7
+							custommusic = musicname
 						end
 					end
 					music:play(musicname)
@@ -766,6 +822,7 @@ function animation:update(dt)
 				end
 			elseif v[1] == "togglelowgravity" then
 				lowgravity = not lowgravity
+				setphysics(currentphysics)
 			elseif v[1] == "togglelightsout" then
 				lightsout = not lightsout
 			elseif v[1] == "centercamera" then
@@ -861,12 +918,28 @@ function animation:update(dt)
 						p.disablejumping = false
 					end
 				end
+			elseif v[1] == "changeportal" then
+				local pstart, pend = 1, players
+				if v[2] ~= "everyone" then
+					pstart, pend = tonumber(string.sub(v[2], -1)), tonumber(string.sub(v[2], -1))
+				end
+				for i = pstart, pend do
+					if objects["player"][i] then
+						local p = objects["player"][i]
+						p.portalgun = (v[3] ~= "none")
+						if p.portalgun and (not p.characterdata.noportalgun) and playertype ~= "classic" and playertype ~= "cappy" then
+							p.portals = v[3]
+							p:updateportalsavailable()
+						end
+					end
+				end
 			elseif v[1] == "triggeranimation" then
 				if animationtriggerfuncs[v[2]] then
 					for i = 1, #animationtriggerfuncs[v[2]] do
 						animationtriggerfuncs[v[2]][i]:trigger()
 					end
 				end
+				animationtriggerfuncs[v[2]].triggered = true
 				
 			elseif v[1] == "addkeys" then
 				if v[3] == "everyone" then
@@ -948,7 +1021,7 @@ function animation:trigger()
 	if self.enabled then
 		--check conditions
 		local pass = true
-		
+
 		for i, v in pairs(self.conditions) do
 			if v[1] == "noprevsublevel" then
 				if prevsublevel then
@@ -984,6 +1057,36 @@ function animation:trigger()
 				if marioscore < tonumber(v[2]) then
 					pass = false
 					break
+				end
+			elseif v[1] == "ifcoins" then
+				local value = tonumber(v[3])
+				if v[2] == "=" and mariocoincount ~= value then
+					pass = false
+				elseif v[2] == ">" and mariocoincount <= value then
+					pass = false
+				elseif v[2] == "<" and mariocoincount >= value then
+					pass = false
+				end
+			elseif v[1] == "ifcollectables" then
+				local value = tonumber(v[3])
+				local typ = tonumber(v[4])
+				if not collectablescount[typ] then
+					pass = false
+				elseif v[2] == "=" and collectablescount[typ] ~= value then
+					pass = false
+				elseif v[2] == ">" and collectablescount[typ] <= value then
+					pass = false
+				elseif v[2] == "<" and collectablescount[typ] >= value then
+					pass = false
+				end
+			elseif v[1] == "ifpoints" then
+				local value = tonumber(v[3])
+				if v[2] == "=" and marioscore ~= value then
+					pass = false
+				elseif v[2] == ">" and marioscore <= value then
+					pass = false
+				elseif v[2] == "<" and marioscore >= value then
+					pass = false
 				end
 			elseif v[1] == "requirekeys" then
 				if v[3] == "everyone" then

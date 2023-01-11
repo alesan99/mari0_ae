@@ -31,6 +31,7 @@ icerunacceleration = 8 --^^^
 groundfreezetime = 3 --seconds stunned when sledge bro ground pounded
 goombashoehop = 8 --height of hops when mario has goomba shoe
 fencespeed = 4 --speed when climbing fence
+fencejumptime = 0.05 --how long mario jumps when holding up and jumping while climbing
 
 --STARCOLORS
 starcolors = {}
@@ -199,8 +200,7 @@ yoshitoungekill = {"mushroom", "goomba", "koopa", "hammerbro", "hammer", "plant"
 dkhammerkill = {"goomba", "koopa", "hammerbro", "plant", "cheep", "bowser", "squid", "flyingfish", "lakito", "sidestepper", "icicle", "splunkin", "ninji", "mole", "pokey", "barrel", "chainchomp", "rockywrench", "enemy", "spike", "spikeball", "magikoopa"}
 
 tileentities = {"tile", "buttonblock", "flipblock", "platform", "donut", "frozencoin", "tilemoving", "belt"}
-tileentitieswind = {"tile", "buttonblock", "flipblock", "platform", "donut", "frozencoin", "tilemoving", "belt", "smallspring", "box", "spring", "screenboundary", "cubedispenser", "ceilblocker"}
-
+tileentitieswind = {"tile", "buttonblock", "flipblock", "platform", "donut", "frozencoin", "tilemoving", "belt", "smallspring", "box", "spring", "screenboundary", "cubedispenser", "ceilblocker", "snakeblock", "powblock", "ice", "door", "lightbridgebody", "rocketturret", "blocktogglebutton", "cannonballcannon"}
 freezetime = 6.5 --8
 iceblockspeed = 10
 iceblockkickminspeed = 2 --speed player needs to kick
@@ -866,6 +866,7 @@ powerupslist = {"small", "big", "fire", "hammer", "frog", "raccoon", "ice", "meg
 onlysaveiflevelmodified = true
 
 --colors for text entity and hud
+textcolorsnames = {"black","blue","brown","gray","green","lime","maroon","orange","pink","purple","red","sky","white","yellow"}
 textcolors = {
 	white = {255,255,255},
 	black = {0,0,0},

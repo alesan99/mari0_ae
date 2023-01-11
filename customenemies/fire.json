@@ -48,6 +48,7 @@
 	"spawnsound": "fire",
 	
 	"ignorefaithplates": true,
+	"ignoreplatform": true,
 
 	"supersize": true,
 	"meltsice": true,

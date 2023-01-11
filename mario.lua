@@ -220,6 +220,7 @@ function mario:init(x, y, i, animation, size, t, properties)
 	self.climbframe = 1
 	self.fenceframe = 1
 	self.fenceanimationprogress = 1
+	self.fencejumptimer = 0
 	self.floatframe = 1
 	self.spinframez = 1
 	self.raccoonflyframe = 1
@@ -969,7 +970,7 @@ function mario:update(dt)
 			local dobreak = false
 			for j, obj in pairs(dkhammerkill) do
 				for i, v in pairs(objects[obj]) do
-					if (not v.shot) and v.width and aabb(x, y, w, h, v.x, v.y, v.width, v.height) then
+					if v.active and (not v.shot) and v.width and aabb(x, y, w, h, v.x, v.y, v.width, v.height) then
 						if obj == "enemy" then
 							if v:shotted("right", "dkhammer", false, false) ~= false then
 								addpoints(v.firepoints or 200, self.x, self.y)
@@ -1924,7 +1925,7 @@ function mario:update(dt)
 			if self.animationmisc then
 				self.animationmisc.frame = 2
 				if self.animationmisc.locked then
-					self.animationmisc.frame = 2
+					self.animationmisc.frame = 1
 				end
 			end
 			self.active = true
@@ -2026,7 +2027,7 @@ function mario:update(dt)
 					getcollectable(x, y)
 				end
 			end
-			if self.size > 1 then
+			if self.size > 1 and not (self.ducking and self.size == 14) then
 				if inmap(x, y-1) then
 					if tilequads[map[x][y-1][1]].coin then
 						collectcoin(x, y-1)
@@ -2112,64 +2113,67 @@ function mario:update(dt)
 	--fence controls and shit :)
 	if self.fence then
 		self:updateangle()
+		--no more fence flying, actually check if we're on a fence
+		local x = math.floor(self.x+self.width/2)+1
+		local y = math.floor(self.y+self.height/2)+1
+		if not (inmap(x, y) and tilequads[map[x][y][1]]:getproperty("fence")) then
+			self:dropfence()
+			return
+		end
+
 		local targetspeedx = 0
 		local targetspeedy = 0
-		if upkey(self.playernumber) and self.controlsenabled then
-			targetspeedy = -self.characterdata.fencespeed
-		elseif downkey(self.playernumber) and self.controlsenabled then
-			targetspeedy = self.characterdata.fencespeed
-		end
-		--check for fence
-		local anim = false
-		local x = math.floor(self.x+self.width/2)+1
-		local y = math.floor(self.y+self.height/2+targetspeedy*dt)+1
-		if inmap(x, y) and tilequads[map[x][y][1]]:getproperty("fence", x, y) then
-			self.speedy = targetspeedy
-			if targetspeedy ~= 0 then
-				anim = true
-			end
-		else
-			if targetspeedy > 0 then
-				self:dropfence()
-				return
-			end
-			self.speedy = 0
-		end
-		if leftkey(self.playernumber) and self.controlsenabled  then
-			targetspeedx = -self.characterdata.fencespeed
-		elseif rightkey(self.playernumber) and self.controlsenabled then
-			targetspeedx = self.characterdata.fencespeed
-		end
-		--check for fence
-		local x = math.floor(self.x+self.width/2+targetspeedx*dt)+1
-		local y = math.floor(self.y+self.height/2)+1
-		if inmap(x, y) and tilequads[map[x][y][1]]:getproperty("fence", x, y) then
-			self.speedx = targetspeedx
-
-			if targetspeedx ~= 0 then
-				anim = true
-			end
-		else
+		if not self.controlsenabled then
 			self.speedx = 0
+			self.speedy = 0
+			return
 		end
-		
-		if anim then
+		local u,d,l,r,s = upkey(self.playernumber), downkey(self.playernumber), leftkey(self.playernumber), rightkey(self.playernumber), self.characterdata.fencespeed
+		if u and not d then
+			targetspeedy = -s
+		elseif d and not u then
+			targetspeedy = s
+		end
+		if l and not r then
+			targetspeedx = -s
+		elseif r and not l then
+			targetspeedx = s
+		end
+		local tx = math.floor(self.x+self.width/2 + targetspeedx*dt)+1
+		local ty = math.floor(self.y+self.height/2 + targetspeedy*dt)+1
+
+		if (not inmap(tx,y)) or (not tilequads[map[tx][y][1]]:getproperty("fence")) then
+			self.x = math.max(math.min(self.x + targetspeedx*dt, x-self.width/2-0.001), x-self.width/2-0.999)
+			targetspeedx = 0
+		end
+		if (not inmap(x,ty)) or (not tilequads[map[x][ty][1]]:getproperty("fence")) then
+			if targetspeedy <= 0 then
+				self.y = math.max(self.y + targetspeedy*dt, y-self.height/2-1)
+				targetspeedy = 0
+			else
+				self:dropfence()
+			end	
+		end
+
+		self.speedx = targetspeedx
+		self.speedy = targetspeedy
+		if targetspeedx ~= 0 or targetspeedy ~= 0 then
 			local frames = self.characterdata.fenceframes
-			if self.characterdata.fenceframes == 0 then
+			if frames == 0 then
 				frames = 2
 			end
 			self.fenceanimationprogress = ((self.fenceanimationprogress+self.characterdata.fenceanimationspeed*dt-1)%(frames))+1
 			self.fenceframe = math.floor(self.fenceanimationprogress)
 		end
 		self.animationstate = "fence"
-		self.gravity = 0
 		self:setquad()
 		return
 	else
 		local x = math.floor(self.x+self.width/2)+1
 		local y = math.floor(self.y+self.height/2)+1
-		local y2 = math.floor(self.y)+1
-		if upkey(self.playernumber) and ismaptile(x,y) and tilequads[map[x][y][1]].fence and ismaptile(x,y2) and tilequads[map[x][y2][1]].fence then
+		if self.fencejumptimer > 0 then
+			self.fencejumptimer = self.fencejumptimer - dt
+		elseif upkey(self.playernumber) and ismaptile(x,y) and tilequads[map[x][y][1]].fence then
 			if self:grabfence() then
 				return
 			end
@@ -2717,6 +2721,10 @@ function mario:updateangle()
 			end
 		end
 		return
+	end
+
+	if self.disableaiming then
+		return false
 	end
 	
 	if self.playernumber == mouseowner then
@@ -3674,6 +3682,7 @@ function mario:jump(force)
 				
 				if self.fence then
 					self:dropfence()
+					self.fencejumptimer = fencejumptime
 					self.falling = false
 				end
 				
@@ -4698,7 +4707,7 @@ function mario:floorcollide(a, b)
 			self.animationstate = anim
 			return false
 		elseif b.stompable then
-			if b.stompbounce then--bounce off of enemy
+			if b.stompbounce or (b.stompbounceifsmall and self.size ~= 16) then--bounce off of enemy
 				self:stompbounce(a, b)
 			else
 				self:stompenemy(a, b)
@@ -4774,7 +4783,7 @@ function mario:floorcollide(a, b)
 		return false
 	elseif (a == "goomba" and b.t ~= "spikey" and  b.t ~= "spikeyfall" and b.t ~= "spiketop" and b.t ~= "bigspikey" and (b.t ~= "shyguy" or self.groundpounding)) or a == "bulletbill" or a == "flyingfish" or a == "lakito" or a == "hammerbro" or (a == "koopa" and b.t ~= "downspikey" and b.t ~= "spikeyshell") or a == "bigbill" or a == "cannonball" or a == "splunkin" or a == "bigkoopa" or (a == "drybones" and not b.spiked) or a == "ninji" or a == "mole" or (a == "bomb" and not b.explosion)
 		or (a == "boomboom" and b.ducking == false and b.stomped == false) or (a == "squid" and b.color == "pink") or (a == "pokey" and b.t == "snowpokey") or a == "rockywrench" or (a == "koopaling" and b.stompable) or a == "magikoopa" or a == "spike" or (a == "spikeball" and b.stompable) or (a == "plantcreeper" and b.stompable) then
-		if b.stompbounce then--bounce off of enemy
+		if b.stompbounce or (b.stompbounceifsmall and self.size ~= 16) then--bounce off of enemy
 			self:stompbounce(a, b)
 		else
 			self:stompenemy(a, b)
@@ -4867,7 +4876,7 @@ function mario:floorcollide(a, b)
 		self.tileice = true
 	elseif a == "box" or a == "core" then
 		--check if box can even move
-		if (b.gravitydir and (b.gravitydir == "left" or b.gravitydir == "right")) then
+		if (b.gravitydir and (b.gravitydir == "left" or b.gravitydir == "right") and self.gravitydir == b.gravitydir) then
 			if self.speedy > maxwalkspeed/2 then
 				self.speedy = self.speedy - self.speedy * 6 * gdt
 			end
@@ -5226,6 +5235,13 @@ function mario:rightcollide(a, b, passive)
 	end
 
 	if self.size == 14 and self.ducking and (a ~= "mushroom") and self.blueshelled then --blueshell
+		if a == "tile" then --shell go over gaps
+			local x, y = b.cox, b.coy
+			if inmap(x, y-1) and tilequads[map[x][y-1][1]].collision == false and self.speedy > 0 and self.y+self.height+1 < y+spacerunroom then
+				self.y = b.y - self.height; self.speedy = 0; self.x = b.x-self.width+0.0001; self.falling = false
+				return false
+			end
+		end
 		if a == "tile" or a == "portalwall" or a == "spring" or a == "donut" or a == "springgreen" or a == "bigmole" or a == "muncher" or (a == "flipblock" and not b.flippable) or a == "frozencoin" or a == "buttonblock" or (a == "enemy" and (b.resistsenemykill or b.resistseverything)) then	
 			self.speedx = -math.abs(self.speedx)
 			local x, y = b.cox, b.coy
@@ -5295,7 +5311,7 @@ function mario:rightcollide(a, b, passive)
 				end
 
 				if self.speedy > 2 and b.stompable then --not in orignal SE, stomp if speed is high
-					if b.stompbounce then--bounce off of enemy
+					if b.stompbounce or (b.stompbounceifsmall and self.size ~= 16) then--bounce off of enemy
 						self:stompbounce(a, b)
 					else
 						self:stompenemy(a, b)
@@ -5357,7 +5373,7 @@ function mario:rightcollide(a, b, passive)
 		end
 	elseif self.speedy > 2 and ((a == "goomba" and b.t ~= "spikey" and  b.t ~= "spikeyfall" and b.t ~= "spiketop" and b.t ~= "bigspikey" and b.t ~= "shyguy") or a == "bulletbill" or a == "flyingfish" or a == "lakito" or a == "hammerbro" or (a == "koopa" and b.t ~= "downspikey" and b.t ~= "spikeyshell") or a == "bigbill" or a == "cannonball" or a == "splunkin" or a == "bigkoopa" or (a == "drybones" and not b.spiked) or a == "ninji" or a == "mole"
 		or (a == "bomb" and not b.explosion) or (a == "boomboom" and b.ducking == false and b.stomped == false) or (a == "squid" and b.color == "pink") or (a == "pokey" and b.t == "snowpokey") or (a == "koopaling" and b.stompable) or a == "magikoopa" or a == "spike" or (a == "spikeball" and b.stompable) or (a == "plantcreeper" and b.dir ~= "left")) then
-		if b.stompbounce then
+		if b.stompbounce or (b.stompbounceifsmall and self.size ~= 16) then
 			self:stompbounce(a, b)
 		else
 			self:stompenemy(a, b)
@@ -5550,7 +5566,7 @@ function mario:rightcollide(a, b, passive)
 		end
 	elseif a == "box" or a == "core" then
 		--check if box can even move
-		if not (b.gravitydir and (b.gravitydir ~= "down" and b.gravitydir ~= "up")) then
+		if not (b.gravitydir and (b.gravitydir ~= "down" and b.gravitydir ~= "up") and self.gravitydir == b.gravitydir) then
 			if self.speedx > maxwalkspeed/2 then
 				self.speedx = self.speedx - self.speedx * 6 * gdt
 			end
@@ -5592,7 +5608,7 @@ function mario:rightcollide(a, b, passive)
 		end
 	end
 
-	if self.gravitydir == "right" and a ~= "tile" and a ~= "portaltile" then
+	if self.gravitydir == "right" and a ~= "tile" and a ~= "portaltile" and (not b.doesntchangeplayergravity) then
 		self.gravitydir = "down"
 	end
 	
@@ -5632,6 +5648,13 @@ function mario:leftcollide(a, b)
 	end
 
 	if self.size == 14 and self.ducking and (a ~= "mushroom") and self.blueshelled then --blueshell
+		if a == "tile" then --shell go over gaps
+			local x, y = b.cox, b.coy
+			if inmap(x, y-1) and tilequads[map[x][y-1][1]].collision == false and self.speedy > 0 and self.y+self.height+1 < y+spacerunroom then
+				self.y = b.y - self.height; self.speedy = 0; self.x = b.x+1-0.0001; self.falling = false
+				return false
+			end
+		end
 		if a == "tile" or a == "portalwall" or a == "spring" or a == "donut" or a == "springgreen" or a == "bigmole" or a == "muncher" or (a == "flipblock" and not b.flippable) or a == "frozencoin" or a == "buttonblock" or (a == "enemy" and (b.resistsenemykill or b.resistseverything)) then	
 			self.speedx = math.abs(self.speedx)
 			local x, y = b.cox, b.coy
@@ -5702,7 +5725,7 @@ function mario:leftcollide(a, b)
 				end
 
 				if self.speedy > 2 and b.stompable then --not in orignal SE, stomp if speed is high
-					if b.stompbounce then--bounce off of enemy
+					if b.stompbounce or (b.stompbounceifsmall and self.size ~= 16) then--bounce off of enemy
 						self:stompbounce(a, b)
 					else
 						self:stompenemy(a, b)
@@ -5763,7 +5786,7 @@ function mario:leftcollide(a, b)
 		end
 	elseif self.speedy > 2 and ((a == "goomba" and b.t ~= "spikey" and  b.t ~= "spikeyfall" and b.t ~= "spiketop" and b.t ~= "bigspikey" and b.t ~= "shyguy") or a == "bulletbill" or a == "flyingfish" or a == "lakito" or a == "hammerbro" or (a == "koopa" and b.t ~= "downspikey" and b.t ~= "spikeyshell") or a == "bigbill" or a == "cannonball" or a == "splunkin" or a == "bigkoopa" or a == "fireball" or a == "iceball" or (a == "drybones" and not b.spiked) or a == "ninji" or a == "mole" or (a == "bomb" and not b.explosion) or (a == "boomboom" and b.ducking == false and b.stomped == false)
 		or (a == "squid" and b.color == "pink") or (a == "pokey" and b.t == "snowpokey") or (a == "koopaling" and b.stompable) or a == "magikoopa" or a == "spike" or (a == "spikeball" and b.stompable) or (a == "plantcreeper" and b.dir ~= "right")) then
-		if b.stompbounce then--bounce off of enemy
+		if b.stompbounce or (b.stompbounceifsmall and self.size ~= 16) then--bounce off of enemy
 			self:stompbounce(a, b)
 		else
 			self:stompenemy(a, b)
@@ -5809,6 +5832,18 @@ function mario:leftcollide(a, b)
 			end
 		end
 		self:die("time")
+	elseif a == "frozencoin" or a == "buttonblock" or a == "flipblock" then
+		--Check if mario should run across a gap.
+		local x, y = b.cox, b.coy
+		if inmap(x, y-1) and tilequads[map[x][y-1][1]].collision == false and self.speedy > 0 and self.y+self.height+1 < y+spacerunroom then
+			self.y = b.y - self.height
+			self.speedy = 0
+			self.x = b.x+1-0.0001
+			self.falling = false
+			self.animationstate = "running"
+			self:setquad()
+			return false
+		end
 	elseif a == "tile" then
 		local x, y = b.cox, b.coy
 		
@@ -5887,7 +5922,7 @@ function mario:leftcollide(a, b)
 		end
 		
 		--Check if it's a pipe with pipe pipe.
-		if self.falling == false and self.jumping == false and (leftkey(self.playernumber) or intermission) then --but only on ground and rightkey
+		if self.falling == false and self.jumping == false and (leftkey(self.playernumber) or intermission) then --but only on ground and leftkey
 			for i, p in pairs(pipes) do
 				if p:inside("left", x, self) then
 					self.y = p.coy-self.height
@@ -5930,7 +5965,7 @@ function mario:leftcollide(a, b)
 		end
 	elseif a == "box" or a == "core" then
 		--check if box can even move
-		if not (b.gravitydir and (b.gravitydir ~= "down" and b.gravitydir ~= "up")) then
+		if not (b.gravitydir and (b.gravitydir ~= "down" and b.gravitydir ~= "up") and self.gravitydir == b.gravitydir) then
 			if self.speedx < -maxwalkspeed/2 then
 				self.speedx = self.speedx + math.abs(self.speedx) * 6 * gdt
 			end
@@ -5972,7 +6007,7 @@ function mario:leftcollide(a, b)
 		end
 	end
 
-	if self.gravitydir == "left" and a ~= "tile" and a ~= "portaltile" then
+	if self.gravitydir == "left" and a ~= "tile" and a ~= "portaltile" and (not b.doesntchangeplayergravity) then
 		self.gravitydir = "down"
 	end
 	
@@ -6045,7 +6080,7 @@ function mario:ceilcollide(a, b)
 				if self.helmet then
 					--helmet hit
 					if self.helmet == "beetle" and not b.static then
-						if b.gravity ~= 0 then
+						if (not b.gravity) or b.gravity ~= 0 then
 							b.speedy = math.min(-helmetbounceforce, self.speedy)
 						end
 						playsound(helmethitsound)
@@ -6102,7 +6137,7 @@ function mario:ceilcollide(a, b)
 			if self.helmet then
 				--helmet hit
 				if self.helmet == "beetle" and not b.static then
-					if b.gravity ~= 0 then
+					if (not b.gravity) or b.gravity ~= 0 or a == "thwomp" then
 						b.speedy = math.min(-helmetbounceforce, self.speedy)
 					end
 					playsound(helmethitsound)
@@ -6149,7 +6184,7 @@ function mario:ceilcollide(a, b)
 		self:die("time")
 	elseif a == "box" or a == "core" then
 		--check if box can even move
-		if (b.gravitydir and (b.gravitydir == "left" or b.gravitydir == "right")) then
+		if (b.gravitydir and (b.gravitydir == "left" or b.gravitydir == "right") and self.gravitydir == b.gravitydir) then
 			if self.speedy < -maxwalkspeed/2 then
 				self.speedy = self.speedy + math.abs(self.speedy) * 6 * gdt
 			end
@@ -6249,7 +6284,7 @@ function mario:ceilcollide(a, b)
 		end
 		
 		--Check if it's a pipe with pipe pipe.
-		if upkey(self.playernumber) and self.jumping then --but only on ground and rightkey
+		if upkey(self.playernumber) then --but only in midair and upkey
 			for i, p in pairs(pipes) do
 				if p:inside("up", y, self) then
 					self:pipe(p.cox, p.coy, "up", i)
@@ -6331,7 +6366,7 @@ function mario:ceilcollide(a, b)
 		self.jumping = false
 		self.falling = true
 		self.speedy = headforce
-	elseif a ~= "tile" and a ~= "portaltile" then
+	elseif a ~= "tile" and a ~= "portaltile" and (not b.doesntchangeplayergravity) then
 		self.gravitydir = "down"
 	end
 end
@@ -6442,7 +6477,7 @@ function mario:passivecollide(a, b)
 			return true
 		end
 	elseif a == "box" or a == "core" then
-		if not (b.gravitydir and (b.gravitydir ~= "down" and b.gravitydir ~= "up")) then
+		if not (b.gravitydir and (b.gravitydir ~= "down" and b.gravitydir ~= "up") and self.gravitydir == b.gravitydir) then
 			if self.speedx < 0 then
 				if self.speedx < -maxwalkspeed/2 then
 					self.speedx = self.speedx - self.speedx * 6 * gdt
@@ -6558,7 +6593,9 @@ end
 function mario:starcollide(a, b)
 	--enemies that die
 	if a == "enemy" then
-		if b:shotted("right", nil, nil, false, true) then
+		if b.resistsstar then
+			return true
+		elseif b:shotted("right", nil, nil, false, true) then
 			addpoints(firepoints[b.t] or 100, self.x, self.y)
 			return true
 		end
@@ -6737,13 +6774,13 @@ function mario:grabvine(b)
 end
 
 function mario:grabfence()
-	if self.ducking or self.vine or self.shoe or self.clearpipe or self.statue or self.pickup then
+	if self.ducking or self.vine or self.shoe or self.clearpipe or self.statue or self.pickup or self.fireenemyride then
 		return false
 	end
 	self.fence = true
 	self.speedx = 0
 	self.speedy = 0
-	self.gravity = 0
+	self.ignoregravity = true
 	
 	self.raccoonfly = false
 	self.capefly = false
@@ -6755,6 +6792,8 @@ function mario:grabfence()
 	self.fenceanimationprogress = 1
 	self.animationstate = "fence"
 	self:setquad()
+	self.jumping = false
+	self.falling = true
 	self.falloverride = true
 
 	net_action(self.playernumber, "grabfence")
@@ -6766,8 +6805,7 @@ function mario:dropfence()
 	self.ignoreplatform = false
 	self.animationstate = "falling"
 	self:setquad()
-	self.gravity = self.characterdata.yacceleration
-
+	self.ignoregravity = false
 	net_action(self.playernumber, "dropfence")
 end
 
@@ -6841,8 +6879,13 @@ function hitblock(x, y, t, v)
 			size = 2
 		end
 	end
-	if t and (t.funnel or t.nohitsound) then
-		hitsound = false
+	if t then
+		if (t.funnel or t.nohitsound) then
+			hitsound = false
+		end
+		if t.hitsblocks and not t.breaksblocks then
+			size = 1
+		end
 	end
 	
 	if size and not v then --net hit block
@@ -7088,13 +7131,14 @@ function hitblock(x, y, t, v)
 end
 
 function hitontop(x, y)
+	if breakoutmode then return end
 	--kill enemies on top
 	for i, v in pairs(enemies) do
 		if objects[v] then
 			for j, w in pairs(objects[v]) do
 				if w.width and (w.active or w.killedfromblocksbelownotactive) then
-					local centerX = w.x + w.width/2
-					if inrange(centerX, x-1, x, true) and y-1 == w.y+w.height then
+					local cx = math.max(x-1,math.min(x,w.x))
+					if inrange(cx, w.x, w.x+w.width, true) and inrange(w.y+w.height, y-1, y-1.125, true) then
 						--get dir
 						local dir = "right"
 						if w.x+w.width/2 < x-0.5 then
@@ -7201,6 +7245,7 @@ function destroyblock(x, y, v) --v = true, "nopoints"
 	if (not v) or not (v == "nopoints") then
 		addpoints(50)
 	end
+	updateranges()
 	
 	if debris and blockdebrisquads[debris] then
 		table.insert(blockdebristable, blockdebris:new(x-.5, y-.5, 3.5, -23, blockdebrisimage, blockdebrisquads[debris][spriteset]))
@@ -7213,7 +7258,7 @@ function destroyblock(x, y, v) --v = true, "nopoints"
 		table.insert(blockdebristable, blockdebris:new(x-.5, y-.5, 3.5, -14))
 		table.insert(blockdebristable, blockdebris:new(x-.5, y-.5, -3.5, -14))
 	end
-		
+	
 	if (not v) or (v == "nopoints") then
 		generatespritebatch()
 	end
@@ -7244,7 +7289,7 @@ function mario:die(how)
 		return
 	end
 	
-	if how ~= "pit" and how ~= "time" and how ~= "lava" and how ~= "killscript" then
+	if how ~= "pit" and how ~= "time" and how ~= "lava" and how ~= "killscript" and not self.dead then
 		animationsystem_playerhurttrigger(self.playernumber)
 
 		if how == "Laser" then
@@ -7468,6 +7513,53 @@ function mario:emancipate(a)
 	
 	for i, v in pairs(delete) do
 		table.remove(portalprojectiles, v) --remove
+	end
+end
+
+function mario:shootportal(i)
+	if (not self.controlsenabled) or self.vine or self.fence then
+		return false
+	end
+
+	--knockback
+	if portalknockback and self.portalgun then
+		local xadd = math.sin(self.pointingangle)*30
+		local yadd = math.cos(self.pointingangle)*30
+		self.speedx = self.speedx + xadd
+		self.speedy = self.speedy + yadd
+		self.falling = true
+		self.animationstate = "falling"
+		self:setquad()
+	end
+	
+	if playertype == "portal" and self.portalgun and (self.portals == "both" or self.portals == i .. " only") then
+		local sourcex, sourcey = self.x+self.portalsourcex, self.y+self.portalsourcey
+		local direction = self.pointingangle
+		
+		net_action(self.playernumber, "portal|" .. i .. "|" .. sourcex .. "|" .. sourcey .. "|" .. direction)
+		shootportal(self.playernumber, i, sourcex, sourcey, direction)
+	elseif playertype == "minecraft" then
+		local v = self
+		local sourcex, sourcey = self.x+self.portalsourcex, self.y+self.portalsourcey
+		local cox, coy, side, tend, x, y = traceline(sourcex, sourcey, v.pointingangle)
+		
+		if i == 1 then
+			if cox then
+				local dist = math.sqrt((v.x+v.width/2 - x)^2 + (v.y+v.height/2 - y)^2)
+				if dist <= minecraftrange then
+					breakingblockX = cox
+					breakingblockY = coy
+					breakingblockprogress = 0
+				end
+			end
+		elseif i == 2 then
+			if cox then
+				local dist = math.sqrt((v.x+v.width/2 - x)^2 + (v.y+v.height/2 - y)^2)
+				if dist <= minecraftrange then
+					placeblock(cox, coy, side)
+				end
+			end
+		end
 	end
 end
 
@@ -8106,7 +8198,7 @@ function mario:axe()
 	self.static = false
 	self.animation = "axe"
 	self.fireanimationtimer = fireanimationtime
-	self.invincible = false
+	self.invincible = true--false
 	self.drawable = true
 	self.animationx = axex
 	self.animationy = axey
@@ -8854,7 +8946,7 @@ function mario:dive(water)
 	end
 end
 
-function mario:turretshot(tx, ty, sx, sy) --turret
+function mario:turretshot(tx, ty, sx, sy, knockback) --turret
 	if self.pickup and not self.pickup.rigidgrab then
 		if tx > self.x+self.width/2 and self.pointingangle < 0 then --right
 			return false
@@ -8868,8 +8960,10 @@ function mario:turretshot(tx, ty, sx, sy) --turret
 	if self.dead or self.starred then 
 		return false
 	end
-	if (self.speedx < 0) ~= (sx < 0) then
-		self.speedx = self.speedx + (sx/math.abs(sx))*9 --push back
+	if knockback then
+		if (self.speedx < 0) ~= (sx < 0) then
+			self.speedx = self.speedx + (sx/math.abs(sx))*9 --push back
+		end
 	end
 	if self.invincible then 
 		return false
@@ -9060,6 +9154,7 @@ end
 
 function mario:stopanimation()
 	self.animation = false
+	self.drawable = true
 end
 
 function mario:stopgroundpound(force)

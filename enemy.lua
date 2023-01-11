@@ -109,6 +109,9 @@ function enemy:init(x, y, t, a, properties)
 		end
 	end
 
+	-- update qaud if quadno is changed, better than running the same check 10 times
+	local oldqaudno = (self.quadno or 1)
+
 	--right click menu
 	if self.rightclickmenu and self.a[3] then
 		local s = tostring(self.a[3])
@@ -127,9 +130,6 @@ function enemy:init(x, y, t, a, properties)
 						else
 							self[name] = value
 						end
-						if name == "quadno" then
-							self.quad = self.quadgroup[self.quadno]
-						end
 					end
 				elseif testinglevel then
 					notice.new("No rightclickmenu entry\nfor number:" .. tostring(self.a[3]), notice.red, 3)
@@ -139,9 +139,6 @@ function enemy:init(x, y, t, a, properties)
 					self[self.rightclickmenu[1]] = deepcopy(self.rightclickmenu[self.a[3]])
 				else
 					self[self.rightclickmenu[1]] = self.rightclickmenu[self.a[3]]
-				end
-				if self.rightclickmenu[1] == "quadno" then
-					self.quad = self.quadgroup[self.quadno]
 				end
 			end
 		else
@@ -155,10 +152,78 @@ function enemy:init(x, y, t, a, properties)
 			else
 				self[self.rightclickmenu[1]] = self.a[3]
 			end
-			if self.rightclickmenu[1] == "quadno" then
-				self.quad = self.quadgroup[self.quadno]
+		end
+	end
+
+	--right click
+	if self.rightclick and #self.a > 0 then
+		self.a[3] = tostring(self.a[3]):gsub("B", "-")
+		local val
+		-- types
+		if self.rightclicktypes then
+			val = convertr(self.a[3], self.rightclicktypes)
+		else
+			local types = {}
+			local index = 0
+			for i = 1, #self.rightclick do
+				if self.rightclick[i][1] ~= "text" then
+					index = index + 1
+					if self.rightclick[i][1] == "dropdown" or self.rightclick[i][1] == "input" then
+						local var = self.a[3]:split("|")
+						if tonumber(var[index]) then
+							types[index] = "num"
+						else
+							types[index] = "string"
+						end
+					elseif self.rightclick[i][1] == "checkbox" then
+						types[index] = "bool"
+					end
+				end
+			end
+			val = convertr(self.a[3], types)
+		end
+		-- actally convert
+		local index = 0
+		for i = 1, #self.rightclick do
+			if self.rightclick[i][1] ~= "text" then
+				index = index + 1
+				if type(self.rightclick[i][2]) == "table" then
+					local var = false
+					if self.rightclick[i][1] == "dropdown" then -- based on rightclickmenu
+						for b = 1, #self.rightclick[i][4] do
+							if self.rightclick[i][4][b] == val[index] or (tonumber(self.rightclick[i][4][b]) and tonumber(self.rightclick[i][4][b]) == val[index]) then
+								var = b
+							end
+						end
+					elseif self.rightclick[i][1] == "checkbox" then -- first list is for if true, second for if it is false
+						if val[index] == true then var = 1 else var = 2 end
+					elseif self.rightclick[i][1] == "input" then
+						notice.new("you can't use a list\nfor an input!", notice.red, 3)
+					end
+
+					for i, v in pairs(self.rightclick[i][2][var]) do
+						local name = v[1]
+						local value = v[2]
+						if (not self.casesensitive) and (name ~= "offsetX" and name ~= "offsetY" and name ~= "quadcenterX" and name ~= "quadcenterY") then
+							value = value:lower()
+						end
+						if type(value) == "table" then
+							self[name] = deepcopy(value)
+						else
+							self[name] = value
+						end
+					end
+				else
+					self[self.rightclick[i][2]] = val[index]
+				end
 			end
 		end
+		table.remove(self.a, 1)
+	end
+	
+	-- if quadno is changed in either rightclick
+	if oldqaudno ~= self.quadno then
+		self.quad = self.quadgroup[self.quadno]
 	end
 	
 	if self.customtimer then
@@ -279,6 +344,7 @@ function enemy:init(x, y, t, a, properties)
 	self.starty = self.y
 	self.startactive = self.active
 	self.startdrawable = self.drawable
+	self.startkillsenemies = self.killsenemies
 	
 	self.spawnallow = true
 	self.spawnedenemies = {}
@@ -393,6 +459,10 @@ function enemy:init(x, y, t, a, properties)
 		self.lifetimer = self.lifetime
 	end
 	
+	if self.flickertime then
+		self.flickertimer = 0
+	end
+	
 	if self.jumps then
 		self.jumptimer = 0
 	end
@@ -421,11 +491,7 @@ function enemy:init(x, y, t, a, properties)
 	end
 	
 	if self.spawnsound then
-		if self.sound and self.spawnsound == self.t then
-			playsound(self.sound)
-		else
-			playsound(self.spawnsound)
-		end
+		self:playsound(self.spawnsound)
 	end
 
 	if self.spawnchildren then
@@ -439,7 +505,11 @@ function enemy:init(x, y, t, a, properties)
 				if type(self.spawnchildrenoffsety) == "table" then
 					offsety = self.spawnchildrenoffsety[i]
 				end
-				local temp = enemy:new(self.x+self.width/2+.5+offsetx, self.y+self.height+offsety, self.spawnchildren[i], {"ignorespawnchildren"})
+				local a = {"ignorespawnchildren"}
+				if self.childrencanspawnchildren then
+					a = {}
+				end
+				local temp = enemy:new(self.x+self.width/2+.5+offsetx, self.y+self.height+offsety, self.spawnchildren[i], a)
 				if self.spawnchildrenparent then
 					temp.parent = self
 				end
@@ -507,6 +577,9 @@ function enemy:init(x, y, t, a, properties)
 	if self.animationtriggeronspawn or self.triggeranimationonspawn then
 		self:triggeranimation(self.animationtriggeronspawn or self.triggeranimationonspawn)
 	end
+	if self.transformenemyanimationonspawn then
+		transformenemyanimation(self.transformenemyanimationonspawn)
+	end
 	
 	self.outtable = {}
 end
@@ -527,16 +600,12 @@ function enemy:update(dt)
 	end
 
 	self.funnel = false
-	if self.lifetimer and not self.shot then
-		self.lifetimer = self.lifetimer - dt
-		if self.lifetimer <= 0 then
-			if self.transforms and self:gettransformtrigger("lifetime") then
-				self:transform(self:gettransformsinto("lifetime"))
-			end
-			self:output()
-			self.dead = true
-			
-			return true
+	
+	if self.flickertime and self.flickertimer then
+		self.flickertimer = self.flickertimer + dt
+		while self.flickertimer > self.flickertime do
+			self.flickertimer = self.flickertimer - self.flickertime
+			self.drawable = not self.drawable
 		end
 	end
 	
@@ -582,6 +651,19 @@ function enemy:update(dt)
 
 	if self.frozen then
 		return false
+	end
+	
+	if self.lifetimer and not self.shot then
+		self.lifetimer = self.lifetimer - dt
+		if self.lifetimer <= 0 then
+			if self.transforms and self:gettransformtrigger("lifetime") then
+				self:transform(self:gettransformsinto("lifetime"))
+			end
+			self:output()
+			self.dead = true
+			
+			return true
+		end
 	end
 
 	if self.rotationanimation then
@@ -637,9 +719,11 @@ function enemy:update(dt)
 			end
 		end
 		if self.watergravity then
-			self.gravity = self.watergravity
-		else
-			self.gravity = self.startgravity
+			if oldwater == false and self.water == true then
+				self.gravity = self.watergravity
+			elseif oldwater == true and self.water == false then
+				self.gravity = self.startgravity
+			end
 		end
 		if self.y+self.height < uwmaxheight and underwater and self.watergravity then
 			self.speedy = uwpushdownspeed
@@ -754,7 +838,7 @@ function enemy:update(dt)
 				if self.bouncetimerstage and not self.bounceforcerandom then
 					force = self.bounceforce[self.bouncetimerstage]
 				else
-					force = self.bounceforce[math.floor(#self.bounceforce)]
+					force = self.bounceforce[math.random(#self.bounceforce)]
 				end
 			end
 			self.speedy = -(force or 10)
@@ -1788,7 +1872,7 @@ function enemy:update(dt)
 		end
 	end
 	
-	if self.facesplayer then
+	if self.facesplayer or self.facesplayery then
 		local closestplayer = 1
 		local closestdist = math.sqrt((objects["player"][1].x-self.x)^2+(objects["player"][1].y-self.y)^2)
 		for i = 2, players do
@@ -1800,10 +1884,19 @@ function enemy:update(dt)
 			end
 		end
 		
-		if objects["player"][closestplayer].x + objects["player"][closestplayer].width/2 > self.x + self.width/2 then
-			self.animationdirection = "left"
-		else
-			self.animationdirection = "right"
+		if self.facesplayer then
+			if objects["player"][closestplayer].x + objects["player"][closestplayer].width/2 > self.x + self.width/2 then
+				self.animationdirection = "left"
+			else
+				self.animationdirection = "right"
+			end
+		end
+		if self.facesplayery then
+			if objects["player"][closestplayer].y + objects["player"][closestplayer].height/2 > self.y + self.height/2 then
+				self.upsidedown = false
+			else
+				self.upsidedown = true
+			end
 		end
 	end
 	
@@ -1963,30 +2056,47 @@ function enemy:update(dt)
 
 	--Check if player is near
 	if self.transforms and (self:gettransformtrigger("playernear") or self:gettransformtrigger("playernotnear")) then
+		local check = false
 		if type(self.playerneardist) == "number" then
 			for i = 1, players do
 				local v = objects["player"][i]
-				if inrange(v.x+v.width/2, self.x+self.width/2-(self.playerneardist or 3), self.x+self.width/2+(self.playerneardist or 3)) then
-					if self:gettransformtrigger("playernear") then
-						self:transform(self:gettransformsinto("playernear"))
-						return
-					end
-				elseif self:gettransformtrigger("playernotnear") then
-					self:transform(self:gettransformsinto("playernotnear"))
-					return
-				end
+				check = inrange(v.x+v.width/2, self.x+self.width/2-(self.playerneardist or 3), self.x+self.width/2+(self.playerneardist or 3))
+				if check then break end
 			end
 		elseif type(self.playerneardist) == "table" and #self.playerneardist == 4 then
 			local col = checkrect(self.x+self.playerneardist[1], self.y+self.playerneardist[2], self.playerneardist[3], self.playerneardist[4], {"player"})
-			if #col > 0 then
-				if self:gettransformtrigger("playernear") then
-					self:transform(self:gettransformsinto("playernear"))
-					return
+			check = (#col > 0)
+		end
+
+		if check and self:gettransformtrigger("playernear")then
+			self:transform(self:gettransformsinto("playernear"))
+			return
+		elseif (not check) and self:gettransformtrigger("playernotnear") then
+			self:transform(self:gettransformsinto("playernotnear"))
+			return
+		end
+	end
+	
+	--Check if enemy/enemies is near
+	if self.transforms and (self:gettransformtrigger("enemynear") or self:gettransformtrigger("enemynotnear")) then
+		local check = false
+		for i, v in pairs(objects["enemy"]) do
+			if (type(self.enemynearcheck) == "table" and tablecontains(self.enemynearcheck, v.t)) or self.enemynearcheck == v.t then
+				if type(self.enemyneardist) == "number" then
+					check = inrange(v.x+v.width/2, self.x+self.width/2-(self.enemyneardist or 3), self.x+self.width/2+(self.enemyneardist or 3))
+				elseif type(self.enemyneardist) == "table" and #self.enemyneardist == 4 then
+					check = aabb(v.x, v.y, v.width, v.height, self.x+self.enemyneardist[1], self.y+self.enemyneardist[2], self.enemyneardist[3], self.enemyneardist[4])
 				end
-			elseif self:gettransformtrigger("playernotnear") then
-				self:transform(self:gettransformsinto("playernotnear"))
-				return
+				if check then break end
 			end
+		end
+
+		if check and self:gettransformtrigger("enemynear")then
+			self:transform(self:gettransformsinto("enemynear"))
+			return
+		elseif (not check) and self:gettransformtrigger("enemynotnear") then
+			self:transform(self:gettransformsinto("enemynotnear"))
+			return
 		end
 	end
 	
@@ -2077,8 +2187,8 @@ function enemy:update(dt)
 			local oldy = self.y
 			
 			local offsetx = (self.carryoffsetx or 0)
-			if self.carryoffsetx then
-				if self.carryparent.pointingangle > 0 then
+			if self.carryoffsetx then --carry in the direction player is facing
+				if (self.carryparent.portalgun and self.carryparent.pointingangle > 0) or self.carryparent.animationdirection == "left" then
 					offsetx = -offsetx
 				end
 			end
@@ -2250,8 +2360,10 @@ function enemy:shotted(dir, cause, high, fireball, star)
 		collectcoin(nil, nil, tonumber(self.givecoinwhenshot) or 1)
 	end
 	
-	if not self.noshotsound then
-		playsound("shot")
+	if self.shotsound then
+		self:playsound(self.shotsound)
+	elseif not self.noshotsound then
+		self:playsound("shot")
 	end
 	
 	if self.transforms then
@@ -2376,25 +2488,25 @@ function enemy:customtimeraction(action, arg, arg2)
 			self[p] = math.min(self[p],arg)
 		elseif a == "max" then
 			self[p] = math.max(self[p],arg)
+		elseif a == "log" then
+			self[p] = math.log(arg)
 		elseif a == "tonumber" then
 			self[p] = tonumber(self[p])
 		elseif a == "tostring" then
 			self[p] = tostring(self[p])
+		elseif a == "concat" then
+			self[p] = self[p] .. arg
 
 		elseif a == "if" then
 			self:ifstatement(action, ogarg, ogarg2)
-			--                   first;  Symb; Second;     Action;     Arg;
+			--				   first;  Symb; Second;	 Action;	 Arg;
 			--EXAMPLE: [0,["if","speedx",">=","speedy"],["set","speedy"],25]
 		end
 	else --backwards compatibility
 		if action == "bounce" then
 			if self.speedy == 0 then self.speedy = -(arg or 10) end
 		elseif action == "playsound" then
-			if self.sound and arg == self.t then
-				playsound(self.sound)
-			else
-				playsound(arg)
-			end
+			self:playsound(arg)
 		elseif action == "spawnenemy" then
 			if self.spawnsenemyrandoms then
 				self.spawnsenemy = self.spawnsenemyrandoms[math.random(#self.spawnsenemyrandoms)]
@@ -2408,6 +2520,12 @@ function enemy:customtimeraction(action, arg, arg2)
 					self.trackcontroller.travel = "forward"
 				end
 			end
+		elseif action == "stopsound" then
+			if self.sound and arg == self.t then
+				self.sound:stop()
+			elseif _G[arg .. "sound"] then
+				_G[arg .. "sound"]:stop()
+			end
 		end
 		if string.sub(action, 0, 7) == "reverse" then
 			local parameter = string.sub(action, 8, string.len(action))
@@ -2420,6 +2538,12 @@ function enemy:customtimeraction(action, arg, arg2)
 			self[parameter] = self[parameter] * arg
 		elseif action == "setframe" then
 			self.quad = self.quadgroup[arg]
+		elseif LoveConsole and action == "print" then --only for advanced users!
+			if self[arg] then
+				print(self[arg])
+			else
+				print(arg)
+			end
 		elseif string.sub(action, 0, 3) == "set" then
 			self[string.sub(action, 4, string.len(action))] = arg
 		end
@@ -2430,19 +2554,20 @@ function enemy:ifstatement(t, action, arg)
 	--EXAMPLE: ["if","speedx","==","speedy"],["set","speedy"],10
 	--EXAMPLE: ["if","speedx","==","speedy","and","jumping","~=",false],["set","speedy"],10
 	local statementPass = false
-	for i = 1, math.floor(#t/4) do
+	for step = 1, math.floor(#t/4) do
+		local i = 1+(step-1)*4
 		local check = t[i]
 
 		--get properties needed for comparison
 		local prop1,prop2 = t[i+1], t[i+3]
-		if (type(prop1) == "string" and self[prop1]) then
-			prop1 = self[prop1]
-		elseif (type(prop1) == "table" and prop1[1] and prop1[2] and prop1[1] == "property") then
+		if (type(prop1) == "table" and prop1[1] and prop1[2] and prop1[1] == "property") then
 			prop1 = self[prop1[2]]
-		end	
-		if (type(prop2) == "string" and self[prop2]) then
+		else
+			prop1 = self[prop1]	
+		end
+		if (type(prop2) == "string" and self[prop2] ~= nil) then
 			prop2 = self[prop2]
-		elseif (type(prop2) == "table" and prop2[2] and prop2[2] and prop2[2] == "property") then
+		elseif (type(prop2) == "table" and prop2[1] and prop2[2] and prop2[1] == "property") then
 			prop2 = self[prop2[2]]
 		end
 
@@ -2658,7 +2783,7 @@ function enemy:globalcollide(a, b, c, d, dir)
 		end
 	end
 	
-	if a == "fireball" and self.resistsfire then
+	if a == "fireball" and (self.resistsfire or self.reflectsfireballs) then
 		return true
 	end
 	
@@ -2693,24 +2818,36 @@ function enemy:globalcollide(a, b, c, d, dir)
 		return true
 	end
 	
-	if self.breaksblocks then
-		if (self.breakblockside == nil or self.breakblockside == "global") then
-			if a == "tile" then
-				if self.breakshardblocks and (tilequads[map[b.cox][b.coy][1]].coinblock or (tilequads[map[b.cox][b.coy][1]].debris and blockdebrisquads[tilequads[map[b.cox][b.coy][1]].debris])) then -- hard block
-					destroyblock(b.cox, b.coy, "nopoints")
-				else
-					hitblock(b.cox, b.coy, self, true)
-				end
-			elseif a == "flipblock" then
-				if self.breaksflipblocks then
-					b:destroy()
-				end
-			end
-		end
+	if self.breakblockside == nil or self.breakblockside == "global" then
+		self:breakblock(a, b)
 	end
 	
 	if self.nocollidestops or b.nocollidestops then
 		return true
+	end
+end
+
+function enemy:breakblock(a, b)
+	if a == "tile" then
+		if self.breakshardblocks and (tilequads[map[b.cox][b.coy][1]].coinblock or (tilequads[map[b.cox][b.coy][1]].debris and blockdebrisquads[tilequads[map[b.cox][b.coy][1]].debris])) then -- hard block
+			destroyblock(b.cox, b.coy, "nopoints")
+		else
+			if self.breaksblocks then
+				hitblock(b.cox, b.coy, self, true)
+			elseif self.hitsblocks then
+				hitblock(b.cox, b.coy, self, (self.small and math.abs(self.speedx) > 0.01))
+			end
+		end
+	elseif a == "flipblock" then
+		if self.breaksflipblocks or self.breaksentityblocks then
+			b:destroy()
+		elseif self.hitsflipblocks or self.hitsentityblocks then
+			b:hit()
+		end
+	elseif a == "powblock" then
+		if self.triggerspowblock then
+			b:hit()
+		end
 	end
 end
 
@@ -2779,20 +2916,8 @@ function enemy:leftcollide(a, b, c, d)
 		self.speedx = math.abs(self.speedx)
 	end
 	
-	if self.breaksblocks then
-		if (self.breakblockside == "sides" or self.breakblockside == "left") then
-			if a == "tile" then
-				if self.breakshardblocks and (tilequads[map[b.cox][b.coy][1]].coinblock or (tilequads[map[b.cox][b.coy][1]].debris and blockdebrisquads[tilequads[map[b.cox][b.coy][1]].debris])) then -- hard block
-					destroyblock(b.cox, b.coy, "nopoints")
-				else
-					hitblock(b.cox, b.coy, self, true)
-				end
-			elseif a == "flipblock" then
-				if self.breaksflipblocks then
-					b:destroy()
-				end
-			end
-		end
+	if self.breakblockside == "sides" or self.breakblockside == "left" then
+		self:breakblock(a, b)
 	end
 
 	if self.gel then
@@ -2835,7 +2960,7 @@ function enemy:leftcollide(a, b, c, d)
 				if a == "tile" then
 					hitblock(b.cox, b.coy, self, true)
 				else
-					playsound("blockhit")
+					self:playsound("blockhit")
 				end
 			end
 			return false
@@ -2908,20 +3033,8 @@ function enemy:rightcollide(a, b, c, d)
 		self.speedx = -math.abs(self.speedx)
 	end
 	
-	if self.breaksblocks then
-		if (self.breakblockside == "sides" or self.breakblockside == "right") then
-			if a == "tile" then
-				if self.breakshardblocks and (tilequads[map[b.cox][b.coy][1]].coinblock or (tilequads[map[b.cox][b.coy][1]].debris and blockdebrisquads[tilequads[map[b.cox][b.coy][1]].debris])) then -- hard block
-					destroyblock(b.cox, b.coy, "nopoints")
-				else
-					hitblock(b.cox, b.coy, self, true)
-				end
-			elseif a == "flipblock" then
-				if self.breaksflipblocks then
-					b:destroy()
-				end
-			end
-		end
+	if self.breakblockside == "sides" or self.breakblockside == "right" then
+		self:breakblock(a, b)
 	end
 
 	if self.gel then
@@ -2965,7 +3078,7 @@ function enemy:rightcollide(a, b, c, d)
 				if a == "tile" then
 					hitblock(b.cox, b.coy, self, true)
 				else
-					playsound("blockhit")
+					self:playsound("blockhit")
 				end
 			end
 			return false
@@ -3025,20 +3138,8 @@ function enemy:ceilcollide(a, b, c, d)
 		self.speedy = math.abs(self.speedy)
 	end
 	
-	if self.breaksblocks then
-		if self.breakblockside == "ceil" then
-			if a == "tile" then
-				if self.breakshardblocks and (tilequads[map[b.cox][b.coy][1]].coinblock or (tilequads[map[b.cox][b.coy][1]].debris and blockdebrisquads[tilequads[map[b.cox][b.coy][1]].debris])) then -- hard block
-					destroyblock(b.cox, b.coy, "nopoints")
-				else
-					hitblock(b.cox, b.coy, self, true)
-				end
-			elseif a == "flipblock" then
-				if self.breaksflipblocks then
-					b:destroy()
-				end
-			end
-		end
+	if self.breakblockside == "ceil" then
+		self:breakblock(a, b)
 	end
 
 	if self.gel then
@@ -3069,7 +3170,7 @@ function enemy:floorcollide(a, b, c, d)
 			objects["player"][i]:groundshock()
 		end
 		earthquake = 4
-		playsound(thwompsound)
+		self:playsound(thwompsound)
 		self.speedy = 0
 	end
 	
@@ -3141,20 +3242,8 @@ function enemy:floorcollide(a, b, c, d)
 		end
 	end
 
-	if self.breaksblocks then
-		if self.breakblockside == "floor" then
-			if a == "tile" then
-				if self.breakshardblocks and (tilequads[map[b.cox][b.coy][1]].coinblock or (tilequads[map[b.cox][b.coy][1]].debris and blockdebrisquads[tilequads[map[b.cox][b.coy][1]].debris])) then -- hard block
-					destroyblock(b.cox, b.coy, "nopoints")
-				else
-					hitblock(b.cox, b.coy, self, true)
-				end
-			elseif a == "flipblock" then
-				if self.breaksflipblocks then
-					b:destroy()
-				end
-			end
-		end
+	if self.breakblockside == "floor" then
+		self:breakblock(a, b)
 	end
 
 	if self.gel then
@@ -3309,6 +3398,7 @@ function enemy:stomp(x, b)
 				self.speedx = 0
 				self.combo = 1
 				self.quad = self.quadgroup[self.smallquad]
+				self.killsenemies = self.startkillsenemies
 			end
 		else
 			self.active = false
@@ -3333,6 +3423,9 @@ end
 
 function enemy:autodeleted()
 	self.dead = true
+	if self.transforms and self:gettransformtrigger("autodeleted") then
+		self:transform(self:gettransformsinto("autodeleted"))
+	end
 	if self.shot then
 		self:output()
 	else
@@ -3389,11 +3482,7 @@ function enemy:output(transformed)
 			end
 		end
 		if self.deathsound then --AE ADDITION
-			if self.sound and self.deathsound == self.t then
-				playsound(self.sound)
-			else
-				playsound(self.deathsound)
-			end
+			self:playsound(self.deathsound)
 		end
 		if self.droplevelballondeath then
 			local obj = levelball:new(self.x+self.width/2, self.y+self.height/2)
@@ -3405,6 +3494,14 @@ function enemy:output(transformed)
 		end
 		if self.transformenemyanimationondeath then
 			transformenemyanimation(self.transformenemyanimationondeath)
+		end
+		if self.stopsoundondeath then
+			local sound = self.stopsoundondeath
+			if self.sound and (sound == self.t or sound == true) then
+				self.sound:stop()
+			elseif _G[sound .. "sound"] then
+				_G[sound .. "sound"]:stop()
+			end
 		end
 	end
 end
@@ -3419,6 +3516,7 @@ function enemy:triggeranimation(s)
 				anim:trigger()
 			end
 		end
+		animationtriggerfuncs[s].triggered = true
 	end
 end
 
@@ -3600,7 +3698,8 @@ function enemy:transform(t, returntransform, death)
 
 	if self.frozen and (not self.dontpassfrozen) and self.iceblock then --TODO FIX
 		self.iceblock.enemy = temp
-		temp:freeze()
+		temp:freeze("ignoretransform")
+		temp.iceblock = self.iceblock
 	end
 
 	if self.supersized then
@@ -3742,13 +3841,9 @@ function enemy:used(id)
 	self.pickupready = false
 
 	if self.grabsound then
-		if self.sound and self.grabsound == self.t then
-			playsound(self.sound)
-		else
-			playsound(self.grabsound)
-		end
+		self:playsound(self.grabsound)
 	elseif not self.nograbsound then
-		playsound(grabsound)
+		self:playsound(grabsound)
 	end
 end
 
@@ -3769,13 +3864,13 @@ function enemy:dropped(gravitydir)
 	end
 	self.speedy = self.thrownspeedy or 0
 	if not self.thrownignorecarryspeed then
-		if self.carryparent.pointingangle > 0 then --left
+		if (self.carryparent.portalgun and self.carryparent.pointingangle > 0) or self.carryparent.animationdirection == "left" then --left
 			self.speedx = self.carryparent.speedx-(self.thrownspeedx or 0)
 		else
 			self.speedx = self.carryparent.speedx+(self.thrownspeedx or 0)
 		end
 	else
-		if self.carryparent.pointingangle > 0 then --left
+		if (self.carryparent.portalgun and self.carryparent.pointingangle > 0) or self.carryparent.animationdirection == "left" then --left
 			self.speedx = -(self.thrownspeedx or 0)
 		else
 			self.speedx = (self.thrownspeedx or 0)
@@ -3783,16 +3878,16 @@ function enemy:dropped(gravitydir)
 	end
 
 	local offsetx = (self.carryoffsetx or 0)
-	if self.carryoffsetx and self.carryparent.pointingangle > 0 then
+	if self.carryoffsetx and ((self.carryparent.portalgun and self.carryparent.pointingangle > 0) or self.carryparent.animationdirection == "left") then
 		offsetx = -offsetx
 	end
 	self.x = (self.carryparent.x+self.carryparent.width/2-self.width/2) + offsetx
 	self.y = (self.carryparent.y-self.height)+(self.carryoffsety or 0)
 
 	if self.throwsound then
-		playsound(self.throwsound)
+		self:playsound(self.throwsound)
 	elseif not self.nothrowsound then
-		playsound(throwsound)
+		self:playsound(throwsound)
 	end
 	self.carryparent = nil
 	
@@ -3801,8 +3896,8 @@ function enemy:dropped(gravitydir)
 	end
 end
 
-function enemy:freeze()
-	if self.transforms and self:gettransformtrigger("freeze") then
+function enemy:freeze(ignoretransform)
+	if (not ignoretransform) and self.transforms and self:gettransformtrigger("freeze") then
 		self:transform(self:gettransformsinto("freeze"))
 		return
 	end
@@ -3816,7 +3911,7 @@ function enemy:kick(dir)
 		return false
 	end
 	if not self.nokicksound then
-		playsound(shotsound)
+		self:playsound(shotsound)
 	end
 	if dir == "left" then
 		self.speedx = -self.kickspeed
@@ -3937,13 +4032,23 @@ function enemy:dosupersize()
 	if self.supersizeproperties then
 		for i, v in pairs(self.supersizeproperties) do
 			local name = i
-			if name ~= "offsetX" and name ~= "offsetY" and name ~= "quadcenterX" and name ~= "quadcenterY" then
+			if (not self.casesensitive) or (name ~= "offsetX" and name ~= "offsetY" and name ~= "quadcenterX" and name ~= "quadcenterY") then
 				name = name:lower()
 			end
 			self[name] = v
 			if name == "quadno" then
 				self.quad = self.quadgroup[self.quadno]
 			end
+		end
+	end
+end
+
+function enemy:playsound(sound)
+	if (not self.dontplaysoundsoffscreen) or onscreen(self.x, self.y, self.width, self.height) then
+		if self.sound and sound == self.t then
+			playsound(self.sound)
+		else
+			playsound(sound)
 		end
 	end
 end

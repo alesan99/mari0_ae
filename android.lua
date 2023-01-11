@@ -95,6 +95,16 @@ function androidLoad()
 	buttons["portal2"].portal = true
 	buttons["portal1"].color = {60, 188, 252}
 	buttons["portal2"].color = {232, 130, 30}
+	
+	-- shift keys to left
+	if fourbythree then
+		local skip = {"left", "right", "up", "down", "reload", "portal1", "portal2"}
+		for i, v in pairs(buttons) do
+			if not tablecontains(skip, i) then 
+				v.x = v.x - 144
+			end
+		end
+	end
 
 	--Level Editor
 	local editorButtonsimg = love.graphics.newImage("graphics/GUI/androideditorbuttons.png")

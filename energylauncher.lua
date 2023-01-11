@@ -255,7 +255,7 @@ function energyball:init(x, y, dir, t, parent)
 	
 	self.dead = false
 	self.deathtimer = 0
-	self.autodelete = true
+	self.extremeautodelete = true
 
 	self.parent = parent
 	
@@ -440,4 +440,5 @@ end
 
 function energyball:autodeleted()
 	self.destroy = true
+	self.parent:callback(self.catched)
 end

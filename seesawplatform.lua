@@ -43,7 +43,7 @@ function seesawplatform:update(dt)
 	
 	for i, v in pairs(self.checktable) do
 		for j, w in pairs(objects[v]) do
-			if (not w.ignoreplatform) and (not w.jumping) and inrange(w.x, self.x-w.width, self.x+self.width) then
+			if w.active and (not w.ignoreplatform) and (not w.jumping) and w.width and inrange(w.x, self.x-w.width, self.x+self.width) then
 				if inrange(w.y, self.y - w.height - 0.1, self.y - w.height + 0.1) then
 					numberofobjects = numberofobjects + 1
 					if #checkrect(w.x, w.y, w.width, w.height, {"exclude", w}) == 0 then

@@ -21,6 +21,7 @@ function tile:init(x, y)
 		if (t.rightslant or t.halfrightslant1 or t.halfrightslant2) and (t.leftslant or t.halfleftslant1 or t.halfleftslant2) then
 			--slant
 			self.slants = nil
+			self.slab = true
 			if t.rightslant and t.leftslant then
 				self.height = 0.5
 				if (not t.downslant) and self.height ~= 1 then

@@ -55,6 +55,7 @@ function physicsupdate(dt)
 			for i, v in pairs(w) do
 				if ((v.static == false) or (v.activestatic == true)) and v.active then
 					--GRAVITY
+					local oldy = v.y
 					local oldgravity
 					if (not v.activestatic) and (not v.ignoregravity) then
 						--low gravity
@@ -69,32 +70,31 @@ function physicsupdate(dt)
 						if j == "player" or v.gravitydir then
 							if v.gravitydir == "up" then
 								v.speedy = v.speedy - (v.gravity or yacceleration)*dt
-								if v.speedy < -maxyspeed then
-									v.speedy = -maxyspeed
-								end
+								v.speedy = math.max(-maxyspeed, v.speedy)
 							elseif v.gravitydir == "right" then
 								v.speedx = v.speedx + (v.gravity or yacceleration)*dt
-								if v.speedx < -maxyspeed then
-									v.speedx = -maxyspeed
-								end
+								v.speedx = math.max(-maxyspeed, v.speedx)
 							elseif v.gravitydir == "left" then
 								v.speedx = v.speedx - (v.gravity or yacceleration)*dt
-								if v.speedx > maxyspeed then
-									v.speedx = maxyspeed
-								end
+								v.speedy = math.min(maxyspeed, v.speedx)
 							else
 								v.speedy = v.speedy + (v.gravity or yacceleration)*dt
-								if v.speedy > maxyspeed then
-									v.speedy = maxyspeed
-								end
+								v.speedy = math.min(maxyspeed, v.speedy)
 							end
 						elseif (j == "goomba" and v.t == "spiketop") or (j == "enemy" and v.movement == "crawl") then
 							v.speedy = math.max(-maxyspeed, math.min(maxyspeed, v.speedy + (v.gravity or 0)*dt))
 							v.speedx = math.max(-maxyspeed, math.min(maxyspeed, v.speedx + (v.gravityx or 0)*dt))
 						else
 							v.speedy = v.speedy + (v.gravity or yacceleration)*dt
-							if v.speedy > maxyspeed then
-								v.speedy = maxyspeed
+							v.speedy = math.min(v.maxyspeed or maxyspeed, v.speedy)
+							if v.minyspeed then
+								v.speedy = math.max(v.minyspeed, v.speedy)
+							end
+							if v.maxxspeed then
+								v.speedx = math.min(v.maxxspeed, v.speedx)
+							end
+							if v.minxspeed then
+								v.speedx = math.max(v.minxspeed, v.speedx)
 							end
 						end
 					end
@@ -157,7 +157,6 @@ function physicsupdate(dt)
 						xfrom, xto = xto, xfrom
 						dir = -1
 					end
-					
 					for x = xfrom, xto, dir do
 						for y = ystart, ystart+math.ceil(v.height+0.0001) do
 							--check if invisible block
@@ -233,7 +232,7 @@ function physicsupdate(dt)
 						for h, u in pairs(emancipationgrills) do
 							if u.active and v.emancipate then
 								if u.dir == "hor" then
-									if inrange(v.x+6/16, u.startx-1, u.endx, true) and inrange(u.y-14/16, v.y, v.y+v.speedy*dt, true) then
+									if inrange(v.x+6/16, u.startx-1, u.endx, true) and inrange(u.y-14/16, oldy, v.y+v.speedy*dt, true) then
 										v:emancipate(h)
 									end
 								else
@@ -968,7 +967,7 @@ function checkportalHOR(self, nextY) --handles horizontal (up- and down facing) 
 				
 				local testx, testy, testspeedx, testspeedy, testrotation = portalcoords(self.x, self.y, self.speedx, self.speedy, self.width, self.height, self.rotation, self.animationdirection, entryportalX, entryportalY, entryportalfacing, exitportalX, exitportalY, exitportalfacing, self, true)
 			
-				if #checkrect(testx, testy, self.width, self.height, {"exclude", self}, false) == 0 then --Check if exit position is free
+				if self.ignoreportalspacecheck or #checkrect(testx, testy, self.width, self.height, {"exclude", self}, false) == 0 then --Check if exit position is free
 					self.x, self.y, self.speedx, self.speedy, self.rotation = testx, testy, testspeedx, testspeedy, testrotation
 				else
 					self.speedy = -self.speedy*0.95
@@ -1068,7 +1067,7 @@ function checkportalVER(self, nextX) --handles vertical (left- and right facing)
 				
 				local testx, testy, testspeedx, testspeedy, testrotation = portalcoords(self.x, self.y, self.speedx, self.speedy, self.width, self.height, self.rotation, self.animationdirection, entryportalX, entryportalY, entryportalfacing, exitportalX, exitportalY, exitportalfacing, self, true)
 			
-				if #checkrect(testx, testy, self.width, self.height, {"exclude", self}, false) == 0 then
+				if self.ignoreportalspacecheck or #checkrect(testx, testy, self.width, self.height, {"exclude", self}, false) == 0 then
 					self.x, self.y, self.speedx, self.speedy, self.rotation = testx, testy, testspeedx, testspeedy, testrotation
 				else
 					self.speedx = -self.speedx

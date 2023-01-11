@@ -44,5 +44,6 @@
 	"throwquadoffset": 1,
 	"throwpreparetime": 0.5,
 	
-	"ignorefaithplates": true
+	"ignorefaithplates": true,
+	"ignoreplatform": true
 }

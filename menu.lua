@@ -515,7 +515,7 @@ function menu_draw()
 		love.graphics.draw(titleimage, titlequad[titleframe], x*scale, 24*scale, 0, scale, scale)
 		
 		love.graphics.setColor(255, 255, 255)
-		properprintF("©2012-2020 maurice", (x+titlewidth-144)*scale, 112*scale)
+		properprintF("©2012-2022 maurice", (x+titlewidth-144)*scale, 112*scale)
 		love.graphics.setColor(255, 255, 255, 255)
 		
 		if selection == 0 then
@@ -1627,8 +1627,11 @@ function loadbackground(background)
 
 	--dropshadow
 	if mappackselection and mappackdropshadow then
-		dropshadow = mappackdropshadow[mappackselection]
+		local sel = mappackselection
+		for i = 1, #mappacklist do if mappacklist[i] == mappack then sel = i break end end
+		dropshadow = mappackdropshadow[sel]
 	end
+	mappackversion = nil
 
 	--BLOCKTOGGLE STUFF
 	solidblockperma = {false, false, false, false}
@@ -1660,7 +1663,6 @@ function loadbackground(background)
 		love.graphics.setBackgroundColor(backgroundcolor[backgroundi])
 		portalgun = true
 		portalguni = 1
-		levelversion = VERSION
 	else
 		local s = love.filesystem.read( mappackfolder .. "/" .. mappack .. "/" .. background )
 		local s2 = s:split(";")
@@ -1749,6 +1751,9 @@ function loadbackground(background)
 					if tonumber(r[2]) and entityquads[tonumber(r[2])] and entityquads[tonumber(r[2])].t == "spawn" then
 						startx = x
 						starty = y
+						if r[3] and r[3] == "true" then
+							startx = startx - 0.5
+						end
 					end
 				end
 
@@ -1773,7 +1778,6 @@ function loadbackground(background)
 		customforeground = false
 		portalgun = true
 		portalguni = 1
-		levelversion = false
 		nofunallowed = nil
 		
 		for i = 2, #s2 do
@@ -1808,6 +1812,7 @@ function loadbackground(background)
 				nofunallowed = true
 			elseif s3[1] == "vs" then
 				local vs = tonumber(s3[2])
+				mappackversion = vs
 				if vs and vs > VERSION then
 					if math.abs(vs-VERSION) < 0.1 then
 						notice.new("This map was made for a\nnew patch of mari0 ae\ndownload the new version", notice.white, 4.5)

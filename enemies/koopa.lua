@@ -49,6 +49,7 @@ function koopa:init(x, y, t)
 		self.speedx = 0
 		self.timer = 0
 		self.dontenterclearpipes = true
+		self.ignoreplatform = true
 	elseif self.t == "flying2" then
 		self.graphic = koopaimage
 		self.flying = true
@@ -58,6 +59,7 @@ function koopa:init(x, y, t)
 		self.timer = 0
 		self.dontenterclearpipes = true
 		self.pipespawnmax = 1
+		self.ignoreplatform = true
 		--self.timer2 = 0
 	elseif self.t == "flying" then
 		self.flying = true
