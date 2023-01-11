@@ -18,6 +18,7 @@ function menu_load()
 	optionstab = 2
 	optionsselection = 1
 	skinningplayer = 1
+	characteri = characters.data[mariocharacter[1]].i
 	rgbselection = 1
 	colorsetedit = 1
 	mappackselection = 1
@@ -26,6 +27,10 @@ function menu_load()
 	openmappacksbutton.active = false
 	opendlcbutton = guielement:new("button", 241, 190, "open dlc folder", opendlcfolder, nil, 0, 2.5, 147, true)
 	opendlcbutton.active = false
+	mappacksearch = guielement:new("input", 249, 112, 15, searchmappacks, "", 100, nil, nil, 0)
+	mappacksearch.active = false
+	oldmappacksearchtable = {}
+	mappacksearchi = 1
 	screenzoom = 1
 	screenzoom2 = 1/screenzoom
 
@@ -201,6 +206,9 @@ function menu_update(dt)
 				mappackhorscrollsmooth = mappackhorscroll
 			end
 		end
+	end
+	if mappacksearch.active then
+		mappacksearch:update(dt)
 	end
 	
 	if gamestate == "options" and optionstab == 2 then
@@ -917,6 +925,7 @@ function menu_draw()
 			love.graphics.translate(round(((mappackhorscrollrange*scale)*2) - mappackhorscrollsmooth*scale*mappackhorscrollrange), 0)
 			
 			love.graphics.setScissor(21*scale, 16*scale, 218*scale, 200*scale)
+			local drawsearch = true
 			if mappackhorscrollsmooth > 1 and mappackhorscrollsmooth < 3 then
 				love.graphics.setColor(255, 255, 255)
 				properprint("daily challenge:" .. datet[1] .. "/" .. datet[2] .. "/" .. datet[3], 25*scale, 21*scale)
@@ -952,10 +961,12 @@ function menu_draw()
 				love.graphics.rectangle("fill", 26*scale, 47*scale, 76*scale, 76*scale)
 				love.graphics.setColor(255, 255, 255)
 				love.graphics.draw(calendarimg, 26*scale, 47*scale, 0, scale, scale)
+				drawsearch = false
 			end
 			love.graphics.setScissor()
 			
 			love.graphics.translate(- (round(((mappackhorscrollrange*scale)*2) - mappackhorscrollsmooth*scale*mappackhorscrollrange)), 0)
+			if drawsearch then mappacksearch:draw() end
 		end
 		
 		love.graphics.setScissor()
@@ -1144,7 +1155,7 @@ function menu_draw()
 			
 			properprintF("{", 64*scale, 56*scale)
 			properprintF("}", 112*scale, 56*scale)
-			properprint(v.name, (118-#v.name*4)*scale, 80*scale)
+			properprint(characters.data[characters.list[characteri]].name, (118-#characters.data[characters.list[characteri]].name*4)*scale, 80*scale)
 			
 			--hat
 			offsets = customplayerhatoffsets(mariocharacter[skinningplayer], "hatoffsets", "idle") or hatoffsets["idle"]
@@ -1845,15 +1856,18 @@ end
 function mappacks()
 	opendlcbutton.active = false
 	openmappacksbutton.active = false
+	mappacksearch.active = false
 	if mappackhorscroll == 0 then
 		loadmappacks()
 		openmappacksbutton.active = true
+		mappacksearch.active = true
 	elseif mappackhorscroll == 1 then
 		if (not onlinemappacklist) or onlinemappacklisterror then
 			loadonlinemappacks()
 		end
 		mappacktype = "online"
 		opendlcbutton.active = true
+		mappacksearch.active = true
 	elseif mappackhorscroll == 2 then
 		loaddailychallenge()
 	end
@@ -2229,7 +2243,14 @@ function menu_keypressed(key, unicode)
 			end
 		end
 	elseif gamestate == "mappackmenu" then
-		if (key == "up" or key == "w") then
+		if mappacksearch.inputting then
+			if (key == "up" or key == "down") then
+				mappacksearch.inputting = false
+			else
+				mappacksearch:keypress(key)
+				return
+			end
+		elseif (key == "up" or key == "w") then
 			if mappacktype == "local" then
 				if mappackselection > 1 then
 					mappackselection = mappackselection - 1
@@ -2329,7 +2350,7 @@ function menu_keypressed(key, unicode)
 		elseif mappacktype == "daily_challenge" and (key == "return" or key == "enter" or key == "kenter" or key == " ") then
 			infinitetime = false
 			game_load("dailychallenge")
-		elseif key == "escape" or (key == "return" or key == "enter" or key == "kpenter" or key == " ") then
+		elseif (key == "return" or key == "enter" or key == "kpenter" or key == " ") then
 			--stop loading mappacks
 			if mappacklistthread and mappacklistthread:isRunning() then
 				mappacklistthreadchannelin:push({"stop"})
@@ -2348,6 +2369,11 @@ function menu_keypressed(key, unicode)
 			if mappack == "custom_mappack" then
 				createmappack()
 			end
+		elseif key == "escape" then
+			if mappacklistthread and mappacklistthread:isRunning() then
+				mappacklistthreadchannelin:push({"stop"})
+			end
+			gamestate = "menu"
 		elseif (key == "right" or key == "d") or (key == "left" or key == "a") then
 			--change mappack selection tab
 			if (key == "right" or key == "d") then
@@ -2387,12 +2413,14 @@ function menu_keypressed(key, unicode)
 				if optionstab == 2 or optionstab == 1 then
 					if skinningplayer > 1 then
 						skinningplayer = skinningplayer - 1
+						characteri = characters.data[mariocharacter[skinningplayer]].i
 					end
 				end
 			elseif (key == "right" or key == "d") then
 				if optionstab == 2 or optionstab == 1 then
 					if skinningplayer < 4 then
 						skinningplayer = skinningplayer + 1
+						characteri = characters.data[mariocharacter[skinningplayer]].i
 						if players > #controls then
 							loadconfig()
 						end
@@ -2411,6 +2439,11 @@ function menu_keypressed(key, unicode)
 					end
 				elseif optionsselection > 3 then
 					keypromptstart()
+				end
+			elseif optionstab == 2 and optionsselection == 3 then
+				if characteri ~= characters.data[mariocharacter[skinningplayer]].i then
+					colorsetedit = 1
+					setcustomplayer(characters.list[characteri], skinningplayer)
 				end
 			elseif optionstab == 3 then
 				if optionsselection == 7 then
@@ -2491,14 +2524,10 @@ function menu_keypressed(key, unicode)
 				end
 				if optionsselection == 3 then
 					if #characters.list > 0 then
-						local t = characters.list
-						local i = characters.data[mariocharacter[skinningplayer]].i+1 or 1
-						if i > #t then
-							i = 1
+						characteri = characteri+1 or 1
+						if characteri > #characters.list then
+							characteri = 1
 						end
-
-						colorsetedit = 1
-						setcustomplayer(t[i], skinningplayer)
 					end
 				elseif optionsselection == 4 and not (mariocharacter[skinningplayer] and not characters.data[mariocharacter[skinningplayer]].hats) then
 					if mariohats[skinningplayer][1] == nil then
@@ -2628,14 +2657,10 @@ function menu_keypressed(key, unicode)
 				end
 				if optionsselection == 3 then
 					if #characters.list > 0 then
-						local t = characters.list
-						local i = characters.data[mariocharacter[skinningplayer]].i-1
-						if i < 1 then
-							i = #t
+						characteri = characteri-1 or 1
+						if characteri < 1 then
+							characteri = #characters.list
 						end
-
-						colorsetedit = 1
-						setcustomplayer(t[i], skinningplayer)
 					end
 				elseif optionsselection == 4 and not (mariocharacter[skinningplayer] and not characters.data[mariocharacter[skinningplayer]].hats) then
 					if mariohats[skinningplayer][1] == 1 then
@@ -2842,6 +2867,7 @@ function menu_mousepressed(x, y, button)
 	elseif gamestate == "mappackmenu" then
 		openmappacksbutton:click(x, y, button)
 		opendlcbutton:click(x, y, button)
+		mappacksearch:click(x, y, button)
 		if button == "wu" then
 			menu_keypressed("up")
 		elseif button == "wd" then
@@ -2925,6 +2951,7 @@ function menu_mousereleased(x, y, button)
 		mouseonselecthold = false
 	elseif gamestate == "mappackmenu" then
 		mappackscrollmouse = false
+		mappacksearch:unclick(x, y)
 	end
 end
 
@@ -3292,5 +3319,49 @@ function menu_updatemouseselection(x,y)
 			selection = 4
 			mouseonselect = 4
 		end
+	end
+end
+
+function searchmappacks()
+	local text = mappacksearch.value
+	local mappacksearchtable = {}
+	local names = mappackname
+	if mappacktype == "online" then names = onlinemappackname end
+
+	for i in pairs(names) do
+		for j = 1, (#names[i] - #text)+1 do
+			if string.sub(names[i], j, #text+j-1) == text then
+				table.insert(mappacksearchtable, i)
+				break
+			end
+		end
+	end
+	if #mappacksearchtable == 0 then
+		playsound("blockhit")
+		return
+	end
+
+	local pass = true
+	for i in pairs(mappacksearchtable) do
+		if mappacksearchtable[i] ~= oldmappacksearchtable[i] then
+		pass = false
+		end
+	end
+
+	if pass then
+		mappacksearchi = mappacksearchi + 1
+	else
+		mappacksearchi = 0
+		oldmappacksearchtable = mappacksearchtable
+	end
+
+	local topick = mappacksearchtable[(mappacksearchi % #mappacksearchtable)+1]
+
+	if mappacktype == "local" then
+		mappackselection = topick
+		updatescroll()
+	elseif mappacktype == "online" then
+		onlinemappackselection = topick
+		onlineupdatescroll()
 	end
 end
