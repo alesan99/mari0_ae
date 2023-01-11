@@ -2022,7 +2022,7 @@ rightclicktype["camerastop"] = {
 		rightclickvalues2[4] = y
 	end,
 	format = {
-		{"button", 1, {"select range", function(var, step) startrcregion(var, step) end, {1, 1}}},
+		{"button", 1, {"select range", function(var, step) startrcregion(var, step) end, {1, 2}}},
 		{"checkbox", 5, "force push"},
 		{"checkbox", 6, "ignore if"},
 		"off-screen",
