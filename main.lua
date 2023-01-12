@@ -1755,10 +1755,7 @@ function changescale(s, fullscreen)
 		elseif fullscreen then
 			gamewidth, gameheight = width*16*scale, height*16*scale
 		end
-		winwidth, winheight = love.graphics.getDimensions()
-		if fullscreen then
-			winwidth, winheight = love.window.getDesktopDimensions()
-		end
+		winwidth, winheight = getWindowSize()
 		
 		canvassupported = true--love.graphics.isSupported("canvas")
 		if canvassupported then
@@ -1783,7 +1780,7 @@ function changescale(s, fullscreen)
 		love.window.setMode(width*16*scale, height*16*scale, {fullscreen=fullscreen,vsync=vsync, msaa=fsaa}) --27x14 blocks (15 blocks actual height)
 		
 		gamewidth, gameheight = love.graphics.getDimensions()
-		winwidth, winheight = love.graphics.getDimensions()
+		winwidth, winheight = getWindowSize()
 		
 		if shaders then
 			shaders:refresh()
@@ -1810,6 +1807,27 @@ function love.resize(w, h)
 		shaders:refresh()
 	end
 end	
+
+function getWindowSize(setW, setH)
+	local w, h
+	if fullscreen then
+		w, h = love.window.getDesktopDimensions()
+	else
+		if setW and setH then
+			w, h = setW, setH
+		else
+			w, h = love.graphics.getDimensions()
+		end
+		if DPIFix and resizable then
+			local factor = DPIFix
+			if not (type(DPIFix) == "number") then
+				factor = 2
+			end
+			w, h = w*factor, h*factor
+		end
+	end
+	return w, h
+end
 
 lgs = love.graphics.setScissor
 function love.graphics.setScissor(x, y, w, h)
@@ -1916,11 +1934,10 @@ function love.keypressed(key, scancode, isrepeat, textinput)
 	
 	if key == "return" and love.keyboard.isDown("lalt") then
 		fullscreen = not fullscreen
+		winwidth, winheight = getWindowSize()
 		if fullscreen then
-			winwidth, winheight = love.window.getDesktopDimensions()
 			changescale(5, fullscreen)
 		else
-			winwidth, winheight = love.graphics.getDimensions()
 			changescale(scale, fullscreen)
 		end
 		if gamestate == "game" then
@@ -2923,6 +2940,7 @@ function loadnitpicks()
 			PersistentEditorTools = false
 		end
 		PersistentEditorToolsLocal = t.persistenteditortoolslocal
+		DPIFix = t.dpifix
 	end
 end
 

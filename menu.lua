@@ -27,8 +27,8 @@ function menu_load()
 	openmappacksbutton.active = false
 	opendlcbutton = guielement:new("button", 241, 190, "open dlc folder", opendlcfolder, nil, 0, 2.5, 147, true)
 	opendlcbutton.active = false
-	mappacksearch = guielement:new("input", 249, 112, 15, searchmappacks, "", 100, nil, nil, 0)
-	mappacksearch.active = false
+	mappacksearchbar = guielement:new("input", 240, 16, 15, searchmappacks, "", 100, nil, nil, 0)
+	mappacksearchbar.active = false
 	oldmappacksearchtable = {}
 	mappacksearchi = 1
 	screenzoom = 1
@@ -207,8 +207,8 @@ function menu_update(dt)
 			end
 		end
 	end
-	if mappacksearch.active then
-		mappacksearch:update(dt)
+	if mappacksearchbar.active then
+		mappacksearchbar:update(dt)
 	end
 	
 	if gamestate == "options" and optionstab == 2 then
@@ -515,7 +515,7 @@ function menu_draw()
 		love.graphics.draw(titleimage, titlequad[titleframe], x*scale, 24*scale, 0, scale, scale)
 		
 		love.graphics.setColor(255, 255, 255)
-		properprintF("©2012-2022 maurice", (x+titlewidth-144)*scale, 112*scale)
+		properprintF("©2012-2023 maurice", (x+titlewidth-144)*scale, 112*scale)
 		love.graphics.setColor(255, 255, 255, 255)
 		
 		if selection == 0 then
@@ -760,6 +760,9 @@ function menu_draw()
 					end
 					openmappacksbutton:draw()
 					properprintF("       open\n  mappacks folder", 239*scale, 194*scale)
+					if mappacksearchbar.active then
+						mappacksearchbar:draw()
+					end
 				end
 			end
 			
@@ -925,7 +928,6 @@ function menu_draw()
 			love.graphics.translate(round(((mappackhorscrollrange*scale)*2) - mappackhorscrollsmooth*scale*mappackhorscrollrange), 0)
 			
 			love.graphics.setScissor(21*scale, 16*scale, 218*scale, 200*scale)
-			local drawsearch = true
 			if mappackhorscrollsmooth > 1 and mappackhorscrollsmooth < 3 then
 				love.graphics.setColor(255, 255, 255)
 				properprint("daily challenge:" .. datet[1] .. "/" .. datet[2] .. "/" .. datet[3], 25*scale, 21*scale)
@@ -961,12 +963,10 @@ function menu_draw()
 				love.graphics.rectangle("fill", 26*scale, 47*scale, 76*scale, 76*scale)
 				love.graphics.setColor(255, 255, 255)
 				love.graphics.draw(calendarimg, 26*scale, 47*scale, 0, scale, scale)
-				drawsearch = false
 			end
 			love.graphics.setScissor()
 			
 			love.graphics.translate(- (round(((mappackhorscrollrange*scale)*2) - mappackhorscrollsmooth*scale*mappackhorscrollrange)), 0)
-			if drawsearch then mappacksearch:draw() end
 		end
 		
 		love.graphics.setScissor()
@@ -1856,18 +1856,17 @@ end
 function mappacks()
 	opendlcbutton.active = false
 	openmappacksbutton.active = false
-	mappacksearch.active = false
+	mappacksearchbar.active = false
 	if mappackhorscroll == 0 then
 		loadmappacks()
 		openmappacksbutton.active = true
-		mappacksearch.active = true
+		mappacksearchbar.active = true
 	elseif mappackhorscroll == 1 then
 		if (not onlinemappacklist) or onlinemappacklisterror then
 			loadonlinemappacks()
 		end
 		mappacktype = "online"
 		opendlcbutton.active = true
-		mappacksearch.active = true
 	elseif mappackhorscroll == 2 then
 		loaddailychallenge()
 	end
@@ -2243,11 +2242,11 @@ function menu_keypressed(key, unicode)
 			end
 		end
 	elseif gamestate == "mappackmenu" then
-		if mappacksearch.inputting then
+		if mappacksearchbar.inputting then
 			if (key == "up" or key == "down") then
-				mappacksearch.inputting = false
+				mappacksearchbar.inputting = false
 			else
-				mappacksearch:keypress(key)
+				mappacksearchbar:keypress(key)
 				return
 			end
 		elseif (key == "up" or key == "w") then
@@ -2472,6 +2471,11 @@ function menu_keypressed(key, unicode)
 					end
 				end
 			elseif optionstab == 2 then
+				if characteri ~= characters.data[mariocharacter[skinningplayer]].i then
+					colorsetedit = 1
+					setcustomplayer(characters.list[characteri], skinningplayer)
+				end
+
 				local limit = 6
 				if characters.data[mariocharacter[skinningplayer]].colorables then
 					limit = 10
@@ -2497,6 +2501,11 @@ function menu_keypressed(key, unicode)
 			end
 		elseif (key == "up" or key == "w") then
 			if optionsselection > 1 then
+				if characteri ~= characters.data[mariocharacter[skinningplayer]].i then
+					colorsetedit = 1
+					setcustomplayer(characters.list[characteri], skinningplayer)
+				end
+
 				optionsselection = optionsselection - 1
 			else
 				if optionstab == 1 then
@@ -2797,6 +2806,10 @@ function menu_keypressed(key, unicode)
 				end
 			end
 		elseif key == "escape" then
+			if characteri ~= characters.data[mariocharacter[skinningplayer]].i then
+				colorsetedit = 1
+				setcustomplayer(characters.list[characteri], skinningplayer)
+			end
 			gamestate = "menu"
 			saveconfig()
 		end
@@ -2867,7 +2880,7 @@ function menu_mousepressed(x, y, button)
 	elseif gamestate == "mappackmenu" then
 		openmappacksbutton:click(x, y, button)
 		opendlcbutton:click(x, y, button)
-		mappacksearch:click(x, y, button)
+		mappacksearchbar:click(x, y, button)
 		if button == "wu" then
 			menu_keypressed("up")
 		elseif button == "wd" then
@@ -2951,7 +2964,7 @@ function menu_mousereleased(x, y, button)
 		mouseonselecthold = false
 	elseif gamestate == "mappackmenu" then
 		mappackscrollmouse = false
-		mappacksearch:unclick(x, y)
+		mappacksearchbar:unclick(x, y)
 	end
 end
 
@@ -3323,7 +3336,7 @@ function menu_updatemouseselection(x,y)
 end
 
 function searchmappacks()
-	local text = mappacksearch.value
+	local text = mappacksearchbar.value
 	local mappacksearchtable = {}
 	local names = mappackname
 	if mappacktype == "online" then names = onlinemappackname end
