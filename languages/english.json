@@ -176,6 +176,12 @@
 		"quick test": "quick test",
 		"change size": "change size",
 		"toggle minimap with m": "toggle minimap with m",
+		"are you sure?": "are you sure?",
+		"unsaved changes will be lost!": "unsaved changes will be lost!",
+		"save and exit": "save and exit",
+		"save and continue": "save and continue",
+		"continue": "continue",
+		"cancel": "cancel",
 	"^_Change Size":"",
 		"old width: ": "old width: ",
 		"old height: ": "old height: ",
@@ -327,4 +333,7 @@
 		"portal gun": "portal gun",
 		"selection tool": "selection tool",
 		"power line draw": "power line draw",
+
+"^_Notices":"",
+	"Map saved!": "Map saved!",
 }

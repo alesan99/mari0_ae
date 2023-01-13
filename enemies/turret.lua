@@ -36,7 +36,7 @@ function turret:init(x, y, dir, t, r)
 
 		self.knockback = v[3]
 		if v[3] == nil then
-			if mappackversion and mappackversion <= 13.0114 then
+			if (not mappackversion) or mappackversion <= 13.0114 then
 				self.knockback = false
 			else
 				self.knockback = true

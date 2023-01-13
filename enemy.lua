@@ -2520,6 +2520,12 @@ function enemy:customtimeraction(action, arg, arg2)
 					self.trackcontroller.travel = "forward"
 				end
 			end
+		elseif action == "stopsound" then
+			if self.sound and arg == self.t then
+				self.sound:stop()
+			elseif _G[arg .. "sound"] then
+				_G[arg .. "sound"]:stop()
+			end
 		end
 		if string.sub(action, 0, 7) == "reverse" then
 			local parameter = string.sub(action, 8, string.len(action))
@@ -2554,14 +2560,14 @@ function enemy:ifstatement(t, action, arg)
 
 		--get properties needed for comparison
 		local prop1,prop2 = t[i+1], t[i+3]
-		if (type(prop1) == "string" and self[prop1]) then
-			prop1 = self[prop1]
-		elseif (type(prop1) == "table" and prop1[1] and prop1[2] and prop1[1] == "property") then
+		if (type(prop1) == "table" and prop1[1] and prop1[2] and prop1[1] == "property") then
 			prop1 = self[prop1[2]]
-		end	
-		if (type(prop2) == "string" and self[prop2]) then
+		else
+			prop1 = self[prop1]	
+		end
+		if (type(prop2) == "string" and self[prop2] ~= nil) then
 			prop2 = self[prop2]
-		elseif (type(prop2) == "table" and prop2[2] and prop2[2] and prop2[2] == "property") then
+		elseif (type(prop2) == "table" and prop2[1] and prop2[2] and prop2[1] == "property") then
 			prop2 = self[prop2[2]]
 		end
 
@@ -2777,7 +2783,7 @@ function enemy:globalcollide(a, b, c, d, dir)
 		end
 	end
 	
-	if a == "fireball" and self.resistsfire then
+	if a == "fireball" and (self.resistsfire or self.reflectsfireballs) then
 		return true
 	end
 	
@@ -3488,6 +3494,14 @@ function enemy:output(transformed)
 		end
 		if self.transformenemyanimationondeath then
 			transformenemyanimation(self.transformenemyanimationondeath)
+		end
+		if self.stopsoundondeath then
+			local sound = self.stopsoundondeath
+			if self.sound and (sound == self.t or sound == true) then
+				self.sound:stop()
+			elseif _G[sound .. "sound"] then
+				_G[sound .. "sound"]:stop()
+			end
 		end
 	end
 end

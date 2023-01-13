@@ -5922,7 +5922,7 @@ function mario:leftcollide(a, b)
 		end
 		
 		--Check if it's a pipe with pipe pipe.
-		if self.falling == false and self.jumping == false and (leftkey(self.playernumber) or intermission) then --but only on ground and rightkey
+		if self.falling == false and self.jumping == false and (leftkey(self.playernumber) or intermission) then --but only on ground and leftkey
 			for i, p in pairs(pipes) do
 				if p:inside("left", x, self) then
 					self.y = p.coy-self.height
@@ -6284,7 +6284,7 @@ function mario:ceilcollide(a, b)
 		end
 		
 		--Check if it's a pipe with pipe pipe.
-		if upkey(self.playernumber) and self.jumping then --but only on ground and rightkey
+		if upkey(self.playernumber) then --but only in midair and upkey
 			for i, p in pairs(pipes) do
 				if p:inside("up", y, self) then
 					self:pipe(p.cox, p.coy, "up", i)
@@ -7131,13 +7131,14 @@ function hitblock(x, y, t, v)
 end
 
 function hitontop(x, y)
+	if breakoutmode then return end
 	--kill enemies on top
 	for i, v in pairs(enemies) do
 		if objects[v] then
 			for j, w in pairs(objects[v]) do
 				if w.width and (w.active or w.killedfromblocksbelownotactive) then
-					local centerX = w.x + w.width/2
-					if inrange(centerX, x-1, x, true) and y-1 == w.y+w.height then
+					local cx = math.max(x-1,math.min(x,w.x))
+					if inrange(cx, w.x, w.x+w.width, true) and inrange(w.y+w.height, y-1, y-1.125, true) then
 						--get dir
 						local dir = "right"
 						if w.x+w.width/2 < x-0.5 then
@@ -7288,7 +7289,7 @@ function mario:die(how)
 		return
 	end
 	
-	if how ~= "pit" and how ~= "time" and how ~= "lava" and how ~= "killscript" then
+	if how ~= "pit" and how ~= "time" and how ~= "lava" and how ~= "killscript" and not self.dead then
 		animationsystem_playerhurttrigger(self.playernumber)
 
 		if how == "Laser" then
@@ -9153,6 +9154,7 @@ end
 
 function mario:stopanimation()
 	self.animation = false
+	self.drawable = true
 end
 
 function mario:stopgroundpound(force)

@@ -12,8 +12,6 @@ function rocketturret:init(x, y, r)
 	self.dir = "left"
 	
 	self.mask = {true}
-	
-	self.autodelete = true
 
 	--IMAGE STUFF
 	self.drawable = true

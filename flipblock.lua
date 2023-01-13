@@ -216,6 +216,11 @@ function flipblock:hit()
 					w:change()
 				end
 			end
+			for j, w in pairs(tracks) do
+				if w.switch and w.color == self.color then
+					w:change()
+				end
+			end
 			for i = 1, #animationswitchtriggerfuncs do
 				local t = animationswitchtriggerfuncs[i]
 				if tonumber((t[2] or 0)) and tonumber((t[2] or 0)) == self.color then

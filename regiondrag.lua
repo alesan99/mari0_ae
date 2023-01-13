@@ -101,8 +101,8 @@ function regiondrag:update(dt)
 		self.width = math.floor((x/scale)/16*self.step)/self.step-self.x+1/self.step
 		self.height = math.floor(((y/scale)+8)/16*self.step)/self.step-self.y+1/self.step
 	elseif self.grabbed.center then
-		self.x = math.floor(((x-self.movex)/scale)/16*self.step)/self.step+self.oldx
-		self.y = math.floor(((y-self.movey)/scale)/16*self.step)/self.step+self.oldy
+		self.x = round(((x-self.movex)/scale)/16*self.step,0)/self.step+self.oldx
+		self.y = round(((y-self.movey)/scale)/16*self.step,0)/self.step+self.oldy
 	end
 	if self.width < 0 then
 		local oldx = self.x
