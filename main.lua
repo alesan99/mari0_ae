@@ -1264,7 +1264,7 @@ function saveconfig()
 		s = s .. "playercolors:" .. i .. ":"
 		for j = 1, #mariocolors[i] do
 			for k = 1, 3 do
-				s = s .. mariocolors[i][j][k]
+				s = s .. round(mariocolors[i][j][k] * 255)
 				if j == #mariocolors[i] and k == 3 then
 					s = s .. ";"
 				else
@@ -1411,7 +1411,7 @@ function loadconfig(nodefaultconfig)
 			s3 = s2[3]:split(",")
 			mariocolors[tonumber(s2[2])] = {}
 			for j = 1, math.floor(#s3/3) do
-				table.insert(mariocolors[tonumber(s2[2])], {tonumber(s3[3*(j-1)+1]), tonumber(s3[3*(j-1)+2]), tonumber(s3[3*(j-1)+3])})
+				table.insert(mariocolors[tonumber(s2[2])], {tonumber(s3[3*(j-1)+1])/255, tonumber(s3[3*(j-1)+2])/255, tonumber(s3[3*(j-1)+3])/255})
 			end
 			
 		elseif s2[1] == "portalhues" then
