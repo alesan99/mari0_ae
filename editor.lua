@@ -482,7 +482,7 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	end
 	
 	if PersistentEditorTools then
-		if PersistentEditorToolsLocal and (not editorsavedata) and love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/editorsave.json") then
+		if PersistentEditorToolsLocal and (not editorsavedata) and love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/editorsave.json") ~= nil then
 			local data = love.filesystem.read(mappackfolder .. "/" .. mappack .. "/editorsave.json")
 			editorsavedata = JSON:decode(data)
 		end

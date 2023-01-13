@@ -2729,7 +2729,7 @@ function love.errorhandler(msg)
 		end
 	end
 	local screenshot = false
-	if love.graphics.newScreenshot then
+	if love.graphics.captureScreenshot then
 		love.graphics.captureScreenshot(function(s) screenshot = s end)
 	end
 
