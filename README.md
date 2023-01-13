@@ -2,6 +2,7 @@
 <p align="center">This is the repository for my mod Mari0: Alesan99's Entities</p>
 
 ## 👷 Contributions
+
 Bug fixes and quality of life improvements are welcome!
 This includes stuff like custom enemy properties and new animations.
 
@@ -9,11 +10,13 @@ Avoid major additions that will potentially cause bugs or complicate the game/co
 I appreciate the help, but the goal is to continue the mod while I am busy. Major changes will only increase my workload and make the mod even buggier.
 
 ## 📥 Downloads
+
 [**Downloads are available here.**](https://forum.stabyourself.net/viewtopic.php?f=13&t=3636)
 
 Development builds are available [here](https://github.com/alesan99/mari0_ae/actions).
 
 ## 💡 About
+
 **Alesan99's Entities** adds many entities to [Mari0](https://stabyourself.net/mari0)! From Enemies to power ups you'll never run out of entities to make levels now!
 
 It even has bonus features like online multiplayer, custom characters, custom enemies/powerups, animated tiles, infinite levels and music, vertical scrolling, tile properties, and more!
@@ -41,6 +44,7 @@ It even has bonus features like online multiplayer, custom characters, custom en
 </details>
 
 ### ✨ Features
+
 <details>
   <summary>🍄 Entities Added</summary>
 
@@ -227,6 +231,7 @@ It even has bonus features like online multiplayer, custom characters, custom en
 </details>
 
 ## 💌 Credits
+
 Special thanks to:
 - [***ME***](https://alesan99.blogspot.com) (check out my [Youtube](https://www.youtube.com/channel/UClCb0X0Yd36KgGnJwhIrcQw))
 - **Maurice** and **Fakeuser** for regular turrets
@@ -245,7 +250,7 @@ Special thanks to:
 - **Subpixel** for bowser3, rotodiscs, ninji, and splunkin sprites
 - **Critfish** for overgrown portal sprites
 - **MadNyle** for propeller sound effect and mega mushroom
-- **qixils** for the automatic GitHub workflows
+- **qixils** for the automatic GitHub workflows and LÖVE 11.4 update
 - **All you guys** for reporting bugs and making maps
 
 - And thanks to [**NNB**](https://github.com/NNBnh) for this GitHub README page
