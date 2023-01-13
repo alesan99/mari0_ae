@@ -162,6 +162,8 @@ function loadcustomtext()
 end
 
 function defaultcustomtext(initial)
+	-- colors here have intentionally been left as 0..255
+	-- the conversion to 0..1 is handled in levelscreen.lua
 	endingtextcolor = {255, 255, 255}
 	endingtextcolorname = "white"
 	endingtext = {"congratulations!", "you have finished this mappack!"}
@@ -231,6 +233,14 @@ function savecustomtext()
 	love.filesystem.write(mappackfolder .. "/" .. mappack .. "/text.txt", s)
 	loadcustomtext()
 	notice.new("Saved custom text!", notice.white, 2)
+end
+
+function getendingtextcolor()
+	return endingtextcolor[1] / 255, endingtextcolor[2] / 255, endingtextcolor[3] / 255
+end
+
+function gethudtextcolor()
+	return hudtextcolor[1] / 255, hudtextcolor[2] / 255, hudtextcolor[3] / 255
 end
 
 function loadcustombackground(filename)
