@@ -2,9 +2,9 @@ name: Compile
 on: [push, pull_request]
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         path: main
         submodules: true
@@ -19,27 +19,27 @@ jobs:
     - name: Build
       run: cd main && python3 -m makelove
     - name: Artifact (LÖVE)
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: a99e-source
         path: main/makelove-build/love/${{ env.ARTIFACT_NAME_LOVE }}
     - name: Artifact (AppImage)
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: a99e-linux
         path: main/makelove-build/appimage/${{ env.ARTIFACT_NAME_APPIMAGE }}
     - name: Artifact (Win64)
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: a99e-win64
         path: main/makelove-build/win64/${{ env.ARTIFACT_NAME_WIN64 }}
     - name: Artifact (Win32)
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: a99e-win32
         path: main/makelove-build/win32/${{ env.ARTIFACT_NAME_WIN32 }}
     - name: Artifact (MacOS)
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: a99e-macos
         path: main/makelove-build/macos/${{ env.ARTIFACT_NAME_MACOS }}
