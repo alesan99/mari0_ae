@@ -6486,10 +6486,19 @@ function loadentity(t, x, y, r, id)
 		pipes[tilemap(x,y)] = pipe:new("pipe2", x, y, r)
 	elseif t == "pipespawn" then
 		local offseted = false
+		--two way vertical pipe
 		if inmap(x+1, y) and entityquads[map[x+1][y][2]] and entityquads[map[x+1][y][2]].t == "pipe" 
 		and (not (map[x][y][3] and type(map[x][y][3]) == "string" and not (map[x][y][3]:find("up") or map[x][y][3]:find("down"))) ) then
 			x = x+1
 			offseted = true
+		end
+		--two way horizontal pipe
+		if not offseted then
+			if inmap(x, y+1) and entityquads[map[x][y+1][2]] and entityquads[map[x][y+1][2]].t == "pipe" 
+			and (not (map[x][y][3] and type(map[x][y][3]) == "string" and not (map[x][y][3]:find("left") or map[x][y][3]:find("right"))) ) then
+				y = y+1
+				offseted = true
+			end
 		end
 		exitpipes[tilemap(x,y)] = pipe:new("pipespawn", x, y, r)
 	elseif t == "pipespawndown" then
