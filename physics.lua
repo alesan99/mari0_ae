@@ -70,32 +70,31 @@ function physicsupdate(dt)
 						if j == "player" or v.gravitydir then
 							if v.gravitydir == "up" then
 								v.speedy = v.speedy - (v.gravity or yacceleration)*dt
-								if v.speedy < -maxyspeed then
-									v.speedy = -maxyspeed
-								end
+								v.speedy = math.max(-maxyspeed, v.speedy)
 							elseif v.gravitydir == "right" then
 								v.speedx = v.speedx + (v.gravity or yacceleration)*dt
-								if v.speedx < -maxyspeed then
-									v.speedx = -maxyspeed
-								end
+								v.speedx = math.max(-maxyspeed, v.speedx)
 							elseif v.gravitydir == "left" then
 								v.speedx = v.speedx - (v.gravity or yacceleration)*dt
-								if v.speedx > maxyspeed then
-									v.speedx = maxyspeed
-								end
+								v.speedy = math.min(maxyspeed, v.speedx)
 							else
 								v.speedy = v.speedy + (v.gravity or yacceleration)*dt
-								if v.speedy > maxyspeed then
-									v.speedy = maxyspeed
-								end
+								v.speedy = math.min(maxyspeed, v.speedy)
 							end
 						elseif (j == "goomba" and v.t == "spiketop") or (j == "enemy" and v.movement == "crawl") then
 							v.speedy = math.max(-maxyspeed, math.min(maxyspeed, v.speedy + (v.gravity or 0)*dt))
 							v.speedx = math.max(-maxyspeed, math.min(maxyspeed, v.speedx + (v.gravityx or 0)*dt))
 						else
 							v.speedy = v.speedy + (v.gravity or yacceleration)*dt
-							if v.speedy > maxyspeed then
-								v.speedy = maxyspeed
+							v.speedy = math.min(v.maxyspeed or maxyspeed, v.speedy)
+							if v.minyspeed then
+								v.speedy = math.max(v.minyspeed, v.speedy)
+							end
+							if v.maxxspeed then
+								v.speedx = math.min(v.maxxspeed, v.speedx)
+							end
+							if v.minxspeed then
+								v.speedx = math.max(v.minxspeed, v.speedx)
 							end
 						end
 					end

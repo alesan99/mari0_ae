@@ -439,7 +439,7 @@ function snakeblock:update(dt)
 				if (w.active) and (not w.static) and (not w.shot) and (not w.flying) and (not w.ignoreplatform) then
 					--if self.speedy ~= 0 then --vertical carry
 						if not w.jumping and inrange(w.x, self.x-w.width, self.x+self.width) then
-							if inrange(w.y, self.y - w.height - 0.1, self.y - w.height + 0.1) then
+							if inrange(w.y, self.y - w.height - 50*dt, self.y - w.height + 50*dt) then
 								self.active = false
 								local pass = false
 								local condition = false
