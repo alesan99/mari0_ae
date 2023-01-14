@@ -57,6 +57,8 @@ function menu_load()
 	RGBchangespeed = 200
 	huechangespeed = 0.5
 	spriteset = 1
+	speedtarget = 1
+	currentanimation = 1
 	
 	portalcolors = {}
 	for i = 1, players do

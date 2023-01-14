@@ -84,7 +84,9 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 
 	levelmodified = false
 	
-	currentanimation = 1
+	if not currentanimation then
+		currentanimation = 1
+	end
 	animationguilines = {}
 	
 	tileselection = false
@@ -501,6 +503,10 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 			
 			editorsavedata = false
 		end
+	end
+	
+	if currentanimation and currentanimation ~= 1 then
+		selectanimation(currentanimation, "initial")
 	end
 
 	if player_position then
@@ -3855,11 +3861,15 @@ function moveupanimationguiline(t, tabl)
 	end
 end
 
-function selectanimation(i)
+function selectanimation(i, initial)
 	guielements["animationselectdrop"].var = i
-	saveanimation()
+	if not initial then
+		saveanimation()
+	end
 	currentanimation = i
-	generateanimationgui()
+	if not initial then
+		generateanimationgui()
+	end
 	guielements["animationnameinput"].value = string.sub(animations[currentanimation].name, 1, -6)
 	guielements["animationnameinput"]:updatePos()
 	animationsaveas = false
