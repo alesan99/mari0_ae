@@ -587,14 +587,30 @@ function editor_update(dt)
 		elseif customrcopen == "path" and allowdrag then
 			--draw path (this used to be so simple, but then i added clear pipes ;( )
 			local x, y = love.mouse.getPosition()
-			if love.mouse.isDown("l") then
-				local rcp = rightclickpath
-				local ox, oy =  rcp.last[1],  rcp.last[2]
-				local dir = rcp.dir
-				local tx, ty = getMouseTile(x, y+8*screenzoom*scale)
+			local rcp = rightclickpath
+			local ox, oy =  rcp.last[1],  rcp.last[2]
+			local dir = rcp.dir
+			local mtx, mty = getMouseTile(x, y+8*screenzoom*scale)
+			local tx = mtx-rcp.x
+			local ty = mty-rcp.y
+			if love.mouse.isDown("m") then --change origin
+				if (not rcp.pipe) and rcp.path and #rcp.path == 1 then
+					rcp.path[1][1], rcp.path[1][2] = tx, ty
+					if ty == 0 then
+						if mtx > rcp.x then
+							rcp.dir = "right"
+						else
+							rcp.dir = "left"
+						end
+					elseif ty > 0 then
+						rcp.dir = "down"
+					else
+						rcp.dir = "up"
+					end
+					rcp.last[1], rcp.last[2] = tx, ty
+				end
+			elseif love.mouse.isDown("l") then
 				local coveredtiles = {}
-				tx = tx-rcp.x
-				ty = ty-rcp.y
 				--fit into pipe path
 				if rcp.pipe then
 					if (dir == "right" or dir == "left") and ty < oy then
@@ -6122,6 +6138,25 @@ function startrcpath(var) --snake block path
 		end
 	end
 	
+	--different origin for snakeblock
+	if (not rcp.pipe) and (not t.default) then
+		if #rcp.path > 1 then
+			local ox, oy = 1, 0
+			local tx, ty = rcp.path[2][1], rcp.path[2][2]
+			if ty == 0 then
+				if tx > 0 then
+					--nothing
+				else
+					ox, oy = tx+1, ty
+				end
+			elseif ty > 0 then
+				ox, oy = tx, ty-1
+			else
+				ox, oy = tx, ty+1
+			end
+			rcp.path[1][1], rcp.path[1][2] = ox, oy
+		end
+	end
 	
 	closecustomrc(true)
 	rightclickobjects = {}
