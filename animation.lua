@@ -34,6 +34,7 @@ ifnumber:i:>/</=:v				if a variable is equal/greater than something
 ifcoins:>/</=:v					if coin count is equal/greater than v
 ifcollectables:>/</=:v:i			if collectable count of a type is equal/greater than v
 ifpoints:>/</=:v				if points is equal/greater than v
+requireplayers:i				requires i players to trigger
 --]]
 
 --[[ ACTIONS:
@@ -1179,6 +1180,11 @@ function animation:trigger()
 						end
 					end
 				end
+			elseif v[1] == "requireplayers" then
+				if players < tonumber(v[2]) then
+					pass = false
+					break
+				end	
 			end
 		end
 		
