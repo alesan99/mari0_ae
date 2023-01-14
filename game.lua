@@ -4709,7 +4709,7 @@ function loadmap(filename)
 				local s4 = s3[2]:split(",")
 				background = 4
 				backgroundrgbon = true
-				backgroundrgb = {tonumber(s4[1]), tonumber(s4[2]), tonumber(s4[3])}
+				backgroundrgb = {tonumber(s4[1])/255, tonumber(s4[2])/255, tonumber(s4[3])/255}
 				backgroundcolor[4] = backgroundrgb
 			end
 		elseif s3[1] == "spriteset" then
@@ -6143,7 +6143,7 @@ function savemap(filename)
 	--options
 	s = s .. ";height=" .. mapheight
 	if background == 4 then
-		s = s .. ";background=" .. backgroundrgb[1] .. "," .. backgroundrgb[2] .. "," .. backgroundrgb[3]
+		s = s .. ";background=" .. round(backgroundrgb[1]*255) .. "," .. round(backgroundrgb[2]*255) .. "," .. round(backgroundrgb[3]*255)
 	else
 		s = s .. ";background=" .. background
 	end
