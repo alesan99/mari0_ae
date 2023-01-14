@@ -733,7 +733,7 @@ function guielement:click(x, y, button)
 					end
 				else
 					if self:inhighlight(x, y) then
-						if button == "r" and self.rightclickvalue and not android then
+						if button == "r" and (self.rightclickvalue or (self.displayfunction and self.min and self.max)) and not android then
 							self.inputting = true
 							self.textvalue = self:displayfunction(self.value)
 							self.cursorblink = true
@@ -814,8 +814,8 @@ function guielement:keypress(key,textinput)
 				elseif (key == "return" or key == "enter" or key == "kpenter") then
 					local newvalue = tonumber(self.textvalue)
 					if newvalue then
-						if self.rcrange then
-							local min, max = self.rcrange[1], self.rcrange[2]
+						if self.rcrange or (self.min and self.max) then
+							local min, max = self.min or self.rcrange[1], self.max or self.rcrange[2]
 							newvalue = math.min(max, math.max(min, newvalue))
 							self.value = (newvalue-min)/(max-min)
 						end

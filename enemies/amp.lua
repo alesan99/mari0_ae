@@ -102,6 +102,7 @@ function amp:init(x, y, r)
 		self.animationtime = 0.1
 		self.shotted = nil
 		self.resistsyoshitounge = true
+		self.light = 3
 	end
 	self.resistsshoe = true
 	self.clearpipespeed = 0
@@ -110,7 +111,6 @@ function amp:init(x, y, r)
 
 	self.falling = false
 	self.timer = 0
-	self.light = 3
 
 	self.trackable = true
 	self.track = false

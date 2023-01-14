@@ -2778,7 +2778,7 @@ function enemy:globalcollide(a, b, c, d, dir)
 	
 	if self.killsenemies and ((self.killsenemiesonsides and (dir == "left" or dir == "right")) or (self.killsenemiesonbottom and dir == "floor") or (self.killsenemiesontop and dir == "ceil") or
 		(self.killsenemiesonleft and dir == "left") or (self.killsenemiesonright and dir == "right") or (self.killsenemiesonpassive and dir == "passive"))
-		and a == "enemy" and not (b.resistsenemykill or b.resistseverything) then
+		and a == "enemy" and (not (b.resistsenemykill or b.resistseverything)) and (not b.killsenemies) then
 		return true
 	end
 	
@@ -2829,6 +2829,23 @@ function enemy:globalcollide(a, b, c, d, dir)
 		if b.enemykillsdontflyaway then
 			self.doesntflyawayonfireball = true
 		end
+		if b.small and not b.nocombo then
+			if b.combo < #koopacombo then
+				b.combo = b.combo + 1
+				addpoints(koopacombo[b.combo], self.x, self.y)
+			else
+				for i = 1, players do
+					if mariolivecount ~= false then
+						mariolives[i] = mariolives[i]+1
+						respawnplayers()
+					end
+				end
+				table.insert(scrollingscores, scrollingscore:new("1up", self.x, self.y))
+				playsound(oneupsound)
+			end
+		else
+			addpoints((firepoints[self.t] or 200), self.x, self.y)
+		end
 		self:shotted(dir)
 
 		if b.bouncesonenemykill then
@@ -2840,7 +2857,6 @@ function enemy:globalcollide(a, b, c, d, dir)
 			self:output()
 		end
 		
-		addpoints((firepoints[self.t] or 200), self.x, self.y)
 		return true
 	end
 	

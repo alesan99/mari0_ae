@@ -1578,7 +1578,7 @@ rightclicktype["boxtube"] = {
 	end,
 	maketable = function()
 		local list = {"cube","companion cube","edgeless cube"}
-		local listnames = {"cube","companion cube","edgeless cube"}
+		local listnames = shallowcopy(list)
 		for j, w in pairs(customenemies) do
 			if w and enemiesdata[w] and enemiesdata[w].hidden then
 				--hidden!
