@@ -452,7 +452,6 @@ function loadcustomplayers()
 end
 
 --local splitShader
---`color` param is expected to be an array of 0..255 values (r, g, b) to maintain support for old community-created content
 function splitimage(img, color, exclude, imagedata) --split singe image into colorable images
 	if false then --useShader then
 		if not splitShader then
@@ -487,7 +486,7 @@ function splitimage(img, color, exclude, imagedata) --split singe image into col
 		love.graphics.setCanvas(output)
 		love.graphics.setShader(splitShader)
 		splitShader:send("inputImage", input)
-		splitShader:send("splitColor", {color[1]/255,color[2]/255,color[3]/255})
+		splitShader:send("splitColor", {color[1],color[2],color[3]})
 		love.graphics.draw(input,0,0)
 		love.graphics.setShader()
 		love.graphics.setCanvas(c)
@@ -499,7 +498,7 @@ function splitimage(img, color, exclude, imagedata) --split singe image into col
 		for x = 0, input:getWidth()-1 do
 			for y = 0, input:getHeight()-1 do
 				local r, g, b, a = input:getPixel(x, y)
-				local rr, rg, rb = round(r*255), round(g*255), round(b*255)
+				local rr, rg, rb = r, g, b
 				local place = false
 				if exclude then
 					place = true
