@@ -9,10 +9,12 @@ jobs:
         path: main
         submodules: true
       name: Checkout Repository
+    - name: Add Universe Repository
+      run: sudo add-apt-repository universe
     - name: Update Packages
       run: sudo apt-get update
     - name: Install Dependencies
-      run: sudo apt-get install --assume-yes wine-stable wine64 python3-pip libfuse3-dev
+      run: sudo apt-get install --assume-yes wine-stable wine64 python3-pip libfuse2
     - name: Install makelove
       run: pip3 install git+https://github.com/pfirsich/makelove/
     - name: Build
