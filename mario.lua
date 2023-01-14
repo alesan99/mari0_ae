@@ -1998,7 +1998,7 @@ function mario:update(dt)
 						if tilequads[map[x][y][1]].coin then
 							collectcoin(x, y)
 						elseif objects["coin"][tilemap(x, y)] then
-							collectcoin2(x, y)
+							collectcoinentity(x, y)
 						elseif objects["collectable"][tilemap(x, y)] and not objects["collectable"][tilemap(x, y)].coinblock then
 							getcollectable(x, y)
 						end
@@ -2012,7 +2012,7 @@ function mario:update(dt)
 				if tilequads[map[x][y][1]].coin then
 					collectcoin(x, y)
 				elseif objects["coin"][tilemap(x, y)] then
-					collectcoin2(x, y)
+					collectcoinentity(x, y)
 				elseif objects["collectable"][tilemap(x, y)] and not objects["collectable"][tilemap(x, y)].coinblock then
 					getcollectable(x, y)
 				end
@@ -2022,7 +2022,7 @@ function mario:update(dt)
 				if tilequads[map[x][y][1]].coin then
 					collectcoin(x, y)
 				elseif objects["coin"][tilemap(x, y)] then
-					collectcoin2(x, y)
+					collectcoinentity(x, y)
 				elseif objects["collectable"][tilemap(x, y)] and not objects["collectable"][tilemap(x, y)].coinblock then
 					getcollectable(x, y)
 				end
@@ -2032,7 +2032,7 @@ function mario:update(dt)
 					if tilequads[map[x][y-1][1]].coin then
 						collectcoin(x, y-1)
 					elseif objects["coin"][tilemap(x, y-1)] then
-						collectcoin2(x, y-1)
+						collectcoinentity(x, y-1)
 					elseif objects["collectable"][tilemap(x, y-1)] and not objects["collectable"][tilemap(x, y-1)].coinblock then
 						getcollectable(x, y-1)
 					end
@@ -7216,7 +7216,7 @@ function hitontop(x, y)
 			collectcoin(x, y-1)
 			table.insert(coinblockanimations, coinblockanimation:new(x-0.5, y-1))
 		elseif objects["coin"][tilemap(x, y-1)] then
-			collectcoin2(x, y-1)
+			collectcoinentity(x, y-1)
 			table.insert(coinblockanimations, coinblockanimation:new(x-0.5, y-1))
 		elseif objects["collectable"][tilemap(x, y-1)] and not objects["collectable"][tilemap(x, y-1)].coinblock then
 			getcollectable(x, y-1)
@@ -8786,7 +8786,7 @@ function collectcoin(x, y, amount, group)
 	end
 end
 
-function collectcoin2(x, y) --DONT MIND ME OK
+function collectcoinentity(x, y) --DONT MIND ME OK
 	objects["coin"][tilemap(x, y)] = nil
 	addpoints(200)
 	playsound(coinsound)

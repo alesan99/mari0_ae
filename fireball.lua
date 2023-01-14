@@ -100,7 +100,7 @@ function fireball:update(dt)
 			if tilequads[map[x][y][1]].coin then
 				collectcoin(x, y)
 			elseif objects["coin"][tilemap(x, y)] and not objects["coin"][tilemap(x, y)].frozen then
-				collectcoin2(x, y)
+				collectcoinentity(x, y)
 			elseif objects["collectable"][tilemap(x, y)] then
 				getcollectable(x, y)
 			end

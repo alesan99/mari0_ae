@@ -2283,6 +2283,31 @@ function enemy:update(dt)
 			end
 		end
 	end
+
+	--collect coins and collectables if enemy is over tile
+	if self.collectscoins or self.collectscollectables then --if it collects coins, it will collect collectables. But not the other way
+		local collectscollectables = true
+		if self.collectscollectables == false then --ignore collectables if explicitly set to false
+			collectscollectables = false
+		end
+		for x = math.ceil(self.x), math.ceil(self.x+self.width) do
+			for y = math.ceil(self.y), math.ceil(self.y+self.height) do
+				if ismaptile(x, y) then
+					if self.collectscoins and tilequads[map[x][y][1]].coin then
+						collectcoin(x, y)
+					elseif self.collectscoins and objects["coin"][tilemap(x, y)] then
+						collectcoinentity(x, y)
+					elseif collectscollectables and objects["collectable"][tilemap(x, y)] and not objects["collectable"][tilemap(x, y)].coinblock then
+						local collectableid = objects["collectable"][tilemap(x, y)].t
+						if not (self.collectscollectables and type(self.collectscollectables) == "table" and not self.collectscollectables[collectableid]) then
+							--if the the property is set to a table, only collect collectable if the id number is set to true in the table
+							getcollectable(x, y)
+						end
+					end
+				end
+			end
+		end
+	end
 	
 	if self.customtimer then
 		--[delay, [action, parameter], argument]
