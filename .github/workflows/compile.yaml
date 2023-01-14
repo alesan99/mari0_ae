@@ -12,7 +12,7 @@ jobs:
     - name: Update Packages
       run: sudo apt-get update
     - name: Install Dependencies
-      run: sudo apt-get install --assume-yes wine-stable wine64 python3-pip
+      run: sudo apt-get install --assume-yes wine-stable wine64 python3-pip fuse3
     - name: Install makelove
       run:
         pip3 install git+https://github.com/pfirsich/makelove/
