@@ -8255,7 +8255,7 @@ end
 
 function endgame()
 	if testlevel then
-		editor_load(player_position)
+		stoptestinglevel()
 		return
 	end
 	love.audio.stop()

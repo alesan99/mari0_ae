@@ -1577,15 +1577,22 @@ rightclicktype["boxtube"] = {
 		return v
 	end,
 	maketable = function()
-		local t = {"cube","companion cube","edgeless cube"}
+		local list = {"cube","companion cube","edgeless cube"}
+		local listnames = {"cube","companion cube","edgeless cube"}
 		for j, w in pairs(customenemies) do
-			table.insert(t, w)
+			if w and enemiesdata[w] and enemiesdata[w].hidden then
+				--hidden!
+			else
+				table.insert(list, w)
+				table.insert(listnames, "_ENEMY" .. w)
+			end
 		end
-		return t
+		return list, listnames
 	end,
 	objfunc = function()
-		rightclicktype["boxtube"].t = rightclicktype["boxtube"].maketable()
+		rightclicktype["boxtube"].t, rightclicktype["boxtube"].tnames = rightclicktype["boxtube"].maketable()
 		rightclickobjects[8].entries = rightclicktype["boxtube"].t
+		rightclickobjects[8].displayentries = rightclicktype["boxtube"].tnames
 		rightclickobjects[8]:updatePos()
 	end,
 	savefunc = function()
