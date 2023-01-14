@@ -207,6 +207,7 @@ function flipblock:hit()
 			end
 
 			changeswitchblock(self.color)
+
 			playsound(switchsound)
 			for j, w in pairs(objects["flipblock"]) do
 				if w.t == "switchblock" and w.color == self.color and not (w.cox == self.cox and w.coy == self.coy) then

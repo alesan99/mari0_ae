@@ -19,18 +19,21 @@ whennumber:i:>/</=:v				when a variable turns something
 --]]
 
 --[[ CONDITIONS:
-noprevsublevel						doesn't if the level was changed from another sublevel (Mario goes through pipe, lands in 1-1_1, prevsublevel was _0, no trigger.)
-worldequals:i						only triggers if current world is i
-levelequals:i						only triggers if current level is i
-sublevelequals:i					only triggers if current sublevel is i
-requirecoins:i						requires i coins to trigger (will not remove coins)
+noprevsublevel					doesn't if the level was changed from another sublevel (Mario goes through pipe, lands in 1-1_1, prevsublevel was _0, no trigger.)
+worldequals:i					only triggers if current world is i
+levelequals:i					only triggers if current level is i
+sublevelequals:i				only triggers if current sublevel is i
+requirecoins:i					requires i coins to trigger (will not remove coins)
 
 playersize[:player]:size			requires a player to be size
 requirecollectables:i				requires i collectables to trigger (will not remove coins)
-requirepoints:i						requires i points
+requirepoints:i					requires i points
 buttonhelddown:button				only if button is held down
 requirekeys[:player]:i				requires i keys
 ifnumber:i:>/</=:v				if a variable is equal/greater than something
+ifcoins:>/</=:v					if coin count is equal/greater than v
+ifcollectables:>/</=:v:i			if collectable count of a type is equal/greater than v
+ifpoints:>/</=:v				if points is equal/greater than v
 --]]
 
 --[[ ACTIONS:
@@ -916,6 +919,21 @@ function animation:update(dt)
 						p.disablejumping = false
 					end
 				end
+			elseif v[1] == "changeportal" then
+				local pstart, pend = 1, players
+				if v[2] ~= "everyone" then
+					pstart, pend = tonumber(string.sub(v[2], -1)), tonumber(string.sub(v[2], -1))
+				end
+				for i = pstart, pend do
+					if objects["player"][i] then
+						local p = objects["player"][i]
+						p.portalgun = (v[3] ~= "none")
+						if p.portalgun and (not p.characterdata.noportalgun) and playertype ~= "classic" and playertype ~= "cappy" then
+							p.portals = v[3]
+							p:updateportalsavailable()
+						end
+					end
+				end
 			elseif v[1] == "triggeranimation" then
 				if animationtriggerfuncs[v[2]] then
 					for i = 1, #animationtriggerfuncs[v[2]] do
@@ -1042,6 +1060,36 @@ function animation:trigger()
 				if marioscore < tonumber(v[2]) then
 					pass = false
 					break
+				end
+			elseif v[1] == "ifcoins" then
+				local value = tonumber(v[3])
+				if v[2] == "=" and mariocoincount ~= value then
+					pass = false
+				elseif v[2] == ">" and mariocoincount <= value then
+					pass = false
+				elseif v[2] == "<" and mariocoincount >= value then
+					pass = false
+				end
+			elseif v[1] == "ifcollectables" then
+				local value = tonumber(v[3])
+				local typ = tonumber(v[4])
+				if not collectablescount[typ] then
+					pass = false
+				elseif v[2] == "=" and collectablescount[typ] ~= value then
+					pass = false
+				elseif v[2] == ">" and collectablescount[typ] <= value then
+					pass = false
+				elseif v[2] == "<" and collectablescount[typ] >= value then
+					pass = false
+				end
+			elseif v[1] == "ifpoints" then
+				local value = tonumber(v[3])
+				if v[2] == "=" and marioscore ~= value then
+					pass = false
+				elseif v[2] == ">" and marioscore <= value then
+					pass = false
+				elseif v[2] == "<" and marioscore >= value then
+					pass = false
 				end
 			elseif v[1] == "requirekeys" then
 				if v[3] == "everyone" then

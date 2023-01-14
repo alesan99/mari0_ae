@@ -83,7 +83,7 @@ function belt:init(x, y, r, t)
 	end
 
 	--move things
-	self.checktable = {"player", "box", "smallspring", "turret", "mushroom", "oneup", "powblock", "ice", "enemy"}
+	self.checktable = {"player", "box", "smallspring", "turret", "mushroom", "oneup", "powblock", "ice", "enemy", "core", "pbutton"}
 	for i, v in pairs(enemies) do
 		if objects[v] and underwater == false then
 			table.insert(self.checktable, v)

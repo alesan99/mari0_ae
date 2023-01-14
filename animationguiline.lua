@@ -338,6 +338,58 @@ table.insert(toenter, {name = "requirecollectables",
 	}
 })
 
+table.insert(toenter, {name = "ifcoins",
+	t= {
+		t="condition",
+		nicename="if coins",
+		entries={
+			{
+				t="comparisonselection",
+			},
+			{
+				t="numinput",
+			}
+		}
+	}
+})
+
+table.insert(toenter, {name = "ifpoints",
+	t= {
+		t="condition",
+		nicename="if points",
+		entries={
+			{
+				t="comparisonselection",
+			},
+			{
+				t="numinput",
+			}
+		}
+	}
+})
+
+table.insert(toenter, {name = "ifcollectables",
+	t= {
+		t="condition",
+		nicename="if collectables",
+		entries={
+			{
+				t="comparisonselection",
+			},
+			{
+				t="numinput",
+			},
+			{
+				t="text",
+				value="type",
+			},
+			{
+				t="collectableselection",
+			}
+		}
+	}
+})
+
 table.insert(toenter, {name = "requirekeys",
 t= {
 	t="condition",
@@ -1809,6 +1861,7 @@ table.insert(toenter, {name = "waitfortrigger",
 	}
 })
 
+
 table.insert(toenter, {name = "toggleswitchblock", 
 	t = {
 		t="action",
@@ -1821,6 +1874,29 @@ table.insert(toenter, {name = "toggleswitchblock",
 			{
 				t="switchblockselection",
 			}
+		}
+	}
+})
+
+table.insert(toenter, {name = "changeportal", 
+	t = {
+		t="action",
+		nicename="set available portals:",
+		entries={
+			{
+				t="text",
+				value="for"
+			},
+			{
+				t="playerselection",
+			},
+			{
+				t="text",
+				value="to"
+			},
+			{
+				t="portalselection",
+			},
 		}
 	}
 })
@@ -2026,6 +2102,11 @@ function animationguiline:init(tabl, t2)
 					args = {"=", "+", "-"}
 					displayargs = {"=", "+", "-"}
 
+				elseif v.t == "portalselection" then
+					dropdown = true
+					dropwidth = 6
+					args = {"both","none","1 only","2 only","gel"}
+					displayargs = {"both","none","1 only","2 only","gel"}
 				end
 				
 				if dropdown then
