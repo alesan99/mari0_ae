@@ -1,4 +1,4 @@
-name = "Alesan99's entities"
+name = "a99e"
 default_targets = ["win32", "win64", "appimage", "macos"]
 build_directory = "makelove-build"
 icon_file = "graphics/icon.png"
