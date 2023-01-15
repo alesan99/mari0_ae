@@ -2374,12 +2374,19 @@ function game_draw()
 			love.graphics.setLineWidth(lw)
 
 			--animation numbers
-			if love.keyboard.isDown("0") then
-				love.graphics.setColor(255, 255, 255, 150)
-				local y = 2
+			if HITBOXDEBUGANIMS then
+				love.graphics.setColor(255, 255, 255, 225)
+				local x, y, max = 0, 2, 0
 				for i, n in pairs(animationnumbers) do
-					properprint(i .. ": " .. n, 2*scale, y*scale)
+					local text = i .. ": " .. n
+					if #text > max then
+						max = #text
+					end
+					properprint(text, x*scale, y*scale)
 					y = y + 10
+					if y >= (height*16)-10 then
+						x, y = x + 8*(max+1), 2
+					end
 				end
 			end
 		end
@@ -3715,6 +3722,9 @@ function drawplayer(i, x, y, r, pad, drop)
 end
 
 function drawHUD()
+	if HITBOXDEBUG and HITBOXDEBUGANIMS then
+		return
+	end
 	local properprintfunc = properprintF
 	if hudoutline then
 		properprintfunc = properprintFbackground

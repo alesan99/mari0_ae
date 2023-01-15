@@ -1946,7 +1946,9 @@ function love.keypressed(key, scancode, isrepeat, textinput)
 		return
 	end
 	
-	if key == "f10" then
+	if key == "0" and HITBOXDEBUG then
+		HITBOXDEBUGANIMS = not HITBOXDEBUGANIMS
+	elseif key == "f10" then
 		if android then
 			--hide ui
 			androidHIDE = not androidHIDE
