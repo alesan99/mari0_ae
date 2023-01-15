@@ -109,6 +109,7 @@ settime:time						sets time
 setplayerlight:blocks				sets player's light in lights out mode
 waitforinput                        waits until a spesific/any player presses a button
 waitfrotrigger                      waits until a spesific animation is triggered
+makeinvincible:i					makes player invincible/give star for i or default seconds
 --]]
 
 function animation:init(path, name)
@@ -980,6 +981,29 @@ function animation:update(dt)
 			elseif v[1] == "setplayerlight" then
 				for i = 1, players do
 					objects["player"][i].light = tonumber(v[2])
+				end
+			elseif v[1] == "makeinvincible" then
+				local time = mariostarduration
+				if v[2] ~= "" and tonumber(v[2]) and tonumber(v[2]) > 0 then
+					time = tonumber(v[2])
+				end
+				if v[3] == "everyone" then
+					for i = 1, players do
+						if objects["player"][i].animation == "grow1" or objects["player"][i].animation == "grow2" or objects["player"][i].animation == "shrink" then
+							return false
+						end
+						objects["player"][i]:star()
+						objects["player"][i].startimer = (mariostarduration-time)
+					end
+				else
+					local i = tonumber(string.sub(v[3], -1))
+					if objects["player"][i] then
+						if objects["player"][i].animation == "grow1" or objects["player"][i].animation == "grow2" or objects["player"][i].animation == "shrink" then
+							return false
+						end
+						objects["player"][i]:star()
+						objects["player"][i].startimer = (mariostarduration-time)
+					end
 				end
 			elseif v[1] == "setnumber" then
 				local name = tostring(v[2])
