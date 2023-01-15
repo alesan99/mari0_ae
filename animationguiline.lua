@@ -473,6 +473,18 @@ table.insert(toenter, {name = "ifnumber",
 	}
 })
 
+table.insert(toenter, {name = "requireplayers",
+	t= {
+		t="condition",
+		nicename="require players:",
+		entries={
+			{
+				t="levelselection",
+			},
+		}
+	}
+})
+
 --ACTIONS:
 
 table.insert(toenter, {name = "disablecontrols", 
