@@ -501,6 +501,9 @@ function trackcontroller:update(dt)
 	--Update Speed
 	if b.trackplatform and b.active then --hold enemies
 		local checktable = {"player", "mushroom", "oneup"}
+		if b.trackplatformchecktable or b.platformchecktable then
+			checktable = b.trackplatformchecktable or b.platformchecktable
+		end
 		local xdiff = b.x-oldx
 		local ydiff = b.y-oldy
 		local condition = false
