@@ -6087,6 +6087,46 @@ function warpzone(i, l)
 	levelscreen_load("next")
 end
 
+function changeswitchstate(color, perma, flipblocks)
+	for j, w in pairs(objects["buttonblock"]) do
+		if w.color == color then
+			w:change()
+		end
+	end
+	for j, w in pairs(objects["belt"]) do
+		if w.t == "switch" and w.color == color then
+			w:change()
+		end
+	end
+	for j, w in pairs(tracks) do
+		if w.switch and w.color == color then
+			w:change()
+		end
+	end
+	for i = 1, #animationswitchtriggerfuncs do
+		local t = animationswitchtriggerfuncs[i]
+		if tonumber((t[2] or 0)) and tonumber((t[2] or 0)) == color then
+			t[1]:trigger()
+		end
+	end
+
+	if perma then
+		solidblockperma[color] = not solidblockperma[color]
+	end
+	if flipblocks then
+		for j, w in pairs(objects["flipblock"]) do
+			if w.t == "switchblock" and w.color == color then
+				w.on = not w.on
+				if w.on then
+					w.quad = flipblockquad[color][w.quadi]
+				else
+					w.quad = flipblockquad[color][w.quadi+2]
+				end
+			end
+		end
+	end
+end
+
 function game_mousereleased(x, y, button)
 	if button == "l" then
 		if playertype == "minecraft" then
