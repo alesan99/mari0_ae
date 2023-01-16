@@ -206,28 +206,8 @@ function flipblock:hit()
 				self.quad = flipblockquad[self.color][self.quadi+2]
 			end
 
-			for j, w in pairs(objects["buttonblock"]) do
-				if w.color == self.color then
-					w:change()
-				end
-			end
-			for j, w in pairs(objects["belt"]) do
-				if w.t == "switch" and w.color == self.color then
-					w:change()
-				end
-			end
-			for j, w in pairs(tracks) do
-				if w.switch and w.color == self.color then
-					w:change()
-				end
-			end
-			for i = 1, #animationswitchtriggerfuncs do
-				local t = animationswitchtriggerfuncs[i]
-				if tonumber((t[2] or 0)) and tonumber((t[2] or 0)) == self.color then
-					t[1]:trigger()
-				end
-			end
 			playsound(switchsound)
+			changeswitchstate(self.color, false)
 			for j, w in pairs(objects["flipblock"]) do
 				if w.t == "switchblock" and w.color == self.color and not (w.cox == self.cox and w.coy == self.coy) then
 					w.on = self.on
