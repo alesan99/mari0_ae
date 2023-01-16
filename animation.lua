@@ -111,6 +111,7 @@ setplayerlight:blocks				sets player's light in lights out mode
 waitforinput                        waits until a spesific/any player presses a button
 waitfrotrigger                      waits until a spesific animation is triggered
 makeinvincible:i					makes player invincible/give star for i or default seconds
+changeswitchstate:i					trigger switchblocks
 --]]
 
 function animation:init(path, name)
@@ -1003,6 +1004,10 @@ function animation:update(dt)
 							objects["player"][i].startimer = (mariostarduration-time)
 						end
 					end
+				end
+			elseif v[1] == "changeswitchstate" then
+				if tonumber(v[2]) and tonumber(v[2]) <= 4 then
+					changeswitchstate(tonumber(v[2]), (v[3] == "on"), true)
 				end
 			elseif v[1] == "setnumber" then
 				local name = tostring(v[2])
