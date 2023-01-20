@@ -345,7 +345,10 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	guielements["currentsounddropdown"] = guielement:new("dropdown", 184, 63, 16, changecurrentsound, 1, unpack(soundliststring))
 	--guielements["currentsounddropdown"].scrollbar.scrollstep = 0.11 --how much mousewheel scrolls
 	guielements["openfoldersoundscustom"] = guielement:new("button", 184, 105, TEXT["open folder"], opencustomimagefolder, 2, {"sounds"})
-	guielements["openfoldermusiccustom"] = guielement:new("button", 184, 165, TEXT["open folder"], opencustomimagefolder, 2, {"music"})
+	guielements["openfoldermusiccustom"] = guielement:new("button", 184, 164, TEXT["open folder"], opencustomimagefolder, 2, {"music"})
+	guielements["savesounds"] = guielement:new("button", 176, 199, TEXT["update sounds"], savecustomimage, 2)
+	guielements["savesounds"].bordercolor = {255, 0, 0}
+	guielements["savesounds"].bordercolorhigh = {255, 127, 127}
 
 	--custom enemies
 	changecurrentenemy(1, true)
@@ -2946,16 +2949,17 @@ function editor_draw()
 				love.graphics.draw(gateimg, gatequad[5], 92*scale, 132*scale, math.sin(((coinanimation-1)/5)*(math.pi*2))/6, 8*scale, 8*scale, 8, 8)
 				properprintF(TEXT["current sound"], 176*scale, 54*scale)
 				properprintF(TEXT["sound template"], 176*scale, 79*scale)
-				properprintF(TEXT["replace sound"], 176*scale, 125*scale)
-				properprintF(TEXT["add music"], 176*scale, 156*scale)
+				properprintF(TEXT["replace sound"], 176*scale, 124*scale)
+				properprintF(TEXT["add music"], 176*scale, 155*scale)
 				love.graphics.setColor(127, 127, 127)
-				properprintF(TEXT["open sounds folder to\nreplace sounds!"], 184*scale, 134*scale)
-				properprintF(TEXT["put any .mp3 or .ogg\nin the music folder!"], 184*scale, 183*scale)
+				properprintF(TEXT["open sounds folder to\nreplace sounds!"], 184*scale, 133*scale)
+				properprintF(TEXT["put any .mp3 or .ogg\nin the music folder!"], 184*scale, 181*scale)
 				love.graphics.setColor(255, 255, 255)
 				
 				guielements["exportimagetemplate"]:draw()
 				guielements["openfoldersoundscustom"]:draw()
 				guielements["openfoldermusiccustom"]:draw()
+				guielements["savesounds"]:draw()
 				guielements["currentsounddropdown"]:draw()
 			elseif customtabstate == "text" then
 				guielements["endingtexttab"]:draw()
@@ -3544,6 +3548,7 @@ function customtabtab(t)
 		guielements["exportimagetemplate"].active = true
 		guielements["openfoldersoundscustom"].active = true
 		guielements["openfoldermusiccustom"].active = true
+		guielements["savesounds"].active = true
 	elseif t == "text" then
 		texttabtab(textstate)
 	elseif t == "enemies" then
@@ -7512,6 +7517,11 @@ function savecustomimage()
 			loadcustombackground(custombackground)
 		end
 		notice.new("Loaded background", notice.white, 2)
+	elseif customtabstate == "sounds" then
+		loadcustomsounds()
+		loadcustommusic()
+		guielements["musicdropdown"].entries = editormusictable
+		notice.new("Updated sounds and music", notice.white, 2)
 	end
 end
 function resetcustomimage()
