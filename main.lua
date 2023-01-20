@@ -183,7 +183,7 @@ function love.load()
 	love.graphics.setFont(font)
 
 	utf8 = require("utf8")
-	local t = require("libs/utf8_simple")
+	local t = require("libs.utf8_simple")
 	utf8.chars = t.chars
 	utf8.sub = t.sub
 	fontglyphs = [[
@@ -295,7 +295,7 @@ function love.load()
 	loadingbardraw(1)
 	local enemyluas = love.filesystem.getDirectoryItems("enemies")
 	for i = 1, #enemyluas do
-		require("enemies/" .. enemyluas[i]:sub(1, enemyluas[i]:len()-4))
+		require("enemies." .. enemyluas[i]:sub(1, enemyluas[i]:len()-4))
 	end
 	print("done loading enemies!")
 	loadingbardraw(1)
@@ -1026,7 +1026,7 @@ function love.load()
 
 	--debug graphs
 	if debugGraphs then
-		debugGraph = require "libs/debugGraph"
+		debugGraph = require "libs.debugGraph"
 		fpsGraph = debugGraph:new('fps', 0, 0)
 		memGraph = debugGraph:new('mem', 0, 30)
 		drawGraph = debugGraph:new('custom', 0, 60)
