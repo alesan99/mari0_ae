@@ -8764,7 +8764,7 @@ function collectcoin(x, y, amount, group)
 			local x1, y1, x2, y2 = r["group"][1], r["group"][2], r["group"][3], r["group"][4]
 			for tx = x1, x2 do
 				for ty = y1, y2 do
-					if not (x == tx and y == ty) then
+					if (not (x == tx and y == ty)) and tilequads[map[tx][ty][1]].coin then
 						collectcoin(tx, ty, amount, "group")
 					end
 				end
