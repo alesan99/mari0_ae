@@ -253,6 +253,7 @@ function drybones:update(dt)
 						self.quad = boocrawlerquad[spriteset][self.quadi]
 						self.drawable = true
 						self.light = 1
+						self.mask[13] = false
 					end
 				else
 					if self.animationdirection == "right" then
@@ -276,6 +277,7 @@ function drybones:update(dt)
 					else
 						self.drawable = false
 						self.light = false
+						self.mask[13] = true
 					end
 				elseif not self.mask[3] then
 					if self.animationdirection == "right" then
