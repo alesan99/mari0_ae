@@ -596,8 +596,10 @@ function editor_update(dt)
 			local mtx, mty = getMouseTile(x, y+8*screenzoom*scale)
 			local tx = mtx-rcp.x
 			local ty = mty-rcp.y
-			if love.mouse.isDown("m") then --change origin
-				if (not rcp.pipe) and rcp.path and #rcp.path == 1 then
+			local changedorigin = false
+			if (not rcp.pipe) and rcp.path and #rcp.path == 1 and love.mouse.isDown("l") then --change origin of snakeblock
+				local length = rcp.snakelength or 3
+				if (ty == 0 and (tx == 1 or tx == -length)) or ((ty == -1 or ty == 1) and (tx == 0 or tx == 1-length)) then
 					rcp.path[1][1], rcp.path[1][2] = tx, ty
 					if ty == 0 then
 						if mtx > rcp.x then
@@ -611,8 +613,11 @@ function editor_update(dt)
 						rcp.dir = "up"
 					end
 					rcp.last[1], rcp.last[2] = tx, ty
+					changedorigin = true
 				end
-			elseif love.mouse.isDown("l") then
+			end
+			
+			if love.mouse.isDown("l") and not changedorigin then
 				local coveredtiles = {}
 				--fit into pipe path
 				if rcp.pipe then
@@ -6112,6 +6117,7 @@ function startrcpath(var) --snake block path
 		pipe = t.pipe or false, --is it wide?
 		vars = deepcopy(rightclickvalues2),
 		drag = true, --able to add onto path currently?
+		snakelength = rightclickvalues2[2], --if snakeblock, what is its length
 	}
 	local rcp = rightclickpath
 

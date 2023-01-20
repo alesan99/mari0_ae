@@ -68,7 +68,7 @@ function angrysun:update(dt)
 		else
 			self.movex = (width-7)*(1-v)
 		end
-		self.movey = math.sin(v*math.pi)*(mapheight-self.starty-3)
+		self.movey = math.sin(v*math.pi)*(height-self.starty-3)
 		
 		if self.fallingtimer > 2 then
 			self.falling = false

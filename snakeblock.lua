@@ -14,6 +14,8 @@ function snakeblocksline:init(x, y, r)
 	self.speed = 5
 	self.loop = true
 	self.respawn = false
+	self.startdir = "right"
+	self.firstdir = "right"
 	
 	if #self.r > 0 and self.r[1] ~= "link" then
 		--rightclick things
@@ -31,6 +33,29 @@ function snakeblocksline:init(x, y, r)
 				else
 					break
 				end
+			end
+			--different origin
+			if #self.path > 1 then
+				local ox, oy = 1, 0
+				local tx, ty = self.path[2][1]-x, self.path[2][2]-y
+				if ty == 0 then
+					if tx > 0 then
+						--nothing
+					else
+						ox, oy = tx+1, ty
+						self.firstdir = "left"
+					end
+				elseif ty > 0 then
+					ox, oy = tx, ty-1
+					self.firstdir = "down"
+				else
+					ox, oy = tx, ty+1
+					self.firstdir = "up"
+				end
+				if tx < 0 then
+					self.startdir = "left"
+				end
+				self.path[1][1], self.path[1][2] = ox+x, oy+y
 			end
 			--length
 			self.length = math.max(3, v[2])
@@ -66,7 +91,11 @@ function snakeblocksline:init(x, y, r)
 	self.currentchild = 2
 	for i = 1, self.length do
 		--local tx, ty = self.path[i][1], self.path[i][2]
-		local obj = snakeblock:new(self.x-self.length+i, self.y, self, false, self.quadi)
+		local blockx = self.x-self.length+i
+		if self.startdir == "left" then
+			blockx = self.x+1-i
+		end
+		local obj = snakeblock:new(blockx, self.y, self, false, self.quadi)
 		self.child[i] = obj
 		table.insert(objects["snakeblock"], obj)
 		if i == 1 then
@@ -77,14 +106,33 @@ function snakeblocksline:init(x, y, r)
 	end
 
 	self.movingchild = {}
-	local obj = snakeblock:new(self.x, self.y, self, false, self.quadi)
-	obj.speedx = self.speed
+	local firstx = self.x
+	if self.startdir == "left" then
+		firstx = self.x-self.length+1
+	end
+	local obj = snakeblock:new(firstx, self.y, self, false, self.quadi)
+	if self.firstdir == "up" then
+		obj.speedy = -self.speed
+	elseif self.firstdir == "down" then
+		obj.speedy = self.speed
+	elseif self.firstdir == "left" then
+		obj.speedx = -self.speed
+	else
+		obj.speedx = self.speed
+	end
 	self.movingchild[1] = obj
 	self.movingchild[1].push = true
 	table.insert(objects["snakeblock"], obj)
-	local obj = snakeblock:new(self.x-self.length+1, self.y, self, false, self.quadi)
+	local endx = self.x-self.length+1
+	if self.startdir == "left" then
+		endx = self.x
+	end
+	local obj = snakeblock:new(endx, self.y, self, false, self.quadi)
 	self.movingchild[2] = obj
 	obj.speedx = self.speed
+	if self.startdir == "left" then
+		obj.speedx = -self.speed
+	end
 	table.insert(objects["snakeblock"], obj)
 
 	self.linked = false
@@ -152,75 +200,93 @@ function snakeblocksline:update(dt)
 			end
 			self.child[1].x = oldchildx
 			self.child[1].y = oldchildy
-			--moving child front
-			local dir = "right"
-			local ox, oy = self.path[self.stage][1], self.path[self.stage][2]
-			if self.path[self.stage+1] then
-				local nx, ny = self.path[self.stage+1][1], self.path[self.stage+1][2]
-				if nx < ox then
-					dir = "left"
-				elseif ny > oy then
-					dir = "down"
-				elseif ny < oy then
-					dir = "up"
-				end
-			end
-			self.movingchild[1].x = self.path[self.stage][1]-1
-			self.movingchild[1].y = self.path[self.stage][2]-1
-			self.movingchild[1].dx = self.movingchild[1].x
-			self.movingchild[1].dy = self.movingchild[1].y
-			if self.stage == #self.path and not self.loop then
-				self.movingchild[1].speedx = 0
-				self.movingchild[1].speedy = 0
-			elseif dir == "right" then
-				self.movingchild[1].speedx = self.speed
-				self.movingchild[1].speedy = 0
-			elseif dir == "left" then
-				self.movingchild[1].speedx = -self.speed
-				self.movingchild[1].speedy = 0
-			elseif dir == "down" then
-				self.movingchild[1].speedx = 0
-				self.movingchild[1].speedy = self.speed
-			elseif dir == "up" then
-				self.movingchild[1].speedx = 0
-				self.movingchild[1].speedy = -self.speed
-			end
-			--moving child back
-			local dir = "right"
-			if self.path[self.backstage] and self.path[self.backstage+1] then
-				local ox, oy = self.path[self.backstage][1], self.path[self.backstage][2]
-				local nx, ny = self.path[self.backstage+1][1], self.path[self.backstage+1][2]
-				if nx < ox then
-					dir = "left"
-				elseif ny > oy then
-					dir = "down"
-				elseif ny < oy then
-					dir = "up"
-				end
-				self.movingchild[2].x = self.path[self.backstage][1]-1
-				self.movingchild[2].y = self.path[self.backstage][2]-1
-				self.movingchild[2].dx = self.movingchild[2].x
-				self.movingchild[2].dy = self.movingchild[2].y
-			end
-			if self.stage == #self.path and not self.loop then
-				self.movingchild[2].speedx = 0
-				self.movingchild[2].speedy = 0
-			elseif dir == "right" then
-				self.movingchild[2].speedx = self.speed
-				self.movingchild[2].speedy = 0
-			elseif dir == "left" then
-				self.movingchild[2].speedx = -self.speed
-				self.movingchild[2].speedy = 0
-			elseif dir == "down" then
-				self.movingchild[2].speedx = 0
-				self.movingchild[2].speedy = self.speed
-			elseif dir == "up" then
-				self.movingchild[2].speedx = 0
-				self.movingchild[2].speedy = -self.speed
-			end
+			self:updatemovingchildspeed()
 
 			self.timer = self.timer - 1
 		end
+	end
+end
+
+function snakeblocksline:updatemovingchildspeed()
+	--moving child front
+	local dir = self.startdir
+	local ox, oy = math.floor(self.movingchild[1].x+0.5)+1, math.floor(self.movingchild[1].y+0.5)+1
+	if self.path[self.stage] then
+		ox, oy = self.path[self.stage][1], self.path[self.stage][2]
+	end
+	local nextstage = self.stage+1
+	if nextstage > #self.path then nextstage = 1 end
+	if self.path[nextstage] then
+		local nx, ny = self.path[nextstage][1], self.path[nextstage][2]
+		if nx < ox then
+			dir = "left"
+		elseif ny > oy then
+			dir = "down"
+		elseif ny < oy then
+			dir = "up"
+		else
+			dir = "right"
+		end
+	end
+	self.movingchild[1].x = self.path[self.stage][1]-1
+	self.movingchild[1].y = self.path[self.stage][2]-1
+	self.movingchild[1].dx = self.movingchild[1].x
+	self.movingchild[1].dy = self.movingchild[1].y
+	if self.stage == #self.path and not self.loop then
+		self.movingchild[1].speedx = 0
+		self.movingchild[1].speedy = 0
+	elseif dir == "right" then
+		self.movingchild[1].speedx = self.speed
+		self.movingchild[1].speedy = 0
+	elseif dir == "left" then
+		self.movingchild[1].speedx = -self.speed
+		self.movingchild[1].speedy = 0
+	elseif dir == "down" then
+		self.movingchild[1].speedx = 0
+		self.movingchild[1].speedy = self.speed
+	elseif dir == "up" then
+		self.movingchild[1].speedx = 0
+		self.movingchild[1].speedy = -self.speed
+	end
+	--moving child back
+	local dir = self.startdir
+	local nextstage = self.backstage+1
+	if nextstage > #self.path then nextstage = 1 end
+	if self.path[nextstage] then
+		local ox, oy = math.floor(self.movingchild[2].x+0.5)+1, math.floor(self.movingchild[2].y+0.5)+1
+		if self.path[self.backstage] then
+			ox, oy = self.path[self.backstage][1], self.path[self.backstage][2]
+		end
+		local nx, ny = self.path[nextstage][1], self.path[nextstage][2]
+		if nx < ox then
+			dir = "left"
+		elseif ny > oy then
+			dir = "down"
+		elseif ny < oy then
+			dir = "up"
+		else
+			dir = "right"
+		end
+		self.movingchild[2].x = ox-1
+		self.movingchild[2].y = oy-1
+		self.movingchild[2].dx = self.movingchild[2].x
+		self.movingchild[2].dy = self.movingchild[2].y
+	end
+	if self.stage == #self.path and not self.loop then
+		self.movingchild[2].speedx = 0
+		self.movingchild[2].speedy = 0
+	elseif dir == "right" then
+		self.movingchild[2].speedx = self.speed
+		self.movingchild[2].speedy = 0
+	elseif dir == "left" then
+		self.movingchild[2].speedx = -self.speed
+		self.movingchild[2].speedy = 0
+	elseif dir == "down" then
+		self.movingchild[2].speedx = 0
+		self.movingchild[2].speedy = self.speed
+	elseif dir == "up" then
+		self.movingchild[2].speedx = 0
+		self.movingchild[2].speedy = -self.speed
 	end
 end
 
