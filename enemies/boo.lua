@@ -119,20 +119,16 @@ function boo:update(dt)
 	end
 
 	--rotate back to 0 (portals)
-	if self.t == "spikeyfall" then
-		self.rotation = 0
-	else
-		self.rotation = math.fmod(self.rotation, math.pi*2)
+	self.rotation = math.fmod(self.rotation, math.pi*2)
+	if self.rotation > 0 then
+		self.rotation = self.rotation - portalrotationalignmentspeed*dt
+		if self.rotation < 0 then
+			self.rotation = 0
+		end
+	elseif self.rotation < 0 then
+		self.rotation = self.rotation + portalrotationalignmentspeed*dt
 		if self.rotation > 0 then
-			self.rotation = self.rotation - portalrotationalignmentspeed*dt
-			if self.rotation < 0 then
-				self.rotation = 0
-			end
-		elseif self.rotation < 0 then
-			self.rotation = self.rotation + portalrotationalignmentspeed*dt
-			if self.rotation > 0 then
-				self.rotation = 0
-			end
+			self.rotation = 0
 		end
 	end
 		

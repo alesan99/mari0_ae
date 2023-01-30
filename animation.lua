@@ -19,18 +19,22 @@ whennumber:i:>/</=:v				when a variable turns something
 --]]
 
 --[[ CONDITIONS:
-noprevsublevel						doesn't if the level was changed from another sublevel (Mario goes through pipe, lands in 1-1_1, prevsublevel was _0, no trigger.)
-worldequals:i						only triggers if current world is i
-levelequals:i						only triggers if current level is i
-sublevelequals:i					only triggers if current sublevel is i
-requirecoins:i						requires i coins to trigger (will not remove coins)
+noprevsublevel					doesn't if the level was changed from another sublevel (Mario goes through pipe, lands in 1-1_1, prevsublevel was _0, no trigger.)
+worldequals:i					only triggers if current world is i
+levelequals:i					only triggers if current level is i
+sublevelequals:i				only triggers if current sublevel is i
+requirecoins:i					requires i coins to trigger (will not remove coins)
 
 playersize[:player]:size			requires a player to be size
 requirecollectables:i				requires i collectables to trigger (will not remove coins)
-requirepoints:i						requires i points
+requirepoints:i					requires i points
 buttonhelddown:button				only if button is held down
 requirekeys[:player]:i				requires i keys
 ifnumber:i:>/</=:v				if a variable is equal/greater than something
+ifcoins:>/</=:v					if coin count is equal/greater than v
+ifcollectables:>/</=:v:i			if collectable count of a type is equal/greater than v
+ifpoints:>/</=:v				if points is equal/greater than v
+requireplayers:i				requires i players to trigger
 --]]
 
 --[[ ACTIONS:
@@ -106,6 +110,8 @@ settime:time						sets time
 setplayerlight:blocks				sets player's light in lights out mode
 waitforinput                        waits until a spesific/any player presses a button
 waitfrotrigger                      waits until a spesific animation is triggered
+makeinvincible:i					makes player invincible/give star for i or default seconds
+changeswitchstate:i					trigger switchblocks
 --]]
 
 function animation:init(path, name)
@@ -344,7 +350,8 @@ function animation:update(dt)
 					end
 				end
 			elseif self.waiting.t == "trigger" then
-				if animationtriggerfuncs[self.waiting.name] then
+				if animationtriggerfuncs[self.waiting.name] and animationtriggerfuncs[self.waiting.name].triggered then
+					animationtriggerfuncs[self.waiting.name].triggered = nil
 					self.waiting = false
 				end
 			end
@@ -914,12 +921,28 @@ function animation:update(dt)
 						p.disablejumping = false
 					end
 				end
+			elseif v[1] == "changeportal" then
+				local pstart, pend = 1, players
+				if v[2] ~= "everyone" then
+					pstart, pend = tonumber(string.sub(v[2], -1)), tonumber(string.sub(v[2], -1))
+				end
+				for i = pstart, pend do
+					if objects["player"][i] then
+						local p = objects["player"][i]
+						p.portalgun = (v[3] ~= "none")
+						if p.portalgun and (not p.characterdata.noportalgun) and playertype ~= "classic" and playertype ~= "cappy" then
+							p.portals = v[3]
+							p:updateportalsavailable()
+						end
+					end
+				end
 			elseif v[1] == "triggeranimation" then
 				if animationtriggerfuncs[v[2]] then
 					for i = 1, #animationtriggerfuncs[v[2]] do
 						animationtriggerfuncs[v[2]][i]:trigger()
 					end
 				end
+				animationtriggerfuncs[v[2]].triggered = true
 				
 			elseif v[1] == "addkeys" then
 				if v[3] == "everyone" then
@@ -960,6 +983,31 @@ function animation:update(dt)
 			elseif v[1] == "setplayerlight" then
 				for i = 1, players do
 					objects["player"][i].light = tonumber(v[2])
+				end
+			elseif v[1] == "makeinvincible" then
+				local time = mariostarduration
+				if v[2] ~= "" and tonumber(v[2]) and tonumber(v[2]) > 0 then
+					time = tonumber(v[2])
+				end
+				if v[3] == "everyone" then
+					for i = 1, players do
+						if objects["player"][i].animation ~= "grow1" and objects["player"][i].animation ~= "grow2" and objects["player"][i].animation ~= "shrink" then
+							objects["player"][i]:star()
+							objects["player"][i].startimer = (mariostarduration-time)
+						end
+					end
+				else
+					local i = tonumber(string.sub(v[3], -1))
+					if objects["player"][i] then
+						if objects["player"][i].animation ~= "grow1" and objects["player"][i].animation ~= "grow2" and objects["player"][i].animation ~= "shrink" then
+							objects["player"][i]:star()
+							objects["player"][i].startimer = (mariostarduration-time)
+						end
+					end
+				end
+			elseif v[1] == "changeswitchstate" then
+				if tonumber(v[2]) and tonumber(v[2]) <= 4 then
+					changeswitchstate(tonumber(v[2]), (v[3] == "on"), true)
 				end
 			elseif v[1] == "setnumber" then
 				local name = tostring(v[2])
@@ -1037,6 +1085,36 @@ function animation:trigger()
 				if marioscore < tonumber(v[2]) then
 					pass = false
 					break
+				end
+			elseif v[1] == "ifcoins" then
+				local value = tonumber(v[3])
+				if v[2] == "=" and mariocoincount ~= value then
+					pass = false
+				elseif v[2] == ">" and mariocoincount <= value then
+					pass = false
+				elseif v[2] == "<" and mariocoincount >= value then
+					pass = false
+				end
+			elseif v[1] == "ifcollectables" then
+				local value = tonumber(v[3])
+				local typ = tonumber(v[4])
+				if not collectablescount[typ] then
+					pass = false
+				elseif v[2] == "=" and collectablescount[typ] ~= value then
+					pass = false
+				elseif v[2] == ">" and collectablescount[typ] <= value then
+					pass = false
+				elseif v[2] == "<" and collectablescount[typ] >= value then
+					pass = false
+				end
+			elseif v[1] == "ifpoints" then
+				local value = tonumber(v[3])
+				if v[2] == "=" and marioscore ~= value then
+					pass = false
+				elseif v[2] == ">" and marioscore <= value then
+					pass = false
+				elseif v[2] == "<" and marioscore >= value then
+					pass = false
 				end
 			elseif v[1] == "requirekeys" then
 				if v[3] == "everyone" then
@@ -1129,6 +1207,11 @@ function animation:trigger()
 						end
 					end
 				end
+			elseif v[1] == "requireplayers" then
+				if players < tonumber(v[2]) then
+					pass = false
+					break
+				end	
 			end
 		end
 		

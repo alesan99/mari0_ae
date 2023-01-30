@@ -13,89 +13,73 @@ function tile:init(x, y)
 	self.static = true
 	self.category = 2
 	self.mask = {true}
+
 	if map[self.cox] and map[self.cox][self.coy] and tilequads[map[self.cox][self.coy][1]] and tilequads[map[self.cox][self.coy][1]].collision then
 		local t = tilequads[map[self.cox][self.coy][1]]
-		if t.rightslant or t.halfrightslant1 or t.halfrightslant2 or t.leftslant or t.halfleftslant1 or t.halfleftslant2 then
-			self.slants = math.min(16*3,16*scale)
+		--Slopes
+		if t.rightslant or t.leftslant then
+			self.SLOPE = true
 		end
-		if (t.rightslant or t.halfrightslant1 or t.halfrightslant2) and (t.leftslant or t.halfleftslant1 or t.halfleftslant2) then
-			--slant
-			self.slants = nil
+		--Slabs
+		if t.rightslant and t.leftslant then
+			self.SLOPE = nil
 			self.slab = true
-			if t.rightslant and t.leftslant then
+			if t.fullrightslant and t.fullleftslant then
 				self.height = 0.5
 				if (not t.downslant) and self.height ~= 1 then
 					self.y = self.y + 0.5
 				end
-			elseif t.rightslant and t.halfleftslant1 then
+			elseif t.fullrightslant and t.halfleftslant1 then
 				self.height = 0.5
 				self.width = 0.5
 				if (not t.downslant) and self.height ~= 1 then
 					self.y = self.y + 0.5
 				end
-			elseif t.rightslant and t.halfleftslant2 then
+			elseif t.fullrightslant and t.halfleftslant2 then
 				self.width = 0.5
-			elseif t.halfrightslant1 and t.leftslant then
+			elseif t.halfrightslant1 and t.fullleftslant then
 				self.height = 0.5
 				self.width = 0.5
 				self.x = self.x + 0.5
 				if (not t.downslant) and self.height ~= 1 then
 					self.y = self.y + 0.5
 				end
-			elseif t.halfrightslant2 and t.leftslant then
+			elseif t.halfrightslant2 and t.fullleftslant then
 				self.width = 0.5
 				self.x = self.x + 0.5
 			end
+		--Right slopes
 		elseif t.rightslant then
 			self.slant = "right"
-			self.active = false
-			self.step = 1/(self.slants)
-			for num = 1, self.slants do
-				objects["pixeltile"][num + tilemap(self.cox, self.coy)*100] = pixeltile:new(self.x+((num-1)*self.step), self.y+((num-1)*self.step), self.cox, self.coy, 1/self.slants, 1-((num-1)*self.step), "right", self.step)
+			self.y1 = 0
+			self.y2 = 1
+			if t.halfrightslant1 then
+				self.y1 = 0.5
+				self.y2 = 1
+			elseif t.halfrightslant2 then
+				self.y1 = 0
+				self.y2 = 0.5
 			end
-		elseif t.halfrightslant1 then
-			self.slant = "right"
-			self.active = false
-			self.step = 1/self.slants/2
-			for num = 1, self.slants do
-				objects["pixeltile"][num + tilemap(self.cox, self.coy)*100] = pixeltile:new(self.x+((num-1)/self.slants), self.y+0.5+((num-1)*self.step), self.cox, self.coy, 1/self.slants,  0.5-((num-1)*self.step), "right", self.step)
-			end
-		elseif t.halfrightslant2 then
-			self.slant = "right"
-			self.active = false
-			self.step = 1/self.slants/2
-			for num = 1, self.slants do
-				objects["pixeltile"][num + tilemap(self.cox, self.coy)*100] = pixeltile:new(self.x+((num-1)/self.slants), self.y+((num-1)*self.step), self.cox, self.coy, 1/self.slants, 1-((num-1)*self.step), "right", self.step)
-			end
+		--Left slopes
 		elseif t.leftslant then
 			self.slant = "left"
-			self.active = false
-			self.step = 1/(self.slants)
-			for num = 1, self.slants do
-				objects["pixeltile"][self.slants+1-num + tilemap(self.cox, self.coy)*100] = pixeltile:new(self.x+(1-(num*self.step)), self.y+((num-1)*self.step), self.cox, self.coy, 1/self.slants, 1-((num-1)*self.step), "left", self.step)
-			end
-		elseif t.halfleftslant1 then
-			self.slant = "left"
-			self.active = false
-			self.step = 1/self.slants/2
-			for num = 1, self.slants do
-				objects["pixeltile"][self.slants+1-num + tilemap(self.cox, self.coy)*100] = pixeltile:new(self.x+(1-(num/self.slants)), self.y+0.5+((num-1)*self.step), self.cox, self.coy, 1/self.slants, 0.5-((num-1)*self.step), "left", self.step)
-			end
-		elseif t.halfleftslant2 then
-			self.slant = "left"
-			self.active = false
-			self.step = 1/self.slants/2
-			for num = 1, self.slants do
-				objects["pixeltile"][self.slants+1-num + tilemap(self.cox, self.coy)*100] = pixeltile:new(self.x+(1-(num/self.slants)), self.y+((num-1)*self.step), self.cox, self.coy, 1/self.slants, 1-((num-1)*self.step), "left", self.step)
+			self.y1 = 1
+			self.y2 = 0
+			if t.halfleftslant1 then
+				self.y1 = 1
+				self.y2 = 0.5
+			elseif t.halfleftslant2 then
+				self.y1 = 0.5
+				self.y2 = 0
 			end
 		end
-		if self.slants and t.downslant then
-			for num = 1, self.slants do
-				local b = objects["pixeltile"][num + tilemap(self.cox, self.coy)*100]
-				b.y = self.y
-				b.step = 0
-			end
+		--Upside down slopes
+		if self.SLOPE and t.downslant then
+			self.y1 = 1-self.y1
+			self.y2 = 1-self.y2
+			self.UPSIDEDOWNSLOPE = true
 		end
+		--Platform tiles (No collision)
 		if t.platform then
 			self.PLATFORM = true
 		end
@@ -108,24 +92,44 @@ function tile:init(x, y)
 		if t.platformright then
 			self.PLATFORMRIGHT = true
 		end
+		--Disable collisions if next to slopes
+		--if not self.SLOPE then
+			if not (t.PLATFORM or t.PLATFORMDOWN or t.PLATFORMLEFT or t.PLATFORMRIGHT) then 
+				local tleft, tabove
+				if ismaptile(self.cox-1, self.coy) and tilequads[map[self.cox-1][self.coy][1]] then
+					tleft = tilequads[map[self.cox-1][self.coy][1]].leftslant
+				end
+				if ismaptile(self.cox, self.coy-1) and tilequads[map[self.cox][self.coy-1][1]] then
+					local tq = tilequads[map[self.cox][self.coy-1][1]]
+					tabove = (tq.leftslant or tq.rightslant) and not tq.downslant
+				end
+				if tleft or tabove then
+					self.PLATFORM, self.PLATFORMDOWN, self.PLATFORMLEFT, self.PLATFORMRIGHT = true, true, true, true
+					if tleft then
+						self.PLATFORMLEFT = false
+					end
+					if tabove then
+						self.PLATFORM = false
+					end
+					self.byslope = true
+				end
+			end
+		--end
+		if t.rightslant then  --maps are loaded from left -> right, so the slope tile on the right has to look to the left to disable the tile's collision
+			local tr, tright
+			if ismaptile(self.cox-1, self.coy) and tilequads[map[self.cox-1][self.coy][1]] then
+				if tilequads[map[self.cox-1][self.coy][1]].collision then
+					tr = objects["tile"][tilemap(self.cox-1, self.coy)]
+					tright = true
+				end
+			end
+			if tright then
+				if not tr.byslope then
+					tr.PLATFORM, tr.PLATFORMDOWN, tr.PLATFORMLEFT, tr.PLATFORMRIGHT = true, true, true, true
+				end
+				tr.PLATFORMRIGHT = false
+				tr.byslope = true
+			end
+		end
 	end
-end
-
-pixeltile = class:new()
-
-function pixeltile:init(x, y, cox, coy, width, height, dir, step)
-	self.cox = cox
-	self.coy = coy
-	self.x = x
-	self.y = y
-	self.speedx = 0
-	self.speedy = 0
-	self.step = step or 1/(16*scale)
-	self.width = width or self.step
-	self.height = height
-	self.dir = dir
-	self.active = true
-	self.static = true
-	self.category = 2
-	self.mask = {true}
 end

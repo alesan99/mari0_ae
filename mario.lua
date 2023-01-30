@@ -1998,7 +1998,7 @@ function mario:update(dt)
 						if tilequads[map[x][y][1]].coin then
 							collectcoin(x, y)
 						elseif objects["coin"][tilemap(x, y)] then
-							collectcoin2(x, y)
+							collectcoinentity(x, y)
 						elseif objects["collectable"][tilemap(x, y)] and not objects["collectable"][tilemap(x, y)].coinblock then
 							getcollectable(x, y)
 						end
@@ -2012,7 +2012,7 @@ function mario:update(dt)
 				if tilequads[map[x][y][1]].coin then
 					collectcoin(x, y)
 				elseif objects["coin"][tilemap(x, y)] then
-					collectcoin2(x, y)
+					collectcoinentity(x, y)
 				elseif objects["collectable"][tilemap(x, y)] and not objects["collectable"][tilemap(x, y)].coinblock then
 					getcollectable(x, y)
 				end
@@ -2022,7 +2022,7 @@ function mario:update(dt)
 				if tilequads[map[x][y][1]].coin then
 					collectcoin(x, y)
 				elseif objects["coin"][tilemap(x, y)] then
-					collectcoin2(x, y)
+					collectcoinentity(x, y)
 				elseif objects["collectable"][tilemap(x, y)] and not objects["collectable"][tilemap(x, y)].coinblock then
 					getcollectable(x, y)
 				end
@@ -2032,7 +2032,7 @@ function mario:update(dt)
 					if tilequads[map[x][y-1][1]].coin then
 						collectcoin(x, y-1)
 					elseif objects["coin"][tilemap(x, y-1)] then
-						collectcoin2(x, y-1)
+						collectcoinentity(x, y-1)
 					elseif objects["collectable"][tilemap(x, y-1)] and not objects["collectable"][tilemap(x, y-1)].coinblock then
 						getcollectable(x, y-1)
 					end
@@ -2142,11 +2142,11 @@ function mario:update(dt)
 		local tx = math.floor(self.x+self.width/2 + targetspeedx*dt)+1
 		local ty = math.floor(self.y+self.height/2 + targetspeedy*dt)+1
 
-		if not tilequads[map[tx][y][1]]:getproperty("fence") then
+		if (not inmap(tx,y)) or (not tilequads[map[tx][y][1]]:getproperty("fence")) then
 			self.x = math.max(math.min(self.x + targetspeedx*dt, x-self.width/2-0.001), x-self.width/2-0.999)
 			targetspeedx = 0
 		end
-		if not tilequads[map[x][ty][1]]:getproperty("fence") then
+		if (not inmap(x,ty)) or (not tilequads[map[x][ty][1]]:getproperty("fence")) then
 			if targetspeedy <= 0 then
 				self.y = math.max(self.y + targetspeedy*dt, y-self.height/2-1)
 				targetspeedy = 0
@@ -5922,7 +5922,7 @@ function mario:leftcollide(a, b)
 		end
 		
 		--Check if it's a pipe with pipe pipe.
-		if self.falling == false and self.jumping == false and (leftkey(self.playernumber) or intermission) then --but only on ground and rightkey
+		if self.falling == false and self.jumping == false and (leftkey(self.playernumber) or intermission) then --but only on ground and leftkey
 			for i, p in pairs(pipes) do
 				if p:inside("left", x, self) then
 					self.y = p.coy-self.height
@@ -6284,7 +6284,7 @@ function mario:ceilcollide(a, b)
 		end
 		
 		--Check if it's a pipe with pipe pipe.
-		if upkey(self.playernumber) and self.jumping then --but only on ground and rightkey
+		if upkey(self.playernumber) then --but only in midair and upkey
 			for i, p in pairs(pipes) do
 				if p:inside("up", y, self) then
 					self:pipe(p.cox, p.coy, "up", i)
@@ -7131,13 +7131,14 @@ function hitblock(x, y, t, v)
 end
 
 function hitontop(x, y)
+	if breakoutmode then return end
 	--kill enemies on top
 	for i, v in pairs(enemies) do
 		if objects[v] then
 			for j, w in pairs(objects[v]) do
 				if w.width and (w.active or w.killedfromblocksbelownotactive) then
-					local centerX = w.x + w.width/2
-					if inrange(centerX, x-1, x, true) and y-1 == w.y+w.height then
+					local cx = math.max(x-1,math.min(x,w.x))
+					if inrange(cx, w.x, w.x+w.width, true) and inrange(w.y+w.height, y-1, y-1.125, true) then
 						--get dir
 						local dir = "right"
 						if w.x+w.width/2 < x-0.5 then
@@ -7215,7 +7216,7 @@ function hitontop(x, y)
 			collectcoin(x, y-1)
 			table.insert(coinblockanimations, coinblockanimation:new(x-0.5, y-1))
 		elseif objects["coin"][tilemap(x, y-1)] then
-			collectcoin2(x, y-1)
+			collectcoinentity(x, y-1)
 			table.insert(coinblockanimations, coinblockanimation:new(x-0.5, y-1))
 		elseif objects["collectable"][tilemap(x, y-1)] and not objects["collectable"][tilemap(x, y-1)].coinblock then
 			getcollectable(x, y-1)
@@ -7288,7 +7289,7 @@ function mario:die(how)
 		return
 	end
 	
-	if how ~= "pit" and how ~= "time" and how ~= "lava" and how ~= "killscript" then
+	if how ~= "pit" and how ~= "time" and how ~= "lava" and how ~= "killscript" and not self.dead then
 		animationsystem_playerhurttrigger(self.playernumber)
 
 		if how == "Laser" then
@@ -8763,7 +8764,7 @@ function collectcoin(x, y, amount, group)
 			local x1, y1, x2, y2 = r["group"][1], r["group"][2], r["group"][3], r["group"][4]
 			for tx = x1, x2 do
 				for ty = y1, y2 do
-					if not (x == tx and y == ty) then
+					if (not (x == tx and y == ty)) and tilequads[map[tx][ty][1]].coin then
 						collectcoin(tx, ty, amount, "group")
 					end
 				end
@@ -8785,7 +8786,7 @@ function collectcoin(x, y, amount, group)
 	end
 end
 
-function collectcoin2(x, y) --DONT MIND ME OK
+function collectcoinentity(x, y) --DONT MIND ME OK
 	objects["coin"][tilemap(x, y)] = nil
 	addpoints(200)
 	playsound(coinsound)
@@ -9153,6 +9154,7 @@ end
 
 function mario:stopanimation()
 	self.animation = false
+	self.drawable = true
 end
 
 function mario:stopgroundpound(force)

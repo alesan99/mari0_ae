@@ -66,17 +66,24 @@ function levelscreen_load(reason, i)
 					end
 				end
 				if gamefinished then
-					gamestate = "mappackfinished"
-					blacktime = gameovertime
-					
-					if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/endingmusic.ogg") or love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/endingmusic.mp3") then
-						playsound(endingmusic)
+					if testlevel then
+						testlevelworld = 1
+						testlevellevel = 1
+						notice.new("You have finished this mappack!", notice.white, 5)
+						stoptestinglevel()
 					else
-						music:play("princessmusic")
-					end
-					if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/ending.png") then
-						levelscreenimage = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/ending.png")
-						levelscreenimagecheck = true
+						gamestate = "mappackfinished"
+						blacktime = gameovertime
+						
+						if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/endingmusic.ogg") or love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/endingmusic.mp3") then
+							playsound(endingmusic)
+						else
+							music:play("princessmusic")
+						end
+						if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/ending.png") then
+							levelscreenimage = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/ending.png")
+							levelscreenimagecheck = true
+						end
 					end
 				else
 					if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "-" .. mariolevel .. "levelscreen.png") then

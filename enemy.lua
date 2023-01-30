@@ -2283,6 +2283,32 @@ function enemy:update(dt)
 			end
 		end
 	end
+
+	--collect coins and collectables if enemy is over tile
+	if (self.collectscoins or self.collectscollectables or self.collectscoinsinshell) and not ((self.collectscoinsinshell or self.collectscollectablesinshell) and not self.small) then --if it collects coins, it will collect collectables. But not the other way
+		local collectscoins = self.collectscoins or self.collectscoinsinshell
+		local collectscollectables = true
+		if self.collectscollectables == false then --ignore collectables if explicitly set to false
+			collectscollectables = false
+		end
+		for x = math.ceil(self.x), math.ceil(self.x+self.width) do
+			for y = math.ceil(self.y), math.ceil(self.y+self.height) do
+				if ismaptile(x, y) then
+					if collectscoins and tilequads[map[x][y][1]].coin then
+						collectcoin(x, y)
+					elseif collectscoins and objects["coin"][tilemap(x, y)] then
+						collectcoinentity(x, y)
+					elseif collectscollectables and objects["collectable"][tilemap(x, y)] and not objects["collectable"][tilemap(x, y)].coinblock then
+						local collectableid = objects["collectable"][tilemap(x, y)].t
+						if not (self.collectscollectables and type(self.collectscollectables) == "table" and not self.collectscollectables[collectableid]) then
+							--if the the property is set to a table, only collect collectable if the id number is set to true in the table
+							getcollectable(x, y)
+						end
+					end
+				end
+			end
+		end
+	end
 	
 	if self.customtimer then
 		--[delay, [action, parameter], argument]
@@ -2520,6 +2546,12 @@ function enemy:customtimeraction(action, arg, arg2)
 					self.trackcontroller.travel = "forward"
 				end
 			end
+		elseif action == "stopsound" then
+			if self.sound and arg == self.t then
+				self.sound:stop()
+			elseif _G[arg .. "sound"] then
+				_G[arg .. "sound"]:stop()
+			end
 		end
 		if string.sub(action, 0, 7) == "reverse" then
 			local parameter = string.sub(action, 8, string.len(action))
@@ -2554,14 +2586,14 @@ function enemy:ifstatement(t, action, arg)
 
 		--get properties needed for comparison
 		local prop1,prop2 = t[i+1], t[i+3]
-		if (type(prop1) == "string" and self[prop1]) then
-			prop1 = self[prop1]
-		elseif (type(prop1) == "table" and prop1[1] and prop1[2] and prop1[1] == "property") then
+		if (type(prop1) == "table" and prop1[1] and prop1[2] and prop1[1] == "property") then
 			prop1 = self[prop1[2]]
-		end	
-		if (type(prop2) == "string" and self[prop2]) then
+		else
+			prop1 = self[prop1]	
+		end
+		if (type(prop2) == "string" and self[prop2] ~= nil) then
 			prop2 = self[prop2]
-		elseif (type(prop2) == "table" and prop2[2] and prop2[2] and prop2[2] == "property") then
+		elseif (type(prop2) == "table" and prop2[1] and prop2[2] and prop2[1] == "property") then
 			prop2 = self[prop2[2]]
 		end
 
@@ -2746,7 +2778,7 @@ function enemy:globalcollide(a, b, c, d, dir)
 	
 	if self.killsenemies and ((self.killsenemiesonsides and (dir == "left" or dir == "right")) or (self.killsenemiesonbottom and dir == "floor") or (self.killsenemiesontop and dir == "ceil") or
 		(self.killsenemiesonleft and dir == "left") or (self.killsenemiesonright and dir == "right") or (self.killsenemiesonpassive and dir == "passive"))
-		and a == "enemy" and not (b.resistsenemykill or b.resistseverything) then
+		and a == "enemy" and (not (b.resistsenemykill or b.resistseverything)) and (not b.killsenemies) then
 		return true
 	end
 	
@@ -2777,7 +2809,7 @@ function enemy:globalcollide(a, b, c, d, dir)
 		end
 	end
 	
-	if a == "fireball" and self.resistsfire then
+	if a == "fireball" and (self.resistsfire or self.reflectsfireballs) then
 		return true
 	end
 	
@@ -2797,6 +2829,23 @@ function enemy:globalcollide(a, b, c, d, dir)
 		if b.enemykillsdontflyaway then
 			self.doesntflyawayonfireball = true
 		end
+		if b.small and not b.nocombo then
+			if b.combo < #koopacombo then
+				b.combo = b.combo + 1
+				addpoints(koopacombo[b.combo], self.x, self.y)
+			else
+				for i = 1, players do
+					if mariolivecount ~= false then
+						mariolives[i] = mariolives[i]+1
+						respawnplayers()
+					end
+				end
+				table.insert(scrollingscores, scrollingscore:new("1up", self.x, self.y))
+				playsound(oneupsound)
+			end
+		else
+			addpoints((firepoints[self.t] or 200), self.x, self.y)
+		end
 		self:shotted(dir)
 
 		if b.bouncesonenemykill then
@@ -2808,7 +2857,6 @@ function enemy:globalcollide(a, b, c, d, dir)
 			self:output()
 		end
 		
-		addpoints((firepoints[self.t] or 200), self.x, self.y)
 		return true
 	end
 	
@@ -3489,6 +3537,14 @@ function enemy:output(transformed)
 		if self.transformenemyanimationondeath then
 			transformenemyanimation(self.transformenemyanimationondeath)
 		end
+		if self.stopsoundondeath then
+			local sound = self.stopsoundondeath
+			if self.sound and (sound == self.t or sound == true) then
+				self.sound:stop()
+			elseif _G[sound .. "sound"] then
+				_G[sound .. "sound"]:stop()
+			end
+		end
 	end
 end
 
@@ -3502,6 +3558,7 @@ function enemy:triggeranimation(s)
 				anim:trigger()
 			end
 		end
+		animationtriggerfuncs[s].triggered = true
 	end
 end
 

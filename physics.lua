@@ -46,6 +46,7 @@
 
 --32: BOMB-OMB/FROZENCOIN
 --33: TRACK
+local rotatepoint, getslopey
 
 function physicsupdate(dt)
 	local lobjects = objects
@@ -70,35 +71,35 @@ function physicsupdate(dt)
 						if j == "player" or v.gravitydir then
 							if v.gravitydir == "up" then
 								v.speedy = v.speedy - (v.gravity or yacceleration)*dt
-								if v.speedy < -maxyspeed then
-									v.speedy = -maxyspeed
-								end
+								v.speedy = math.max(-maxyspeed, v.speedy)
 							elseif v.gravitydir == "right" then
 								v.speedx = v.speedx + (v.gravity or yacceleration)*dt
-								if v.speedx < -maxyspeed then
-									v.speedx = -maxyspeed
-								end
+								v.speedx = math.max(-maxyspeed, v.speedx)
 							elseif v.gravitydir == "left" then
 								v.speedx = v.speedx - (v.gravity or yacceleration)*dt
-								if v.speedx > maxyspeed then
-									v.speedx = maxyspeed
-								end
+								v.speedy = math.min(maxyspeed, v.speedx)
 							else
 								v.speedy = v.speedy + (v.gravity or yacceleration)*dt
-								if v.speedy > maxyspeed then
-									v.speedy = maxyspeed
-								end
+								v.speedy = math.min(maxyspeed, v.speedy)
 							end
 						elseif (j == "goomba" and v.t == "spiketop") or (j == "enemy" and v.movement == "crawl") then
 							v.speedy = math.max(-maxyspeed, math.min(maxyspeed, v.speedy + (v.gravity or 0)*dt))
 							v.speedx = math.max(-maxyspeed, math.min(maxyspeed, v.speedx + (v.gravityx or 0)*dt))
 						else
 							v.speedy = v.speedy + (v.gravity or yacceleration)*dt
-							if v.speedy > maxyspeed then
-								v.speedy = maxyspeed
+							v.speedy = math.min(v.maxyspeed or maxyspeed, v.speedy)
+							if v.minyspeed then
+								v.speedy = math.max(v.minyspeed, v.speedy)
+							end
+							if v.maxxspeed then
+								v.speedx = math.min(v.maxxspeed, v.speedx)
+							end
+							if v.minxspeed then
+								v.speedx = math.max(v.minxspeed, v.speedx)
 							end
 						end
 					end
+					v.slopeangle = nil
 					
 					--PORTALS LOL
 					local passed = false
@@ -165,27 +166,18 @@ function physicsupdate(dt)
 								local t = lobjects["tile"][tilemap(x, y)]
 								if t then
 									--    Same object             Active                  Not masked
-									if (i ~= g or j ~= h) and (t.active or t.slant) and v.mask[t.category] ~= true then
+									if (i ~= g or j ~= h) and (t.active or t.SLOPE) and v.mask[t.category] ~= true then
 										--slants
-										if t.slant then
-											for num = 1, t.slants do
-												local t2 = lobjects["pixeltile"][num + tilemap(x, y)*100]
-												if t2 then
-													local collision1, collision2 = checkcollisionslope(v, t2, "pixeltile", x .. "-" .. y .. "-" .. num, j, i, dt, passed)
-													if collision1 then
-														horcollision = true
-													elseif collision2 then
-														vercollision = true
-													end
-												end
-											end
+										local collision1, collision2
+										if t.SLOPE then
+											collision1, collision2 = checkcollisionslope(v, t, "tile", tilemap(x, y), j, i, dt, passed)
 										else
-											local collision1, collision2 = checkcollision(v, t, "tile", tilemap(x, y), j, i, dt, passed)
-											if collision1 then
-												horcollision = true
-											elseif collision2 then
-												vercollision = true
-											end
+											collision1, collision2 = checkcollision(v, t, "tile", tilemap(x, y), j, i, dt, passed)
+										end
+										if collision1 then
+											horcollision = true
+										elseif collision2 then
+											vercollision = true
 										end
 									end
 								end
@@ -244,29 +236,114 @@ function physicsupdate(dt)
 							end
 						end
 					end
+
+					--Stick to slopes
+					local fx = v.x + v.speedx*dt --future x
+					local fy = v.y + v.speedy*dt --future x
+					local stucktoslope = false
+					if (not v.activestatic) and v.mask[2] ~= true and v.speedy >= 0 and math.abs(v.speedx) > 0.0001 and horcollision == false then
+						local leftedge = v.x
+						local rightedge = v.x+v.width
+						local fleftedge = fx
+						local frightedge = fx+v.width
+
+						local y1 = math.floor(v.y+v.height)+1
+						local x1, x2 = math.floor(frightedge)+1, math.floor(fleftedge)+1
+
+						local x
+						local y = y1
+
+						--TODO: Clean up code
+						local stick = false
+						if ismaptile(x1, y1) and v.speedx < 0 then --check for left slope under right edge
+							local tq = tilequads[map[x1][y1][1] ]
+							if tq:getproperty("collision", x1, y1) and tq.leftslant and not tq.downslant then
+								x = x1
+								stick = true
+							end
+						end
+						if ismaptile(x2, y1) and v.speedx > 0 then --check for right slope under left edge
+							local tq = tilequads[map[x2][y1][1] ]
+							if tq:getproperty("collision", x2, y1) and tq.rightslant and not tq.downslant then
+								x = x2
+								stick = true
+							end
+						end
+						if ismaptile(x1, y1+1) and v.speedx < 0 and not x then --check for left slope under right edge
+							local tq = tilequads[map[x1][y1+1][1] ]
+							if tq:getproperty("collision", x1, y1+1) and tq.leftslant and not tq.downslant then
+								x = x1
+								y = y1+1
+								stick = true
+							end
+						end
+						if ismaptile(x2, y1+1) and v.speedx > 0 and not x then --check for right slope under left edge
+							local tq = tilequads[map[x2][y1+1][1] ]
+							if tq:getproperty("collision", x2, y1+1) and tq.rightslant and not tq.downslant then
+								x = x2
+								y = y1+1
+								stick = true
+							end
+						end
+						if x then --try to stick
+							if ismaptile(x, y) then
+								local t = objects["tile"][tilemap(x,y)]
+								if t and t.SLOPE then
+									local tq = tilequads[map[x][y][1] ]
+									local location, flocation
+									if tq.leftslant then
+										location = rightedge-t.x
+										flocation = frightedge-t.x
+									elseif tq.rightslant then
+										location = leftedge-t.x
+										flocation = fleftedge-t.x
+									end
+									--location = math.max(0, math.min(1, location))
+									flocation2 = flocation --unbounded
+									--flocation = math.max(0, math.min(1, flocation)) --bounded to tile
+									local targety = t.y+getslopey(flocation, t.y1, t.y2)
+									local targety2 = t.y+getslopey(flocation2, t.y1, t.y2)
+									local currentground = (t.y+getslopey(location, t.y1, t.y2))
+									local rangey = targety2-currentground --make sure it only sticks if reasonably close to slope
+									if v.y+v.height >= currentground-rangey-0.00001 then
+										stucktoslope = targety-v.height
+									end
+								end
+							end
+						end
+						if stucktoslope then
+							v.slopeangle = true
+							v.falling = false --TODO: Fix not falling after falling off slope
+						end
+					end
 					
 					--Move the object
 					if vercollision == false and not v.activestatic then
 						v.y = v.y + v.speedy*dt
-						if v.gravity then
-							if v.startfall then
-								if v.gravitydir then
-									if (v.gravitydir == "down" and v.speedy == v.gravity*dt) or (v.gravitydir == "up" and v.speedy == -v.gravity*dt) then
+						if not stucktoslope then
+							if v.gravity then
+								if v.startfall then
+									if v.gravitydir then
+										if (v.gravitydir == "down" and v.speedy == v.gravity*dt) or (v.gravitydir == "up" and v.speedy == -v.gravity*dt) then
+											v:startfall(i)
+										end
+									elseif v.speedy == v.gravity*dt then
 										v:startfall(i)
 									end
-								elseif v.speedy == v.gravity*dt then
+								end
+							else
+								if v.speedy == yacceleration*dt and v.startfall then
 									v:startfall(i)
 								end
-							end
-						else
-							if v.speedy == yacceleration*dt and v.startfall then
-								v:startfall(i)
 							end
 						end
 					end
 					
 					if horcollision == false and not v.activestatic then
 						v.x = v.x + v.speedx*dt
+						if stucktoslope then
+							v.y = stucktoslope
+						end
 						if v.gravity then
 							if v.startfall then
 								if v.gravitydir then
@@ -364,51 +441,135 @@ function checkcollisionslope(v, t, h, g, j, i, dt, passed) --v: b1table | t: b2t
 	local hadhorcollision = false
 	local hadvercollision = false
 	
-	if math.abs(v.x-t.x) < math.max(v.width, t.width)+1 and math.abs(v.y-t.y) < math.max(v.height, t.height)+1 then
-		--check if it's a passive collision (Object is colliding anyway)
-		if not passed and aabb(v.x, v.y, v.width, v.height, t.x, t.y, t.width, t.height) then --passive collision! (oh noes!)
-			if passivecollision(v, t, h, g, j, i, dt) then
-				if (v.y+v.height >= t.y and v.y+v.height <= t.y+t.step) then
-					if v.speedy > 0 then
-						v.speedy = 0
-					end
-					v.y = t.y - v.height - 0.0001
-				end
-				hadvercollision = true
+	--if math.abs(v.x-t.x) < math.max(v.width, t.width)+1 and math.abs(v.y-t.y) < math.max(v.height, t.height)+1 then
+		local inside, diff, angle = insideslope(v.x,v.y,v.width,v.height, t.x,t.y+t.y1,t.x+t.width,t.y+t.y2, t.UPSIDEDOWNSLOPE)
+		local finside, fdiff, fangle = insideslope(v.x + v.speedx*dt,v.y + v.speedy*dt,v.width,v.height, t.x,t.y+t.y1,t.x+t.width,t.y+t.y2, t.UPSIDEDOWNSLOPE)
+		local sright, sleft = t.slant == "right", t.slant == "left"
+		--is it on the slope part of the block?
+		local inslantrange = false
+		if sright then
+			if v.x > t.x or v.x+v.speedx*dt > t.x then
+				inslantrange = true
 			end
-			
+		elseif sleft then
+			if v.x+v.width < t.x+t.width or v.x+v.width+v.speedx*dt < t.x+t.width then
+				inslantrange = true
+			end
+		end
+		--is it going in a direction that should intersect with the slope?
+		local rotx, roty = rotatepoint(v.x, v.y, angle)
+		local rotfx, rotfy = rotatepoint(v.x+v.speedx*dt, v.y+v.speedy*dt, angle)
+		local diffy = rotfy-roty
+		--Check if movement ray intersects slope line
+		local inslopedirection = false
+		if (not t.UPSIDEDOWNSLOPE) then
+			inslopedirection = (diffy <= 0)
+		else
+			inslopedirection = (diffy >= 0)
+		end
+		
+		--TODO: Fix platform property for slopes (important for phantom collisions with right slope next to left slope)
+		if not passed and aabb(v.x, v.y, v.width, v.height, t.x, t.y, t.width, t.height) and inslopedirection and finside then 
+			--sloped side collision
+			--v.x = v.x + v.speedx*dt + math.sin(angle)*diff
+			--v.y = v.y + v.speedy*dt + math.cos(angle)*diff
+			local location = v.x-t.x
+			if sleft then
+				location = v.x+v.width-t.x
+			end
+			location = math.max(0, math.min(1, location))
+			local ty = t.y+getslopey(location, t.y1, t.y2) --, v.y+v.speedy*dt)
+			local collided = false
+			if not t.UPSIDEDOWNSLOPE then
+				if ty-v.height < v.y+v.speedy*dt then
+					v.y = ty - v.height
+					collided = true
+				end
+			else
+				if ty > v.y+v.speedy*dt then
+					v.y = ty
+					collided = true
+				end
+			end
+
+			if collided then
+				v.slopeangle = angle
+				v.slopeleft = sleft
+				v.sloperight = sright
+
+				hadvercollision = true
+				if not t.UPSIDEDOWNSLOPE then
+					if (t.PLATFORMDOWN and (not t.PLATFORM)) or t.NOEXTERNALVERCOLLISIONS then
+					elseif v.floorcollide then
+						if v:floorcollide(h, t, dt) ~= false then
+							if v.postfloorcollide then
+								v:postfloorcollide(h, t, dt)
+							end
+							if v.speedy > 0 then
+								v.speedy = 0
+							end
+						end
+					else
+						if v.speedy > 0 then
+							v.speedy = 0
+						end
+					end
+				else
+					if (t.PLATFORM and (not t.PLATFORMDOWN)) or t.NOEXTERNALVERCOLLISIONS then
+						return false
+					elseif v.ceilcollide then
+						if v:ceilcollide(h, t) ~= false then
+							if t.postceilcollide then
+								t:postceilcollide(h, t)
+							end
+							if v.speedy < 0 then
+								v.speedy = 0
+							end
+							return true
+						end
+					else
+						if v.speedy < 0 then
+							v.speedy = 0
+						end
+					end
+				end
+			end
 		elseif aabb(v.x + v.speedx*dt, v.y + v.speedy*dt, v.width, v.height, t.x, t.y, t.width, t.height) then
-			if aabb(v.x + v.speedx*dt, v.y, v.width, v.height, t.x, t.y, t.width, t.height) then --Collision is horizontal!
+			--flat side collision
+			local boundingy      = t.y+math.min(t.y1,t.y2)
+			local boundingheight = 1-math.min(t.y1,t.y2)
+			local lefty = t.y+t.y1
+			local leftheight = 1-t.y1
+			local righty = t.y+t.y2
+			local rightheight = 1-t.y2
+			if t.UPSIDEDOWNSLOPE then
+				boundingy = t.y
+				boundingheight = math.max(t.y1,t.y2)
+				lefty = t.y
+				leftheight = t.y1
+				righty = t.y
+				rightheight = t.y2
+			end
+			if sright and v.speedx > 0 and aabb(v.x + v.speedx*dt, v.y, v.width, v.height, t.x, lefty, t.width, leftheight) and not aabb(v.x, v.y, v.width, v.height, t.x, lefty, t.width, leftheight) then --Collision is horizontal!
 				if horcollision(v, t, h, g, j, i, dt) then
 					hadhorcollision = true
 				end
-				
-			elseif aabb(v.x, v.y+v.speedy*dt, v.width, v.height, t.x, t.y, t.width, t.height) then --Collision is vertical!
+			elseif sleft and v.speedx < 0 and aabb(v.x + v.speedx*dt, v.y, v.width, v.height, t.x, righty, t.width, rightheight) and not aabb(v.x, v.y, v.width, v.height, t.x, righty, t.width, rightheight) then --Collision is horizontal!
+				if horcollision(v, t, h, g, j, i, dt) then
+					hadhorcollision = true
+				end
+			elseif v.speedy > 0 and aabb(v.x, v.y+v.speedy*dt, v.width, v.height, t.x, boundingy, t.width, boundingheight) and ((t.UPSIDEDOWNSLOPE and v.y+v.height <= t.y) or not inslantrange) then --Collision is vertical!
 				if vercollision(v, t, h, g, j, i, dt) then
 					hadvercollision = true
 				end
-				
-			else 
-				--We're fucked, it's a diagonal collision! run!
-				--Okay actually let's take this slow okay. Let's just see if we're moving faster horizontally than vertically, aight?
-				local grav = yacceleration
-				if self and self.gravity then
-					grav = self.gravity
-				end
-				if math.abs(v.speedy-grav*dt) < math.abs(v.speedx) then
-					--vertical collision it is.
-					if vercollision(v, t, h, g, j, i, dt) then
-						hadvercollision = true
-					end
-				else 
-					--okay so we're moving mainly vertically, so let's just pretend it was a horizontal collision? aight cool.
-					if horcollision(v, t, h, g, j, i, dt) then
-						hadhorcollision = true
-					end
+			elseif v.speedy < 0 and aabb(v.x, v.y+v.speedy*dt, v.width, v.height, t.x, boundingy, t.width, boundingheight) and v.y > t.y+t.height and ((not t.UPSIDEDOWNSLOPE) or (not inslantrange)) then --Collision is vertical!
+				if vercollision(v, t, h, g, j, i, dt) then
+					hadvercollision = true
 				end
 			end
+			--TODO: Diagonal collisions
 		end
-	end
+	--end
 	
 	return hadhorcollision, hadvercollision
 end
@@ -591,6 +752,7 @@ function vercollision(v, t, h, g, j, i, dt)
 				t.speedy = 0
 			end
 		end
+
 		if (t.PLATFORMDOWN and (not t.PLATFORM)) or t.NOEXTERNALVERCOLLISIONS then
 			return false
 		elseif v.floorcollide then
@@ -617,6 +779,32 @@ end
 
 function aabb(ax, ay, awidth, aheight, bx, by, bwidth, bheight)
 	return ax+awidth > bx and ax < bx+bwidth and ay+aheight > by and ay < by+bheight
+end
+
+function rotatepoint(x,y,a)
+	return (x*math.cos(a)-y*math.sin(a)), (x*math.sin(a)+y*math.cos(a))
+end
+function insideslope(x,y,w,h, sx1,sy1,sx2,sy2, upsidedown)
+	--check if rectangle is below or above an infinite sloped line
+	local realangle = math.atan2(-(sy1-sy2), (sx1-sx2))
+	local angle = realangle+math.pi*0.5 --find angle of slope
+	local linex, liney = rotatepoint(sx1,sy1, angle) --rotate line to create a flat level ground
+	local p = {x,y, x+w,y, x+w,y+h, x,y+h}
+	local pmin, pmax = math.huge, -math.huge
+	for pi = 1, #p, 2 do --rotate all rectangle points to match the new flat level ground
+		local px1,py1 = rotatepoint(p[pi],p[pi+1], angle)
+		pmin=math.min(pmin,px1)
+		pmax=math.max(pmax,px1)
+	end
+	--check if rectangle is below (or above) the flat level ground
+	if upsidedown then
+		return pmin < linex, linex-pmin, realangle
+	else
+		return pmax > linex, pmax-linex, realangle --inside?, diff, angle of slope
+	end
+end
+function getslopey(location, y1, y2)
+	return y1+((y2-y1)*location)
 end
 
 function checkrect(x, y, width, height, list, statics, condition)

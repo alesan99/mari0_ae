@@ -26,7 +26,7 @@ entitylist = {
 	{t="koopahalf", supersize=true},
 	{t="flag"},
 	{t="koopared", spawnable=true, offset=13, block=true, supersize=true},
-	{t="kooparedhalf"},
+	{t="kooparedhalf", supersize=true},
 	{t="vine", block=true},
 	{t="hammerbro", spawnable=true, block=true},
 	{t="cheepred", spawnable=true, supersize=true},
@@ -89,7 +89,7 @@ entitylist = {
 	{t="whitegelleft"},
 	{t="timer"},
 	{t="beetle", spawnable=true, offset=76, block=true, supersize=true},
-	{t="beetlehalf"},
+	{t="beetlehalf", supersize=true},
 	{t="kooparedflying", spawnable=true, supersize=true},
 	{t="koopaflying", spawnable=true, supersize=true},
 	{t="castlefireccw", name="firebar"},
@@ -112,7 +112,7 @@ entitylist = {
 	{t="flyingfishend"},
 	{t="upfire", name="lava bubble", spawnable=true, block=true, supersize=true},
 	{t="spikey", name="spiny", spawnable=true, offset=99, block=true, supersize=true},
-	{t="spikeyhalf"},
+	{t="spikeyhalf", supersize=true},
 	{t="checkpoint"},
 	{t="poisonmush", spawnable=true, block=true},
 	{t="downplant", spawnable=true, supersize=true},
@@ -141,13 +141,13 @@ entitylist = {
 	{t="thwomp", spawnable=true, offset=224, supersize=true},
 	{t="fishbone", spawnable=true, supersize=true},
 	{t="drybones", spawnable=true, offset=128, block=true, supersize=true},
-	{t="dryboneshalf"},
+	{t="dryboneshalf", supersize=true},
 	{t="muncher", spawnable=true, supersize=true, block=true},
 	{t="bigbeetle", name="big beetle",spawnable=true, supersize=true},
 	{t="meteorstart"},
 	{t="meteorend"},
 	{t="drygoomba", spawnable=true, offset=134, supersize=true},
-	{t="drygoombahalf"},
+	{t="drygoombahalf", supersize=true},
 	{t="dryplant", spawnable=true, supersize=true},
 	{t="drydownplant", spawnable=true, supersize=true},
 	{t="donut"},
@@ -159,7 +159,7 @@ entitylist = {
 	{t="moleground", name="mole ground", spawnable=true, block=true},
 	{t="bigmole", name="big mole", spawnable=true, supersize=true},
 	{t="bomb", spawnable=true, offset=146, block=true, supersize=true},
-	{t="bombhalf"},
+	{t="bombhalf", supersize=true},
 	{t="fireplant", spawnable=true, supersize=true},
 	{t="flipblock"},
 	{t="downfireplant", spawnable=true, supersize=true},
@@ -170,7 +170,7 @@ entitylist = {
 	{t="levelball", spawnable=true, block=true},
 	{t="leaf", spawnable=true, block=true},
 	{t="koopablue", spawnable=true, offset=157, supersize=true},
-	{t="koopabluehalf"},
+	{t="koopabluehalf", supersize=true},
 	{t="koopaflying2", name="koopaflying hor", spawnable=true, supersize=true},
 	{t="windstart"},
 	{t="windend"},
@@ -217,7 +217,7 @@ entitylist = {
 	{t="tiletool"},
 	{t="iceflower", spawnable=true, block=true},
 	{t="shyguy", spawnable=true, offset=204, block=true, supersize=true},
-	{t="shyguyhalf"},
+	{t="shyguyhalf", supersize=true},
 	{t="enemytool", name="spawner", supersize=true},
 	{t="randomizer"},
 	{t="yoshi", spawnable=true, block=true, supersize=false},
@@ -226,7 +226,7 @@ entitylist = {
 	{t="musicchanger"},
 	{t="pbutton", name="p switch", spawnable=true, block=true},
 	{t="spiketop", spawnable=true, offset=213, supersize=true},
-	{t="spiketophalf"},
+	{t="spiketophalf", supersize=true},
 	{t="pokey", spawnable=true, supersize=true},
 	{t="snowpokey", spawnable=true, supersize=true},
 	{t="fighterfly", spawnable=true, block=true, supersize=true},
@@ -249,7 +249,7 @@ entitylist = {
 	{t="pipespawndown"},
 	{t="thwimp", spawnable=true},
 	{t="drybeetle", spawnable=true, offset=236, block=true, supersize=true},
-	{t="drybeetlehalf"},
+	{t="drybeetlehalf", supersize=true},
 	{t="tinygoomba", spawnable=true, block=true},
 	{t="koopaling", spawnable=true, supersize=true},
 	{t="bigmushroom", spawnable=true, name="mega mushroom", block=true},
@@ -330,6 +330,7 @@ entitylist = {
 	{t="mole", name="mole", spawnable=true, block=true, supersize=true},
 	{t="grinder"},
 	{t="bowserjr", spawnable=true, supersize=true},
+	{t="trackswitch"},
 }
 
 --only spawnable with spawner or by enemies
@@ -719,6 +720,7 @@ entitydescriptions = {
 	"place on empty tile - monty mole", --"mole",
 	"place anywhere - grinder", --"grinder",
 	"place on empty tile - bowser jr.", --"bowserjr",
+	"place anywhere - track switch - right click for path", --"trackswitch",
 }
 
 rightclickvalues = {}
@@ -740,8 +742,6 @@ rightclickvalues["pedestal"] = {"portals", "both", "1 only", "2 only", "gel"}
 rightclickvalues["pokey"] = {"height", "default", 1, 2, 3, 4, 5, 6, 7, 8}
 rightclickvalues["snowpokey"] = {"height", "default", 1, 2, 3, 4, 5, 6, 7, 8}
 
-rightclickvalues["plusclock"] = {"time", 100, 50, 10}
-
 rightclickvalues["goombashoe"] = {"type", 1, 2}
 
 rightclickvalues["yoshi"] = {"color", 1, 2, 3, 4}
@@ -762,7 +762,7 @@ rightclicktype["text"] = {
 		"text",
 		{"input", 1, "text", 14, 50, 1, function(v) rightclickvalues2[1] = v end}, --"input", var, default, width, maxlen, height, function
 		"color",
-		{"dropdown", 2, 6, nil, {"black","blue","brown","gray","green","lime","maroon","orange","pink","purple","red","sky","white","yellow"}},
+		{"dropdown", 2, 6, nil, deepcopy(textcolorsnames)},
 		{"checkbox", 3, "outline", default = false},
 		{"checkbox", 5, "centered", default = false},
 		{"checkbox", 6, "big", default = false},
@@ -1361,6 +1361,7 @@ rightclicktype["belt"] = {
 	default = "3|3",
 	varfunc = function(v, i)
 		if i == 1 then
+			f = v -- I would have just removed all this but idk if you want to keep it or not
 			if v == "right slow" then f = 3
 			elseif v == "right fast" then f = 6
 			elseif v == "left slow" then f = -3
@@ -1439,7 +1440,16 @@ rightclicktype["timer"] = {
 	format = {
 		{"checkbox", 2, "visible"},
 		"time",
-		{"slider", 1, range = {1, 20, round = 1}},
+		{"input", 1, "1", 5, 5, 1, function(v)
+			if tonumber(v) then
+				rightclickvalues2[1] = math.max(0,v)
+			else
+				rightclickvalues2[1] = 0
+				rightclickobjects[3].value = "0"
+				rightclickobjects[3].textoffset = 0
+			end
+		end},
+		--{"slider", 1, range = {1, 20, round = 1}},
 		{"button", 2, {"link power", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}}
 	},
 }
@@ -1567,15 +1577,22 @@ rightclicktype["boxtube"] = {
 		return v
 	end,
 	maketable = function()
-		local t = {"cube","companion cube","edgeless cube"}
+		local list = {"cube","companion cube","edgeless cube"}
+		local listnames = shallowcopy(list)
 		for j, w in pairs(customenemies) do
-			table.insert(t, w)
+			if w and enemiesdata[w] and enemiesdata[w].hidden then
+				--hidden!
+			else
+				table.insert(list, w)
+				table.insert(listnames, "_ENEMY" .. w)
+			end
 		end
-		return t
+		return list, listnames
 	end,
 	objfunc = function()
-		rightclicktype["boxtube"].t = rightclicktype["boxtube"].maketable()
+		rightclicktype["boxtube"].t, rightclicktype["boxtube"].tnames = rightclicktype["boxtube"].maketable()
 		rightclickobjects[8].entries = rightclicktype["boxtube"].t
+		rightclickobjects[8].displayentries = rightclicktype["boxtube"].tnames
 		rightclickobjects[8]:updatePos()
 	end,
 	savefunc = function()
@@ -2012,7 +2029,7 @@ rightclicktype["camerastop"] = {
 		rightclickvalues2[4] = y
 	end,
 	format = {
-		{"button", 1, {"select range", function(var, step) startrcregion(var, step) end, {1, 1}}},
+		{"button", 1, {"select range", function(var, step) startrcregion(var, step) end, {1, 2}}},
 		{"checkbox", 5, "force push"},
 		{"checkbox", 6, "ignore if"},
 		"off-screen",
@@ -2066,10 +2083,29 @@ rightclicktype["track"] = {
 		rightclickvalues2[1] = s
 	end,
 	format = {
-		{"button", 1, {"lay tracks", function(var) allowdrag = false; startrctrack(var) end, {{1}}},
+		{"button", 1, {"lay tracks", function(var) allowdrag = false; startrctrack(var, m) end, {{1}}},
 		{"x", function() rightclickvalues2[1] = "0:0:c:c:d" end, {}, textcolor = {255, 0, 0}}},
 		{"checkbox", 2, "visible"},
 		{"button", 2, {"link stop ", startrclink}, {"x", resetrclink, textcolor = {255, 0, 0}}},
+	}
+}
+
+rightclicktype["trackswitch"] = {
+	name = "track switch",
+	default = "0:0:c:c:d|0:0:c:c:d|true|1",
+	trackfunc = function(s, var)
+		rightclickvalues2[var] = s
+	end,
+	format = {
+		{"button", 1, {"lay tracks #1", function(var) allowdrag = false; startrctrack(var) end, {{1}}},
+		{"x", function() rightclickvalues2[1] = "0:0:c:c:d" end, {}, textcolor = {255, 0, 0}}},
+		{"button", 2, {"lay tracks #2", function(var) allowdrag = false; startrctrack(var) end, {{2}}},
+		{"x", function() rightclickvalues2[2] = "0:0:c:c:d" end, {}, textcolor = {255, 0, 0}}},
+		{"checkbox", 3, "visible"},
+		"color",
+		{"dropdown", 4, 3, nil, {1,2,3,4}},
+		{"button", 3, {"link switch ", startrclink, {"switch", "switch"}}, {"x", resetrclink, textcolor = {255, 0, 0}}},
+		{"button", 3, {"link stop ", startrclink, {"stop", "power"}}, {"x", resetrclink, textcolor = {255, 0, 0}}},
 	}
 }
 
@@ -2193,6 +2229,15 @@ rightclicktype["muncher"] = {
 	default = "false",
 	format = {
 		{"checkbox", 1, "frozen"},
+	}
+}
+
+rightclicktype["plusclock"] = {
+	name = "plus clock",
+	default = "100",
+	format = {
+		"time:",
+		{"slider", 1, range = {10, 300, step = 10}},
 	}
 }
 

@@ -147,8 +147,9 @@ function cheepcheep:update(dt)
 			end
 			self.quad = sleepfishquad[1][self.frame]
 		end
-		
-		if onscreen(self.x, self.y, self.width, self.height) then
+
+		local stop = (levelfinished or levelballfinish)
+		if onscreen(self.x, self.y, self.width, self.height) and not stop then
 			for i = 1, players do --check if player is near
 				local v = objects["player"][i]
 				if inrange(v.x+v.width/2, self.x+self.width/2-3, self.x+self.width/2+3) then --no player near
@@ -198,7 +199,8 @@ function cheepcheep:update(dt)
 					closestplayer = i
 				end
 			end
-			if dist > stopchasingdistance or (levelfinished or levelballfinish) then
+			local stop = (levelfinished or levelballfinish)
+			if dist > stopchasingdistance or stop then
 				--go back to sleep if player is too far
 				self.sleeping = true
 				self.bubbletimer = 0

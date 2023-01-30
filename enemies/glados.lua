@@ -113,7 +113,7 @@ function glados:update(dt)
 	elseif self.dead then
 		neurotoxin = false
 		self.explodetimer = self.explodetimer + dt
-		earthquake = 20
+		earthquake = 12
 		if self.explodetimer > 4 then
 			nextlevel()
 			return true--EXPLODE

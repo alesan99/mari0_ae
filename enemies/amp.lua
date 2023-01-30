@@ -50,6 +50,7 @@ function amp:init(x, y, r)
 	
 	--IMAGE STUFF
 	self.drawable = true
+	self.rotation = 0
 	
 	self.animationtimer = 0
 	self.movetimer = 0
@@ -77,6 +78,7 @@ function amp:init(x, y, r)
 		self.shot = false
 		self.freezable = true
 		self.stompbounce = true
+		self.portalable = true
 
 		self.trackgravity = 28
 		self.animationtime = 0.1
@@ -100,6 +102,7 @@ function amp:init(x, y, r)
 		self.animationtime = 0.1
 		self.shotted = nil
 		self.resistsyoshitounge = true
+		self.light = 3
 	end
 	self.resistsshoe = true
 	self.clearpipespeed = 0
@@ -108,7 +111,6 @@ function amp:init(x, y, r)
 
 	self.falling = false
 	self.timer = 0
-	self.light = 3
 
 	self.trackable = true
 	self.track = false

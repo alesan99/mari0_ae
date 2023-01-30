@@ -27,6 +27,11 @@ function seesawplatform:init(x, y, size, callback, side)
 		end
 	end
 	
+	--jump through bottom when mario maker physics are enabled
+	if mariomakerphysics then
+		self.PLATFORM = true
+	end
+	
 	--IMAGE STUFF
 	self.drawable = false
 	
