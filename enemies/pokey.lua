@@ -357,8 +357,14 @@ function pokey:passivecollide(a, b)
 	if b.PLATFORM then
 		return false
 	end
-	if a == "pokey" and b.head == self.head then
-		return true
+	--Telepot to top of pokey body if clipping
+	if a == "pokey" and ((b.head == self.head) or ((not self.bodypart) and self == b.head)) then
+		if self.y < b.y and ((not self.bodypart) or (b.i < self.i)) then
+			self.y = b.y-self.height-0.06 --sloppy fix for weird clipping teleporting with slopes, should redo pokeys instead
+			return true
+		else
+			return false
+		end
 	end
 	self:leftcollide(a, b)
 	return false
