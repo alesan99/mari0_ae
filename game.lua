@@ -2309,12 +2309,24 @@ function game_draw()
 				for j, k in pairs(v) do
 					if k.width then
 						if xscroll >= k.x-width and k.x+k.width > xscroll then
-							if k.active then
+							if k.active and not k.red then
 								love.graphics.setColor(255, 255, 255)
 							else
 								love.graphics.setColor(255, 0, 0)
 							end
-							if k.width <= 1/16 then
+							
+							if k.SLOPE then
+								local points = {0,k.y1, 1,k.y2, 1,1.05, 0,1.05}
+								if k.UPSIDEDOWNSLOPE then
+									points[5], points[6] = 1,-0.05
+									points[7], points[8] = 0,-0.05
+								end
+								for i = 1, #points, 2 do
+									points[i] = math.floor((points[i]+k.x-xscroll)*16*scale)+.5
+									points[i+1] = math.floor((points[i+1]+k.y-yscroll-.5)*16*scale)+.5
+								end
+								love.graphics.polygon("line", unpack(points))
+							elseif k.width <= 1/16 then
 								love.graphics.rectangle("fill", math.floor((k.x-xscroll)*16*scale), math.floor((k.y-yscroll-.5)*16*scale), k.width*16*scale, k.height*16*scale)
 							elseif incognito then
 								love.graphics.rectangle("fill", math.floor((k.x-xscroll)*16*scale)+.5, math.floor((k.y-yscroll-.5)*16*scale)+.5, k.width*16*scale-1, k.height*16*scale-1)
@@ -5805,7 +5817,7 @@ function getTile(x, y, portalable, portalcheck, facing, ignoregrates, dir) --ret
 		end
 	end
 
-	if objects["tile"][tilemap(x, y)] and (objects["tile"][tilemap(x, y)].slant or objects["tile"][tilemap(x, y)].slab) then
+	if objects["tile"][tilemap(x, y)] and (objects["tile"][tilemap(x, y)].slant or objects["tile"][tilemap(x, y)].slab) and ismaptile(x,y) then
 		if portalcheck then
 			return false, map[x][y][1]
 		else
