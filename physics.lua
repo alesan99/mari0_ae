@@ -241,7 +241,7 @@ function physicsupdate(dt)
 					local fx = v.x + v.speedx*dt --future x
 					local fy = v.y + v.speedy*dt --future x
 					local stucktoslope = false
-					if (not v.activestatic) and v.mask[2] ~= true and v.speedy >= 0 and math.abs(v.speedx) > 0.0001 and horcollision == false then
+					if (not v.activestatic) and v.mask[2] ~= true and ((not v.gravity) or v.gravity > 0) and v.speedy >= 0 and math.abs(v.speedx) > 0.0001 and horcollision == false then
 						local leftedge = v.x
 						local rightedge = v.x+v.width
 						local fleftedge = fx
@@ -290,6 +290,7 @@ function physicsupdate(dt)
 								local t = objects["tile"][tilemap(x,y)]
 								if t and t.SLOPE then
 									local tq = tilequads[map[x][y][1] ]
+									local angle, realangle = getslopeangle(0,t.y1,1,t.y2)
 									local location, flocation
 									if tq.leftslant then
 										location = rightedge-t.x
@@ -307,24 +308,24 @@ function physicsupdate(dt)
 									local rangey = targety2-currentground --make sure it only sticks if reasonably close to slope
 									if v.y+v.height >= currentground-rangey-0.00001 then
 										stucktoslope = targety-v.height
+										v.slopeangle = realangle
 									end
 								end
 							end
 						end
 						if stucktoslope then
-							v.slopeangle = true
-							v.falling = false --TODO: Fix not falling after falling off slope
+							v.speedy = 0
 						end
 					end
 					
 					--Move the object
 					if vercollision == false and not v.activestatic then
 						v.y = v.y + v.speedy*dt
-						if not stucktoslope then
+						--if not stucktoslope then
 							if v.gravity then
 								if v.startfall then
 									if v.gravitydir then
-										if (v.gravitydir == "down" and v.speedy == v.gravity*dt) or (v.gravitydir == "up" and v.speedy == -v.gravity*dt) then
+										if (v.gravitydir == "down" and (v.speedy == v.gravity*dt or v.y == v.y+v.gravity*dt)) or (v.gravitydir == "up" and v.speedy == -v.gravity*dt) then
 											v:startfall(i)
 										end
 									elseif v.speedy == v.gravity*dt then
@@ -336,11 +337,20 @@ function physicsupdate(dt)
 									v:startfall(i)
 								end
 							end
-						end
+						--end
 					end
 					
 					if horcollision == false and not v.activestatic then
-						v.x = v.x + v.speedx*dt
+						if v.slopeangle then
+							rotspeedx, _ = rotatepoint(v.speedx, 0, -v.slopeangle-math.pi)
+							v.x = v.x + rotspeedx*dt
+							if v.slopeposty then
+								v.y = v.slopeposty
+							end
+						else
+							v.x = v.x + v.speedx*dt
+						end
+						
 						if stucktoslope then
 							v.y = stucktoslope
 						end
@@ -468,11 +478,10 @@ function checkcollisionslope(v, t, h, g, j, i, dt, passed) --v: b1table | t: b2t
 			inslopedirection = (diffy >= 0)
 		end
 		
+		EPSILON=1e-14
 		--TODO: Fix platform property for slopes (important for phantom collisions with right slope next to left slope)
-		if not passed and aabb(v.x, v.y, v.width, v.height, t.x, t.y, t.width, t.height) and inslopedirection and finside then 
+		if not passed and aabb(v.x, v.y, v.width, v.height, t.x, t.y, t.width, t.height) and finside then 
 			--sloped side collision
-			--v.x = v.x + v.speedx*dt + math.sin(angle)*diff
-			--v.y = v.y + v.speedy*dt + math.cos(angle)*diff
 			local location = v.x-t.x
 			if sleft then
 				location = v.x+v.width-t.x
@@ -482,22 +491,34 @@ function checkcollisionslope(v, t, h, g, j, i, dt, passed) --v: b1table | t: b2t
 			local collided = false
 			if not t.UPSIDEDOWNSLOPE then
 				if ty-v.height < v.y+v.speedy*dt then
-					v.y = ty - v.height
-					collided = true
+					v.y = ty - v.height; collided = true
 				end
 			else
 				if ty > v.y+v.speedy*dt then
-					v.y = ty
-					collided = true
+					v.y = ty; collided = true
 				end
 			end
-
 			if collided then
 				v.slopeangle = angle
-				v.slopeleft = sleft
-				v.sloperight = sright
+
+				--Object has just been pushed out of the slope vertically, but will need to be pushed vertically again later after it moves
+				--Unfortunately needed for slopes to work with fast objects at low framerates
+				local rotspeedx, _ = rotatepoint(v.speedx, 0, -v.slopeangle-math.pi)
+				local postx = v.x+rotspeedx*dt
+				local postlocation = postx-t.x
+				if sleft then
+					postlocation = postx+v.width-t.x
+				end
+				postlocation = math.max(0, math.min(1, postlocation))
+				local postty = t.y+getslopey(postlocation, t.y1, t.y2) --, v.y+v.speedy*dt)
+				if not t.UPSIDEDOWNSLOPE then
+					v.slopeposty = postty-v.height
+				else
+					v.slopeposty = postty
+				end
 
 				hadvercollision = true
+				
 				if not t.UPSIDEDOWNSLOPE then
 					if (t.PLATFORMDOWN and (not t.PLATFORM)) or t.NOEXTERNALVERCOLLISIONS then
 					elseif v.floorcollide then
@@ -560,6 +581,9 @@ function checkcollisionslope(v, t, h, g, j, i, dt, passed) --v: b1table | t: b2t
 				end
 			elseif v.speedy > 0 and aabb(v.x, v.y+v.speedy*dt, v.width, v.height, t.x, boundingy, t.width, boundingheight) and ((t.UPSIDEDOWNSLOPE and v.y+v.height <= t.y) or not inslantrange) then --Collision is vertical!
 				if vercollision(v, t, h, g, j, i, dt) then
+					if v.y ~= math.floor(v.y) then
+						v.y = boundingy-v.height
+					end
 					hadvercollision = true
 				end
 			elseif v.speedy < 0 and aabb(v.x, v.y+v.speedy*dt, v.width, v.height, t.x, boundingy, t.width, boundingheight) and v.y > t.y+t.height and ((not t.UPSIDEDOWNSLOPE) or (not inslantrange)) then --Collision is vertical!
@@ -784,10 +808,17 @@ end
 function rotatepoint(x,y,a)
 	return (x*math.cos(a)-y*math.sin(a)), (x*math.sin(a)+y*math.cos(a))
 end
-function insideslope(x,y,w,h, sx1,sy1,sx2,sy2, upsidedown)
-	--check if rectangle is below or above an infinite sloped line
+function getslopeangle(sx1,sy1,sx2,sy2)
 	local realangle = math.atan2(-(sy1-sy2), (sx1-sx2))
 	local angle = realangle+math.pi*0.5 --find angle of slope
+	return angle, realangle
+end
+function getslopey(location, y1, y2)
+	return y1+((y2-y1)*location)
+end
+function insideslope(x,y,w,h, sx1,sy1,sx2,sy2, upsidedown)
+	--check if rectangle is below or above an infinite sloped line
+	local angle, realangle = getslopeangle(sx1,sy1,sx2,sy2)
 	local linex, liney = rotatepoint(sx1,sy1, angle) --rotate line to create a flat level ground
 	local p = {x,y, x+w,y, x+w,y+h, x,y+h}
 	local pmin, pmax = math.huge, -math.huge
@@ -802,9 +833,6 @@ function insideslope(x,y,w,h, sx1,sy1,sx2,sy2, upsidedown)
 	else
 		return pmax > linex, pmax-linex, realangle --inside?, diff, angle of slope
 	end
-end
-function getslopey(location, y1, y2)
-	return y1+((y2-y1)*location)
 end
 
 function checkrect(x, y, width, height, list, statics, condition)

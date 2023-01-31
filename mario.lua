@@ -6318,33 +6318,35 @@ function mario:ceilcollide(a, b)
 			end
 			
 			--Check if it should bounce the block next to it, or push mario instead (Hello, devin hitch!)
-			if self.x < x-22/16 and self.gravitydir ~= "up" and self.size ~= 8 and self.size ~= 16 then
-				--check if block left of it is a better fit
-				if x > 1 and tilequads[map[x-1][y][1]].collision == true then
-					x = x - 1
-				else
-					local col = checkrect(x-28/16, self.y, self.width, self.height, {"exclude", self}, true, "ignoreplatforms")
-					if #col == 0 then
-						self.x = x-28/16
-						if self.speedx > 0 then
-							self.speedx = 0
-						end
-						return false
-					end					
-				end
-			elseif self.x > x-6/16 and self.gravitydir ~= "up" and self.size ~= 8 and self.size ~= 16 then
-				--check if block right of it is a better fit
-				if x < mapwidth and tilequads[map[x+1][y][1]].collision == true then
-					x = x + 1
-				else
-					local col = checkrect(x, self.y, self.width, self.height, {"exclude", self}, true, "ignoreplatforms")
-					if #col == 0 then
-						self.x = x
-						if self.speedx < 0 then
-							self.speedx = 0
-						end
-						return false
-					end	
+			if self.gravitydir ~= "up" and self.size ~= 8 and self.size ~= 16 and not b.UPSIDEDOWNSLOPE then
+				if self.x < x-22/16 then
+					--check if block left of it is a better fit
+					if x > 1 and tilequads[map[x-1][y][1]].collision == true then
+						x = x - 1
+					else
+						local col = checkrect(x-28/16, self.y, self.width, self.height, {"exclude", self}, true, "ignoreplatforms")
+						if #col == 0 then
+							self.x = x-28/16
+							if self.speedx > 0 then
+								self.speedx = 0
+							end
+							return false
+						end					
+					end
+				elseif self.x > x-6/16 then
+					--check if block right of it is a better fit
+					if x < mapwidth and tilequads[map[x+1][y][1]].collision == true then
+						x = x + 1
+					else
+						local col = checkrect(x, self.y, self.width, self.height, {"exclude", self}, true, "ignoreplatforms")
+						if #col == 0 then
+							self.x = x
+							if self.speedx < 0 then
+								self.speedx = 0
+							end
+							return false
+						end	
+					end
 				end
 			end
 		end
