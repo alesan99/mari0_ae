@@ -285,12 +285,13 @@ function physicsupdate(dt)
 								stick = true
 							end
 						end
+						local t
 						if x then --try to stick
 							if ismaptile(x, y) then
-								local t = objects["tile"][tilemap(x,y)]
+								t = objects["tile"][tilemap(x,y)]
 								if t and t.SLOPE then
 									local tq = tilequads[map[x][y][1] ]
-									local angle, realangle = getslopeangle(0,t.y1,1,t.y2)
+									local inside, diff, angle, realangle = insideslope(v.x,v.y,v.width,v.height, t.x,t.y+t.y1,t.x+t.width,t.y+t.y2, t.UPSIDEDOWNSLOPE)
 									local location, flocation
 									if tq.leftslant then
 										location = rightedge-t.x
@@ -306,14 +307,24 @@ function physicsupdate(dt)
 									local targety2 = t.y+getslopey(flocation2, t.y1, t.y2)
 									local currentground = (t.y+getslopey(location, t.y1, t.y2))
 									local rangey = targety2-currentground --make sure it only sticks if reasonably close to slope
-									if v.y+v.height >= currentground-rangey-0.00001 then
+									local platformpass = true
+									local onlyplatform = (t.PLATFORM == true and t.PLATFORMDOWN == nil and t.PLATFORMLEFT == nil and t.PLATFORMRIGHT == nil)
+									if onlyplatform and not (diff <= 1e-1) then
+										platformpass = false
+										print("ugh")
+									end
+									if v.y+v.height >= currentground-rangey-0.00001 and platformpass then
 										stucktoslope = targety-v.height
 										v.slopeangle = realangle
+										--print("hello?", angle, realangle)
 									end
 								end
 							end
 						end
 						if stucktoslope then
+							if v.floorcollide then
+								v:floorcollide("tile", t, dt)
+							end
 							v.speedy = 0
 						end
 					end
@@ -347,6 +358,7 @@ function physicsupdate(dt)
 							if v.slopeposty then
 								v.y = v.slopeposty
 							end
+							--print("slowed",rotspeedx)
 						else
 							v.x = v.x + v.speedx*dt
 						end
@@ -452,8 +464,10 @@ function checkcollisionslope(v, t, h, g, j, i, dt, passed) --v: b1table | t: b2t
 	local hadvercollision = false
 	
 	--if math.abs(v.x-t.x) < math.max(v.width, t.width)+1 and math.abs(v.y-t.y) < math.max(v.height, t.height)+1 then
-		local inside, diff, angle = insideslope(v.x,v.y,v.width,v.height, t.x,t.y+t.y1,t.x+t.width,t.y+t.y2, t.UPSIDEDOWNSLOPE)
-		local finside, fdiff, fangle = insideslope(v.x + v.speedx*dt,v.y + v.speedy*dt,v.width,v.height, t.x,t.y+t.y1,t.x+t.width,t.y+t.y2, t.UPSIDEDOWNSLOPE)
+		local insideaabb = aabb(v.x, v.y, v.width, v.height, t.x, t.y, t.width, t.height)
+		local finsideaabb = aabb(v.x+v.speedx*dt, v.y+v.speedy*dt, v.width, v.height, t.x, t.y, t.width, t.height)
+		local inside, diff, angle, realangle = insideslope(v.x,v.y,v.width,v.height, t.x,t.y+t.y1,t.x+t.width,t.y+t.y2, t.UPSIDEDOWNSLOPE)
+		local finside, fdiff, fangle, frealangle = insideslope(v.x + v.speedx*dt,v.y + v.speedy*dt,v.width,v.height, t.x,t.y+t.y1,t.x+t.width,t.y+t.y2, t.UPSIDEDOWNSLOPE)
 		local sright, sleft = t.slant == "right", t.slant == "left"
 		--is it on the slope part of the block?
 		local inslantrange = false
@@ -467,8 +481,8 @@ function checkcollisionslope(v, t, h, g, j, i, dt, passed) --v: b1table | t: b2t
 			end
 		end
 		--is it going in a direction that should intersect with the slope?
-		local rotx, roty = rotatepoint(v.x, v.y, angle)
-		local rotfx, rotfy = rotatepoint(v.x+v.speedx*dt, v.y+v.speedy*dt, angle)
+		local rotx, roty = rotatepoint(v.x, v.y, realangle)
+		local rotfx, rotfy = rotatepoint(v.x+v.speedx*dt, v.y+v.speedy*dt, realangle)
 		local diffy = rotfy-roty
 		--Check if movement ray intersects slope line
 		local inslopedirection = false
@@ -477,10 +491,21 @@ function checkcollisionslope(v, t, h, g, j, i, dt, passed) --v: b1table | t: b2t
 		else
 			inslopedirection = (diffy >= 0)
 		end
+
+		--TODO: Fix flat side collision with upside-down slopes
+		--TODO: Fix really fast collisions being ignored
+
+		--TODO: Add a better way to tell if the tile was intentionally set to be an UPPLATFORM
+		--Currently it gets confusing because slopes automatically become PLATFORMS if they are adjacent to other slopes
+		--There are times where a slope SHOUDLN't have its collision disabled (upside down slope over regular tile etc.)
+		local onlyplatform = (t.PLATFORM == true and t.PLATFORMDOWN == nil and t.PLATFORMLEFT == nil and t.PLATFORMRIGHT == nil)
+		local platformpass = true
+		if onlyplatform and not inslantrange then
+			platformpass = false
+		end
 		
-		EPSILON=1e-14
-		--TODO: Fix platform property for slopes (important for phantom collisions with right slope next to left slope)
-		if not passed and aabb(v.x, v.y, v.width, v.height, t.x, t.y, t.width, t.height) and finside then 
+		if not passed and inslopedirection and ((insideaabb or finsideaabb) and finside) and (diff <= 1e-1 or (not insideaabb)) and platformpass then --(diff <= 1e-1 or (not insideaabb))
+			
 			--sloped side collision
 			local location = v.x-t.x
 			if sleft then
@@ -499,7 +524,7 @@ function checkcollisionslope(v, t, h, g, j, i, dt, passed) --v: b1table | t: b2t
 				end
 			end
 			if collided then
-				v.slopeangle = angle
+				v.slopeangle = realangle
 
 				--Object has just been pushed out of the slope vertically, but will need to be pushed vertically again later after it moves
 				--Unfortunately needed for slopes to work with fast objects at low framerates
@@ -571,22 +596,70 @@ function checkcollisionslope(v, t, h, g, j, i, dt, passed) --v: b1table | t: b2t
 				righty = t.y
 				rightheight = t.y2
 			end
-			if sright and v.speedx > 0 and aabb(v.x + v.speedx*dt, v.y, v.width, v.height, t.x, lefty, t.width, leftheight) and not aabb(v.x, v.y, v.width, v.height, t.x, lefty, t.width, leftheight) then --Collision is horizontal!
-				if horcollision(v, t, h, g, j, i, dt) then
-					hadhorcollision = true
-				end
-			elseif sleft and v.speedx < 0 and aabb(v.x + v.speedx*dt, v.y, v.width, v.height, t.x, righty, t.width, rightheight) and not aabb(v.x, v.y, v.width, v.height, t.x, righty, t.width, rightheight) then --Collision is horizontal!
-				if horcollision(v, t, h, g, j, i, dt) then
-					hadhorcollision = true
-				end
-			elseif v.speedy > 0 and aabb(v.x, v.y+v.speedy*dt, v.width, v.height, t.x, boundingy, t.width, boundingheight) and ((t.UPSIDEDOWNSLOPE and v.y+v.height <= t.y) or not inslantrange) then --Collision is vertical!
-				if vercollision(v, t, h, g, j, i, dt) then
-					if v.y ~= math.floor(v.y) then
-						v.y = boundingy-v.height
+			local i01 = aabb(v.x+v.speedx*dt, v.y+v.speedy*dt, v.width, v.height, t.x, boundingy, t.width, boundingheight)
+
+			local i11 = aabb(v.x + v.speedx*dt, v.y, v.width, v.height, t.x, lefty, t.width, leftheight)
+			local i12 = not aabb(v.x, v.y, v.width, v.height, t.x, lefty, t.width, leftheight)
+
+			local i21 = aabb(v.x + v.speedx*dt, v.y, v.width, v.height, t.x, righty, t.width, rightheight)
+			local i22 = not aabb(v.x, v.y, v.width, v.height, t.x, righty, t.width, rightheight)
+
+			local i31 = aabb(v.x, v.y+v.speedy*dt, v.width, v.height, t.x, boundingy, t.width, boundingheight)
+			--local i32 = 
+			
+			local i41 = aabb(v.x, v.y+v.speedy*dt, v.width, v.height, t.x, boundingy, t.width, boundingheight)
+			--local i42 = 
+
+			--[[if not t.UPSIDEDOWNSLOPE then
+				if v.speedx > 0 and v.speedy > 0 then
+					if (not i11) and (not i31) and i01 then
+						if math.abs(v.speedx) > math.abs(v.speedy) then
+							i11 = true
+						else
+							i31 = true
+						end
 					end
+				elseif v.speedx > 0 and v.speedy < 0 then
+					if (not i11) and (not i41) and i01 then
+						if math.abs(v.speedx) > math.abs(v.speedy) then
+							i11 = true
+						else
+							i41 = true
+						end
+					end
+				elseif v.speedx < 0 and v.speedy > 0 then
+					if (not i21) and (not i31) and i01 then
+						if math.abs(v.speedx) > math.abs(v.speedy) then
+							i21 = true
+						else
+							i31 = true
+						end
+					end
+
+				elseif v.speedx < 0 and v.speedy < 0 then
+					if (not i21) and (not i41) and i01 then
+						if math.abs(v.speedx) > math.abs(v.speedy) then
+							i21 = true
+						else
+							i41 = true
+						end
+					end
+				end
+			end]]
+
+			if sright and v.speedx > 0 and i11 and i12 then --Collision is horizontal!
+				if horcollision(v, t, h, g, j, i, dt) then
+					hadhorcollision = true
+				end
+			elseif sleft and v.speedx < 0 and i21 and i22 then --Collision is horizontal!
+				if horcollision(v, t, h, g, j, i, dt) then
+					hadhorcollision = true
+				end
+			elseif v.speedy > 0 and i31 and ((t.UPSIDEDOWNSLOPE and v.y+v.height <= t.y) or not inslantrange) then --Collision is vertical!
+				if (not onlyplatform) and vercollision(v, t, h, g, j, i, dt) then
 					hadvercollision = true
 				end
-			elseif v.speedy < 0 and aabb(v.x, v.y+v.speedy*dt, v.width, v.height, t.x, boundingy, t.width, boundingheight) and v.y > t.y+t.height and ((not t.UPSIDEDOWNSLOPE) or (not inslantrange)) then --Collision is vertical!
+			elseif v.speedy < 0 and i41 and v.y > t.y+t.height and ((not t.UPSIDEDOWNSLOPE) or (not inslantrange)) then --Collision is vertical!
 				if vercollision(v, t, h, g, j, i, dt) then
 					hadvercollision = true
 				end
@@ -829,9 +902,9 @@ function insideslope(x,y,w,h, sx1,sy1,sx2,sy2, upsidedown)
 	end
 	--check if rectangle is below (or above) the flat level ground
 	if upsidedown then
-		return pmin < linex, linex-pmin, realangle
+		return pmin < linex, linex-pmin, angle, realangle
 	else
-		return pmax > linex, pmax-linex, realangle --inside?, diff, angle of slope
+		return pmax > linex, pmax-linex, angle, realangle --inside?, diff, angle of slope
 	end
 end
 
