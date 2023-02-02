@@ -331,9 +331,6 @@ function mario:init(x, y, i, animation, size, t, properties)
 	self.upkeytimer = 0
 	self.downkeytimer = 0
 	
-	--SLANTS/SLOPES
-	self.onslant = false
-	
 	self.mazevar = 0
 
 	self.light  = 3.5
@@ -1976,19 +1973,6 @@ function mario:update(dt)
 		end
 	end
 
-	--slant timer
-	if self.onslant then
-		self.onslanttimer = self.onslanttimer - dt
-		if self.onslanttimer < 0 then
-			self.onslant = false
-			if self.speedy > 0 then
-				self:startfall()
-				self.animationstate = "falling"
-				self:setquad()
-			end
-		end
-	end
-
 	--coins
 	if not editormode then
 		if (self.size == 8 or self.size == 16) or bigmario then --collect coins as huge mario
@@ -2848,7 +2832,7 @@ function mario:movement(dt)
 			end
 		end
 	else
-		if self.animationstate == "running" or self.onslant then
+		if self.animationstate == "running" then
 			self:runanimation(dt)
 		elseif self.animationstate == "floating" and self.float then
 			self.floatanimationprogress = self.floatanimationprogress + (math.abs(10)+4)/5*dt*self.characterdata.runanimationspeed
@@ -3698,7 +3682,7 @@ function mario:jump(force)
 					self.speedy = -30
 				end]]
 				
-				if (((self.animation ~= "grow1" and self.animation ~= "grow2") or self.falling) and (self.falling == false or self.animation == "grow1" or self.animation == "grow2")) or self.onslant
+				if (((self.animation ~= "grow1" and self.animation ~= "grow2") or self.falling) and (self.falling == false or self.animation == "grow1" or self.animation == "grow2"))
 					or ((self.characterdata.doublejump or self.characterdata.dbljmppls) and (not self.hasdoublejumped)) then
 					if self.animation ~= "grow1" and self.animation ~= "grow2" and (not self.characterdata.nojumpsound) then
 						if self.size == 1 then
@@ -3719,7 +3703,6 @@ function mario:jump(force)
 
 					self.falloverride = false
 					self.falloverridestrict = false
-					self.onslant = false
 					
 					local jumpforce, jumpforceadd = self.characterdata.jumpforce, self.characterdata.jumpforceadd
 					if currentphysics == 7 then -- portal physics; jump one block
@@ -3875,7 +3858,7 @@ function mario:wag() --raccoon
 	if self.controlsenabled then
 		if (self.size == 6 or self.size == 9 or self.size == 11) then
 			if not self.water and (not self.noteblock) and (not self.noteblock2) and
-				not self.statue and not self.onslant and not self.fence and not self.vine and not self.spring and not self.groundpounding then
+				not self.statue and not self.fence and not self.vine and not self.spring and not self.groundpounding then
 				if self.falling and self.speedy >= 0 then
 					self.float = true
 					self.floattimer = 0
@@ -4622,25 +4605,6 @@ function mario:floorcollide(a, b)
 		end
 	end
 	
-	--slants/slopes
-	local onslant = (a == "pixeltile")
-	if onslant then
-		self.onslant = b.dir
-		self.onslantstep = b.step
-		self.onslanttimer = 0.16
-		--[[if b.dir == "right" then
-			if self.x+self.width > b.x+b.y then
-				self.y = self.y - b.step
-			end
-		else
-			if self.x < b.x then
-				self.y = self.y - b.step
-			end
-		end]]
-	else
-		self.onslant = false
-	end
-	
 	--star logic
 	if self.starred or bigmario or self.statue then
 		if self:starcollide(a, b) then
@@ -5349,28 +5313,6 @@ function mario:rightcollide(a, b, passive)
 		return false
 	elseif (a == "plantfire" or a == "brofireball" or a == "castlefirefire" or a == "fire") and self.size == 4 and self.ducking then
 		return false
-	elseif a == "pixeltile" then
-		if b.dir == "left" and self.y < b.y then
-			if b.step ~= 0 then
-				self.y = self.y - b.step
-			end
-			if not self.jumping then
-				self.falling = false
-				self.jumping = false
-			end
-			if b.step ~= 0 then
-				return false
-			end
-		elseif b.dir == "right" then
-			if self.onslant == "left" then
-				return false
-			else
-				local x, y = b.cox, b.coy
-				if tilequads[map[x][y][1]]:getproperty("platform", x, y) then
-					return false
-				end
-			end
-		end
 	elseif self.speedy > 2 and ((a == "goomba" and b.t ~= "spikey" and  b.t ~= "spikeyfall" and b.t ~= "spiketop" and b.t ~= "bigspikey" and b.t ~= "shyguy") or a == "bulletbill" or a == "flyingfish" or a == "lakito" or a == "hammerbro" or (a == "koopa" and b.t ~= "downspikey" and b.t ~= "spikeyshell") or a == "bigbill" or a == "cannonball" or a == "splunkin" or a == "bigkoopa" or (a == "drybones" and not b.spiked) or a == "ninji" or a == "mole"
 		or (a == "bomb" and not b.explosion) or (a == "boomboom" and b.ducking == false and b.stomped == false) or (a == "squid" and b.color == "pink") or (a == "pokey" and b.t == "snowpokey") or (a == "koopaling" and b.stompable) or a == "magikoopa" or a == "spike" or (a == "spikeball" and b.stompable) or (a == "plantcreeper" and b.dir ~= "left")) then
 		if b.stompbounce or (b.stompbounceifsmall and self.size ~= 16) then
@@ -5442,11 +5384,6 @@ function mario:rightcollide(a, b, passive)
 	elseif a == "tile" then
 		local x, y = b.cox, b.coy
 		
-		if self.onslant == "left" and self.y+self.height-2/16 <= b.y then
-			self.y = b.y-self.height
-			return false
-		end
-			
 		if map[x][y]["gels"]["left"] == 4 then
 			if ((self.gravitydir == "up" or self.gravitydir == "down") and self.speedx < 0) or self.shoe then
 			
@@ -5762,28 +5699,6 @@ function mario:leftcollide(a, b)
 		return false
 	elseif (a == "plantfire" or a == "brofireball" or a == "castlefirefire" or a == "fire") and self.size == 4 and self.ducking then
 		return false
-	elseif a == "pixeltile" then
-		if b.dir == "right" and self.y < b.y then
-			if b.step ~= 0 then
-				self.y = self.y - b.step -1/16
-			end
-			if not self.jumping then
-				self.falling = false
-				self.jumping = false
-			end
-			if b.step ~= 0 then
-				return false
-			end
-		elseif b.dir == "left" then
-			if self.onslant == "right" then
-				return false
-			else
-				local x, y = b.cox, b.coy
-				if tilequads[map[x][y][1]]:getproperty("platform", x, y) then
-					return false
-				end
-			end
-		end
 	elseif self.speedy > 2 and ((a == "goomba" and b.t ~= "spikey" and  b.t ~= "spikeyfall" and b.t ~= "spiketop" and b.t ~= "bigspikey" and b.t ~= "shyguy") or a == "bulletbill" or a == "flyingfish" or a == "lakito" or a == "hammerbro" or (a == "koopa" and b.t ~= "downspikey" and b.t ~= "spikeyshell") or a == "bigbill" or a == "cannonball" or a == "splunkin" or a == "bigkoopa" or a == "fireball" or a == "iceball" or (a == "drybones" and not b.spiked) or a == "ninji" or a == "mole" or (a == "bomb" and not b.explosion) or (a == "boomboom" and b.ducking == false and b.stomped == false)
 		or (a == "squid" and b.color == "pink") or (a == "pokey" and b.t == "snowpokey") or (a == "koopaling" and b.stompable) or a == "magikoopa" or a == "spike" or (a == "spikeball" and b.stompable) or (a == "plantcreeper" and b.dir ~= "right")) then
 		if b.stompbounce or (b.stompbounceifsmall and self.size ~= 16) then--bounce off of enemy
@@ -5846,11 +5761,6 @@ function mario:leftcollide(a, b)
 		end
 	elseif a == "tile" then
 		local x, y = b.cox, b.coy
-		
-		if self.onslant == "right" and self.y+self.height-2/16 <= b.y then
-			self.y = b.y-self.height
-			return false
-		end
 		
 		if map[x][y]["gels"]["right"] == 4 then
 			if ((self.gravitydir == "up" or self.gravitydir == "down") and self.speedx > 0) or self.shoe then
@@ -6195,14 +6105,6 @@ function mario:ceilcollide(a, b)
 				return false
 			end
 		end
-	elseif a == "pixeltile" then
-		if self.gravitydir == "down" then
-			local x, y = b.cox, b.coy
-			if tilequads[map[x][y][1]]:getproperty("platform", x, y) then
-				return false
-			end
-			playsound(blockhitsound)
-		end
 	elseif a == "flipblock" then
 		if self.helmet == "spikey" then
 			b:destroy()
@@ -6467,17 +6369,6 @@ function mario:passivecollide(a, b)
 	elseif a == "tilemoving" and b.speedy < 0 then
 		b:hit()
 		return false
-	elseif a == "pixeltile" then
-		if self.gravitydir == "down" then
-			local x, y = b.cox, b.coy
-			if tilequads[map[x][y][1]]:getproperty("platform", x, y) then
-				return true
-			elseif self.y+self.width <= b.y+b.step and b.dir == self.onslant then
-				self.y = self.y - b.step
-				return true
-			end
-			return true
-		end
 	elseif a == "box" or a == "core" then
 		if not (b.gravitydir and (b.gravitydir ~= "down" and b.gravitydir ~= "up") and self.gravitydir == b.gravitydir) then
 			if self.speedx < 0 then
@@ -7232,12 +7123,6 @@ function destroyblock(x, y, v) --v = true, "nopoints"
 	end
 	
 	local debris = tilequads[map[x][y][1]].debris
-	if objects["tile"][tilemap(x, y)] and objects["tile"][tilemap(x, y)].slant then
-		local tile = objects["tile"][tilemap(x, y)]
-		for num = 1, tile.slants do
-			objects["pixeltile"][num + tilemap(tile.cox, tile.coy)*100] = nil
-		end
-	end
 	map[x][y][1] = 1
 	objects["tile"][tilemap(x, y)] = nil
 	map[x][y][2] = nil

@@ -713,7 +713,7 @@ function game_update(dt)
 	--UPDATE OBJECTS
 	local delete
 	for i, v in pairs(objects) do
-		if i ~= "tile" and i ~= "pixeltile" and i ~= "portalwall" and i ~= "screenboundary" and i ~= "coin" and i ~= "risingwater" and i ~= "clearpipesegment" and i ~= "tracksegment" and i ~= "funnel" and i ~= "clearpipe" then
+		if i ~= "tile" and i ~= "portalwall" and i ~= "screenboundary" and i ~= "coin" and i ~= "risingwater" and i ~= "clearpipesegment" and i ~= "tracksegment" and i ~= "funnel" and i ~= "clearpipe" then
 			delete = nil
 			for j, w in pairs(v) do
 				if dropshadow and w.shot and w.rotation then
@@ -1618,7 +1618,7 @@ function game_draw()
 				w:draw()
 			end]]
 			for j, w in pairs(objects) do	
-				if j ~= "tile" and j ~= "pixeltile" then
+				if j ~= "tile" then
 					for i, v in pairs(w) do
 						if v.drawable and (not v.nodropshadow) then--and not v.drawback then
 							love.graphics.setColor(dropshadowcolor)
@@ -2041,7 +2041,7 @@ function game_draw()
 		
 		--OBJECTS
 		for j, w in pairs(objects) do	
-			if j ~= "tile" and j ~= "pixeltile" then
+			if j ~= "tile" then
 				for i, v in pairs(w) do
 					if v.drawable and not v.drawback then
 						love.graphics.setColor(255, 255, 255)
@@ -2142,7 +2142,7 @@ function game_draw()
 						w:draw()
 					end
 					for j, w in pairs(objects) do	
-						if j ~= "tile" and j ~= "pixeltile" then
+						if j ~= "tile" then
 							for i, v in pairs(w) do
 								if v.drawable and (not v.nodropshadow) then--and not v.drawback then
 									love.graphics.setColor(color)
@@ -4218,7 +4218,6 @@ function startlevel(level, reason)
 	objects["portalent"] = {}
 	objects["text"] = {}
 	objects["regiontrigger"] = {}
-	objects["pixeltile"] = {}
 	objects["tiletool"] = {}
 	objects["iceball"] = {}
 	objects["enemytool"] = {}
@@ -6033,7 +6032,7 @@ end
 
 function moveoutportal() --pushes objects out of the portal i in.
 	for i, v in pairs(objects) do
-		if i ~= "tile" and i ~= "pixeltile" and i ~= "portalwall" then
+		if i ~= "tile" and i ~= "portalwall" then
 			for j, w in pairs(v) do
 				if w.active and w.static == false then
 					local p1, p2 = insideportal(w.x, w.y, w.width, w.height)
@@ -8750,7 +8749,7 @@ end
 
 function lightsoutstencil()
 	for i2, v2 in pairs(objects) do
-		if i2 ~= "tile" and i2 ~= "pixeltile" and i2 ~="buttonblock" and i2 ~= "clearpipesegment" then
+		if i2 ~= "tile" and i2 ~="buttonblock" and i2 ~= "clearpipesegment" then
 			for i, v in pairs(objects[i2]) do
 				if (v.active or (i2 == "player" or i2 == "enemy")) and v.light and onscreen(v.x+v.width/2-v.light, v.y+v.height/2-v.light, v.light*2, v.light*2) then
 					local r = v.light
