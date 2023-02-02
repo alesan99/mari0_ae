@@ -517,45 +517,45 @@ function checkcollisionslope(v, t, h, g, j, i, dt, passed) --v: b1table | t: b2t
 		if not passed and docollide then
 			--sloped side collision
 			local location = v.x-t.x
-			if sleft then
-				location = v.x+v.width-t.x
-			end
+			if sleft then location = v.x+v.width-t.x end
 			location = math.max(0, math.min(1, location))
+
 			local ty = t.y+getslopey(location, t.y1, t.y2) --, v.y+v.speedy*dt)
 			local collided = false
-			if not t.UPSIDEDOWNSLOPE then
-				if ty-v.height < v.y+v.speedy*dt then
-					v.y = ty - v.height; collided = true
-				end
-			else
-				if ty > v.y+v.speedy*dt then
-					v.y = ty; collided = true
-				end
+			if (not t.UPSIDEDOWNSLOPE) and ty-v.height < v.y+v.speedy*dt then
+				collided = true
+			elseif t.UPSIDEDOWNSLOPE and ty > v.y+v.speedy*dt then
+				collided = true
 			end
-			if collided then
-				v.slopeangle = realangle
-				--Object has just been pushed out of the slope vertically, but will need to be pushed vertically again later after it moves
-				--Unfortunately needed for slopes to work with fast objects at low framerates
-				local rotspeedx, _ = rotatepoint(v.speedx, 0, -v.slopeangle-math.pi)
-				local postx = v.x+rotspeedx*dt
-				local postlocation = postx-t.x
-				if sleft then
-					postlocation = postx+v.width-t.x
-				end
-				postlocation = math.max(0, math.min(1, postlocation))
-				local postty = t.y+getslopey(postlocation, t.y1, t.y2) --, v.y+v.speedy*dt)
-				if not t.UPSIDEDOWNSLOPE then
-					v.slopeposty = postty-v.height
-				else
-					v.slopeposty = postty
-				end
 
-				hadvercollision = true
-				
-				if not t.UPSIDEDOWNSLOPE then
-					vercollision(v, t, h, g, j, i, dt, true, 1)
-				else
-					vercollision(v, t, h, g, j, i, dt, true, -1)
+			if collided then
+				local ydir = 1
+				if t.UPSIDEDOWNSLOPE then ydir = -1 end
+
+				if vercollision(v, t, h, g, j, i, dt, true, ydir) then
+					hadvercollision = true
+					if not t.UPSIDEDOWNSLOPE then
+						v.y = ty - v.height
+					else
+						v.y = ty
+					end
+					v.slopeangle = realangle
+
+					--Object has just been pushed out of the slope vertically, but will need to be pushed vertically again later after it moves
+					--Unfortunately needed for slopes to work with fast objects at low framerates
+					local rotspeedx, _ = rotatepoint(v.speedx, 0, -v.slopeangle-math.pi)
+					local postx = v.x+rotspeedx*dt
+					local postlocation = postx-t.x
+					if sleft then
+						postlocation = postx+v.width-t.x
+					end
+					postlocation = math.max(0, math.min(1, postlocation))
+					local postty = t.y+getslopey(postlocation, t.y1, t.y2) --, v.y+v.speedy*dt)
+					if not t.UPSIDEDOWNSLOPE then
+						v.slopeposty = postty-v.height
+					else
+						v.slopeposty = postty
+					end
 				end
 			end
 		elseif aabb(v.x + v.speedx*dt, v.y + v.speedy*dt, v.width, v.height, t.x, t.y, t.width, t.height) then
@@ -967,7 +967,11 @@ function checkrect(x, y, width, height, list, statics, condition)
 					end
 					if not skip then
 						if w.active then
-							if aabb(x, y, width, height, w.x, w.y, w.width, w.height) then
+							local inside = aabb(x, y, width, height, w.x, w.y, w.width, w.height)
+							if w.SLOPE then
+								inside = inside and insideslope(x,y,width,height, w.x,w.y1,w.x+w.width,w.y2, w.UPSIDEDOWNSLOPE)
+							end
+							if inside then
 								table.insert(out, i)
 								table.insert(out, j)
 							end
@@ -1011,10 +1015,12 @@ function checkintile(x, y, width, height, list, inobj, condition)
 				end
 				if not skip then
 					if w.active then
-						if aabb(x, y, width, height, w.x, w.y, w.width, w.height) then
+						local inside = aabb(x, y, width, height, w.x, w.y, w.width, w.height)
+						if w.SLOPE then
+							inside = inside and insideslope(x,y,width,height, w.x,w.y1,w.x+w.width,w.y2, w.UPSIDEDOWNSLOPE)
+						end
+						if inside then
 							return w
-							--table.insert(out, i)
-							--table.insert(out, j)
 						end
 					end
 				end
