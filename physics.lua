@@ -311,12 +311,10 @@ function physicsupdate(dt)
 									local onlyplatform = (t.PLATFORM == true and t.PLATFORMDOWN == nil and t.PLATFORMLEFT == nil and t.PLATFORMRIGHT == nil)
 									if onlyplatform and not (diff <= 1e-1) then
 										platformpass = false
-										print("ugh")
 									end
 									if v.y+v.height >= currentground-rangey-0.00001 and platformpass then
 										stucktoslope = targety-v.height
 										v.slopeangle = realangle
-										--print("hello?", angle, realangle)
 									end
 								end
 							end
@@ -358,7 +356,6 @@ function physicsupdate(dt)
 							if v.slopeposty then
 								v.y = v.slopeposty
 							end
-							--print("slowed",rotspeedx)
 						else
 							v.x = v.x + v.speedx*dt
 						end
@@ -459,6 +456,19 @@ function checkcollision(v, t, h, g, j, i, dt, passed) --v: b1table | t: b2table 
 	return hadhorcollision, hadvercollision
 end
 
+function cancollideside(t, side)
+	local safe = (not t.PLATFORM) and (not t.PLATFORMDOWN) and (not t.PLATFORMLEFT) and (not t.PLATFORMRIGHT)
+	if side == "up" then --top
+		return safe or t.PLATFORM
+	elseif side == "down" then
+		return safe or t.PLATFORMDOWN
+	elseif side == "left" then
+		return safe or t.PLATFORMLEFT
+	elseif side == "right" then
+		return safe or t.PLATFORMRIGHT
+	end
+end
+
 function checkcollisionslope(v, t, h, g, j, i, dt, passed) --v: b1table | t: b2table | h: b2type | g: b2id | j: b1type | i: b1id
 	local hadhorcollision = false
 	local hadvercollision = false
@@ -492,20 +502,19 @@ function checkcollisionslope(v, t, h, g, j, i, dt, passed) --v: b1table | t: b2t
 			inslopedirection = (diffy >= 0)
 		end
 
-		--TODO: Fix flat side collision with upside-down slopes
-		--TODO: Fix really fast collisions being ignored
-
-		--TODO: Add a better way to tell if the tile was intentionally set to be an UPPLATFORM
-		--Currently it gets confusing because slopes automatically become PLATFORMS if they are adjacent to other slopes
-		--There are times where a slope SHOUDLN't have its collision disabled (upside down slope over regular tile etc.)
-		local onlyplatform = (t.PLATFORM == true and t.PLATFORMDOWN == nil and t.PLATFORMLEFT == nil and t.PLATFORMRIGHT == nil)
+		--Check if slopes should act like platform tile (only up collision enabled)
+		local onlyplatform = cancollideside(t, "up") and (not cancollideside(t, "down")) and (not cancollideside(t, "left")) and (not cancollideside(t, "right"))
 		local platformpass = true
 		if onlyplatform and not inslantrange then
 			platformpass = false
 		end
+
+		local docollide = inslopedirection and (insideaabb) and finside
+		if onlyplatform then --use more complicated (and unreliable) method to check platform slope intersections
+			docollide = inslopedirection and ((insideaabb or finsideaabb) and finside) and (diff <= 1e-1 or (not insideaabb)) and platformpass
+		end
 		
-		if not passed and inslopedirection and ((insideaabb or finsideaabb) and finside) and (diff <= 1e-1 or (not insideaabb)) and platformpass then --(diff <= 1e-1 or (not insideaabb))
-			
+		if not passed and docollide then
 			--sloped side collision
 			local location = v.x-t.x
 			if sleft then
@@ -525,7 +534,6 @@ function checkcollisionslope(v, t, h, g, j, i, dt, passed) --v: b1table | t: b2t
 			end
 			if collided then
 				v.slopeangle = realangle
-
 				--Object has just been pushed out of the slope vertically, but will need to be pushed vertically again later after it moves
 				--Unfortunately needed for slopes to work with fast objects at low framerates
 				local rotspeedx, _ = rotatepoint(v.speedx, 0, -v.slopeangle-math.pi)
@@ -545,39 +553,9 @@ function checkcollisionslope(v, t, h, g, j, i, dt, passed) --v: b1table | t: b2t
 				hadvercollision = true
 				
 				if not t.UPSIDEDOWNSLOPE then
-					if (t.PLATFORMDOWN and (not t.PLATFORM)) or t.NOEXTERNALVERCOLLISIONS then
-					elseif v.floorcollide then
-						if v:floorcollide(h, t, dt) ~= false then
-							if v.postfloorcollide then
-								v:postfloorcollide(h, t, dt)
-							end
-							if v.speedy > 0 then
-								v.speedy = 0
-							end
-						end
-					else
-						if v.speedy > 0 then
-							v.speedy = 0
-						end
-					end
+					vercollision(v, t, h, g, j, i, dt, true, 1)
 				else
-					if (t.PLATFORM and (not t.PLATFORMDOWN)) or t.NOEXTERNALVERCOLLISIONS then
-						return false
-					elseif v.ceilcollide then
-						if v:ceilcollide(h, t) ~= false then
-							if t.postceilcollide then
-								t:postceilcollide(h, t)
-							end
-							if v.speedy < 0 then
-								v.speedy = 0
-							end
-							return true
-						end
-					else
-						if v.speedy < 0 then
-							v.speedy = 0
-						end
-					end
+					vercollision(v, t, h, g, j, i, dt, true, -1)
 				end
 			end
 		elseif aabb(v.x + v.speedx*dt, v.y + v.speedy*dt, v.width, v.height, t.x, t.y, t.width, t.height) then
@@ -596,6 +574,7 @@ function checkcollisionslope(v, t, h, g, j, i, dt, passed) --v: b1table | t: b2t
 				righty = t.y
 				rightheight = t.y2
 			end
+
 			local i01 = aabb(v.x+v.speedx*dt, v.y+v.speedy*dt, v.width, v.height, t.x, boundingy, t.width, boundingheight)
 
 			local i11 = aabb(v.x + v.speedx*dt, v.y, v.width, v.height, t.x, lefty, t.width, leftheight)
@@ -605,47 +584,43 @@ function checkcollisionslope(v, t, h, g, j, i, dt, passed) --v: b1table | t: b2t
 			local i22 = not aabb(v.x, v.y, v.width, v.height, t.x, righty, t.width, rightheight)
 
 			local i31 = aabb(v.x, v.y+v.speedy*dt, v.width, v.height, t.x, boundingy, t.width, boundingheight)
-			--local i32 = 
-			
-			local i41 = aabb(v.x, v.y+v.speedy*dt, v.width, v.height, t.x, boundingy, t.width, boundingheight)
-			--local i42 = 
 
-			--[[if not t.UPSIDEDOWNSLOPE then
+			if not t.UPSIDEDOWNSLOPE then --Diagonal Collisions
 				if v.speedx > 0 and v.speedy > 0 then
 					if (not i11) and (not i31) and i01 then
 						if math.abs(v.speedx) > math.abs(v.speedy) then
-							i11 = true
-						else
 							i31 = true
+						else
+							i11 = true
 						end
 					end
 				elseif v.speedx > 0 and v.speedy < 0 then
-					if (not i11) and (not i41) and i01 then
+					if (not i11) and (not i31) and i01 then
 						if math.abs(v.speedx) > math.abs(v.speedy) then
-							i11 = true
+							i31 = true
 						else
-							i41 = true
+							i11 = true
 						end
 					end
 				elseif v.speedx < 0 and v.speedy > 0 then
 					if (not i21) and (not i31) and i01 then
 						if math.abs(v.speedx) > math.abs(v.speedy) then
-							i21 = true
-						else
 							i31 = true
+						else
+							i21 = true
 						end
 					end
 
 				elseif v.speedx < 0 and v.speedy < 0 then
-					if (not i21) and (not i41) and i01 then
+					if (not i21) and (not i31) and i01 then
 						if math.abs(v.speedx) > math.abs(v.speedy) then
-							i21 = true
+							i31 = true
 						else
-							i41 = true
+							i21 = true
 						end
 					end
 				end
-			end]]
+			end
 
 			if sright and v.speedx > 0 and i11 and i12 then --Collision is horizontal!
 				if horcollision(v, t, h, g, j, i, dt) then
@@ -656,15 +631,18 @@ function checkcollisionslope(v, t, h, g, j, i, dt, passed) --v: b1table | t: b2t
 					hadhorcollision = true
 				end
 			elseif v.speedy > 0 and i31 and ((t.UPSIDEDOWNSLOPE and v.y+v.height <= t.y) or not inslantrange) then --Collision is vertical!
-				if (not onlyplatform) and vercollision(v, t, h, g, j, i, dt) then
+				local platformpass = true
+				if onlyplatform and ((v.y+v.height > boundingy) or t.platformslopenotopcollision) then
+					platformpass = false
+				end
+				if platformpass and vercollision(v, t, h, g, j, i, dt) then
 					hadvercollision = true
 				end
-			elseif v.speedy < 0 and i41 and v.y > t.y+t.height and ((not t.UPSIDEDOWNSLOPE) or (not inslantrange)) then --Collision is vertical!
+			elseif v.speedy < 0 and i31 and v.y > t.y+t.height and ((not t.UPSIDEDOWNSLOPE) or (not inslantrange)) then --Collision is vertical!
 				if vercollision(v, t, h, g, j, i, dt) then
 					hadvercollision = true
 				end
 			end
-			--TODO: Diagonal collisions
 		end
 	--end
 	
@@ -792,11 +770,11 @@ function horcollision(v, t, h, g, j, i, dt)
 	return false
 end
 
-function vercollision(v, t, h, g, j, i, dt)
+function vercollision(v, t, h, g, j, i, dt, dontpush, ydir)
 	if (t.PLATFORMLEFT or t.PLATFORMRIGHT) and not (t.PLATFORM or t.PLATFORMDOWN) then
 		return false
 	end
-	if v.speedy < 0 then
+	if (ydir or v.speedy) < 0 then
 		--move object DOWN (because it was moving up)
 		if t.floorcollide then
 			if t:floorcollide(j, v) ~= false then
@@ -823,14 +801,18 @@ function vercollision(v, t, h, g, j, i, dt)
 				if v.speedy < 0 then
 					v.speedy = 0
 				end
-				v.y = t.y  + t.height
+				if dontpush ~= true then
+					v.y = t.y  + t.height
+				end
 				return true
 			end
 		else
 			if v.speedy < 0 then
 				v.speedy = 0
 			end
-			v.y = t.y  + t.height
+			if dontpush ~= true then
+				v.y = t.y  + t.height
+			end
 			return true
 		end
 	else					
@@ -860,14 +842,18 @@ function vercollision(v, t, h, g, j, i, dt)
 				if v.speedy > 0 then
 					v.speedy = 0
 				end
-				v.y = t.y - v.height
+				if dontpush ~= true then
+					v.y = t.y - v.height
+				end
 				return true
 			end
 		else
 			if v.speedy > 0 then
 				v.speedy = 0
 			end
-			v.y = t.y - v.height
+			if dontpush ~= true then
+				v.y = t.y - v.height
+			end
 			return true
 		end
 	end

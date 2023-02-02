@@ -298,9 +298,6 @@ function spike:leftcollide(a, b)
 	if self:globalcollide(a, b) then
 		return false
 	end
-	if b.PLATFORM then
-		return false
-	end
 	if a == "pixeltile" and b.dir == "right" then
 		self.y = self.y - 1/16
 		return false
@@ -317,9 +314,6 @@ function spike:rightcollide(a, b)
 	if self:globalcollide(a, b) then
 		return false
 	end
-	if b.PLATFORM then
-		return false
-	end
 	if a == "pixeltile" and b.dir == "left" then
 		self.y = self.y - 1/16
 		return false
@@ -334,9 +328,6 @@ end
 
 function spike:ceilcollide(a, b)
 	if self:globalcollide(a, b) then
-		return false
-	end
-	if b.PLATFORM then
 		return false
 	end
 end
@@ -581,9 +572,6 @@ function spikeball:leftcollide(a, b)
 	if self:globalcollide(a, b) then
 		return false
 	end
-	if b.PLATFORM then
-		return false
-	end
 	if a == "pixeltile" and b.dir == "right" then
 		self.y = self.y - b.step
 		return false
@@ -626,9 +614,6 @@ end
 
 function spikeball:rightcollide(a, b)
 	if self:globalcollide(a, b) then
-		return false
-	end
-	if b.PLATFORM then
 		return false
 	end
 	if a == "pixeltile" and b.dir == "left" then
@@ -676,9 +661,6 @@ function spikeball:ceilcollide(a, b)
 		return false
 	end
 	if a == "player" then
-		return false
-	end
-	if b.PLATFORM then
 		return false
 	end
 	if not self.static then
