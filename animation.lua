@@ -872,7 +872,7 @@ function animation:update(dt)
 				transformenemyanimation(v[2])
 			elseif v[1] == "killallenemies" then
 				for i2, v2 in pairs(objects) do
-					if i1 ~= "tile" and i2 ~= "pixeltile" and i2 ~= "buttonblock" then
+					if i1 ~= "tile" and i2 ~= "buttonblock" then
 						for i, v in pairs(objects[i2]) do
 							if v.active and v.shotted and (not v.resistseverything) then
 								local dir = "right"

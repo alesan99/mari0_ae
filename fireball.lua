@@ -155,12 +155,6 @@ function fireball:update(dt)
 end
 
 function fireball:leftcollide(a, b)
-	if a == "pixeltile" and b.dir == "right" then
-		self.y = self.y - b.step
-		self:floorcollide("tile", b)
-		return false
-	end
-	
 	if a == "donut" or a == "plantfire" then
 		return false
 	end
@@ -182,12 +176,6 @@ function fireball:leftcollide(a, b)
 end
 
 function fireball:rightcollide(a, b)
-	if a == "pixeltile" and b.dir == "left" then
-		self.y = self.y - b.step
-		self:floorcollide("tile", b)
-		return false
-	end
-	
 	if a == "donut" or a == "plantfire" then
 		return false
 	end

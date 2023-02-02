@@ -2902,20 +2902,6 @@ function enemy:leftcollide(a, b, c, d)
 		return false
 	end
 	
-	if a == "tile" then
-		--AE ADDITION
-		--slant
-		if self.onslant == "right" and self.y+self.height-2/16 <= b.y then
-			self.y = b.y-self.height
-			return false
-		end
-	end
-
-	if a == "pixeltile" and b.dir == "right" and self.y < b.y then --AE ADDITION
-		self.y = self.y - b.step
-		return false
-	end
-	
 	if self.transforms and self:gettransformtrigger("leftcollide") and (not self.justspawned) then
 		if self:handlecollisiontransform("leftcollide",a,b) then
 			if not self.dotransformaftercollision then
@@ -3016,20 +3002,6 @@ function enemy:rightcollide(a, b, c, d)
 	end
 
 	if self.ignorerightcollide or b.ignoreleftcollide then --AE ADDITION
-		return false
-	end
-	
-	if a == "tile" then
-		--AE ADDITION
-		--slant
-		if self.onslant == "left" and self.y+self.height-2/16 <= b.y then
-			self.y = b.y-self.height
-			return false
-		end
-	end
-
-	if a == "pixeltile" and b.dir == "left" and self.y < b.y then --AE ADDITION
-		self.y = self.y - b.step
 		return false
 	end
 	
@@ -3252,15 +3224,6 @@ function enemy:floorcollide(a, b, c, d)
 			self.speedy = -self.crawlspeed
 			return true
 		end
-	end
-
-	--slants/slopes --AE ADDITION
-	local onslant = (a == "pixeltile")
-	if onslant then
-		self.onslant = b.dir
-		self.onslantstep = b.step
-	else
-		self.onslant = false
 	end
 	
 	if (not self.frozen) and (self.reflects or self.reflectsy) then

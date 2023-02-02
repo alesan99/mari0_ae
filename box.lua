@@ -296,11 +296,11 @@ function box:floorcollide(a, b)
 		end
 	end
 
-	if a == "pixeltile" and (self.t == "edgeless" or self.gel == 2) then
+	if b.SLOPE and (self.t == "edgeless" or self.gel == 2) then
 		if b.dir == "left" then
-			self.speedx = self.speedx - 6000*b.step*gdt
+			self.speedx = self.speedx - 32*b.incline*gdt
 		else
-			self.speedx = self.speedx + 6000*b.step*gdt
+			self.speedx = self.speedx + 32*b.incline*gdt
 		end
 	end
 	

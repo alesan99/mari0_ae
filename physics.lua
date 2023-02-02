@@ -52,7 +52,7 @@ function physicsupdate(dt)
 	local lobjects = objects
 	
 	for j, w in pairs(lobjects) do
-		if j ~= "tile" and j ~= "pixeltile" and j ~= "buttonblock" and j ~= "tracksegment" then
+		if j ~= "tile" and j ~= "buttonblock" and j ~= "tracksegment" then
 			for i, v in pairs(w) do
 				if ((v.static == false) or (v.activestatic == true)) and v.active then
 					--GRAVITY
@@ -126,7 +126,7 @@ function physicsupdate(dt)
 					
 					--VS OTHER OBJECTS --but not portalwall
 					for h, u in pairs(lobjects) do
-						if h ~= "tile" and h ~= "pixeltile" and h ~= "buttonblock" and h ~= "tracksegment" then
+						if h ~= "tile" and h ~= "buttonblock" and h ~= "tracksegment" then
 							local pass = true
 							for k, l in pairs(latetable) do
 								if h == l then
@@ -323,7 +323,9 @@ function physicsupdate(dt)
 							if v.floorcollide then
 								v:floorcollide("tile", t, dt)
 							end
-							v.speedy = 0
+							if v.speedy > 0 then
+								v.speedy = 0
+							end
 						end
 					end
 					

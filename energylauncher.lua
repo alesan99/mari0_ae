@@ -308,8 +308,8 @@ function energyball:leftcollide(a, b)
 	if onscreen(self.x, self.y, self.width, self.height) then
 		playsound(energybouncesound)
 	end
-	if a == "pixeltile" and b.dir == "right" then
-		if b.step == 0 then --upside down
+	if b.SLOPE and b.dir == "right" then
+		if b.UPSIDEDOWNSLOPE then --upside down
 			self.speedy = -self.speedx
 			self.speedx = 0
 		else
@@ -331,8 +331,8 @@ function energyball:rightcollide(a, b)
 	if onscreen(self.x, self.y, self.width, self.height) then
 		playsound(energybouncesound)
 	end
-	if a == "pixeltile" and b.dir == "left" then
-		if b.step == 0 then --upside down
+	if b.SLOPE and b.dir == "left" then
+		if b.UPSIDEDOWNSLOPE then --upside down
 			self.speedy = self.speedx
 			self.speedx = 0
 		else
@@ -363,13 +363,21 @@ function energyball:ceilcollide(a, b)
 	if onscreen(self.x, self.y, self.width, self.height) then
 		playsound(energybouncesound)
 	end
-	if a == "pixeltile" and b.step == 0 then
-		if b.dir == "right" then
-			self.speedx = self.speedy
-			self.speedy = 0
+	if b.SLOPE and b.UPSIDEDOWNSLOPE then
+		if self.speedx > 0 then
+			self.speedy = math.abs(self.speedx)
+			self.speedx = 0
+		elseif self.speedx < 0 then
+			self.speedy = math.abs(self.speedx)
+			self.speedx = 0
 		else
-			self.speedx = -self.speedy
-			self.speedy = 0
+			if b.dir == "left" then
+				self.speedx = -self.speedy
+				self.speedy = 0
+			else
+				self.speedx = self.speedy
+				self.speedy = 0
+			end
 		end
 		return true
 	elseif a == "tile" or a == "flipblock" or a == "door" or a == "frozencoin" then
@@ -398,10 +406,13 @@ function energyball:floorcollide(a, b)
 	if onscreen(self.x, self.y, self.width, self.height) then
 		playsound(energybouncesound)
 	end
-	if a == "pixeltile" then
-		if b.dir == "right" then
-			self.speedx = self.speedy
-			self.speedy = 0
+	if b.SLOPE then
+		if self.speedx > 0 then
+			self.speedy = -math.abs(self.speedx)
+			self.speedx = 0
+		elseif self.speedx < 0 then
+			self.speedy = -math.abs(self.speedx)
+			self.speedx = 0
 		else
 			self.speedx = -self.speedy
 			self.speedy = 0

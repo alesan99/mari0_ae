@@ -50,7 +50,7 @@ function tile:init(x, y)
 			end
 		--Right slopes
 		elseif t.rightslant then
-			self.slant = "right"
+			self.slant = "right"; self.dir = self.slant
 			self.y1 = 0
 			self.y2 = 1
 			if t.halfrightslant1 then
@@ -60,9 +60,10 @@ function tile:init(x, y)
 				self.y1 = 0
 				self.y2 = 0.5
 			end
+			self.incline = math.abs(self.y2-self.y1)
 		--Left slopes
 		elseif t.leftslant then
-			self.slant = "left"
+			self.slant = "left"; self.dir = self.slant
 			self.y1 = 1
 			self.y2 = 0
 			if t.halfleftslant1 then
@@ -72,6 +73,7 @@ function tile:init(x, y)
 				self.y1 = 0.5
 				self.y2 = 0
 			end
+			self.incline = math.abs(self.y2-self.y1)
 		end
 		--Upside down slopes
 		if self.SLOPE and t.downslant then

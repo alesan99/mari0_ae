@@ -646,22 +646,8 @@ function koopa:leftcollide(a, b, passive)
 	if self:globalcollide(a, b) then
 		return false
 	end
-	if a == "tile" then--check for jump through blocks
-		local x, y = b.cox, b.coy
-
-		--slant
-		if self.onslant == "right" and self.y+self.height-2/16 <= b.y then
-			self.y = b.y-self.height
-			return false
-		end
-	end
 	
 	if self:hitwall(a, b, "left") then
-		return false
-	end
-	
-	if a == "pixeltile" and b.dir == "right" and (not (self.t == "flying")) and (not (self.t == "flying2")) and self.y < b.y then
-		self.y = self.y - b.step
 		return false
 	end
 	
@@ -681,22 +667,8 @@ function koopa:rightcollide(a, b)
 	if self:globalcollide(a, b) then
 		return false
 	end
-	if a == "tile" then--check for jump through blocks
-		local x, y = b.cox, b.coy
-
-		--slant
-		if self.onslant == "left" and self.y+self.height-2/16 <= b.y then
-			self.y = b.y-self.height
-			return false
-		end
-	end
 	
 	if self:hitwall(a, b, "right") then
-		return false
-	end
-	
-	if a == "pixeltile" and b.dir == "left" and (not (self.t == "flying")) and (not (self.t == "flying2")) and self.y < b.y then
-		self.y = self.y - b.step
 		return false
 	end
 	
@@ -794,16 +766,6 @@ function koopa:hitenemy(a, b, dir)
 end
 
 function koopa:passivecollide(a, b)
-	if a == "pixeltile" then
-		local x, y = b.cox, b.coy
-		if tilequads[map[x][y][1]].platform then
-			return false
-		elseif self.y+self.width >= b.y+b.step and b.dir == self.slant then
-			self.y = self.y - b.step
-			return true
-		end
-		return false
-	end
 	if a ~= "clearpipesegment" then
 		if self.speedx < 0 then
 			self:leftcollide(a, b, "passive")
@@ -868,15 +830,6 @@ function koopa:floorcollide(a, b)
 		if self.frozen == false then
 			self.speedy = -koopajumpforce
 		end
-	end
-
-	--slants/slopes
-	local onslant = (a == "pixeltile")
-	if onslant then
-		self.onslant = b.dir
-		self.onslantstep = b.step
-	else
-		self.onslant = false
 	end
 end
 

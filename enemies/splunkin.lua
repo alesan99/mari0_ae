@@ -209,11 +209,6 @@ function splunkin:leftcollide(a, b)
 		return false
 	end
 	
-	if a == "pixeltile" and b.dir == "right" then
-		self.y = self.y - 1/16
-		return false
-	end
-	
 	if self.fast == false then
 		self.speedx = 2
 	else
@@ -225,11 +220,6 @@ end
 
 function splunkin:rightcollide(a, b)
 	if self:globalcollide(a, b) then
-		return false
-	end
-	
-	if a == "pixeltile" and b.dir == "left" then
-		self.y = self.y - 1/16
 		return false
 	end
 	

@@ -885,11 +885,6 @@ function goomba:leftcollide(a, b, passive)
 		return false
 	end
 	
-	if a == "pixeltile" and b.dir == "right" then
-		self.y = self.y - b.step
-		return false
-	end
-	
 	if self.t == "spiketop" and (a == "tile" or a == "buttonblock" or a == "flipblock" or a == "frozencoin") then
 		if self.animationdirection == "right" then
 			self.speedy = -goombaspeed
@@ -937,10 +932,6 @@ function goomba:rightcollide(a, b)
 		return false
 	end
 	
-	if a == "pixeltile" and b.dir == "left" then
-		self.y = self.y - b.step
-		return false
-	end
 	if self.t == "spiketop" and (a == "tile" or a == "buttonblock" or a == "flipblock" or a == "frozencoin") then
 		if self.animationdirection == "right" then
 			self.speedy = goombaspeed
@@ -1025,7 +1016,7 @@ function goomba:globalcollide(a, b)
 		return true
 	end
 
-	if self.t == "spiketop" and a == "pixeltile" then
+	if self.t == "spiketop" and b.SLOPE then --TODO: Fix spiketops with slopes
 		return true
 	end
 	
@@ -1171,16 +1162,6 @@ end
 
 function goomba:passivecollide(a, b)
 	if self:globalcollide(a, b) then
-		return false
-	end
-	if a == "pixeltile" then
-		local x, y = b.cox, b.coy
-		if tilequads[map[x][y][1]].platform then
-			return false
-		elseif self.y+self.width <= b.y+b.step then
-			self.y = self.y - b.step
-			return true
-		end
 		return false
 	end
 	self:leftcollide(a, b, "passive")
