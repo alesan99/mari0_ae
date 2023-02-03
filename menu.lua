@@ -1395,7 +1395,7 @@ function menu_draw()
 				love.graphics.setColor(100, 100, 100, 255)
 			end
 			properprintF(TEXT["volume:"], 30*scale, 110*scale)
-			drawrectangle(90, 112, 90, 1)
+			drawrectangle(90, 113, 90, 1)
 			drawrectangle(90, 110, 1, 7)
 			drawrectangle(179, 110, 1, 7)
 			love.graphics.draw(volumesliderimg, math.floor((89+89*volume)*scale), 110*scale, 0, scale, scale)
