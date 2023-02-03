@@ -1015,10 +1015,6 @@ function goomba:globalcollide(a, b)
 	if self.t == "spikeyfall" and a == "lakito" then
 		return true
 	end
-
-	if self.t == "spiketop" and b.SLOPE then --TODO: Fix spiketops with slopes
-		return true
-	end
 	
 	if (self.t == "wiggler" or self.t == "wigglerchild") and a == "goomba" and (b.t == "wiggler" or b.t == "wigglerchild") then
 		return true
@@ -1105,16 +1101,18 @@ function goomba:floorcollide(a, b)
 	end
 	
 	if self.t == "spiketop" and (a == "tile" or a == "buttonblock" or a == "flipblock" or a == "frozencoin") then
-		self.speedy = 0
-		if self.animationdirection == "right" then
-			self.speedx = -goombaspeed
-		else
-			self.speedx = goombaspeed
+		if not b.SLOPE then
+			self.speedy = 0
+			if self.animationdirection == "right" then
+				self.speedx = -goombaspeed
+			else
+				self.speedx = goombaspeed
+			end
+			self.gravityx = 0
+			self.gravity = yacceleration
+			self.aroundcorner = false
+			return false
 		end
-		self.gravityx = 0
-		self.gravity = yacceleration
-		self.aroundcorner = false
-		return false
 	end
 	
 	if self.t == "spikeyfall" and (not breakoutmode) then

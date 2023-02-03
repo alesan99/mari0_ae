@@ -511,7 +511,8 @@ function checkcollisionslope(v, t, h, g, j, i, dt, passed) --v: b1table | t: b2t
 			platformpass = false
 		end
 
-		local docollide = inslopedirection and (insideaabb) and finside
+		local docollide = inslopedirection and (insideaabb) and finside and diff >= -math.max(0.1,math.abs(diffy))
+		--there's no mathematical basis for the last comparison, (diff > diffy) but it solves weird bottom slope collision when a normal slope is above it for now
 		if onlyplatform then --use more complicated (and unreliable) method to check platform slope intersections
 			docollide = inslopedirection and ((insideaabb or finsideaabb) and finside) and (diff <= 1e-1 or (not insideaabb)) and platformpass
 		end
@@ -522,7 +523,14 @@ function checkcollisionslope(v, t, h, g, j, i, dt, passed) --v: b1table | t: b2t
 			if sleft then location = v.x+v.width-t.x end
 			location = math.max(0, math.min(1, location))
 
+			--target y position
 			local ty = t.y+getslopey(location, t.y1, t.y2) --, v.y+v.speedy*dt)
+			if not t.UPSIDEDOWNSLOPE then
+				ty = ty - v.height
+			else
+				ty = ty
+			end
+
 			local collided = false
 			if (not t.UPSIDEDOWNSLOPE) and ty-v.height < v.y+v.speedy*dt then
 				collided = true
@@ -533,14 +541,18 @@ function checkcollisionslope(v, t, h, g, j, i, dt, passed) --v: b1table | t: b2t
 			if collided then
 				local ydir = 1
 				if t.UPSIDEDOWNSLOPE then ydir = -1 end
-
-				if vercollision(v, t, h, g, j, i, dt, true, ydir) then
-					hadvercollision = true
-					if not t.UPSIDEDOWNSLOPE then
-						v.y = ty - v.height
-					else
-						v.y = ty
+				t.ignorecheckintile = true
+				local insidetile = checkintile(v.x, v.y, v.width, v.height, nil, v, "ignoreslopes")
+				t.ignorecheckintile = false
+				if checkintile(v.x, ty, v.width, v.height, nil, v, "ignoreslopes") and ((sleft and v.speedx > 0) or (sright and v.speedx < 0)) then
+					if horcollision(v, t, h, g, j, i, dt, "dontpush", ydir) then
+						hadhorcollision = true
+						hadvercollision = true
+						v.speedy = 0
 					end
+				elseif vercollision(v, t, h, g, j, i, dt, "dontpush", ydir) then
+					hadvercollision = true
+					v.y = ty
 					v.slopeangle = realangle
 
 					--Object has just been pushed out of the slope vertically, but will need to be pushed vertically again later after it moves
@@ -637,11 +649,13 @@ function checkcollisionslope(v, t, h, g, j, i, dt, passed) --v: b1table | t: b2t
 				if onlyplatform and ((v.y+v.height > boundingy) or t.platformslopenotopcollision) then
 					platformpass = false
 				end
-				if platformpass and vercollision(v, t, h, g, j, i, dt) then
+				if platformpass and vercollision(v, t, h, g, j, i, dt, "dontpush") then
+					v.y = boundingy - v.height
 					hadvercollision = true
 				end
 			elseif v.speedy < 0 and i31 and v.y > t.y+t.height and ((not t.UPSIDEDOWNSLOPE) or (not inslantrange)) then --Collision is vertical!
-				if vercollision(v, t, h, g, j, i, dt) then
+				if vercollision(v, t, h, g, j, i, dt, "dontpush") then
+					v.y = boundingy + boundingheight
 					hadvercollision = true
 				end
 			end
@@ -689,7 +703,7 @@ function passivecollision(v, t, h, g, j, i, dt)
 	return false
 end
 
-function horcollision(v, t, h, g, j, i, dt)
+function horcollision(v, t, h, g, j, i, dt, dontpush)
 	if (t.PLATFORM or t.PLATFORMDOWN) and not (t.PLATFORMLEFT or t.PLATFORMRIGHT) then
 		return false
 	end
@@ -720,14 +734,18 @@ function horcollision(v, t, h, g, j, i, dt)
 				if v.speedx < 0 then
 					v.speedx = 0
 				end
-				v.x = t.x + t.width
+				if not dontpush then
+					v.x = t.x + t.width
+				end
 				return true
 			end
 		else
 			if v.speedx < 0 then
 				v.speedx = 0
 			end
-			v.x = t.x + t.width
+			if not dontpush then
+				v.x = t.x + t.width
+			end
 			return true
 		end
 	else
@@ -757,14 +775,18 @@ function horcollision(v, t, h, g, j, i, dt)
 				if v.speedx > 0 then
 					v.speedx = 0
 				end
-				v.x = t.x - v.width
+				if not dontpush then
+					v.x = t.x - v.width
+				end
 				return true
 			end
 		else
 			if v.speedx > 0 then
 				v.speedx = 0
 			end
-			v.x = t.x - v.width
+			if not dontpush then
+				v.x = t.x - v.width
+			end
 			return true
 		end
 	end
@@ -803,7 +825,7 @@ function vercollision(v, t, h, g, j, i, dt, dontpush, ydir)
 				if v.speedy < 0 then
 					v.speedy = 0
 				end
-				if dontpush ~= true then
+				if not dontpush then
 					v.y = t.y  + t.height
 				end
 				return true
@@ -812,7 +834,7 @@ function vercollision(v, t, h, g, j, i, dt, dontpush, ydir)
 			if v.speedy < 0 then
 				v.speedy = 0
 			end
-			if dontpush ~= true then
+			if not dontpush then
 				v.y = t.y  + t.height
 			end
 			return true
@@ -844,7 +866,7 @@ function vercollision(v, t, h, g, j, i, dt, dontpush, ydir)
 				if v.speedy > 0 then
 					v.speedy = 0
 				end
-				if dontpush ~= true then
+				if not dontpush then
 					v.y = t.y - v.height
 				end
 				return true
@@ -853,7 +875,7 @@ function vercollision(v, t, h, g, j, i, dt, dontpush, ydir)
 			if v.speedy > 0 then
 				v.speedy = 0
 			end
-			if dontpush ~= true then
+			if not dontpush then
 				v.y = t.y - v.height
 			end
 			return true
@@ -890,7 +912,7 @@ function insideslope(x,y,w,h, sx1,sy1,sx2,sy2, upsidedown)
 	end
 	--check if rectangle is below (or above) the flat level ground
 	if upsidedown then
-		return pmin < linex, linex-pmin, angle, realangle
+		return pmin < linex, pmin-linex, angle, realangle
 	else
 		return pmax > linex, pmax-linex, angle, realangle --inside?, diff, angle of slope
 	end
@@ -971,7 +993,7 @@ function checkrect(x, y, width, height, list, statics, condition)
 						if w.active then
 							local inside = aabb(x, y, width, height, w.x, w.y, w.width, w.height)
 							if w.SLOPE then
-								inside = inside and insideslope(x,y,width,height, w.x,w.y1,w.x+w.width,w.y2, w.UPSIDEDOWNSLOPE)
+								inside = inside and insideslope(x,y,width,height, w.x,w.y+w.y1,w.x+w.width,w.y+w.y2, w.UPSIDEDOWNSLOPE)
 							end
 							if inside then
 								table.insert(out, i)
@@ -991,38 +1013,37 @@ function checkintile(x, y, width, height, list, inobj, condition)
 	--local out = {}
 	local inobj = inobj
 
-	for i, v in pairs(list) do
-		if v ~= "tile" and v ~= "buttonblock" and v ~= "clearpipesegment" and v ~= "flipblock" and v ~= "frozencoin" then
-			for j, w in pairs(objects[v]) do
-				local skip = false
-				if inobj then
-					--[[if w.x == inobj.x and w.y == inobj.y then
-						skip = true
-					end]]
-					--masktable
-					if (inobj.mask ~= nil and inobj.mask[w.category] == true) or (w.mask ~= nil and w.mask[inobj.category] == true) then
-						skip = true
-					end
-				end
-				if condition then
-					if condition == "ignoreplatforms" then
-						if w.PLATFORM or w.PLATFORMDOWN or w.PLATFORMLEFT or w.PLATFORMRIGHT then
+	if list then
+		for i, v in pairs(list) do
+			if v ~= "tile" and v ~= "buttonblock" and v ~= "clearpipesegment" and v ~= "flipblock" and v ~= "frozencoin" then
+				for j, w in pairs(objects[v]) do
+					local skip = false
+					if inobj then
+						--[[if w.x == inobj.x and w.y == inobj.y then
 							skip = true
-						end
-					elseif condition == "ignorehorplatforms" then
-						if w.PLATFORM or w.PLATFORMDOWN then
+						end]]
+						--masktable
+						if (inobj.mask ~= nil and inobj.mask[w.category] == true) or (w.mask ~= nil and w.mask[inobj.category] == true) then
 							skip = true
 						end
 					end
-				end
-				if not skip then
-					if w.active then
-						local inside = aabb(x, y, width, height, w.x, w.y, w.width, w.height)
-						if w.SLOPE then
-							inside = inside and insideslope(x,y,width,height, w.x,w.y1,w.x+w.width,w.y2, w.UPSIDEDOWNSLOPE)
+					if condition then
+						if condition == "ignoreplatforms" then
+							if w.PLATFORM or w.PLATFORMDOWN or w.PLATFORMLEFT or w.PLATFORMRIGHT then
+								skip = true
+							end
+						elseif condition == "ignorehorplatforms" then
+							if w.PLATFORM or w.PLATFORMDOWN then
+								skip = true
+							end
 						end
-						if inside then
-							return w
+					end
+					if not skip then
+						if w.active then
+							local inside = aabb(x, y, width, height, w.x, w.y, w.width, w.height)
+							if inside then
+								return w
+							end
 						end
 					end
 				end
@@ -1047,13 +1068,23 @@ function checkintile(x, y, width, height, list, inobj, condition)
 							if t.PLATFORM or t.PLATFORMDOWN then
 								skip = true
 							end
+						elseif condition == "ignoreslopes" then
+							if (t.SLOPE and (not t.UPSIDEDOWNSLOPE) and y+height < t.y+t.height) or t.ignorecheckintile then
+								skip = true
+							end
 						end
 						if condition == "clearpipe" and objects["clearpipesegment"][tilemap(tx, ty)] then
 							skip = true
 						end
 					end
-					if not skip and aabb(x, y, width, height, t.x, t.y, t.width, t.height) then
-						return t
+					if not skip then
+						local inside = aabb(x, y, width, height, t.x, t.y, t.width, t.height)
+						if t.SLOPE then
+							inside = inside and insideslope(x,y,width,height, t.x,t.y+t.y1,t.x+t.width,t.y+t.y2, t.UPSIDEDOWNSLOPE)
+						end
+						if inside then
+							return t
+						end
 					end
 				end
 				local t = objects["buttonblock"][tilemap(tx, ty)]

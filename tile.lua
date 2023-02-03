@@ -105,7 +105,9 @@ function tile:init(x, y)
 			if ismaptile(self.cox, self.coy-1) and tilequads[map[self.cox][self.coy-1][1]] then
 				local tq = tilequads[map[self.cox][self.coy-1][1]]
 				tabove = (tq.leftslant or tq.rightslant) and not tq.downslant
-				if tabove and t.platform then tabove = false end
+				if tabove and (t.platform or (self.SLOPE and not self.UPSIDEDOWNSLOPE)) then
+					tabove = false
+				end
 			end
 			--disable top flat collisions for platform slopes if next to another similar slope (because they should be one continuous line)
 			if self.SLOPE and t.platform and t.rightslant and (not t.downslant) and ismaptile(self.cox-1, self.coy-1) and tilequads[map[self.cox-1][self.coy-1][1]] then
