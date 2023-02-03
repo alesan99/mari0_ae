@@ -523,10 +523,6 @@ function boomboom:globalcollide(a, b)
 	end
 end
 
-function boomboom:startfall()
-
-end
-
 function boomboom:floorcollide(a, b)
 	if self:globalcollide(a, b) then
 		return false

@@ -6467,7 +6467,7 @@ function traceline(sourcex, sourcey, radians, reportal)
 		end
 
 		if objects["tile"][tileposition] then
-			if (objects["tile"][tileposition].slant or objects["tile"][tileposition].slab) and (not tilequads[tileno].grate) then
+			if (objects["tile"][tileposition].slant or objects["tile"][tileposition].slab) and (tilequads[tileno] and not tilequads[tileno].grate) then
 				return false, false, false, false, x, y
 			end
 		end

@@ -54,8 +54,11 @@ function physicsupdate(dt)
 	for j, w in pairs(lobjects) do
 		if j ~= "tile" and j ~= "buttonblock" and j ~= "tracksegment" then
 			for i, v in pairs(w) do
+				local oldspeedx = v.speedx
+				local oldspeedy = v.speedy
 				if ((v.static == false) or (v.activestatic == true)) and v.active then
 					--GRAVITY
+					local oldx = v.x
 					local oldy = v.y
 					local oldgravity
 					if (not v.activestatic) and (not v.ignoregravity) then
@@ -229,7 +232,7 @@ function physicsupdate(dt)
 										v:emancipate(h)
 									end
 								else
-									if inrange(v.y+6/16, u.starty-1, u.endy, true) and inrange(u.x-14/16, v.x, v.x+v.speedx*dt, true) then
+									if inrange(v.y+6/16, u.starty-1, u.endy, true) and inrange(u.x-14/16, oldx, v.x+v.speedx*dt, true) then
 										v:emancipate(h)
 									end
 								end
@@ -334,17 +337,20 @@ function physicsupdate(dt)
 						v.y = v.y + v.speedy*dt
 						--if not stucktoslope then
 							if v.gravity then
+								
 								if v.startfall then
-									if v.gravitydir then
-										if (v.gravitydir == "down" and (v.speedy == v.gravity*dt or v.y == v.y+v.gravity*dt)) or (v.gravitydir == "up" and v.speedy == -v.gravity*dt) then
+									if (not (v.stopjump and v.jumping)) and (not v.quicksand) then
+										if v.gravitydir then
+											if (v.gravitydir == "down" and v.speedy == oldspeedy + v.gravity*dt) or (v.gravitydir == "up" and v.speedy == oldspeedy - v.gravity*dt) then
+												v:startfall(i)
+											end
+										elseif v.speedy == oldspeedy + v.gravity*dt then
 											v:startfall(i)
 										end
-									elseif v.speedy == v.gravity*dt then
-										v:startfall(i)
 									end
 								end
 							else
-								if v.speedy == yacceleration*dt and v.startfall then
+								if v.speedy == oldspeedy + yacceleration*dt and v.startfall then
 									v:startfall(i)
 								end
 							end
@@ -368,7 +374,7 @@ function physicsupdate(dt)
 						if v.gravity then
 							if v.startfall then
 								if v.gravitydir then
-									if (v.gravitydir == "right" and v.speedx == v.gravity*dt) or (v.gravitydir == "left" and v.speedx == -v.gravity*dt) then
+									if (v.gravitydir == "right" and v.speedx == oldspeedx + v.gravity*dt) or (v.gravitydir == "left" and v.speedx == oldspeedx - v.gravity*dt) then
 										v:startfall(i)
 									end
 								end
@@ -458,16 +464,25 @@ function checkcollision(v, t, h, g, j, i, dt, passed) --v: b1table | t: b2table 
 	return hadhorcollision, hadvercollision
 end
 
-function cancollideside(t, side)
-	local safe = (not t.PLATFORM) and (not t.PLATFORMDOWN) and (not t.PLATFORMLEFT) and (not t.PLATFORMRIGHT)
+function cancollideside(t, side, v)
+	local safe = (not t.PLATFORM) and (not t.PLATFORMDOWN) and (not t.PLATFORMLEFT) and (not t.PLATFORMRIGHT) --no platform collisions
+	if v then
+		if v.overridesemisolids then
+			return true
+		elseif v.ignoresemisolids then
+			return not (t.PLATFORM or t.PLATFORMDOWN or t.PLATFORMLEFT or t.PLATFORMRIGHT or t.NOEXTERNALHORCOLLISIONS or t.NOEXTERNALVERCOLLISIONS)
+		end
+	end
 	if side == "up" then --top
-		return safe or t.PLATFORM
+		return (safe or t.PLATFORM) and (not t.NOEXTERNALVERCOLLISIONS)
 	elseif side == "down" then
-		return safe or t.PLATFORMDOWN
+		return (safe or t.PLATFORMDOWN) and (not t.NOEXTERNALVERCOLLISIONS)
 	elseif side == "left" then
-		return safe or t.PLATFORMLEFT
+		return (safe or t.PLATFORMLEFT) and (not t.NOEXTERNALHORCOLLISIONS)
 	elseif side == "right" then
-		return safe or t.PLATFORMRIGHT
+		return (safe or t.PLATFORMRIGHT) and (not t.NOEXTERNALHORCOLLISIONS)
+	elseif side =="passive" then
+		return safe and (not t.hollow)
 	end
 end
 
@@ -666,7 +681,7 @@ function checkcollisionslope(v, t, h, g, j, i, dt, passed) --v: b1table | t: b2t
 end
 
 function passivecollision(v, t, h, g, j, i, dt)
-	if t.PLATFORM or t.PLATFORMDOWN or t.PLATFORMLEFT or t.PLATFORMRIGHT then
+	if not cancollideside(t,"passive",v) then
 		return false
 	end
 	if v.passivecollide then
@@ -679,24 +694,26 @@ function passivecollision(v, t, h, g, j, i, dt)
 				return true
 			end
 		end
-		if t.passivecollide then
+		if t.passivecollide and not v.hollow then
 			t:passivecollide(j, v)
 		end
 	else
-		if v.floorcollide then
-			if v:floorcollide(h, t, dt) ~= false then
+		if not t.hollow then
+			if v.floorcollide then
+				if v:floorcollide(h, t, dt) ~= false then
+					if v.speedy > 0 then
+						v.speedy = 0
+					end
+					v.y = t.y - v.height
+					return true
+				end
+			else
 				if v.speedy > 0 then
 					v.speedy = 0
 				end
 				v.y = t.y - v.height
 				return true
 			end
-		else
-			if v.speedy > 0 then
-				v.speedy = 0
-			end
-			v.y = t.y - v.height
-			return true
 		end
 	end
 	
@@ -704,12 +721,10 @@ function passivecollision(v, t, h, g, j, i, dt)
 end
 
 function horcollision(v, t, h, g, j, i, dt, dontpush)
-	if (t.PLATFORM or t.PLATFORMDOWN) and not (t.PLATFORMLEFT or t.PLATFORMRIGHT) then
-		return false
-	end
 	if v.speedx < 0 then
 		--move object RIGHT (because it was moving left)
-		if t.rightcollide then
+		if not (cancollideside(v, "left", t) and cancollideside(t, "right")) then
+		elseif t.rightcollide then
 			if t:rightcollide(j, v) ~= false then
 				if t.postrightcollide then
 					t:postrightcollide(j,v)
@@ -724,7 +739,7 @@ function horcollision(v, t, h, g, j, i, dt, dontpush)
 			end
 		end
 
-		if (t.PLATFORMLEFT and (not t.PLATFORMRIGHT)) or t.NOEXTERNALHORCOLLISIONS then
+		if not (cancollideside(t, "right", v) and cancollideside(v, "left")) then
 			return false
 		elseif v.leftcollide then
 			if v:leftcollide(h, t) ~= false then
@@ -750,7 +765,8 @@ function horcollision(v, t, h, g, j, i, dt, dontpush)
 		end
 	else
 		--move object LEFT (because it was moving right)
-		if t.leftcollide then
+		if not (cancollideside(v, "right", t) and cancollideside(t, "left")) then
+		elseif t.leftcollide then
 			if t:leftcollide(j, v) ~= false then
 				if t.postleftcollide then
 					t:postleftcollide(j,v)
@@ -765,7 +781,7 @@ function horcollision(v, t, h, g, j, i, dt, dontpush)
 			end
 		end
 		
-		if (t.PLATFORMRIGHT and (not t.PLATFORMLEFT)) or t.NOEXTERNALHORCOLLISIONS then
+		if not (cancollideside(t, "left", v) and cancollideside(v, "right")) then
 			return false
 		elseif v.rightcollide then
 			if v:rightcollide(h, t) ~= false then
@@ -795,12 +811,10 @@ function horcollision(v, t, h, g, j, i, dt, dontpush)
 end
 
 function vercollision(v, t, h, g, j, i, dt, dontpush, ydir)
-	if (t.PLATFORMLEFT or t.PLATFORMRIGHT) and not (t.PLATFORM or t.PLATFORMDOWN) then
-		return false
-	end
 	if (ydir or v.speedy) < 0 then
 		--move object DOWN (because it was moving up)
-		if t.floorcollide then
+		if not (cancollideside(v, "up", t) and cancollideside(t, "down")) then
+		elseif t.floorcollide then
 			if t:floorcollide(j, v) ~= false then
 				if t.postfloorcollide then
 					t:postfloorcollide(j, v)
@@ -815,7 +829,7 @@ function vercollision(v, t, h, g, j, i, dt, dontpush, ydir)
 			end
 		end
 		
-		if (t.PLATFORM and (not t.PLATFORMDOWN)) or t.NOEXTERNALVERCOLLISIONS then
+		if not (cancollideside(t, "down", v) and cancollideside(v, "up")) then
 			return false
 		elseif v.ceilcollide then
 			if v:ceilcollide(h, t) ~= false then
@@ -841,7 +855,8 @@ function vercollision(v, t, h, g, j, i, dt, dontpush, ydir)
 		end
 	else					
 		--move object UP (because it was moving down)
-		if t.ceilcollide then
+		if not (cancollideside(v, "down", t) and cancollideside(t, "up")) then
+		elseif t.ceilcollide then
 			if t:ceilcollide(j, v) ~= false then
 				if t.postceilcollide then
 					t:postceilcollide(j, v)
@@ -856,7 +871,7 @@ function vercollision(v, t, h, g, j, i, dt, dontpush, ydir)
 			end
 		end
 
-		if (t.PLATFORMDOWN and (not t.PLATFORM)) or t.NOEXTERNALVERCOLLISIONS then
+		if not (cancollideside(t, "up", v) and cancollideside(v, "down")) then
 			return false
 		elseif v.floorcollide then
 			if v:floorcollide(h, t, dt) ~= false then

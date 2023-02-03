@@ -188,10 +188,6 @@ function boo:globalcollide(a, b)
 	end
 end
 
-function boo:startfall()
-
-end
-
 function boo:floorcollide(a, b)
 	if self:globalcollide(a, b) then
 		return false

@@ -941,8 +941,8 @@ function animation:update(dt)
 					for i = 1, #animationtriggerfuncs[v[2]] do
 						animationtriggerfuncs[v[2]][i]:trigger()
 					end
+					animationtriggerfuncs[v[2]].triggered = true
 				end
-				animationtriggerfuncs[v[2]].triggered = true
 				
 			elseif v[1] == "addkeys" then
 				if v[3] == "everyone" then

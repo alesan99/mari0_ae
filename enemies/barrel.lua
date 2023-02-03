@@ -171,10 +171,6 @@ function barrel:globalcollide(a, b)
 	end
 end
 
-function barrel:startfall()
-
-end
-
 function barrel:floorcollide(a, b)
 	if self:globalcollide(a, b) then
 		return false

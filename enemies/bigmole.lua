@@ -216,10 +216,6 @@ function bigmole:globalcollide(a, b)
 	end
 end
 
-function bigmole:startfall()
-
-end
-
 function bigmole:floorcollide(a, b)
 	if self:globalcollide(a, b) then
 		return false
