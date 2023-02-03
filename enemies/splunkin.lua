@@ -250,10 +250,6 @@ function splunkin:globalcollide(a, b)
 	end
 end
 
-function splunkin:startfall()
-
-end
-
 function splunkin:floorcollide(a, b)
 	if self:globalcollide(a, b) then
 		return false

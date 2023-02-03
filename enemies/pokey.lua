@@ -341,10 +341,6 @@ function pokey:globalcollide(a, b)
 	end
 end
 
-function pokey:startfall()
-
-end
-
 function pokey:floorcollide(a, b)
 	if self:globalcollide(a, b) then
 		return false

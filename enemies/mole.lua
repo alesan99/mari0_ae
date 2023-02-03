@@ -283,10 +283,6 @@ function mole:globalcollide(a, b)
 	end
 end
 
-function mole:startfall()
-
-end
-
 function mole:floorcollide(a, b)
 	if self:globalcollide(a, b) then
 		return false

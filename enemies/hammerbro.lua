@@ -414,11 +414,6 @@ function hammerbro:globalcollide(a, b)
 	end
 end
 
-
-function hammerbro:startfall()
-	
-end
-
 function hammerbro:floorcollide(a, b)
 	if self:globalcollide(a, b) then
 		return false
