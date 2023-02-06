@@ -8523,7 +8523,7 @@ function mario:fire()
 		end
 
 		--pick up
-		if self.pickupready and self.pickupready.pickupready and (not self.pickupready.parent) and (not self.pickupready.carryonlywithrunbutton) then
+		if self.pickupready and self.pickupready.pickupready and ((not self.pickupready.pickupreadyplayers) or self.pickupready.pickupreadyplayers[self.playernumber]) and (not self.pickupready.parent) and (not self.pickupready.carryonlywithrunbutton) then
 			if self.pickup then
 				if self.pickup.destroying then
 					self.pickup = false

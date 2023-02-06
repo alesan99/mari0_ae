@@ -528,6 +528,8 @@ function enemy:init(x, y, t, a, properties)
 		if self.throwntime then
 			self.throwntimer = 0
 		end
+		self.pickupready = false
+		self.pickupreadyplayers = {}
 	end
 
 	if self.jumps or self.noplayercollisiononthrow then
@@ -2223,10 +2225,12 @@ function enemy:update(dt)
 		else
 			self.pickupready = false
 			for j, w in pairs(objects["player"]) do
+				self.pickupreadyplayers[w.playernumber] = false
 				local col = checkrect(self.x+self.carryrange[1], self.y+self.carryrange[2], self.carryrange[3], self.carryrange[4], {"player"})
 				if #col > 0 then
 					w.pickupready = self
 					self.pickupready = true
+					self.pickupreadyplayers[w.playernumber] = true
 					
 					--carry if holding button
 					if (self.carryifholdingrunbutton and runkey(w.playernumber)) and not w.pickup then

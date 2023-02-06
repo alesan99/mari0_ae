@@ -88,6 +88,8 @@ function goomba:init(x, y, t)
 		self.quadcenterY = 8
 		self.rigidgrab = true --limit angles mario can use
 		self.userect = adduserect(self.x, self.y, 2, 2, self)
+		self.pickupready = false
+		self.pickupreadyplayers = {}
 		--self.returntilemaskontrackrelease = true
 	elseif self.t == "spiketop" or self.t == "spiketopup" then
 		self.graphic = spiketopimg
@@ -560,11 +562,13 @@ function goomba:update(dt)
 					end
 				else
 					self.pickupready = false
-					for j, w in pairs(objects["player"]) do --Make mario stay on shyguy
+					for j, w in ipairs(objects["player"]) do --Make mario stay on shyguy
+						self.pickupreadyplayers[w.playernumber] = false
 						if not w.jumping and inrange(w.x, self.x-w.width, self.x+self.width) then
 							if w.y == self.y - w.height then
 								w.pickupready = self
 								self.pickupready = true
+								self.pickupreadyplayers[w.playernumber] = true
 								if not self.tracked then
 									if #checkrect(w.x+self.speedx*dt, w.y, w.width, w.height, {"exclude", w}, true) == 0 then
 										w.x = w.x + self.speedx*dt
