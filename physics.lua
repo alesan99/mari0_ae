@@ -742,8 +742,8 @@ function horcollision(v, t, h, g, j, i, dt, dontpush)
 			return false
 		elseif v.leftcollide then
 			if v:leftcollide(h, t) ~= false then
-				if t.postleftcollide then
-					t:postleftcollide(h,t)
+				if v.postleftcollide then
+					v:postleftcollide(h,t)
 				end
 				if v.speedx < 0 then
 					v.speedx = 0
@@ -784,8 +784,8 @@ function horcollision(v, t, h, g, j, i, dt, dontpush)
 			return false
 		elseif v.rightcollide then
 			if v:rightcollide(h, t) ~= false then
-				if t.postrightcollide then
-					t:postrightcollide(h,t)
+				if v.postrightcollide then
+					v:postrightcollide(h,t)
 				end
 				if v.speedx > 0 then
 					v.speedx = 0
@@ -832,8 +832,8 @@ function vercollision(v, t, h, g, j, i, dt, dontpush, ydir)
 			return false
 		elseif v.ceilcollide then
 			if v:ceilcollide(h, t) ~= false then
-				if t.postceilcollide then
-					t:postceilcollide(h, t)
+				if v.postceilcollide then
+					v:postceilcollide(h, t)
 				end
 				if v.speedy < 0 then
 					v.speedy = 0
