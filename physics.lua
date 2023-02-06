@@ -473,13 +473,13 @@ function cancollideside(t, side, v)
 		end
 	end
 	if side == "up" then --top
-		return (safe or t.PLATFORM) and (not t.NOEXTERNALVERCOLLISIONS)
+		return (safe or t.PLATFORM)
 	elseif side == "down" then
-		return (safe or t.PLATFORMDOWN) and (not t.NOEXTERNALVERCOLLISIONS)
+		return (safe or t.PLATFORMDOWN)
 	elseif side == "left" then
-		return (safe or t.PLATFORMLEFT) and (not t.NOEXTERNALHORCOLLISIONS)
+		return (safe or t.PLATFORMLEFT)
 	elseif side == "right" then
-		return (safe or t.PLATFORMRIGHT) and (not t.NOEXTERNALHORCOLLISIONS)
+		return (safe or t.PLATFORMRIGHT)
 	elseif side =="passive" then
 		return safe and (not t.hollow)
 	end
@@ -738,7 +738,7 @@ function horcollision(v, t, h, g, j, i, dt, dontpush)
 			end
 		end
 
-		if not (cancollideside(t, "right", v) and cancollideside(v, "left")) then
+		if not (cancollideside(t, "right", v) and cancollideside(v, "left") and (not t.NOEXTERNALHORCOLLISIONS)) then
 			return false
 		elseif v.leftcollide then
 			if v:leftcollide(h, t) ~= false then
@@ -780,7 +780,7 @@ function horcollision(v, t, h, g, j, i, dt, dontpush)
 			end
 		end
 		
-		if not (cancollideside(t, "left", v) and cancollideside(v, "right")) then
+		if not (cancollideside(t, "left", v) and cancollideside(v, "right") and (not t.NOEXTERNALHORCOLLISIONS)) then
 			return false
 		elseif v.rightcollide then
 			if v:rightcollide(h, t) ~= false then
@@ -828,7 +828,7 @@ function vercollision(v, t, h, g, j, i, dt, dontpush, ydir)
 			end
 		end
 		
-		if not (cancollideside(t, "down", v) and cancollideside(v, "up")) then
+		if not (cancollideside(t, "down", v) and cancollideside(v, "up") and (not t.NOEXTERNALVERCOLLISIONS)) then
 			return false
 		elseif v.ceilcollide then
 			if v:ceilcollide(h, t) ~= false then
@@ -870,7 +870,7 @@ function vercollision(v, t, h, g, j, i, dt, dontpush, ydir)
 			end
 		end
 
-		if not (cancollideside(t, "up", v) and cancollideside(v, "down")) then
+		if not (cancollideside(t, "up", v) and cancollideside(v, "down") and (not t.NOEXTERNALVERCOLLISIONS)) then
 			return false
 		elseif v.floorcollide then
 			if v:floorcollide(h, t, dt) ~= false then
