@@ -337,7 +337,6 @@ function physicsupdate(dt)
 						v.y = v.y + v.speedy*dt
 						--if not stucktoslope then
 							if v.gravity then
-								
 								if v.startfall then
 									if (not (v.stopjump and v.jumping)) and (not v.quicksand) then
 										if v.gravitydir then
