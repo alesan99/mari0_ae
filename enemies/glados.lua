@@ -13,7 +13,7 @@ function glados:init(x, y, r)
 	self.category = 4
 	self.gravity = 0
 	
-	self.mask = {true, true, false, false}
+	self.mask = {true, true, true, false}
 	
 	self.emancipatecheck = false
 	self.autodelete = false

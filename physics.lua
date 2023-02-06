@@ -340,16 +340,16 @@ function physicsupdate(dt)
 								if v.startfall then
 									if (not (v.stopjump and v.jumping)) and (not v.quicksand) then
 										if v.gravitydir then
-											if (v.gravitydir == "down" and v.speedy == oldspeedy + v.gravity*dt) or (v.gravitydir == "up" and v.speedy == oldspeedy - v.gravity*dt) then
+											if (v.gravitydir == "down" and v.speedy == v.gravity*dt) or (v.gravitydir == "up" and v.speedy == -v.gravity*dt) then
 												v:startfall(i)
 											end
-										elseif v.speedy == oldspeedy + v.gravity*dt then
+										elseif v.speedy == v.gravity*dt then
 											v:startfall(i)
 										end
 									end
 								end
 							else
-								if v.speedy == oldspeedy + yacceleration*dt and v.startfall then
+								if v.speedy == yacceleration*dt and v.startfall then
 									v:startfall(i)
 								end
 							end
@@ -373,7 +373,7 @@ function physicsupdate(dt)
 						if v.gravity then
 							if v.startfall then
 								if v.gravitydir then
-									if (v.gravitydir == "right" and v.speedx == oldspeedx + v.gravity*dt) or (v.gravitydir == "left" and v.speedx == oldspeedx - v.gravity*dt) then
+									if (v.gravitydir == "right" and v.speedx == v.gravity*dt) or (v.gravitydir == "left" and v.speedx == -v.gravity*dt) then
 										v:startfall(i)
 									end
 								end
@@ -481,7 +481,7 @@ function cancollideside(t, side, v)
 	elseif side == "right" then
 		return (safe or t.PLATFORMRIGHT)
 	elseif side =="passive" then
-		return safe and (not t.hollow)
+		return safe
 	end
 end
 

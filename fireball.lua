@@ -214,6 +214,9 @@ function fireball:floorcollide(a, b)
 	else
 		self.speedy = -fireballjumpforce
 	end
+	if b.SLOPE then
+		self.speedy = self.speedy -b.incline*10
+	end
 	return false
 end
 
