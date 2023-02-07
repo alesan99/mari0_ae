@@ -565,6 +565,10 @@ function mario:update(dt)
 		raccoonplanesound:stop() --stops raccoon flying sound
 	end
 	
+	--falling state fuck
+	if (not self.falling) and (not self.jumping) then
+		self.landed = true
+	end
 	--double jump?
 	if self.hasdoublejumped and not (self.jumping or self.falling) then
 		self.hasdoublejumped = false
@@ -3670,7 +3674,7 @@ function mario:jump(force)
 					self.falling = false
 				end
 				
-				if self.shoe and (((not lowgravity) and self.speedy > 8) or (lowgravity and self.speedy > 2)) then
+				if self.shoe and (((not lowgravity) and self.speedy > 8) or (lowgravity and self.speedy > 4.5)) then
 					return
 				elseif self.shoe == "drybonesshell" and self.ducking then
 					return
@@ -3682,8 +3686,10 @@ function mario:jump(force)
 					self.speedy = -30
 				end]]
 				
-				if (((self.animation ~= "grow1" and self.animation ~= "grow2") or self.falling) and (self.falling == false or self.animation == "grow1" or self.animation == "grow2"))
-					or ((self.characterdata.doublejump or self.characterdata.dbljmppls) and (not self.hasdoublejumped)) then
+				if ( ((self.animation ~= "grow1" and self.animation ~= "grow2") or self.falling)
+					and (self.falling == false or self.animation == "grow1" or self.animation == "grow2" or (self.shoe and self.landed)) )
+					or ( (self.characterdata.doublejump or self.characterdata.dbljmppls) and (not self.hasdoublejumped) ) then
+					print(self.landed)
 					if self.animation ~= "grow1" and self.animation ~= "grow2" and (not self.characterdata.nojumpsound) then
 						if self.size == 1 then
 							playsound(jumpsound)
@@ -3736,6 +3742,7 @@ function mario:jump(force)
 						self.speedx = -force
 					end
 					self.jumping = true
+					self.landed = false
 					self.animationstate = "jumping"
 					self.jumpframe = 1
 					self.jumpanimationprogress = 1
@@ -4619,6 +4626,7 @@ function mario:floorcollide(a, b)
 	if self.gravitydir == "down" then
 		self.falling = false
 		self.jumping = false
+		self.landed = true
 
 		if self.helmet == "propellerbox" then
 			self.propellerjumping = false
