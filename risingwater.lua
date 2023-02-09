@@ -76,7 +76,7 @@ function risingwater:init(x, y, r)
 	elseif self.t == "quicksand" or self.t == "quicksandtop" then
 		self.sand = true
 		self.sandsink = 80
-		self.sandspeedy = 0.4
+		self.sandspeedy = 0.9
 		self.sandspeedx = 2
 		self.checktable = {"player", "goomba", "koopa", "pokey", "enemy"}
 	elseif self.t == "lava" or self.t == "poison" then
@@ -214,14 +214,25 @@ function risingwater:update(dt)
 							end
 						end
 						if self.sand then
-							b.speedy = math.min(self.sandspeedy, b.speedy + self.sandsink*dt)
+							local gravity = yacceleration or b.gravity
+							if lowgravity and not b.ignorelowgravity then
+								if b.jumping or (b.falling and b.speedy < 0) then
+									gravity = (b.gravity or yacceleration)*lowgravityjumpingmult
+								else
+									gravity = (b.gravity or yacceleration)*lowgravitymult
+								end
+							end
 							if b.speedy > 0 and b.falling then
 								b.falling = false
 								b.jumping = false
 								b.animationstate = "idle"
 							end
+							b.speedy = math.min(self.sandspeedy - gravity*dt, b.speedy + self.sandsink*dt)
 							b.quicksand = true
 							b.speedx = math.min(self.sandspeedx, math.max(-self.sandspeedx, b.speedx))
+							if b.speedx == 0 and not b.jumping then
+								b.animationstate = "idle"
+							end
 						end
 					end
 				else

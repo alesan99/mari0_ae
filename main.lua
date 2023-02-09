@@ -56,7 +56,7 @@ local debugGraph,fpsGraph,memGraph,drawGraph
 local debugGraphs = false
 
 VERSION = 13.0124
-VERSIONSTRING = "13e (3/7/22)"
+VERSIONSTRING = "13.1 (2/6/23)"
 
 android = (love.system.getOS() == "Android" or love.system.getOS() == "iOS") --[DROID]
 androidtest = false--testing android on pc

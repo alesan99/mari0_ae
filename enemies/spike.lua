@@ -298,13 +298,6 @@ function spike:leftcollide(a, b)
 	if self:globalcollide(a, b) then
 		return false
 	end
-	if b.PLATFORM then
-		return false
-	end
-	if a == "pixeltile" and b.dir == "right" then
-		self.y = self.y - 1/16
-		return false
-	end
 	if not self.spit then
 		self.speedx = spikespeed
 		self.animationdirection = "left"
@@ -317,13 +310,6 @@ function spike:rightcollide(a, b)
 	if self:globalcollide(a, b) then
 		return false
 	end
-	if b.PLATFORM then
-		return false
-	end
-	if a == "pixeltile" and b.dir == "left" then
-		self.y = self.y - 1/16
-		return false
-	end
 	if not self.spit then
 		self.speedx = -spikespeed
 		self.animationdirection = "right"
@@ -334,9 +320,6 @@ end
 
 function spike:ceilcollide(a, b)
 	if self:globalcollide(a, b) then
-		return false
-	end
-	if b.PLATFORM then
 		return false
 	end
 end
@@ -581,13 +564,6 @@ function spikeball:leftcollide(a, b)
 	if self:globalcollide(a, b) then
 		return false
 	end
-	if b.PLATFORM then
-		return false
-	end
-	if a == "pixeltile" and b.dir == "right" then
-		self.y = self.y - b.step
-		return false
-	end
 	if a == "tile" and self.t == "spike" then
 		local ti = 1
 		if ismaptile(b.cox, b.coy) and map[b.cox][b.coy][1] then
@@ -626,13 +602,6 @@ end
 
 function spikeball:rightcollide(a, b)
 	if self:globalcollide(a, b) then
-		return false
-	end
-	if b.PLATFORM then
-		return false
-	end
-	if a == "pixeltile" and b.dir == "left" then
-		self.y = self.y - b.step
 		return false
 	end
 	if a == "tile" and self.t == "spike" then
@@ -678,9 +647,6 @@ function spikeball:ceilcollide(a, b)
 	if a == "player" then
 		return false
 	end
-	if b.PLATFORM then
-		return false
-	end
 	if not self.static then
 		self:broke()
 	end
@@ -709,11 +675,11 @@ function spikeball:floorcollide(a, b)
 		return false
 	end
 	if self.rolling then
-		if a == "pixeltile" then
+		if b.SLOPE then
 			if b.dir == "left" then
-				self.speedx = self.speedx - 1500*b.step*gdt
+				self.speedx = self.speedx - 16*b.incline*gdt
 			else
-				self.speedx = self.speedx + 1500*b.step*gdt
+				self.speedx = self.speedx + 16*b.incline*gdt
 			end
 		end
 	end
@@ -743,10 +709,6 @@ function spikeball:passivecollide(a, b)
 		return false
 	end
 	if a == "player" then
-		return false
-	end
-	if a == "pixeltile" then
-		self.y = self.y - b.step
 		return false
 	end
 	if a == "tile" and self.t == "spike" then

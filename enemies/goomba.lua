@@ -88,6 +88,8 @@ function goomba:init(x, y, t)
 		self.quadcenterY = 8
 		self.rigidgrab = true --limit angles mario can use
 		self.userect = adduserect(self.x, self.y, 2, 2, self)
+		self.pickupready = false
+		self.pickupreadyplayers = {}
 		--self.returntilemaskontrackrelease = true
 	elseif self.t == "spiketop" or self.t == "spiketopup" then
 		self.graphic = spiketopimg
@@ -560,11 +562,13 @@ function goomba:update(dt)
 					end
 				else
 					self.pickupready = false
-					for j, w in pairs(objects["player"]) do --Make mario stay on shyguy
+					for j, w in ipairs(objects["player"]) do --Make mario stay on shyguy
+						self.pickupreadyplayers[w.playernumber] = false
 						if not w.jumping and inrange(w.x, self.x-w.width, self.x+self.width) then
 							if w.y == self.y - w.height then
 								w.pickupready = self
 								self.pickupready = true
+								self.pickupreadyplayers[w.playernumber] = true
 								if not self.tracked then
 									if #checkrect(w.x+self.speedx*dt, w.y, w.width, w.height, {"exclude", w}, true) == 0 then
 										w.x = w.x + self.speedx*dt
@@ -885,11 +889,6 @@ function goomba:leftcollide(a, b, passive)
 		return false
 	end
 	
-	if a == "pixeltile" and b.dir == "right" then
-		self.y = self.y - b.step
-		return false
-	end
-	
 	if self.t == "spiketop" and (a == "tile" or a == "buttonblock" or a == "flipblock" or a == "frozencoin") then
 		if self.animationdirection == "right" then
 			self.speedy = -goombaspeed
@@ -937,10 +936,6 @@ function goomba:rightcollide(a, b)
 		return false
 	end
 	
-	if a == "pixeltile" and b.dir == "left" then
-		self.y = self.y - b.step
-		return false
-	end
 	if self.t == "spiketop" and (a == "tile" or a == "buttonblock" or a == "flipblock" or a == "frozencoin") then
 		if self.animationdirection == "right" then
 			self.speedy = goombaspeed
@@ -1022,10 +1017,6 @@ function goomba:globalcollide(a, b)
 	end
 	
 	if self.t == "spikeyfall" and a == "lakito" then
-		return true
-	end
-
-	if self.t == "spiketop" and a == "pixeltile" then
 		return true
 	end
 	
@@ -1114,16 +1105,18 @@ function goomba:floorcollide(a, b)
 	end
 	
 	if self.t == "spiketop" and (a == "tile" or a == "buttonblock" or a == "flipblock" or a == "frozencoin") then
-		self.speedy = 0
-		if self.animationdirection == "right" then
-			self.speedx = -goombaspeed
-		else
-			self.speedx = goombaspeed
+		if not b.SLOPE then
+			self.speedy = 0
+			if self.animationdirection == "right" then
+				self.speedx = -goombaspeed
+			else
+				self.speedx = goombaspeed
+			end
+			self.gravityx = 0
+			self.gravity = yacceleration
+			self.aroundcorner = false
+			return false
 		end
-		self.gravityx = 0
-		self.gravity = yacceleration
-		self.aroundcorner = false
-		return false
 	end
 	
 	if self.t == "spikeyfall" and (not breakoutmode) then
@@ -1171,16 +1164,6 @@ end
 
 function goomba:passivecollide(a, b)
 	if self:globalcollide(a, b) then
-		return false
-	end
-	if a == "pixeltile" then
-		local x, y = b.cox, b.coy
-		if tilequads[map[x][y][1]].platform then
-			return false
-		elseif self.y+self.width <= b.y+b.step then
-			self.y = self.y - b.step
-			return true
-		end
 		return false
 	end
 	self:leftcollide(a, b, "passive")

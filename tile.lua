@@ -50,7 +50,7 @@ function tile:init(x, y)
 			end
 		--Right slopes
 		elseif t.rightslant then
-			self.slant = "right"
+			self.slant = "right"; self.dir = self.slant
 			self.y1 = 0
 			self.y2 = 1
 			if t.halfrightslant1 then
@@ -60,9 +60,10 @@ function tile:init(x, y)
 				self.y1 = 0
 				self.y2 = 0.5
 			end
+			self.incline = math.abs(self.y2-self.y1)
 		--Left slopes
 		elseif t.leftslant then
-			self.slant = "left"
+			self.slant = "left"; self.dir = self.slant
 			self.y1 = 1
 			self.y2 = 0
 			if t.halfleftslant1 then
@@ -72,6 +73,7 @@ function tile:init(x, y)
 				self.y1 = 0.5
 				self.y2 = 0
 			end
+			self.incline = math.abs(self.y2-self.y1)
 		end
 		--Upside down slopes
 		if self.SLOPE and t.downslant then
@@ -92,43 +94,74 @@ function tile:init(x, y)
 		if t.platformright then
 			self.PLATFORMRIGHT = true
 		end
+
 		--Disable collisions if next to slopes
-		--if not self.SLOPE then
-			if not (t.PLATFORM or t.PLATFORMDOWN or t.PLATFORMLEFT or t.PLATFORMRIGHT) then 
-				local tleft, tabove
-				if ismaptile(self.cox-1, self.coy) and tilequads[map[self.cox-1][self.coy][1]] then
-					tleft = tilequads[map[self.cox-1][self.coy][1]].leftslant
+		--if not (t.PLATFORM or t.PLATFORMDOWN or t.PLATFORMLEFT or t.PLATFORMRIGHT) then 
+			local tleft, tabove
+			if ismaptile(self.cox-1, self.coy) and tilequads[map[self.cox-1][self.coy][1]] then
+				tleft = tilequads[map[self.cox-1][self.coy][1]].leftslant
+				if tleft and t.platform then tleft = false end --Make sure platform slopes DO NOT affect other tiles
+			end
+			if ismaptile(self.cox, self.coy-1) and tilequads[map[self.cox][self.coy-1][1]] then
+				local tq = tilequads[map[self.cox][self.coy-1][1]]
+				tabove = (tq.leftslant or tq.rightslant) and not tq.downslant
+				if tabove and (t.platform or (self.SLOPE and not self.UPSIDEDOWNSLOPE)) then
+					tabove = false
 				end
-				if ismaptile(self.cox, self.coy-1) and tilequads[map[self.cox][self.coy-1][1]] then
-					local tq = tilequads[map[self.cox][self.coy-1][1]]
-					tabove = (tq.leftslant or tq.rightslant) and not tq.downslant
+			end
+			--disable top flat collisions for platform slopes if next to another similar slope (because they should be one continuous line)
+			if self.SLOPE and t.platform and t.rightslant and (not t.downslant) and ismaptile(self.cox-1, self.coy-1) and tilequads[map[self.cox-1][self.coy-1][1]] then
+				local tq = tilequads[map[self.cox-1][self.coy-1][1]]
+				if tq.rightslant and not tq.downslant then
+					self.platformslopenotopcollision = true
 				end
-				if tleft or tabove then
-					self.PLATFORM, self.PLATFORMDOWN, self.PLATFORMLEFT, self.PLATFORMRIGHT = true, true, true, true
-					if tleft then
-						self.PLATFORMLEFT = false
-					end
-					if tabove then
-						self.PLATFORM = false
-					end
-					self.byslope = true
+			end
+			if tleft or tabove then
+				local up, down, left, right = cancollideside(self, "up"), cancollideside(self, "down"), cancollideside(self, "left"), cancollideside(self, "right")
+				if tleft then
+					left = false
+				end
+				if tabove then
+					up = false
+				end
+				self.byslope = true
+				if not (up and down and left and right) then
+					self.PLATFORM = up or nil
+					self.PLATFORMDOWN = down or nil
+					self.PLATFORMLEFT = left or nil
+					self.PLATFORMRIGHT = right or nil
 				end
 			end
 		--end
-		if t.rightslant then  --maps are loaded from left -> right, so the slope tile on the right has to look to the left to disable the tile's collision
+		if t.rightslant and not t.platform then  --maps are loaded from left -> right, so the slope tile on the right has to look to the left to disable the tile's collision
 			local tr, tright
 			if ismaptile(self.cox-1, self.coy) and tilequads[map[self.cox-1][self.coy][1]] then
-				if tilequads[map[self.cox-1][self.coy][1]].collision then
+				local tq = tilequads[map[self.cox-1][self.coy][1]]
+				if tq.collision then
 					tr = objects["tile"][tilemap(self.cox-1, self.coy)]
 					tright = true
 				end
 			end
 			if tright then
-				if not tr.byslope then
-					tr.PLATFORM, tr.PLATFORMDOWN, tr.PLATFORMLEFT, tr.PLATFORMRIGHT = true, true, true, true
-				end
-				tr.PLATFORMRIGHT = false
+				local up, down, left, right = cancollideside(tr, "up"), cancollideside(tr, "down"), cancollideside(tr, "left"), cancollideside(tr, "right")
+				right = false
 				tr.byslope = true
+				if not (up and down and left and right) then
+					tr.PLATFORM = up or nil
+					tr.PLATFORMDOWN = down or nil
+					tr.PLATFORMLEFT = left or nil
+					tr.PLATFORMRIGHT = right or nil
+				end
+			end
+		end
+		if t.leftslant and t.platform and (not t.downslant) then
+			--disable top flat collisions for platform slopes if next to another similar slope (because they should be one continuous line)
+			if ismaptile(self.cox-1, self.coy+1) and tilequads[map[self.cox-1][self.coy+1][1]] then
+				local tq = tilequads[map[self.cox-1][self.coy+1][1]]
+				local t = objects["tile"][tilemap(self.cox-1, self.coy+1)]
+				if tq.leftslant and not tq.downslant then
+					t.platformslopenotopcollision = true
+				end
 			end
 		end
 	end

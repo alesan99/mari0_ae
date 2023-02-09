@@ -528,6 +528,8 @@ function enemy:init(x, y, t, a, properties)
 		if self.throwntime then
 			self.throwntimer = 0
 		end
+		self.pickupready = false
+		self.pickupreadyplayers = {}
 	end
 
 	if self.jumps or self.noplayercollisiononthrow then
@@ -2223,10 +2225,12 @@ function enemy:update(dt)
 		else
 			self.pickupready = false
 			for j, w in pairs(objects["player"]) do
+				self.pickupreadyplayers[w.playernumber] = false
 				local col = checkrect(self.x+self.carryrange[1], self.y+self.carryrange[2], self.carryrange[3], self.carryrange[4], {"player"})
 				if #col > 0 then
 					w.pickupready = self
 					self.pickupready = true
+					self.pickupreadyplayers[w.playernumber] = true
 					
 					--carry if holding button
 					if (self.carryifholdingrunbutton and runkey(w.playernumber)) and not w.pickup then
@@ -2902,20 +2906,6 @@ function enemy:leftcollide(a, b, c, d)
 		return false
 	end
 	
-	if a == "tile" then
-		--AE ADDITION
-		--slant
-		if self.onslant == "right" and self.y+self.height-2/16 <= b.y then
-			self.y = b.y-self.height
-			return false
-		end
-	end
-
-	if a == "pixeltile" and b.dir == "right" and self.y < b.y then --AE ADDITION
-		self.y = self.y - b.step
-		return false
-	end
-	
 	if self.transforms and self:gettransformtrigger("leftcollide") and (not self.justspawned) then
 		if self:handlecollisiontransform("leftcollide",a,b) then
 			if not self.dotransformaftercollision then
@@ -3016,20 +3006,6 @@ function enemy:rightcollide(a, b, c, d)
 	end
 
 	if self.ignorerightcollide or b.ignoreleftcollide then --AE ADDITION
-		return false
-	end
-	
-	if a == "tile" then
-		--AE ADDITION
-		--slant
-		if self.onslant == "left" and self.y+self.height-2/16 <= b.y then
-			self.y = b.y-self.height
-			return false
-		end
-	end
-
-	if a == "pixeltile" and b.dir == "left" and self.y < b.y then --AE ADDITION
-		self.y = self.y - b.step
 		return false
 	end
 	
@@ -3252,15 +3228,6 @@ function enemy:floorcollide(a, b, c, d)
 			self.speedy = -self.crawlspeed
 			return true
 		end
-	end
-
-	--slants/slopes --AE ADDITION
-	local onslant = (a == "pixeltile")
-	if onslant then
-		self.onslant = b.dir
-		self.onslantstep = b.step
-	else
-		self.onslant = false
 	end
 	
 	if (not self.frozen) and (self.reflects or self.reflectsy) then

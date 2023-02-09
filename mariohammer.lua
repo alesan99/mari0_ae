@@ -3,7 +3,7 @@ mariohammer = class:new()
 function mariohammer:init(x, y, dir, v)
 	--PHYSICS STUFF
 	self.y = y+4/16
-	self.speedy = (-math.sqrt(2*yacceleration*3.5))+v.speedy --bobthelawyer?
+	self.speedy = (-math.sqrt(2*yacceleration*3.5))--+v.speedy --bobthelawyer?
 	if dir == "right" then
 		self.speedx = hammerspeed+v.speedx
 		self.x = x+3/16

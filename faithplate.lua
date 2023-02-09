@@ -58,7 +58,18 @@ function faithplate:init(x, y, dir, vars, r)
 	
 	self.animationtimer = 1
 	
-	self.includetable = {"player", "box", "turret", "goomba", "koopa", "enemy"}
+	self.includetable = {
+		"player", "box", "gel", "turret", "enemy", "ice", "energyball", "tilemoving",
+		"mushroom", "flower", "oneup", "star", "fireball", "fire", "poisonmush", "brofireball",
+		"boomerang", "hammersuit", "mariohammer", "frogsuit", "levelball", "core", "iceball",
+		"powblock", "smallspring", "pbutton"
+	}
+	local ignorelist = {"icicle", "cheep", "squid", "flyingfish", "cheepwhite", "cheepred", "chainchomp", "pinksquid", "parabeetle", "parabeetleright", "boo", "rockywrench"}
+	for i, v in pairs(enemies) do
+		if not tablecontains(ignorelist, v) then
+			table.insert(self.includetable, v)
+		end
+	end
 end
 
 function faithplate:update(dt)

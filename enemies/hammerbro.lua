@@ -331,9 +331,6 @@ function hammerbro:leftcollide(a, b)
 		self:shotted()
 	elseif a == "boomerang" and b.killstuff then
 		self:shotted()
-	elseif a == "pixeltile" and b.dir == "right" then
-		self.y = self.y - 1/16
-		return false
 	end
 	
 	return false
@@ -361,9 +358,6 @@ function hammerbro:rightcollide(a, b)
 		self:shotted()
 	elseif a == "boomerang" and b.killstuff then
 		self:shotted()
-	elseif a == "pixeltile" and b.dir == "left" then
-		self.y = self.y - 1/16
-		return false
 	end
 	
 	return false
@@ -418,11 +412,6 @@ function hammerbro:globalcollide(a, b)
 			self:shotted()
 		end
 	end
-end
-
-
-function hammerbro:startfall()
-	
 end
 
 function hammerbro:floorcollide(a, b)

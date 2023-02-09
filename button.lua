@@ -15,9 +15,15 @@ function button:init(x, y, t, r)
 	
 	self.dir = "down"
 	self.t = t or 1
-	self.checktable = {"player", "box", "goomba", "koopa", "bomb", "splunkin", "sidestepper", "mole", "bigmole", "drybones", "core", "powblock", "enemy"}
 	if self.t == 2 or self.t == 3 then
 		self.checktable = {"box"}
+	else
+		self.checktable = {"player", "box", "core", "powblock", "smallspring", "pbutton", "enemy"}
+		for i, v in pairs(enemies) do
+			if v ~= "icicle" and v ~= "chainchomp" then
+				table.insert(self.checktable, v)
+			end
+		end
 	end
 
 	self.r = {unpack(r)}

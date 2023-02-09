@@ -872,7 +872,7 @@ function animation:update(dt)
 				transformenemyanimation(v[2])
 			elseif v[1] == "killallenemies" then
 				for i2, v2 in pairs(objects) do
-					if i1 ~= "tile" and i2 ~= "pixeltile" and i2 ~= "buttonblock" then
+					if i1 ~= "tile" and i2 ~= "buttonblock" then
 						for i, v in pairs(objects[i2]) do
 							if v.active and v.shotted and (not v.resistseverything) then
 								local dir = "right"
@@ -941,8 +941,8 @@ function animation:update(dt)
 					for i = 1, #animationtriggerfuncs[v[2]] do
 						animationtriggerfuncs[v[2]][i]:trigger()
 					end
+					animationtriggerfuncs[v[2]].triggered = true
 				end
-				animationtriggerfuncs[v[2]].triggered = true
 				
 			elseif v[1] == "addkeys" then
 				if v[3] == "everyone" then

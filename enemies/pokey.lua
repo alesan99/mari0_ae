@@ -1,6 +1,6 @@
 pokey = class:new()
 
-function pokey:init(x, y, t, l, c, col)
+function pokey:init(x, y, t, l, ischild, col)
 	--PHYSICS STUFF
 	self.x = x-6/16
 	self.y = y-11/16
@@ -16,13 +16,13 @@ function pokey:init(x, y, t, l, c, col)
 	if l and l == "default" then
 		self.length = 3
 	end
-	self.bodypart = c or false --child?
+	self.bodypart = ischild or false --child?
 	self.col = col or false --collision? (only bottom i think)
 	if self.length == 1 then
 		self.col = true
 	end
 	
-	if not c then --if not child
+	if not ischild then --if not child
 		self.child = {}
 		for i = 1, self.length-1 do
 			self.y = self.y - self.height
@@ -171,9 +171,9 @@ function pokey:update(dt)
 					self.child[survivor].portalable = true
 					self.x = self.child[survivor].x
 					self.speedx = self.child[survivor].speedx
-					local hi = -1
+					local hi = 0
 					for i = 1, self.length-1 do
-						if self.child[i] and not self.child[i].shot then
+						if self.child[i] and (not self.child[i].shot) and i ~= survivor then
 							hi = hi + 1
 							self.child[i].x = self.child[survivor].x
 							self.child[i].speedx = self.child[survivor].speedx
@@ -300,9 +300,6 @@ function pokey:leftcollide(a, b)
 	if self:globalcollide(a, b) then
 		return false
 	end
-	if b.PLATFORM then
-		return false
-	end
 	
 	self.speedx = goombaspeed
 	
@@ -311,9 +308,6 @@ end
 
 function pokey:rightcollide(a, b)
 	if self:globalcollide(a, b) then
-		return false
-	end
-	if b.PLATFORM then
 		return false
 	end
 	
@@ -326,9 +320,9 @@ function pokey:ceilcollide(a, b)
 	if self:globalcollide(a, b) then
 		return false
 	end
-	if a == "pokey" and not b.col then
+	--[[if a == "pokey" and not b.col then
 		return false
-	end
+	end]]
 end
 
 function pokey:globalcollide(a, b)
@@ -337,14 +331,14 @@ function pokey:globalcollide(a, b)
 			return true
 		end
 	end
+
+	--[[if a == "pokey" and self.i and b.i and (b.i > self.i) then
+		return true
+	end]]
 	
 	if a == "fireball" or a == "player" then
 		return true
 	end
-end
-
-function pokey:startfall()
-
 end
 
 function pokey:floorcollide(a, b)
@@ -363,7 +357,7 @@ function pokey:passivecollide(a, b)
 			self.y = b.y-self.height-0.06 --sloppy fix for weird clipping teleporting with slopes, should redo pokeys instead
 			return true
 		else
-			return false
+			return true
 		end
 	end
 	self:leftcollide(a, b)
