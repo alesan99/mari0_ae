@@ -558,7 +558,9 @@ function checkcollisionslope(v, t, h, g, j, i, dt, passed) --v: b1table | t: b2t
 				t.ignorecheckintile = true
 				local insidetile = checkintile(v.x, v.y, v.width, v.height, nil, v, "ignoreslopes")
 				t.ignorecheckintile = false
-				if checkintile(v.x, ty, v.width, v.height, nil, v, "ignoreslopes") and ((sleft and v.speedx > 0) or (sright and v.speedx < 0)) then
+				if v.activestatic then --Don't push at all
+					passivecollision(v, t, h, g, j, i, dt) 
+				elseif checkintile(v.x, ty, v.width, v.height, nil, v, "ignoreslopes") and ((sleft and v.speedx > 0) or (sright and v.speedx < 0)) then
 					if horcollision(v, t, h, g, j, i, dt, "dontpush", ydir) then
 						hadhorcollision = true
 						hadvercollision = true
@@ -566,6 +568,9 @@ function checkcollisionslope(v, t, h, g, j, i, dt, passed) --v: b1table | t: b2t
 					end
 				elseif vercollision(v, t, h, g, j, i, dt, "dontpush", ydir) then
 					hadvercollision = true
+					if v.slopeangle and ty > v.y then --don't move object down if its already on a higher slope
+						return hadhorcollision, hadvercollision
+					end
 					v.y = ty
 					v.slopeangle = realangle
 
@@ -584,6 +589,7 @@ function checkcollisionslope(v, t, h, g, j, i, dt, passed) --v: b1table | t: b2t
 					else
 						v.slopeposty = postty
 					end
+					 --TODO: Calculate a lower speedy incase the object will still be inside the slope next frame (aka sliding along ceiling slopes)
 				end
 			end
 		elseif aabb(v.x + v.speedx*dt, v.y + v.speedy*dt, v.width, v.height, t.x, t.y, t.width, t.height) then
