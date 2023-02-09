@@ -470,7 +470,7 @@ function goomba:update(dt)
 			local x = math.floor(self.x + self.width/2+1)--turn around on edge (yeah, goombrats do that)
 			local y = math.floor(self.y + self.height+1.5)
 			
-			if inmap(x, y) and (not checkfortileincoord(x, y)) and ((inmap(x+.5, y) and checkfortileincoord(math.ceil(x+.5), y)) or (inmap(x-.5, y) and checkfortileincoord(math.floor(x-.5), y))) then
+			if inmap(x, y) and (not checkfortileincoord(x, y)) and ((inmap(x+.5, y) and checkfortileincoord(math.ceil(x+.5), y)) or (inmap(x-.5, y) and checkfortileincoord(math.floor(x-.5), y))) and (not (inmap(x,y-1) and objects["tile"][tilemap(x, y-1)] and objects["tile"][tilemap(x, y-1)].SLOPE)) then
 				if (not (self.t == "spiketop")) or (((inmap(x+.5, y) and tilequads[map[math.ceil(x+.5)][y][1]].platform) or (inmap(x-.5, y) and tilequads[map[math.floor(x-.5)][y][1]].platform))) then
 					if self.speedx < 0 then
 						if self.t ~= "goombrat" then

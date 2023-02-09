@@ -887,7 +887,7 @@ function enemy:update(dt)
 		if self.turnaroundoncliff and self.falling == false then
 			--check if nothing below
 			local x, y = math.floor(self.x + self.width/2+1), math.floor(self.y + self.height+1.5)
-			if inmap(x, y) and (not checkfortileincoord(x, y)) and ((inmap(x+.5, y) and checkfortileincoord(math.ceil(x+.5), y)) or (inmap(x-.5, y) and checkfortileincoord(math.floor(x-.5), y))) then
+			if inmap(x, y) and (not checkfortileincoord(x, y)) and ((inmap(x+.5, y) and checkfortileincoord(math.ceil(x+.5), y)) or (inmap(x-.5, y) and checkfortileincoord(math.floor(x-.5), y))) and (not (inmap(x,y-1) and objects["tile"][tilemap(x, y-1)] and objects["tile"][tilemap(x, y-1)].SLOPE)) then
 				if self.speedx < 0 then
 					self.x = x-self.width/2
 				else
