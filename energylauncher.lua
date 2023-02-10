@@ -414,8 +414,13 @@ function energyball:floorcollide(a, b)
 			self.speedy = -math.abs(self.speedx)
 			self.speedx = 0
 		else
-			self.speedx = -self.speedy
-			self.speedy = 0
+			if b.dir == "left" then
+				self.speedx = -self.speedy
+				self.speedy = 0
+			else
+				self.speedx = self.speedy
+				self.speedy = 0
+			end
 		end
 		return true
 	elseif a == "tile" or a == "flipblock" or a == "door" or a == "frozencoin" then

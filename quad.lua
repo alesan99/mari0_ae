@@ -183,6 +183,11 @@ function getquadprops(imgdata, x, y, self)
 			self.downslant = true
 		end
 	end
+
+	--get slab
+	if self.leftslant and self.rightslant then
+		self.slab = true
+	end
 	
 	--get note block
 	self.noteblock = false
