@@ -274,7 +274,7 @@ function energyball:update(dt)
 			self.quad = energyballquad[self.ti][self.quadi]
 		end
 	end
-	if self.hp <= 0 or self.destroy then
+	if self.hp <= 0 or self.destroy or self.y < -5 then
 		if self.hp <= 0 then
 			table.insert(emancipateanimations, emancipateanimation:new(self.x, self.y, self.width, self.height, self.graphic, self.quad, self.speedx*0.2, self.speedy*0.2, self.rotation, self.offsetX, self.offsetY, self.quadcenterX, self.quadcenterY))
 		end
