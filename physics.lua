@@ -728,7 +728,7 @@ end
 function horcollision(v, t, h, g, j, i, dt, dontpush)
 	if v.speedx < 0 then
 		--move object RIGHT (because it was moving left)
-		if not (cancollideside(v, "left", t) and cancollideside(t, "right")) then
+		if not (cancollideside(v, "left", t) and ((not t.nointernalplatform) or cancollideside(t, "right"))) then
 		elseif t.rightcollide then
 			if t:rightcollide(j, v) ~= false then
 				if t.postrightcollide then
@@ -744,7 +744,7 @@ function horcollision(v, t, h, g, j, i, dt, dontpush)
 			end
 		end
 
-		if not (cancollideside(t, "right", v) and cancollideside(v, "left") and (not t.NOEXTERNALHORCOLLISIONS)) then
+		if not (cancollideside(t, "right", v) and ((not v.nointernalplatform) or cancollideside(v, "left")) and (not t.NOEXTERNALHORCOLLISIONS)) then
 			return false
 		elseif v.leftcollide then
 			if v:leftcollide(h, t) ~= false then
@@ -770,7 +770,7 @@ function horcollision(v, t, h, g, j, i, dt, dontpush)
 		end
 	else
 		--move object LEFT (because it was moving right)
-		if not (cancollideside(v, "right", t) and cancollideside(t, "left")) then
+		if not (cancollideside(v, "right", t) and ((not t.nointernalplatform) or cancollideside(t, "left"))) then
 		elseif t.leftcollide then
 			if t:leftcollide(j, v) ~= false then
 				if t.postleftcollide then
@@ -786,7 +786,7 @@ function horcollision(v, t, h, g, j, i, dt, dontpush)
 			end
 		end
 		
-		if not (cancollideside(t, "left", v) and cancollideside(v, "right") and (not t.NOEXTERNALHORCOLLISIONS)) then
+		if not (cancollideside(t, "left", v) and ((not v.nointernalplatform) or cancollideside(v, "right")) and (not t.NOEXTERNALHORCOLLISIONS)) then
 			return false
 		elseif v.rightcollide then
 			if v:rightcollide(h, t) ~= false then
@@ -818,7 +818,7 @@ end
 function vercollision(v, t, h, g, j, i, dt, dontpush, ydir)
 	if (ydir or v.speedy) < 0 then
 		--move object DOWN (because it was moving up)
-		if not (cancollideside(v, "up", t) and cancollideside(t, "down")) then
+		if not (cancollideside(v, "up", t) and ((not t.nointernalplatform) or cancollideside(t, "down"))) then
 		elseif t.floorcollide then
 			if t:floorcollide(j, v) ~= false then
 				if t.postfloorcollide then
@@ -834,7 +834,7 @@ function vercollision(v, t, h, g, j, i, dt, dontpush, ydir)
 			end
 		end
 		
-		if not (cancollideside(t, "down", v) and cancollideside(v, "up") and (not t.NOEXTERNALVERCOLLISIONS)) then
+		if not (cancollideside(t, "down", v) and ((not v.nointernalplatform) or cancollideside(v, "up")) and (not t.NOEXTERNALVERCOLLISIONS)) then
 			return false
 		elseif v.ceilcollide then
 			if v:ceilcollide(h, t) ~= false then
@@ -860,7 +860,7 @@ function vercollision(v, t, h, g, j, i, dt, dontpush, ydir)
 		end
 	else					
 		--move object UP (because it was moving down)
-		if not (cancollideside(v, "down", t) and cancollideside(t, "up")) then
+		if not (cancollideside(v, "down", t) and ((not t.nointernalplatform) or cancollideside(t, "up"))) then
 		elseif t.ceilcollide then
 			if t:ceilcollide(j, v) ~= false then
 				if t.postceilcollide then
@@ -876,7 +876,7 @@ function vercollision(v, t, h, g, j, i, dt, dontpush, ydir)
 			end
 		end
 
-		if not (cancollideside(t, "up", v) and cancollideside(v, "down") and (not t.NOEXTERNALVERCOLLISIONS)) then
+		if not (cancollideside(t, "up", v) and ((not v.nointernalplatform) or cancollideside(v, "down")) and (not t.NOEXTERNALVERCOLLISIONS)) then
 			return false
 		elseif v.floorcollide then
 			if v:floorcollide(h, t, dt) ~= false then
