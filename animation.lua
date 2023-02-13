@@ -788,7 +788,7 @@ function animation:update(dt)
 						local s = t[2]:split("-") --find coords
 						local x, y = tonumber(s[1]), tonumber(s[2])
 						local coinblock = (ismaptile(x, y) and tilequads[map[x][y][1]].collision and tilequads[map[x][y][1]].coinblock)
-						objects["collectable"][t[2]] = collectable:new(x, y, map[x][y], false, coinblock)
+						objects["collectable"][tilemap(x,y)] = collectable:new(x, y, map[x][y], false, coinblock)
 					end
 				end
 				collectableslist[i] = {}
