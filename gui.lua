@@ -200,9 +200,9 @@ function guielement:update(dt)
 
 			if self.highlighting then
 				local mx, my = love.mouse.getX()/scale, love.mouse.getY()/scale
-				self.cursorpos = math.max(math.min(round(((math.min(math.max(mx,self.x),self.x+self.width*8)-self.x)+6)/8) + self.textoffset + math.max((math.min(math.ceil(((my-self.y)-1)/10),self.height)-1)*self.width,0), #self.value+1),1)
+				self.cursorpos = math.max(math.min(round(((math.min(math.max(mx,self.x),self.x+self.width*8)-self.x)+6)/8) + self.textoffset + math.max((math.min(math.ceil(((my-self.y)-1)/10),self.height)-1)*self.width,0), string.len(self.value)+1),1)
 				if self.height == 1 and mx > self.x + 4 + self.width*8 and self.offsettimer == 0 then
-					self.textoffset = math.min(self.textoffset + 1, #self.value - self.width + 1)
+					self.textoffset = math.min(self.textoffset + 1, string.len(self.value) - self.width + 1)
 					self.offsettimer = 0.1
 				elseif self.height == 1 and mx < self.x and self.offsettimer == 0 then
 					self.textoffset = math.max(self.textoffset - 1, 0)
@@ -911,7 +911,7 @@ function guielement:keypress(key,textinput)
 						self.highlight = self.highlight or self.cursorpos
 					end
 
-					self.cursorpos = math.min(#self.value + 1, self.cursorpos + 1)
+					self.cursorpos = math.min(string.len(self.value) + 1, self.cursorpos + 1)
 					--while self.cursorpos-1 >= self.textoffset+self.width do
 						self.textoffset = math.min(math.max(self.textoffset, self.cursorpos-self.width), self.maxlength - self.width)
 					--end
@@ -934,7 +934,7 @@ function guielement:keypress(key,textinput)
 						self.highlight = self.highlight or self.cursorpos
 					end
 
-					self.cursorpos = math.min(#self.value + 1, self.cursorpos + self.width)
+					self.cursorpos = math.min(string.len(self.value) + 1, self.cursorpos + self.width)
 					self.cursorblink = true
 					self.timer = 0
 				elseif key == "backspace" or (key == "x" and self.ctrl and self.highlight) then
@@ -961,7 +961,7 @@ function guielement:keypress(key,textinput)
 					self.timer = 0
 				elseif key == "a" and self.ctrl then
 					self.highlight = 1
-					self.cursorpos = #self.value + 1
+					self.cursorpos = string.len(self.value) + 1
 				elseif key == "c" and self.ctrl then
 					local highlight1, highlight2 = math.min(self.highlight,self.cursorpos),math.max(self.highlight,self.cursorpos)
 					textclipboard = string.sub(self.value,highlight1,highlight2-1)
@@ -1043,7 +1043,7 @@ function guielement:keypress(key,textinput)
 									highlightlength = math.abs(self.highlight - self.cursorpos)
 								end
 								if textclipboard then
-									if (#textclipboard or 0) + #self.value - highlightlength <= self.maxlength then
+									if (#textclipboard or 0) + string.len(self.value) - highlightlength <= self.maxlength then
 										targetkey = textclipboard
 									else
 										notice.new("no room to paste!")

@@ -664,7 +664,7 @@ function checkcollisionslope(v, t, h, g, j, i, dt, passed) --v: b1table | t: b2t
 				if horcollision(v, t, h, g, j, i, dt) then
 					hadhorcollision = true
 				end
-			elseif v.speedy > 0 and i31 and ((t.UPSIDEDOWNSLOPE and v.y+v.height <= t.y) or not inslantrange) then --Collision is vertical!
+			elseif v.speedy > 0 and i31 and ((t.UPSIDEDOWNSLOPE and v.y+v.height <= t.y) or ((not t.UPSIDEDOWNSLOPE) and not inslantrange)) then --Collision is vertical!
 				local platformpass = true
 				if onlyplatform and ((v.y+v.height > boundingy) or t.platformslopenotopcollision) then
 					platformpass = false
@@ -1089,7 +1089,7 @@ function checkintile(x, y, width, height, list, inobj, condition)
 								skip = true
 							end
 						elseif condition == "ignoreslopes" then
-							if (t.SLOPE and (not t.UPSIDEDOWNSLOPE) and y+height < t.y+t.height) or t.ignorecheckintile then
+							if (t.SLOPE and (not t.UPSIDEDOWNSLOPE) and y+height < t.y+t.height) or (t.ignorecheckintile) or (t.PLATFORM or t.PLATFORMDOWN or t.PLATFORMLEFT or t.PLATFORMRIGHT) then
 								skip = true
 							end
 						end
