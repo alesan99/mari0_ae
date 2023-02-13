@@ -179,7 +179,7 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	guielements["timelimitdecrease"].autorepeat = true
 	guielements["timelimitdecrease"].repeatwait = 0.3
 	guielements["timelimitdecrease"].repeatdelay = 0.08
-	guielements["timelimitinput"] = guielement:new("input", 29, 152, string.len(mariotimelimit), changetimelimit, mariotimelimit, 6, nil, nil, 0)
+	guielements["timelimitinput"] = guielement:new("input", 29, 152, string.len(mariotimelimit), changetimelimit, tostring(mariotimelimit), 6, nil, nil, 0)
 	guielements["timelimitinput"].justdisplay = true
 	guielements["timelimitinput"].textoffset = 0
 	guielements["timelimitinput"].inputtingfunc = changetimelimitinputting

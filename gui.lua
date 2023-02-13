@@ -757,7 +757,7 @@ function guielement:click(x, y, button)
 		elseif self.type == "input" then
 			if button ~= "wd" and button ~= "wu" then
 				if self:inhighlight(x, y) then
-					if self.inputting then
+					if ((not android) or self.inputting) then
 						--click where you want the cursor
 						local mx, my = love.mouse.getX()/scale, love.mouse.getY()/scale
 						self.cursorpos = math.max(math.min(round(((mx-self.x)+6.5)/8) + self.textoffset + math.max((math.min(math.ceil(((my-self.y)-1)/10),self.height)-1)*self.width,0), string.len(self.value)+1),1)
