@@ -524,8 +524,19 @@ function checkcollisionslope(v, t, h, g, j, i, dt, passed) --v: b1table | t: b2t
 		if onlyplatform and not inslantrange then
 			platformpass = false
 		end
+		
+		--target y position
+		local location = v.x-t.x
+		if sleft then location = v.x+v.width-t.x end
+		location = math.max(0, math.min(1, location))
+		local ty = t.y+getslopey(location, t.y1, t.y2) --, v.y+v.speedy*dt)
+		if not t.UPSIDEDOWNSLOPE then
+			ty = ty - v.height
+		else
+			ty = ty
+		end
 
-		local docollide = inslopedirection and (insideaabb) and finside and diff >= -math.max(0.1,math.abs(diffy))
+		local docollide = inslopedirection and (insideaabb) and finside and (diff >= -math.max(0.1,math.abs(diffy)) or math.abs((ty-v.y)) < v.height)
 		--there's no mathematical basis for the last comparison, (diff > diffy) but it solves weird bottom slope collision when a normal slope is above it for now
 		if onlyplatform then --use more complicated (and unreliable) method to check platform slope intersections
 			docollide = inslopedirection and ((insideaabb or finsideaabb) and finside) and (diff <= 1e-1 or (not insideaabb)) and platformpass
@@ -533,17 +544,6 @@ function checkcollisionslope(v, t, h, g, j, i, dt, passed) --v: b1table | t: b2t
 		
 		if not passed and docollide then
 			--sloped side collision
-			local location = v.x-t.x
-			if sleft then location = v.x+v.width-t.x end
-			location = math.max(0, math.min(1, location))
-
-			--target y position
-			local ty = t.y+getslopey(location, t.y1, t.y2) --, v.y+v.speedy*dt)
-			if not t.UPSIDEDOWNSLOPE then
-				ty = ty - v.height
-			else
-				ty = ty
-			end
 
 			local collided = false
 			if (not t.UPSIDEDOWNSLOPE) and ty-v.height < v.y+v.speedy*dt then
