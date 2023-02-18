@@ -202,7 +202,7 @@ function koopa:update(dt)
 			if self.t == "downbeetle" or self.t == "downspikey" then
 				y = math.floor(self.y)
 			end
-			if inmap(x, y) and (not checkfortileincoord(x, y)) and ((inmap(x+.5, y) and checkfortileincoord(math.ceil(x+.5), y)) or (inmap(x-.5, y) and checkfortileincoord(math.floor(x-.5), y))) then
+			if inmap(x, y) and (not checkfortileincoord(x, y)) and ((inmap(x+.5, y) and checkfortileincoord(math.ceil(x+.5), y)) or (inmap(x-.5, y) and checkfortileincoord(math.floor(x-.5), y))) and (not (inmap(x,y-1) and objects["tile"][tilemap(x, y-1)] and objects["tile"][tilemap(x, y-1)].SLOPE)) then
 				if self.speedx < 0 then
 					self.animationdirection = "left"
 					self.x = x-self.width/2

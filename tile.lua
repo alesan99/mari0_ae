@@ -99,12 +99,13 @@ function tile:init(x, y)
 		--if not (t.PLATFORM or t.PLATFORMDOWN or t.PLATFORMLEFT or t.PLATFORMRIGHT) then 
 			local tleft, tabove
 			if ismaptile(self.cox-1, self.coy) and tilequads[map[self.cox-1][self.coy][1]] then
-				tleft = tilequads[map[self.cox-1][self.coy][1]].leftslant
+				local tq = tilequads[map[self.cox-1][self.coy][1]]
+				tleft = tq.leftslant and (not tq.slab)
 				if tleft and t.platform then tleft = false end --Make sure platform slopes DO NOT affect other tiles
 			end
 			if ismaptile(self.cox, self.coy-1) and tilequads[map[self.cox][self.coy-1][1]] then
 				local tq = tilequads[map[self.cox][self.coy-1][1]]
-				tabove = (tq.leftslant or tq.rightslant) and not tq.downslant
+				tabove = (tq.leftslant or tq.rightslant) and (not tq.downslant) and (not tq.slab)
 				if tabove and (t.platform or (self.SLOPE and not self.UPSIDEDOWNSLOPE)) then
 					tabove = false
 				end
@@ -112,7 +113,7 @@ function tile:init(x, y)
 			--disable top flat collisions for platform slopes if next to another similar slope (because they should be one continuous line)
 			if self.SLOPE and t.platform and t.rightslant and (not t.downslant) and ismaptile(self.cox-1, self.coy-1) and tilequads[map[self.cox-1][self.coy-1][1]] then
 				local tq = tilequads[map[self.cox-1][self.coy-1][1]]
-				if tq.rightslant and not tq.downslant then
+				if tq.rightslant and (not tq.downslant) and (not tq.slab) then
 					self.platformslopenotopcollision = true
 				end
 			end
@@ -133,7 +134,7 @@ function tile:init(x, y)
 				end
 			end
 		--end
-		if t.rightslant and not t.platform then  --maps are loaded from left -> right, so the slope tile on the right has to look to the left to disable the tile's collision
+		if t.rightslant and (not t.platform) and (not t.slab) then  --maps are loaded from left -> right, so the slope tile on the right has to look to the left to disable the tile's collision
 			local tr, tright
 			if ismaptile(self.cox-1, self.coy) and tilequads[map[self.cox-1][self.coy][1]] then
 				local tq = tilequads[map[self.cox-1][self.coy][1]]
@@ -154,7 +155,7 @@ function tile:init(x, y)
 				end
 			end
 		end
-		if t.leftslant and t.platform and (not t.downslant) then
+		if t.leftslant and t.platform and (not t.downslant) and (not t.slab) then
 			--disable top flat collisions for platform slopes if next to another similar slope (because they should be one continuous line)
 			if ismaptile(self.cox-1, self.coy+1) and tilequads[map[self.cox-1][self.coy+1][1]] then
 				local tq = tilequads[map[self.cox-1][self.coy+1][1]]

@@ -3689,7 +3689,6 @@ function mario:jump(force)
 				if ( ((self.animation ~= "grow1" and self.animation ~= "grow2") or self.falling)
 					and (self.falling == false or self.animation == "grow1" or self.animation == "grow2" or (self.shoe and self.landed)) )
 					or ( (self.characterdata.doublejump or self.characterdata.dbljmppls) and (not self.hasdoublejumped) ) then
-					print(self.landed)
 					if self.animation ~= "grow1" and self.animation ~= "grow2" and (not self.characterdata.nojumpsound) then
 						if self.size == 1 then
 							playsound(jumpsound)

@@ -274,7 +274,7 @@ function energyball:update(dt)
 			self.quad = energyballquad[self.ti][self.quadi]
 		end
 	end
-	if self.hp <= 0 or self.destroy then
+	if self.hp <= 0 or self.destroy or self.y < -5 then
 		if self.hp <= 0 then
 			table.insert(emancipateanimations, emancipateanimation:new(self.x, self.y, self.width, self.height, self.graphic, self.quad, self.speedx*0.2, self.speedy*0.2, self.rotation, self.offsetX, self.offsetY, self.quadcenterX, self.quadcenterY))
 		end
@@ -414,8 +414,13 @@ function energyball:floorcollide(a, b)
 			self.speedy = -math.abs(self.speedx)
 			self.speedx = 0
 		else
-			self.speedx = -self.speedy
-			self.speedy = 0
+			if b.dir == "left" then
+				self.speedx = -self.speedy
+				self.speedy = 0
+			else
+				self.speedx = self.speedy
+				self.speedy = 0
+			end
 		end
 		return true
 	elseif a == "tile" or a == "flipblock" or a == "door" or a == "frozencoin" then
