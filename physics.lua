@@ -80,7 +80,7 @@ function physicsupdate(dt)
 								v.speedx = math.max(-maxyspeed, v.speedx)
 							elseif v.gravitydir == "left" then
 								v.speedx = v.speedx - (v.gravity or yacceleration)*dt
-								v.speedy = math.min(maxyspeed, v.speedx)
+								v.speedx = math.min(maxyspeed, v.speedx)
 							else
 								v.speedy = v.speedy + (v.gravity or yacceleration)*dt
 								v.speedy = math.min(maxyspeed, v.speedy)
@@ -372,9 +372,11 @@ function physicsupdate(dt)
 						end
 						if v.gravity then
 							if v.startfall then
-								if v.gravitydir then
-									if (v.gravitydir == "right" and v.speedx == oldspeedx + v.gravity*dt) or (v.gravitydir == "left" and v.speedx == oldspeedx - v.gravity*dt) then
-										v:startfall(i)
+								if (not (v.stopjump and v.jumping)) and (not v.quicksand) then
+									if v.gravitydir then
+										if (v.gravitydir == "right" and v.speedx == oldspeedx + v.gravity*dt) or (v.gravitydir == "left" and v.speedx == oldspeedx - v.gravity*dt) then
+											v:startfall(i)
+										end
 									end
 								end
 							end

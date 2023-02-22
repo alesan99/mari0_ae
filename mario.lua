@@ -3674,7 +3674,7 @@ function mario:jump(force)
 					self.falling = false
 				end
 				
-				if self.shoe and (((not lowgravity) and self.speedy > 8) or (lowgravity and self.speedy > 4.5)) then
+				if self.shoe and (((not lowgravity) and (self.speedy > 8 or self.speedy < -goombashoehop)) or (lowgravity and (self.speedy > 4.5 or self.speedy < -goombashoehop))) then
 					return
 				elseif self.shoe == "drybonesshell" and self.ducking then
 					return
@@ -3687,7 +3687,7 @@ function mario:jump(force)
 				end]]
 				
 				if ( ((self.animation ~= "grow1" and self.animation ~= "grow2") or self.falling)
-					and (self.falling == false or self.animation == "grow1" or self.animation == "grow2" or (self.shoe and self.landed)) )
+					and (self.falling == false or self.animation == "grow1" or self.animation == "grow2" or (self.shoe and (not self.yoshi) and self.landed)) )
 					or ( (self.characterdata.doublejump or self.characterdata.dbljmppls) and (not self.hasdoublejumped) ) then
 					if self.animation ~= "grow1" and self.animation ~= "grow2" and (not self.characterdata.nojumpsound) then
 						if self.size == 1 then

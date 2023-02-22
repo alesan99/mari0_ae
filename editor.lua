@@ -4003,7 +4003,7 @@ function openchangewidth()
 	guielements["maprightleft"].active = true
 	guielements["maprightright"].active = true
 	guielements["mapwidthapply"].active = true
-	--guielements["mapwidthcancel"].active = true
+	guielements["mapwidthcancel"].active = true
 
 	changemapwidthmenu = true
 	newmapwidth = mapwidth
