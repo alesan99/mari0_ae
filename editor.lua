@@ -6709,7 +6709,7 @@ function editor_keypressed(key, textinput)
 			end
 		end
 	end
-	if editormenuopen == false then
+	if editormenuopen == false and rightclickmenuopen == false then
 		if key == "delete" or key == "backspace" then
 			if tileselection and tileselection.finished then
 				emptySelection()
@@ -6772,7 +6772,7 @@ function editor_keypressed(key, textinput)
 				end
 			end
 		end
-	else --editormenuopen
+	elseif editormenuopen then
 		--set tile hotkeys
 		if editorstate == "tiles" then
 			if tilehotkeys[key] then
