@@ -466,6 +466,7 @@ function checkcollision(v, t, h, g, j, i, dt, passed) --v: b1table | t: b2table 
 end
 
 function cancollideside(t, side, v)
+	if not t then return false end
 	local safe = (not t.PLATFORM) and (not t.PLATFORMDOWN) and (not t.PLATFORMLEFT) and (not t.PLATFORMRIGHT) --no platform collisions
 	if v then
 		if v.overridesemisolids then
