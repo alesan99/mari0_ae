@@ -143,7 +143,7 @@ function tile:init(x, y)
 					tright = true
 				end
 			end
-			if tright then
+			if tright and tr then
 				local up, down, left, right = cancollideside(tr, "up"), cancollideside(tr, "down"), cancollideside(tr, "left"), cancollideside(tr, "right")
 				right = false
 				tr.byslope = true
