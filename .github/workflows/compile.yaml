@@ -9,6 +9,9 @@ jobs:
         path: main
         submodules: true
       name: Checkout Repository
+    - name: Extract Metadata
+      id: metadata
+      run: python3 main/.scripts/extract-metadata.py
     - name: Add Universe Repository
       run: sudo add-apt-repository universe
     - name: Update Packages
@@ -18,29 +21,57 @@ jobs:
     - name: Install makelove
       run: pip3 install git+https://github.com/pfirsich/makelove/
     - name: Build
-      run: cd main && python3 -m makelove
+      run: cd main && python3 -m makelove && cd ..
+    - name: Build (Android)
+      id: build-android
+      uses: love-actions/love-actions-android@v1
+      with:
+        app-name: ${{ steps.metadata.outputs.title }}
+        bundle-id: net.stabyourself.${{ steps.metadata.outputs.id }}
+        product-name: ${{ steps.metadata.outputs.id }}
+        resource-path: "main/.android-resources"
+        love-ref: ${{ steps.metadata.outputs.love-version }}
+        love-package: main/makelove-build/love/${{ env.ARTIFACT_NAME_LOVE }}
+        version-string: ${{ steps.metadata.outputs.version }}
+        version-code: ${{ steps.metadata.outputs.android-version }}
+        output-folder: "main/makelove-build/android"
+        keystore-alias: ${{ secrets.ANDROID_KEYSTORE_ALIAS }}
+        keystore-base64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        keystore-key-password: ${{ secrets.ANDROID_KEYSTORE_KEYPASSWORD }}
+        keystore-store-password: ${{ secrets.ANDROID_KEYSTORE_STOREPASSWORD }}
     - name: Artifact (LÖVE)
       uses: actions/upload-artifact@v3
       with:
-        name: a99e-source
+        name: ${{ steps.metadata.outputs.id }}-source
         path: main/makelove-build/love/${{ env.ARTIFACT_NAME_LOVE }}
     - name: Artifact (AppImage)
       uses: actions/upload-artifact@v3
       with:
-        name: a99e-linux
+        name: ${{ steps.metadata.outputs.id }}-linux
         path: main/makelove-build/appimage/${{ env.ARTIFACT_NAME_APPIMAGE }}
     - name: Artifact (Win64)
       uses: actions/upload-artifact@v3
       with:
-        name: a99e-win64
+        name: ${{ steps.metadata.outputs.id }}-win64
         path: main/makelove-build/win64/${{ env.ARTIFACT_NAME_WIN64 }}
     - name: Artifact (Win32)
       uses: actions/upload-artifact@v3
       with:
-        name: a99e-win32
+        name: ${{ steps.metadata.outputs.id }}-win32
         path: main/makelove-build/win32/${{ env.ARTIFACT_NAME_WIN32 }}
     - name: Artifact (MacOS)
       uses: actions/upload-artifact@v3
       with:
-        name: a99e-macos
+        name: ${{ steps.metadata.outputs.id }}-macos
         path: main/makelove-build/macos/${{ env.ARTIFACT_NAME_MACOS }}
+    - name: Artifact (Android Debug)
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ steps.metadata.outputs.id }}-android-debug
+        path: main/makelove-build/android/${{ steps.metadata.outputs.id }}-debug.apk
+    - name: Artifact (Android Release)
+      if: "${{ secrets.ANDROID_KEYSTORE_ALIAS != '' && secrets.ANDROID_KEYSTORE_BASE64 != '' && secrets.ANDROID_KEYSTORE_KEYPASSWORD != '' && secrets.ANDROID_KEYSTORE_STOREPASSWORD != '' }}"
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ steps.metadata.outputs.id }}-android-release
+        path: main/makelove-build/android/${{ steps.metadata.outputs.id }}-release.apk
