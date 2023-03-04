@@ -12,10 +12,10 @@ love_files = [
 # TODO: more metadata
 
 [windows.exe_metadata]
-ProductName = "Mari0: Alesan99's Entities"
+ProductName = "Mari0: AE"
 
 [linux.desktop_file_metadata]
-Name = "Mari0: Alesan99's Entities"
+Name = "Mari0: AE"
 
 [macos.app_metadata]
-CFBundleDisplayName = "Mari0: Alesan99's Entities"
+CFBundleDisplayName = "Mari0: AE"
