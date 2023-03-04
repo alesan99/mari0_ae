@@ -70,7 +70,7 @@ jobs:
         name: ${{ steps.metadata.outputs.id }}-android-debug
         path: main/makelove-build/android/${{ steps.metadata.outputs.id }}-debug.apk
     - name: Artifact (Android Release)
-      if: "${{ secrets.ANDROID_KEYSTORE_ALIAS != '' && secrets.ANDROID_KEYSTORE_BASE64 != '' && secrets.ANDROID_KEYSTORE_KEYPASSWORD != '' && secrets.ANDROID_KEYSTORE_STOREPASSWORD != '' }}"
+      if: "${{ secrets.ANDROID_KEYSTORE_ALIAS }} != '' && ${{ secrets.ANDROID_KEYSTORE_BASE64 }} != '' && ${{ secrets.ANDROID_KEYSTORE_KEYPASSWORD }} != '' && ${{ secrets.ANDROID_KEYSTORE_STOREPASSWORD }} != ''"
       uses: actions/upload-artifact@v3
       with:
         name: ${{ steps.metadata.outputs.id }}-android-release
