@@ -59,9 +59,9 @@ extern vec2 textureSize;
 #endif
 
 #ifdef LINEAR_PROCESSING
-#	define TEX2D(c) pow(LEVELS(checkTexelBounds(_tex0_, (c))), vec4(inputGamma))
+#	define TEX2D(tex, c) pow(LEVELS(checkTexelBounds(tex, (c))), vec4(inputGamma))
 #else
-#	define TEX2D(c) LEVELS(checkTexelBounds(_tex0_, (c)))
+#	define TEX2D(tex, c) LEVELS(checkTexelBounds(tex, (c)))
 #endif
 
 
@@ -85,17 +85,17 @@ vec2 radialDistortion(vec2 coord, const vec2 ratio)
 }
 
 #ifdef CURVATURE
-vec4 checkTexelBounds(Image texture, vec2 coords)
+vec4 checkTexelBounds(Image tex, vec2 coords)
 {
 	vec2 ss = step(coords, vec2(bounds.x, 1.0)) * step(vec2(0.0, bounds.y), coords);
 	
-	return Texel(texture, coords) * ss.x * ss.y;
+	return Texel(tex, coords) * ss.x * ss.y;
 	// return texcolor;
 }
 #else
-vec4 checkTexelBounds(Image texture, vec2 coords)
+vec4 checkTexelBounds(Image tex, vec2 coords)
 {
-	return Texel(texture, coords);
+	return Texel(tex, coords);
 }
 #endif
 
@@ -125,7 +125,7 @@ vec4 scanlineWeights(float distance, vec4 color)
 	return 1.4 * exp(-pow(weights * inversesqrt(0.5 * wid), wid)) / (0.6 + 0.2 * wid);
 }
 
-vec4 effect(vec4 vcolor, Image texture, vec2 texCoord, vec2 pixel_coords)
+vec4 effect(vec4 vcolor, Image tex, vec2 texCoord, vec2 pixel_coords)
 {
 	vec2 one = 1.0 / textureSize;
 	float mod_factor = texCoord.x * textureSize.x * outputSize.x / inputSize.x;
@@ -186,16 +186,16 @@ vec4 effect(vec4 vcolor, Image texture, vec2 texCoord, vec2 pixel_coords)
 	// scanlines at the horizontal location of the current pixel,
 	// using the Lanczos coefficients above.
 	vec4 col  = clamp(mat4(
-		TEX2D(xy + vec2(-one.x, 0.0)),
-		TEX2D(xy),
-		TEX2D(xy + vec2(one.x, 0.0)),
-		TEX2D(xy + vec2(2.0 * one.x, 0.0))) * coeffs,
+		TEX2D(tex, xy + vec2(-one.x, 0.0)),
+		TEX2D(tex, xy),
+		TEX2D(tex, xy + vec2(one.x, 0.0)),
+		TEX2D(tex, xy + vec2(2.0 * one.x, 0.0))) * coeffs,
 		0.0, 1.0);
 	vec4 col2 = clamp(mat4(
-		TEX2D(xy + vec2(-one.x, one.y)),
-		TEX2D(xy + vec2(0.0, one.y)),
-		TEX2D(xy + one),
-		TEX2D(xy + vec2(2.0 * one.x, one.y))) * coeffs,
+		TEX2D(tex, xy + vec2(-one.x, one.y)),
+		TEX2D(tex, xy + vec2(0.0, one.y)),
+		TEX2D(tex, xy + one),
+		TEX2D(tex, xy + vec2(2.0 * one.x, one.y))) * coeffs,
 		0.0, 1.0);
 
 #ifndef LINEAR_PROCESSING
@@ -214,7 +214,7 @@ vec4 effect(vec4 vcolor, Image texture, vec2 texCoord, vec2 pixel_coords)
 
 #else
 	
-	vec4 mul_res_f = TEX2D(xy);
+	vec4 mul_res_f = TEX2D(tex, xy);
 	vec3 mul_res = mul_res_f.rgb;
 	
 #endif

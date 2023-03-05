@@ -7,9 +7,9 @@ extern vec3 lumacomponents = vec3(1.0, 1.0, 1.0);
 //const vec3 lumcoeff = vec3(0.299,0.587,0.114);
 const vec3 lumcoeff = vec3(0.212671, 0.715160, 0.072169);
 
-vec4 effect(vec4 vcolor, Image texture, vec2 texcoord, vec2 pixel_coords)
+vec4 effect(vec4 vcolor, Image tex, vec2 texcoord, vec2 pixel_coords)
 {	
-	vec4 input0 = Texel(texture, texcoord);
+	vec4 input0 = Texel(tex, texcoord);
 		
 	//exposure knee	
 	input0 *= (exp2(input0)*vec4(exposure));
