@@ -1,7 +1,7 @@
-#define nsamples 5
+const int nsamples = 5;
 
-uniform float blurstart = 1.0; // 0 to 1
-uniform float blurwidth = -0.02; // -1 to 1
+extern float blurstart = 1.0; // 0 to 1
+extern float blurwidth = -0.02; // -1 to 1
 
 
 vec4 effect(vec4 vcolor, Image texture, vec2 texture_coords, vec2 pixel_coords)

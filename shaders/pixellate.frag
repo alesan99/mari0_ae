@@ -3,7 +3,7 @@
 
 extern vec2 textureSize;
 
-#define round(x) floor( (x) + 0.5 )
+float round(float x) { return floor( (x) + 0.5 ); }
 
 vec4 effect(vec4 vcolor, Image texture, vec2 texcoord, vec2 pixel_coords)
 {

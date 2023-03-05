@@ -2,15 +2,15 @@ extern vec2 inputSize;
 extern vec2 textureSize;
 
 
-#define distortion 0.2
+const float distortion = 0.2;
 
 /*
-#define f 0.6
-#define ox 0.5
-#define oy 0.5
-#define scale 0.8
-#define k1 0.7
-#define k2 -0.5
+const float f 0.6;
+const float ox 0.5;
+const float oy 0.5;
+const float scale 0.8;
+const float k1 0.7;
+const float k2 -0.5;
 
 vec2 barrelDistort(vec2 coord)
 {	
