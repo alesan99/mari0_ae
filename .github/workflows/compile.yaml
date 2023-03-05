@@ -12,12 +12,14 @@ jobs:
     - name: Extract Metadata
       id: metadata
       run: python3 main/.scripts/extract-metadata.py
+    - name: Add i386 Architecture
+      run: sudo dpkg --add-architecture i386
     - name: Add Universe Repository
       run: sudo add-apt-repository universe
     - name: Update Packages
       run: sudo apt-get update
     - name: Install Dependencies
-      run: sudo apt-get install --assume-yes wine-stable wine64 python3-pip libfuse2
+      run: sudo apt-get install --assume-yes wine-stable wine64 wine32 python3-pip libfuse2
     - name: Install makelove
       run: pip3 install git+https://github.com/pfirsich/makelove/
     - name: Build
