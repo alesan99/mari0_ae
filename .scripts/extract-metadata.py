@@ -31,7 +31,6 @@ with open(toml_path, 'r') as toml_file:
     toml = toml_file.read()
     metadata['id'] = re.search(r'^name\s*=\s*"(.+)"', toml).group(1)
     # ensure title is the same as the one in main.lua
-    # TODO: don't assert, just print a GH Actions warning (idk how)
     if (_win_title := re.search(r'^ProductName\s*=\s*"(.+)"$', toml, re.MULTILINE)) is None:
         print('::error file=makelove.toml::Windows product name could not be found')
     if metadata['title'] != _win_title.group(1):
