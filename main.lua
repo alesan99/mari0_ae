@@ -1744,6 +1744,7 @@ function changescale(s, fullscreen)
 		if android then
 			scale = 1
 			window_resizable = false
+			fullscreen = true
 		elseif fullscreen then
 			local w, h = love.window.getDesktopDimensions()
 			scale = math.max(1, math.floor(w/(width*16)))
