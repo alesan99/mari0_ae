@@ -34,14 +34,14 @@ function androidLoad()
 	--Skin
 	local skinjsonfile = "android/skin.json"
 	local skinimgfile = "android/skin.png"
-	if love.filesystem.getInfo("alesans_entities/skin.zip") == nil then
+	if love.filesystem.getInfo("alesans_entities/skin.zip") ~= nil then
 		local success = love.filesystem.mount("alesans_entities/skin.zip", "alesans_entities", true)
 	end
 
-	if love.filesystem.getInfo("alesans_entities/skin.json") == nil then
+	if love.filesystem.getInfo("alesans_entities/skin.json") ~= nil then
 		skinjsonfile = "alesans_entities/skin.json"
 	end
-	if love.filesystem.getInfo("alesans_entities/skin.png") == nil then
+	if love.filesystem.getInfo("alesans_entities/skin.png") ~= nil then
 		skinimgfile = "alesans_entities/skin.png"
 	end
 	local s = love.filesystem.read(skinjsonfile)
