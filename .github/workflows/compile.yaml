@@ -3,6 +3,11 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-22.04
+    env:
+      KEYSTORE_ALIAS: ${{ secrets.ANDROID_KEYSTORE_ALIAS }}
+      KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      KEYSTORE_KEYPASSWORD: ${{ secrets.ANDROID_KEYSTORE_KEYPASSWORD }}
+      KEYSTORE_STOREPASSWORD: ${{ secrets.ANDROID_KEYSTORE_STOREPASSWORD }}
     steps:
     - uses: actions/checkout@v3
       with:
@@ -27,7 +32,7 @@ jobs:
       uses: qixils/love-actions-android@v1
       with:
         app-name: ${{ steps.metadata.outputs.title }}
-        bundle-id: net.stabyourself.${{ steps.metadata.outputs.id }}
+        bundle-id: love.to.androidmari0 # backwards compatibility
         product-name: ${{ steps.metadata.outputs.id }}
         resource-path: "main/.android-resources"
         love-ref: ${{ steps.metadata.outputs.love-version }}
@@ -35,10 +40,10 @@ jobs:
         version-string: ${{ steps.metadata.outputs.version }}
         version-code: ${{ steps.metadata.outputs.android-version }}
         output-folder: "main/makelove-build/android"
-        keystore-alias: ${{ secrets.ANDROID_KEYSTORE_ALIAS }}
-        keystore-base64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-        keystore-key-password: ${{ secrets.ANDROID_KEYSTORE_KEYPASSWORD }}
-        keystore-store-password: ${{ secrets.ANDROID_KEYSTORE_STOREPASSWORD }}
+        keystore-alias: ${{ env.KEYSTORE_ALIAS }}
+        keystore-base64: ${{ env.KEYSTORE_BASE64 }}
+        keystore-key-password: ${{ env.KEYSTORE_KEYPASSWORD }}
+        keystore-store-password: ${{ env.KEYSTORE_STOREPASSWORD }}
     - name: Artifact (LÖVE)
       uses: actions/upload-artifact@v3
       with:
@@ -70,7 +75,7 @@ jobs:
         name: ${{ steps.metadata.outputs.id }}-android-debug
         path: main/makelove-build/android/${{ steps.metadata.outputs.id }}-debug.apk
     - name: Artifact (Android Release)
-      if: "${{ steps.build-android.inputs.keystore-alias != '' && steps.build-android.inputs.keystore-base64 != '' && steps.build-android.inputs.keystore-key-password != '' && steps.build-android.inputs.keystore-store-password != '' }}"
+      if: env.KEYSTORE_ALIAS != '' && env.KEYSTORE_BASE64 != '' && env.KEYSTORE_KEYPASSWORD != '' && env.KEYSTORE_STOREPASSWORD != ''
       uses: actions/upload-artifact@v3
       with:
         name: ${{ steps.metadata.outputs.id }}-android-release
