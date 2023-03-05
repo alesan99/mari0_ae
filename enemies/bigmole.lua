@@ -44,6 +44,9 @@ function bigmole:init(x, y)
 	self.shot = false
 	self.trackplatform = true
 
+	self.oldx = self.x
+	self.oldy = self.y
+
 	self.checktable = {"player","box"} --CARRY PLAYER
 end
 
@@ -55,7 +58,7 @@ function bigmole:update(dt)
 					if inrange(w.x, self.x-w.width, self.x+self.width) then
 						if w.y+w.height >= self.y-(1/16) and w.y+w.height <= self.y+(4/16) and (not w.jumping) then
 							if not checkintile(w.x+self.speedx*dt, w.y, w.width, w.height, tileentities, w, "ignoreplatforms") then
-								w.x = w.x + self.speedx*dt
+								w.x = w.x + (self.x-self.oldx)
 								w.y = math.min(self.y-w.height, w.y)
 								w.falling = false
 								w.falloverridestrict = 2
@@ -67,6 +70,8 @@ function bigmole:update(dt)
 			end
 		end
 	end
+	self.oldx = self.x
+	self.oldy = self.y
 	--rotate back to 0 (portals)
 	self.rotation = math.fmod(self.rotation, math.pi*2)
 	if self.rotation > 0 then
@@ -167,12 +172,6 @@ function bigmole:leftcollide(a, b)
 	if self:globalcollide(a, b) then
 		return false
 	end
-	
-	if a == "pixeltile" and b.dir == "right" then
-		self.y = self.y - 1/16
-		return false
-	end
-	
 	self.speedx = goombaspeed
 	
 	self.animationdirection = "left"
@@ -182,11 +181,6 @@ end
 
 function bigmole:rightcollide(a, b)
 	if self:globalcollide(a, b) then
-		return false
-	end
-	
-	if a == "pixeltile" and b.dir == "left" then
-		self.y = self.y - 1/16
 		return false
 	end
 	
@@ -220,10 +214,6 @@ function bigmole:globalcollide(a, b)
 	if a == "fireball" or a == "player" then
 		return true
 	end
-end
-
-function bigmole:startfall()
-
 end
 
 function bigmole:floorcollide(a, b)

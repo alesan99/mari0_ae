@@ -203,7 +203,7 @@ function platform:update(dt)
 						end
 					end
 					if self.speedy ~= 0 then
-						if not w.jumping and inrange(w.x, self.x-w.width, self.x+self.width) then
+						if not w.jumping and inrange(w.x, self.x-w.width, self.x+self.width) and w.speedy and w.height then
 							local clip_past_platform = (w.y+w.height-w.speedy*dt < self.y and w.y+w.height > self.y)
 							if inrange(w.y, self.y - w.height - 0.1, self.y - w.height + 0.1) or clip_past_platform then
 								local x1, y1 = math.ceil(w.x+0.01), math.ceil(self.y+self.height)

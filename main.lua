@@ -56,8 +56,8 @@ if debugconsole then debuginputon = true; debuginput = "print()"; print("DEBUG O
 local debugGraph,fpsGraph,memGraph,drawGraph
 local debugGraphs = false
 
-VERSION = 13.0124
-VERSIONSTRING = "13e (3/7/22)"
+VERSION = 13.1003
+VERSIONSTRING = "13.1 (3/1/23)"
 ANDROIDVERSION = 16
 
 android = (love.system.getOS() == "Android" or love.system.getOS() == "iOS") --[DROID]
@@ -1953,7 +1953,9 @@ function love.keypressed(key, scancode, isrepeat, textinput)
 		return
 	end
 	
-	if key == "f10" then
+	if key == "0" and HITBOXDEBUG then
+		HITBOXDEBUGANIMS = not HITBOXDEBUGANIMS
+	elseif key == "f10" then
 		if android then
 			--hide ui
 			androidHIDE = not androidHIDE

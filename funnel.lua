@@ -15,7 +15,14 @@ function funnel:init(x, y, dir, r)
 	self.timer = 0
 	self.timer2 = 0
 	
-	self.objtable = {"player", "goomba", "box", "koopa", "spikeball", "gel", "turret", "enemy", "ice", "energyball"}
+	self.objtable = {
+		"player", "box", "gel", "turret", "enemy", "ice", "energyball", "tilemoving", "mushroom", "flower", "oneup", "star",
+		"fireball", "fire", "poisonmush", "brofireball", "boomerang", "hammersuit", "mariohammer", "frogsuit", "levelball",
+		"core", "iceball", "powblock", "smallspring", "pbutton"
+	}
+	for i, v in pairs(enemies) do
+		table.insert(self.objtable, v)
+	end
 	
 	table.remove(self.r, 1)
 	table.remove(self.r, 1)

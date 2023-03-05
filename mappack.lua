@@ -250,26 +250,56 @@ function loadcustombackground(filename)
 	custombackgroundheight = {}
 	custombackgroundquad = {}
 	custombackgroundanim = {}
-	--try to load map specific background first
+
+	-- first tries to get BG from level.
 	local levelstring = marioworld .. "-" .. mariolevel
 	local actualsublevel = actualsublevel or mariosublevel
 	if actualsublevel ~= 0 then --changed mariosublevel to actualsublevel because mariosublevel isn't accurate (edit: changed back, revert if anyone complains) (edit: reverted because someone complained)
 		levelstring = levelstring .. "_" .. actualsublevel
 	end
-	local name = levelstring .. "background"
-	if filename and type(filename) == "string" then
-		name = "backgrounds/" .. filename
-	else
-		filename = false--not a string
+	local levelbgname = levelstring .. "background"
+	if (not filename) or type(filename) ~= "string" then
+		filename = false
 	end
-	
-	while love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. name .. i .. ".png") ~= nil do
-		custombackgroundimg[i] = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/" .. name .. i .. ".png")
+
+	-- load background folder BG's
+	local realfl = {}
+	local realflnames = {}
+	local fl = love.filesystem.getDirectoryItems(mappackfolder .. "/" .. mappack .. "/backgrounds/")
+	for b = 1, #fl do
+		if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/backgrounds/" .. fl[b]) ~= nil then
+			-- load BG's from folder
+			local fl2 = love.filesystem.getDirectoryItems(mappackfolder .. "/" .. mappack .. "/backgrounds/" .. fl[b])
+			for b2 = 1, #fl2 do
+				if string.sub(fl2[b2], -4) == ".png" then
+					local name = string.sub(fl2[b2],1,-5)
+					table.insert(realfl, mappackfolder .. "/" .. mappack .. "/backgrounds/" .. fl[b] .. "/" .. name)
+					table.insert(realflnames, name)
+				end
+			end
+		else
+			-- load normal BG's
+			if string.sub(fl[b], -4) == ".png" then
+				local name = string.sub(fl[b],1,-5)
+				table.insert(realfl, mappackfolder .. "/" .. mappack .. "/backgrounds/" .. name)
+				table.insert(realflnames, name)
+			end
+		end
+	end
+	--print(realflnames)
+
+	-- function for making BG's
+	local loadbg = function(i, path, path2)
+		custombackgroundimg[i] = love.graphics.newImage(path .. ".png")
 		custombackgroundwidth[i] = custombackgroundimg[i]:getWidth()/16
 		custombackgroundheight[i] = custombackgroundimg[i]:getHeight()/16
-		if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. name .. i .. ".json") ~= nil then
-			--load animation
-			local data = love.filesystem.read(mappackfolder .. "/" .. mappack .. "/" .. name .. i .. ".json")
+		if love.filesystem.getInfo(path .. ".json") ~= nil or (path2 and love.filesystem.getInfo(path2 .. ".json") ~= nil) then -- load animation
+			local data
+			if love.filesystem.getInfo(path .. ".json") ~= nil then
+				data = love.filesystem.read(path .. ".json")
+			else
+				data = love.filesystem.read(path2 .. ".json")
+			end
 			if not data then return	end
 			data = data:gsub("\r", "")
 			loadcustombackgroundanim(custombackgroundimg, custombackgroundwidth, custombackgroundheight, custombackgroundanim, i, data)
@@ -277,104 +307,149 @@ function loadcustombackground(filename)
 			custombackgroundimg[i]:setWrap("repeat","repeat")
 			custombackgroundquad[i] = love.graphics.newQuad(0,0,width*16,height*16,custombackgroundimg[i]:getWidth(),custombackgroundimg[i]:getHeight())
 		end
-		i = i +1
 	end
 
+	-- loads BG from level
+	while love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. levelbgname .. i .. ".png") ~= nil do
+		loadbg(i, mappackfolder .. "/" .. mappack .. "/" .. levelbgname .. i, mappackfolder .. "/" .. mappack .. "/" .. levelbgname)
+		i = i+1
+	end
 	if #custombackgroundimg == 0 then
-		if filename and love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/backgrounds/" .. filename .. ".png") ~= nil then
-			custombackgroundimg[i] = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/backgrounds/" .. filename .. ".png")
-			custombackgroundwidth[i] = custombackgroundimg[i]:getWidth()/16
-			custombackgroundheight[i] = custombackgroundimg[i]:getHeight()/16
-			if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/backgrounds/" .. filename .. ".json") ~= nil then
-				--load animation
-				local data = love.filesystem.read(mappackfolder .. "/" .. mappack .. "/backgrounds/" .. filename .. ".json")
-				if not data then return	end
-				data = data:gsub("\r", "")
-				loadcustombackgroundanim(custombackgroundimg, custombackgroundwidth, custombackgroundheight, custombackgroundanim, i, data)
-			elseif not SlowBackgrounds then
-				custombackgroundimg[i]:setWrap("repeat","repeat")
-				custombackgroundquad[i] = love.graphics.newQuad(0,0,width*16,height*16,custombackgroundimg[i]:getWidth(),custombackgroundimg[i]:getHeight())
-			end
+		if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. levelbgname .. ".png") ~= nil then
+			loadbg(i, mappackfolder .. "/" .. mappack .. "/" .. levelbgname)
 			return
 		end
-		while love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/background" .. i .. ".png") ~= nil do
-			custombackgroundimg[i] = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/background" .. i .. ".png")
-			custombackgroundwidth[i] = custombackgroundimg[i]:getWidth()/16
-			custombackgroundheight[i] = custombackgroundimg[i]:getHeight()/16
-			i = i +1
+	end
+
+	-- loads BG from folders
+	if #custombackgroundimg == 0 and filename then
+		while tablecontainsi(realflnames, filename .. i) do
+			local path = tablecontainsi(realflnames, filename .. i)
+			loadbg(i, realfl[path], string.sub(realfl[path], 1, -2))
+			i = i+1
+		end
+		if #custombackgroundimg == 0 then
+			if tablecontainsi(realflnames, filename) then
+				local path = tablecontainsi(realflnames, filename)
+				loadbg(i, realfl[path])
+				return
+			end
 		end
 	end
-	
+
+	-- was no background loaded? Lets try a "global" background from the mappack folder
 	if #custombackgroundimg == 0 then
-		custombackgroundimg[i] = love.graphics.newImage("graphics/SMB/portalbackground.png")
-		custombackgroundwidth[i] = custombackgroundimg[i]:getWidth()/16
-		custombackgroundheight[i] = custombackgroundimg[i]:getHeight()/16
-		if not SlowBackgrounds then
-			custombackgroundimg[i]:setWrap("repeat","repeat")
-			custombackgroundquad[i] = love.graphics.newQuad(0,0,width*16,height*16,custombackgroundimg[i]:getWidth(),custombackgroundimg[i]:getHeight())
+		while love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/background" .. i .. ".png") do
+			loadbg(i, mappackfolder .. "/" .. mappack .. "/background" .. i)
+			i = i+1
 		end
+	end
+	-- was no background loaded STILL? It must be from ye olde days, load portal background.
+	if #custombackgroundimg == 0 then
+		loadbg(i, "graphics/SMB/portalbackground")
 	end
 end
 
 function loadcustomforeground(filename)
+	-- I could have just combined the functions but i'm tired. TODO?
 	local i = 1
 	customforegroundimg = {}
 	customforegroundwidth = {}
 	customforegroundheight = {}
 	customforegroundanim = {}
-	--try to load map specific foreground first
+
+	-- first tries to get BG from level.
 	local levelstring = marioworld .. "-" .. mariolevel
 	local actualsublevel = actualsublevel or mariosublevel
-	if actualsublevel ~= 0 then
+	if actualsublevel ~= 0 then --changed mariosublevel to actualsublevel because mariosublevel isn't accurate (edit: changed back, revert if anyone complains) (edit: reverted because someone complained)
 		levelstring = levelstring .. "_" .. actualsublevel
 	end
-	local name = levelstring .. "foreground"
-	if filename and type(filename) == "string" then
-		name = "backgrounds/" .. filename
-	else
-		filename = false--not a string
+	local levelbgname = levelstring .. "foreground"
+	if (not filename) or type(filename) ~= "string" then
+		filename = false
 	end
-	
-	while love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. name .. i .. ".png") ~= nil do
-		customforegroundimg[i] = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/" .. name .. i .. ".png")
+
+	-- load background folder BG's
+	local realfl = {}
+	local realflnames = {}
+	local fl = love.filesystem.getDirectoryItems(mappackfolder .. "/" .. mappack .. "/backgrounds/")
+	for b = 1, #fl do
+		if love.filesystem.isDirectory(mappackfolder .. "/" .. mappack .. "/backgrounds/" .. fl[b]) then
+			-- load BG's from folder
+			local fl2 = love.filesystem.getDirectoryItems(mappackfolder .. "/" .. mappack .. "/backgrounds/" .. fl[b])
+			for b2 = 1, #fl2 do
+				if string.sub(fl2[b2], -4) == ".png" then
+					local name = string.sub(fl2[b2],1,-5)
+					table.insert(realfl, mappackfolder .. "/" .. mappack .. "/backgrounds/" .. fl[b] .. "/" .. name)
+					table.insert(realflnames, name)
+				end
+			end
+		else
+			-- load normal BG's
+			if string.sub(fl[b], -4) == ".png" then
+				local name = string.sub(fl[b],1,-5)
+				table.insert(realfl, mappackfolder .. "/" .. mappack .. "/backgrounds/" .. name)
+				table.insert(realflnames, name)
+			end
+		end
+	end
+
+	-- function for making BG's
+	local loadbg = function(i, path, path2)
+		customforegroundimg[i] = love.graphics.newImage(path .. ".png")
 		customforegroundwidth[i] = customforegroundimg[i]:getWidth()/16
 		customforegroundheight[i] = customforegroundimg[i]:getHeight()/16
-		if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. name .. i .. ".json") ~= nil then
-			--load animation
-			local data = love.filesystem.read(mappackfolder .. "/" .. mappack .. "/" .. name .. i .. ".json")
+		if love.filesystem.getInfo(path .. ".json") ~= nil or (path2 and love.filesystem.getInfo(path2 .. ".json") ~= nil) then -- load animation
+			local data
+			if love.filesystem.getInfo(path .. ".json") ~= nil then
+				data = love.filesystem.read(path .. ".json")
+			else
+				data = love.filesystem.read(path2 .. ".json")
+			end
 			if not data then return	end
 			data = data:gsub("\r", "")
 			loadcustombackgroundanim(customforegroundimg, customforegroundwidth, customforegroundheight, customforegroundanim, i, data)
 		end
-		i = i +1
 	end
-	
+
+	-- loads BG from level
+	while love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. levelbgname .. i .. ".png") ~= nil do
+		loadbg(i, mappackfolder .. "/" .. mappack .. "/" .. levelbgname .. i, mappackfolder .. "/" .. mappack .. "/" .. levelbgname)
+		i = i+1
+	end
 	if #customforegroundimg == 0 then
-		if filename and love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/backgrounds/" .. filename .. ".png") ~= nil then
-			customforegroundimg[i] = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/backgrounds/" .. filename .. ".png")
-			customforegroundwidth[i] = customforegroundimg[i]:getWidth()/16
-			customforegroundheight[i] = customforegroundimg[i]:getHeight()/16
-			if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/backgrounds/" .. filename .. ".json") ~= nil then
-				--load animation
-				local data = love.filesystem.read(mappackfolder .. "/" .. mappack .. "/backgrounds/" .. filename .. ".json")
-				if not data then return	end
-				data = data:gsub("\r", "")
-				loadcustombackgroundanim(customforegroundimg, customforegroundwidth, customforegroundheight, customforegroundanim, i, data)
-			end
+		if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. levelbgname .. ".png") ~= nil then
+			loadbg(i, mappackfolder .. "/" .. mappack .. "/" .. levelbgname)
 			return
 		end
-		while love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/foreground" .. i .. ".png") ~= nil do
-			customforegroundimg[i] = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/foreground" .. i .. ".png")
-			customforegroundwidth[i] = customforegroundimg[i]:getWidth()/16
-			customforegroundheight[i] = customforegroundimg[i]:getHeight()/16
-			i = i +1
+	end
+
+	-- loads BG from folders
+	if #customforegroundimg == 0 and filename then
+		while tablecontainsi(realflnames, filename .. i) do
+			local path = tablecontainsi(realflnames, filename .. i)
+			loadbg(i, realfl[path], string.sub(realfl[path], 1, -2))
+			i = i+1
+		end
+		if #customforegroundimg == 0 then
+			if tablecontainsi(realflnames, filename) then
+				local path = tablecontainsi(realflnames, filename)
+				loadbg(i, realfl[path])
+				return
+			end
 		end
 	end
-	
+
+	-- was no background loaded? Lets try a "global" background from the mappack folder
 	if #customforegroundimg == 0 then
-		customforegroundimg[i] = love.graphics.newImage("graphics/SMB/portalforeground.png")
-		customforegroundwidth[i] = customforegroundimg[i]:getWidth()/16
-		customforegroundheight[i] = customforegroundimg[i]:getHeight()/16
+		while love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/foreground" .. i .. ".png") ~= nil do
+			loadbg(i, mappackfolder .. "/" .. mappack .. "/foreground" .. i)
+			i = i+1
+		end
+	end
+	-- was no background loaded STILL? It must be from ye olde days, load portal background.
+	if #customforegroundimg == 0 then
+		loadbg(i, "graphics/SMB/portalforeground")
 	end
 end
 
@@ -382,24 +457,37 @@ function loadcustombackgrounds()
 	custombackgrounds = {"default"}
 	local fl = love.filesystem.getDirectoryItems(mappackfolder .. "/" .. mappack .. "/backgrounds")
 	for i = 1, #fl do
-		local v = mappackfolder .. "/" .. mappack .. "/backgrounds/" .. fl[i]
-		
-		local extension = string.sub(v, -4, -1)
-		local number = string.sub(v, -5, -5)
-		if extension == ".png" and (number == "1" or (not tonumber(number))) then
-			local name = string.sub(fl[i], 1, -6)
-			if not tonumber(number) then
-				name = string.sub(fl[i], 1, -5)
+		if love.filesystem.isDirectory(mappackfolder .. "/" .. mappack .. "/backgrounds/" .. fl[i]) then
+			-- load BG from folder
+			local fl2 = love.filesystem.getDirectoryItems(mappackfolder .. "/" .. mappack .. "/backgrounds/" .. fl[i])
+			for i2 = 1, #fl2 do
+				local v = mappackfolder .. "/" .. mappack .. "/backgrounds/" .. fl2[i2]
+				local extension = string.sub(v, -4, -1)
+				local number = string.sub(v, -5, -5)
+				if extension == ".png" and (number == "1" or (not tonumber(number))) then
+					local name = string.sub(fl2[i2], 1, -6)
+					if not tonumber(number) then
+						name = string.sub(fl2[i2], 1, -5)
+					end
+					local bg = string.sub(v, 1, -6)
+					local i = 1
+					table.insert(custombackgrounds, name)
+				end
 			end
-			local bg = string.sub(v, 1, -6)
-			local i = 1
-
-			table.insert(custombackgrounds, name)
-		--[[else
-			local name = string.sub(fl[i], 1, -5)
-			local bg = string.sub(v, 1, -5)
-			
-			table.insert(custombackgrounds, name)]]
+		else
+			-- load normal BG
+			local v = mappackfolder .. "/" .. mappack .. "/backgrounds/" .. fl[i]
+			local extension = string.sub(v, -4, -1)
+			local number = string.sub(v, -5, -5)
+			if extension == ".png" and (number == "1" or (not tonumber(number))) then
+				local name = string.sub(fl[i], 1, -6)
+				if not tonumber(number) then
+					name = string.sub(fl[i], 1, -5)
+				end
+				local bg = string.sub(v, 1, -6)
+				local i = 1
+				table.insert(custombackgrounds, name)
+			end
 		end
 	end
 end

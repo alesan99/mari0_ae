@@ -713,7 +713,7 @@ function game_update(dt)
 	--UPDATE OBJECTS
 	local delete
 	for i, v in pairs(objects) do
-		if i ~= "tile" and i ~= "pixeltile" and i ~= "portalwall" and i ~= "screenboundary" and i ~= "coin" and i ~= "risingwater" and i ~= "clearpipesegment" and i ~= "tracksegment" and i ~= "funnel" and i ~= "clearpipe" then
+		if i ~= "tile" and i ~= "portalwall" and i ~= "screenboundary" and i ~= "coin" and i ~= "risingwater" and i ~= "clearpipesegment" and i ~= "tracksegment" and i ~= "funnel" and i ~= "clearpipe" then
 			delete = nil
 			for j, w in pairs(v) do
 				if dropshadow and w.shot and w.rotation then
@@ -1618,7 +1618,7 @@ function game_draw()
 				w:draw()
 			end]]
 			for j, w in pairs(objects) do	
-				if j ~= "tile" and j ~= "pixeltile" then
+				if j ~= "tile" then
 					for i, v in pairs(w) do
 						if v.drawable and (not v.nodropshadow) then--and not v.drawback then
 							love.graphics.setColor(dropshadowcolor)
@@ -2041,7 +2041,7 @@ function game_draw()
 		
 		--OBJECTS
 		for j, w in pairs(objects) do	
-			if j ~= "tile" and j ~= "pixeltile" then
+			if j ~= "tile" then
 				for i, v in pairs(w) do
 					if v.drawable and not v.drawback then
 						love.graphics.setColor(1, 1, 1)
@@ -2142,7 +2142,7 @@ function game_draw()
 						w:draw()
 					end
 					for j, w in pairs(objects) do	
-						if j ~= "tile" and j ~= "pixeltile" then
+						if j ~= "tile" then
 							for i, v in pairs(w) do
 								if v.drawable and (not v.nodropshadow) then--and not v.drawback then
 									love.graphics.setColor(color)
@@ -2309,12 +2309,24 @@ function game_draw()
 				for j, k in pairs(v) do
 					if k.width then
 						if xscroll >= k.x-width and k.x+k.width > xscroll then
-							if k.active then
+							if k.active and not k.red then
 								love.graphics.setColor(1, 1, 1)
 							else
 								love.graphics.setColor(1, 0, 0)
 							end
-							if k.width <= 1/16 then
+							
+							if k.SLOPE then
+								local points = {0,k.y1, 1,k.y2, 1,1.05, 0,1.05}
+								if k.UPSIDEDOWNSLOPE then
+									points[5], points[6] = 1,-0.05
+									points[7], points[8] = 0,-0.05
+								end
+								for i = 1, #points, 2 do
+									points[i] = math.floor((points[i]+k.x-xscroll)*16*scale)+.5
+									points[i+1] = math.floor((points[i+1]+k.y-yscroll-.5)*16*scale)+.5
+								end
+								love.graphics.polygon("line", unpack(points))
+							elseif k.width <= 1/16 then
 								love.graphics.rectangle("fill", math.floor((k.x-xscroll)*16*scale), math.floor((k.y-yscroll-.5)*16*scale), k.width*16*scale, k.height*16*scale)
 							elseif incognito then
 								love.graphics.rectangle("fill", math.floor((k.x-xscroll)*16*scale)+.5, math.floor((k.y-yscroll-.5)*16*scale)+.5, k.width*16*scale-1, k.height*16*scale-1)
@@ -2374,12 +2386,19 @@ function game_draw()
 			love.graphics.setLineWidth(lw)
 
 			--animation numbers
-			if love.keyboard.isDown("0") then
-				love.graphics.setColor(1, 1, 1, 150/255)
-				local y = 2
+			if HITBOXDEBUGANIMS then
+				love.graphics.setColor(1, 1, 1, 225/255)
+				local x, y, max = 0, 2, 0
 				for i, n in pairs(animationnumbers) do
-					properprint(i .. ": " .. n, 2*scale, y*scale)
+					local text = i .. ": " .. n
+					if #text > max then
+						max = #text
+					end
+					properprint(text, x*scale, y*scale)
 					y = y + 10
+					if y >= (height*16)-10 then
+						x, y = x + 8*(max+1), 2
+					end
 				end
 			end
 		end
@@ -3723,6 +3742,9 @@ function drawplayer(i, x, y, r, pad, drop)
 end
 
 function drawHUD()
+	if HITBOXDEBUG and HITBOXDEBUGANIMS then
+		return
+	end
 	local properprintfunc = properprintF
 	if hudoutline then
 		properprintfunc = properprintFbackground
@@ -4204,7 +4226,6 @@ function startlevel(level, reason)
 	objects["portalent"] = {}
 	objects["text"] = {}
 	objects["regiontrigger"] = {}
-	objects["pixeltile"] = {}
 	objects["tiletool"] = {}
 	objects["iceball"] = {}
 	objects["enemytool"] = {}
@@ -5813,7 +5834,7 @@ function getTile(x, y, portalable, portalcheck, facing, ignoregrates, dir) --ret
 		end
 	end
 
-	if objects["tile"][tilemap(x, y)] and (objects["tile"][tilemap(x, y)].slant or objects["tile"][tilemap(x, y)].slab) then
+	if objects["tile"][tilemap(x, y)] and (objects["tile"][tilemap(x, y)].slant or objects["tile"][tilemap(x, y)].slab) and ismaptile(x,y) then
 		if portalcheck then
 			return false, map[x][y][1]
 		else
@@ -6029,7 +6050,7 @@ end
 
 function moveoutportal() --pushes objects out of the portal i in.
 	for i, v in pairs(objects) do
-		if i ~= "tile" and i ~= "pixeltile" and i ~= "portalwall" then
+		if i ~= "tile" and i ~= "portalwall" then
 			for j, w in pairs(v) do
 				if w.active and w.static == false then
 					local p1, p2 = insideportal(w.x, w.y, w.width, w.height)
@@ -6093,6 +6114,46 @@ function warpzone(i, l)
 	end
 	
 	levelscreen_load("next")
+end
+
+function changeswitchstate(color, perma, flipblocks)
+	for j, w in pairs(objects["buttonblock"]) do
+		if w.color == color then
+			w:change()
+		end
+	end
+	for j, w in pairs(objects["belt"]) do
+		if w.t == "switch" and w.color == color then
+			w:change()
+		end
+	end
+	for j, w in pairs(tracks) do
+		if w.switch and w.color == color then
+			w:change()
+		end
+	end
+	for i = 1, #animationswitchtriggerfuncs do
+		local t = animationswitchtriggerfuncs[i]
+		if tonumber((t[2] or 0)) and tonumber((t[2] or 0)) == color then
+			t[1]:trigger()
+		end
+	end
+
+	if perma then
+		solidblockperma[color] = not solidblockperma[color]
+	end
+	if flipblocks then
+		for j, w in pairs(objects["flipblock"]) do
+			if w.t == "switchblock" and w.color == color then
+				w.on = not w.on
+				if w.on then
+					w.quad = flipblockquad[color][w.quadi]
+				else
+					w.quad = flipblockquad[color][w.quadi+2]
+				end
+			end
+		end
+	end
 end
 
 function game_mousereleased(x, y, button)
@@ -6424,7 +6485,7 @@ function traceline(sourcex, sourcey, radians, reportal)
 		end
 
 		if objects["tile"][tileposition] then
-			if (objects["tile"][tileposition].slant or objects["tile"][tileposition].slab) and (not tilequads[tileno].grate) then
+			if (objects["tile"][tileposition].slant or objects["tile"][tileposition].slab) and (tilequads[tileno] and not tilequads[tileno].grate) then
 				return false, false, false, false, x, y
 			end
 		end
@@ -6504,10 +6565,19 @@ function loadentity(t, x, y, r, id)
 		pipes[tilemap(x,y)] = pipe:new("pipe2", x, y, r)
 	elseif t == "pipespawn" then
 		local offseted = false
+		--two way vertical pipe
 		if inmap(x+1, y) and entityquads[map[x+1][y][2]] and entityquads[map[x+1][y][2]].t == "pipe" 
 		and (not (map[x][y][3] and type(map[x][y][3]) == "string" and not (map[x][y][3]:find("up") or map[x][y][3]:find("down"))) ) then
 			x = x+1
 			offseted = true
+		end
+		--two way horizontal pipe
+		if not offseted then
+			if inmap(x, y+1) and entityquads[map[x][y+1][2]] and entityquads[map[x][y+1][2]].t == "pipe" 
+			and (not (map[x][y][3] and type(map[x][y][3]) == "string" and not (map[x][y][3]:find("left") or map[x][y][3]:find("right"))) ) then
+				y = y+1
+				offseted = true
+			end
 		end
 		exitpipes[tilemap(x,y)] = pipe:new("pipespawn", x, y, r)
 	elseif t == "pipespawndown" then
@@ -8271,7 +8341,7 @@ end
 
 function endgame()
 	if testlevel then
-		editor_load(player_position)
+		stoptestinglevel()
 		return
 	end
 	love.audio.stop()
@@ -8695,7 +8765,7 @@ end
 
 function lightsoutstencil()
 	for i2, v2 in pairs(objects) do
-		if i2 ~= "tile" and i2 ~= "pixeltile" and i2 ~="buttonblock" and i2 ~= "clearpipesegment" then
+		if i2 ~= "tile" and i2 ~="buttonblock" and i2 ~= "clearpipesegment" then
 			for i, v in pairs(objects[i2]) do
 				if (v.active or (i2 == "player" or i2 == "enemy")) and v.light and onscreen(v.x+v.width/2-v.light, v.y+v.height/2-v.light, v.light*2, v.light*2) then
 					local r = v.light

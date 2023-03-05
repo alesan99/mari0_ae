@@ -249,7 +249,8 @@ function thwomp:update(dt)
 		--slow down if being flung in wrong direction
 		if (self.t == "left" or self.t == "right") and (not self.track) then
 			if self.speedy ~= 0 then
-				self.speedy = math.max(0,math.abs(self.speedy)-4*dt)*(self.speedy/math.abs(self.speedy))
+				self.speedy = math.max(0,math.abs(self.speedy)-10*dt)*(self.speedy/math.abs(self.speedy))
+				print("hey")
 			end
 		end
 		

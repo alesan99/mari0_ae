@@ -100,7 +100,7 @@ function fireball:update(dt)
 			if tilequads[map[x][y][1]].coin then
 				collectcoin(x, y)
 			elseif objects["coin"][tilemap(x, y)] and not objects["coin"][tilemap(x, y)].frozen then
-				collectcoin2(x, y)
+				collectcoinentity(x, y)
 			elseif objects["collectable"][tilemap(x, y)] then
 				getcollectable(x, y)
 			end
@@ -155,12 +155,6 @@ function fireball:update(dt)
 end
 
 function fireball:leftcollide(a, b)
-	if a == "pixeltile" and b.dir == "right" then
-		self.y = self.y - b.step
-		self:floorcollide("tile", b)
-		return false
-	end
-	
 	if a == "donut" or a == "plantfire" then
 		return false
 	end
@@ -182,12 +176,6 @@ function fireball:leftcollide(a, b)
 end
 
 function fireball:rightcollide(a, b)
-	if a == "pixeltile" and b.dir == "left" then
-		self.y = self.y - b.step
-		self:floorcollide("tile", b)
-		return false
-	end
-	
 	if a == "donut" or a == "plantfire" then
 		return false
 	end
@@ -225,6 +213,9 @@ function fireball:floorcollide(a, b)
 		self.speedy = -iceballjumpforce
 	else
 		self.speedy = -fireballjumpforce
+	end
+	if b.SLOPE then
+		self.speedy = self.speedy -b.incline*10
 	end
 	return false
 end

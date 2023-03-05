@@ -84,7 +84,9 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 
 	levelmodified = false
 	
-	currentanimation = 1
+	if not currentanimation then
+		currentanimation = 1
+	end
 	animationguilines = {}
 	
 	tileselection = false
@@ -177,7 +179,7 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	guielements["timelimitdecrease"].autorepeat = true
 	guielements["timelimitdecrease"].repeatwait = 0.3
 	guielements["timelimitdecrease"].repeatdelay = 0.08
-	guielements["timelimitinput"] = guielement:new("input", 29, 152, string.len(mariotimelimit), changetimelimit, mariotimelimit, 6, nil, nil, 0)
+	guielements["timelimitinput"] = guielement:new("input", 29, 152, string.len(mariotimelimit), changetimelimit, tostring(mariotimelimit), 6, nil, nil, 0)
 	guielements["timelimitinput"].justdisplay = true
 	guielements["timelimitinput"].textoffset = 0
 	guielements["timelimitinput"].inputtingfunc = changetimelimitinputting
@@ -343,7 +345,10 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	guielements["currentsounddropdown"] = guielement:new("dropdown", 184, 63, 16, changecurrentsound, 1, unpack(soundliststring))
 	--guielements["currentsounddropdown"].scrollbar.scrollstep = 0.11 --how much mousewheel scrolls
 	guielements["openfoldersoundscustom"] = guielement:new("button", 184, 105, TEXT["open folder"], opencustomimagefolder, 2, {"sounds"})
-	guielements["openfoldermusiccustom"] = guielement:new("button", 184, 165, TEXT["open folder"], opencustomimagefolder, 2, {"music"})
+	guielements["openfoldermusiccustom"] = guielement:new("button", 184, 164, TEXT["open folder"], opencustomimagefolder, 2, {"music"})
+	guielements["savesounds"] = guielement:new("button", 176, 199, TEXT["update sounds"], savecustomimage, 2)
+	guielements["savesounds"].bordercolor = {255, 0, 0}
+	guielements["savesounds"].bordercolorhigh = {255, 127, 127}
 
 	--custom enemies
 	changecurrentenemy(1, true)
@@ -502,6 +507,10 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 			editorsavedata = false
 		end
 	end
+	
+	if currentanimation and currentanimation ~= 1 then
+		selectanimation(currentanimation, "initial")
+	end
 
 	if player_position then
 		--test from position
@@ -581,14 +590,35 @@ function editor_update(dt)
 		elseif customrcopen == "path" and allowdrag then
 			--draw path (this used to be so simple, but then i added clear pipes ;( )
 			local x, y = love.mouse.getPosition()
-			if love.mouse.isDown("l") then
-				local rcp = rightclickpath
-				local ox, oy =  rcp.last[1],  rcp.last[2]
-				local dir = rcp.dir
-				local tx, ty = getMouseTile(x, y+8*screenzoom*scale)
+			local rcp = rightclickpath
+			local ox, oy =  rcp.last[1],  rcp.last[2]
+			local dir = rcp.dir
+			local mtx, mty = getMouseTile(x, y+8*screenzoom*scale)
+			local tx = mtx-rcp.x
+			local ty = mty-rcp.y
+			local changedorigin = false
+			if (not rcp.pipe) and rcp.path and #rcp.path == 1 and love.mouse.isDown("l") then --change origin of snakeblock
+				local length = rcp.snakelength or 3
+				if (ty == 0 and (tx == 1 or tx == -length)) or ((ty == -1 or ty == 1) and (tx == 0 or tx == 1-length)) then
+					rcp.path[1][1], rcp.path[1][2] = tx, ty
+					if ty == 0 then
+						if mtx > rcp.x then
+							rcp.dir = "right"
+						else
+							rcp.dir = "left"
+						end
+					elseif ty > 0 then
+						rcp.dir = "down"
+					else
+						rcp.dir = "up"
+					end
+					rcp.last[1], rcp.last[2] = tx, ty
+					changedorigin = true
+				end
+			end
+			
+			if love.mouse.isDown("l") and not changedorigin then
 				local coveredtiles = {}
-				tx = tx-rcp.x
-				ty = ty-rcp.y
 				--fit into pipe path
 				if rcp.pipe then
 					if (dir == "right" or dir == "left") and ty < oy then
@@ -2924,16 +2954,17 @@ function editor_draw()
 				love.graphics.draw(gateimg, gatequad[5], 92*scale, 132*scale, math.sin(((coinanimation-1)/5)*(math.pi*2))/6, 8*scale, 8*scale, 8, 8)
 				properprintF(TEXT["current sound"], 176*scale, 54*scale)
 				properprintF(TEXT["sound template"], 176*scale, 79*scale)
-				properprintF(TEXT["replace sound"], 176*scale, 125*scale)
-				properprintF(TEXT["add music"], 176*scale, 156*scale)
+				properprintF(TEXT["replace sound"], 176*scale, 124*scale)
+				properprintF(TEXT["add music"], 176*scale, 155*scale)
 				love.graphics.setColor(.5, .5, .5)
-				properprintF(TEXT["open sounds folder to\nreplace sounds!"], 184*scale, 134*scale)
-				properprintF(TEXT["put any .mp3 or .ogg\nin the music folder!"], 184*scale, 183*scale)
+				properprintF(TEXT["open sounds folder to\nreplace sounds!"], 184*scale, 133*scale)
+				properprintF(TEXT["put any .mp3 or .ogg\nin the music folder!"], 184*scale, 181*scale)
 				love.graphics.setColor(1, 1, 1)
 				
 				guielements["exportimagetemplate"]:draw()
 				guielements["openfoldersoundscustom"]:draw()
 				guielements["openfoldermusiccustom"]:draw()
+				guielements["savesounds"]:draw()
 				guielements["currentsounddropdown"]:draw()
 			elseif customtabstate == "text" then
 				guielements["endingtexttab"]:draw()
@@ -3522,6 +3553,7 @@ function customtabtab(t)
 		guielements["exportimagetemplate"].active = true
 		guielements["openfoldersoundscustom"].active = true
 		guielements["openfoldermusiccustom"].active = true
+		guielements["savesounds"].active = true
 	elseif t == "text" then
 		texttabtab(textstate)
 	elseif t == "enemies" then
@@ -3855,11 +3887,15 @@ function moveupanimationguiline(t, tabl)
 	end
 end
 
-function selectanimation(i)
+function selectanimation(i, initial)
 	guielements["animationselectdrop"].var = i
-	saveanimation()
+	if not initial then
+		saveanimation()
+	end
 	currentanimation = i
-	generateanimationgui()
+	if not initial then
+		generateanimationgui()
+	end
 	guielements["animationnameinput"].value = string.sub(animations[currentanimation].name, 1, -6)
 	guielements["animationnameinput"]:updatePos()
 	animationsaveas = false
@@ -3967,7 +4003,7 @@ function openchangewidth()
 	guielements["maprightleft"].active = true
 	guielements["maprightright"].active = true
 	guielements["mapwidthapply"].active = true
-	--guielements["mapwidthcancel"].active = true
+	guielements["mapwidthcancel"].active = true
 
 	changemapwidthmenu = true
 	newmapwidth = mapwidth
@@ -4323,11 +4359,6 @@ function placetile(x, y, tilei)
 			end
 		end
 	elseif editentities == false then
-		if objects["tile"][tilemap(cox, coy)] and objects["tile"][tilemap(cox, coy)].slant then
-			for num = 1, objects["tile"][tilemap(cox, coy)].slants do
-				objects["pixeltile"][num + tilemap(cox, coy)*100] = nil
-			end
-		end
 		if tilequads[currenttile].collision == true and (tilequads[map[cox][coy][1]].collision == false or (objects["tile"][tilemap(cox, coy)] and objects["tile"][tilemap(cox, coy)].slant)) then
 			local oldtile
 			if tilequads[currenttile].leftslant or tilequads[currenttile].halfleftslant1 or tilequads[currenttile].halfleftslant2 or
@@ -6081,6 +6112,7 @@ function startrcpath(var) --snake block path
 		pipe = t.pipe or false, --is it wide?
 		vars = deepcopy(rightclickvalues2),
 		drag = true, --able to add onto path currently?
+		snakelength = rightclickvalues2[2], --if snakeblock, what is its length
 	}
 	local rcp = rightclickpath
 
@@ -6112,6 +6144,25 @@ function startrcpath(var) --snake block path
 		end
 	end
 	
+	--different origin for snakeblock
+	if (not rcp.pipe) and (not t.default) then
+		if #rcp.path > 1 then
+			local ox, oy = 1, 0
+			local tx, ty = rcp.path[2][1], rcp.path[2][2]
+			if ty == 0 then
+				if tx > 0 then
+					--nothing
+				else
+					ox, oy = tx+1, ty
+				end
+			elseif ty > 0 then
+				ox, oy = tx, ty-1
+			else
+				ox, oy = tx, ty+1
+			end
+			rcp.path[1][1], rcp.path[1][2] = ox, oy
+		end
+	end
 	
 	closecustomrc(true)
 	rightclickobjects = {}
@@ -6658,7 +6709,7 @@ function editor_keypressed(key, textinput)
 			end
 		end
 	end
-	if editormenuopen == false then
+	if editormenuopen == false and rightclickmenuopen == false then
 		if key == "delete" or key == "backspace" then
 			if tileselection and tileselection.finished then
 				emptySelection()
@@ -6721,7 +6772,7 @@ function editor_keypressed(key, textinput)
 				end
 			end
 		end
-	else --editormenuopen
+	elseif editormenuopen then
 		--set tile hotkeys
 		if editorstate == "tiles" then
 			if tilehotkeys[key] then
@@ -7467,6 +7518,11 @@ function savecustomimage()
 			loadcustombackground(custombackground)
 		end
 		notice.new("Loaded background", notice.white, 2)
+	elseif customtabstate == "sounds" then
+		loadcustomsounds()
+		loadcustommusic()
+		guielements["musicdropdown"].entries = editormusictable
+		notice.new("Updated sounds and music", notice.white, 2)
 	end
 end
 function resetcustomimage()

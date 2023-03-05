@@ -133,6 +133,7 @@ function koopa:init(x, y, t)
 		self.dontenterclearpipes = true
 	end
 	
+	self.shellanimal = true
 	self.flipped = false
 	
 	self.falling = false
@@ -201,7 +202,7 @@ function koopa:update(dt)
 			if self.t == "downbeetle" or self.t == "downspikey" then
 				y = math.floor(self.y)
 			end
-			if inmap(x, y) and (not checkfortileincoord(x, y)) and ((inmap(x+.5, y) and checkfortileincoord(math.ceil(x+.5), y)) or (inmap(x-.5, y) and checkfortileincoord(math.floor(x-.5), y))) then
+			if inmap(x, y) and (not checkfortileincoord(x, y)) and ((inmap(x+.5, y) and checkfortileincoord(math.ceil(x+.5), y)) or (inmap(x-.5, y) and checkfortileincoord(math.floor(x-.5), y))) and (not (inmap(x,y-1) and objects["tile"][tilemap(x, y-1)] and objects["tile"][tilemap(x, y-1)].SLOPE)) then
 				if self.speedx < 0 then
 					self.animationdirection = "left"
 					self.x = x-self.width/2
@@ -645,94 +646,12 @@ function koopa:leftcollide(a, b, passive)
 	if self:globalcollide(a, b) then
 		return false
 	end
-	if a == "tile" then--check for jump through blocks
-		local x, y = b.cox, b.coy
-
-		--slant
-		if self.onslant == "right" and self.y+self.height-2/16 <= b.y then
-			self.y = b.y-self.height
-			return false
-		end
-	end
 	
-	if a == "tile" or a == "portalwall" or a == "spring" or a == "donut" or a == "springgreen" or a == "bigmole" or a == "muncher" or (a == "flipblock" and not b.flippable) or a == "frozencoin" or a == "buttonblock" or (a == "enemy" and (b.resistsenemykill or b.resistseverything)) or a == "clearpipesegment" then	
-		if self.small then
-			if not self.staystillfall then
-				if self.t == "bigkoopa" or self.t == "bigbeetle" then
-					self.quad = bigkoopaquad[spriteset][3]
-				else
-					self.quad = koopaquad[spriteset][3]
-				end
-				if self.flipped then
-					if self.t == "bigkoopa" then
-						self.offsetY = -5
-					elseif self.t == "bigbeetle" then
-						self.offsetY = -1
-					elseif self.t == "beetle" or self.t == "beetleshell" then
-						self.offsetY = 6
-					else
-						self.offsetY = 4
-					end
-				else
-					self.offsetY = 0
-				end
-				if not self.empty then
-					self.wakeuptimer = koopawakeup
-				end
-				if a == "tile" then
-					local x, y1, y2 = b.cox, b.coy, b.coy
-					local big = self.width > 1
-					local pass = true
-					if big then y1, y2 = math.floor(self.y)+1, math.floor(self.y+self.height-0.1)+1 end
-					for y = y1, y2 do
-						if ismaptile(x,y) and tilequads[map[x][y][1]].collision then
-							if big and (tilequads[map[x][y][1]].coinblock or (tilequads[map[x][y][1]].debris and blockdebrisquads[tilequads[map[x][y][1]].debris])) then -- hard block
-								destroyblock(x, y)
-							elseif tilequads[map[x][y][1]].collision then
-								hitblock(x, y, {size=2}, {sound = onscreen(x-2.5,y-2.5,5,5)})
-								if big and tilequads[map[x][y][1]].collision then
-									pass = false
-								end
-							end
-						end
-					end
-					if big and pass then
-						return false
-					end
-				else
-					playsound(blockhitsound)
-				end
-				self.speedx = math.abs(self.speedx)
-			else
-				self.speedx = math.abs(self.speedx)
-			end
-			self.passivepass = false
-		end
-	end
-	
-	if a == "pixeltile" and b.dir == "right" and (not (self.t == "flying")) and (not (self.t == "flying2")) and self.y < b.y then
-		self.y = self.y - b.step
+	if self:hitwall(a, b, "left") then
 		return false
 	end
 	
-	if a ~= "tile" and a ~= "portalwall" and a ~= "platform" and self.active and self.small and self.speedx ~= 0 and a ~= "player" and a ~= "spring" and a ~= "donut" and a ~= "springgreen" and a ~= "bigmole" and a ~= "muncher" and a ~= "koopaling" and a ~= "bowser" then
-		if b.shotted and (not self.staystillfall) and (not (b.resistsenemykill or b.resistseverything)) then
-			if self.combo < #koopacombo then
-				self.combo = self.combo + 1
-				addpoints(koopacombo[self.combo], b.x, b.y)
-			else
-				for i = 1, players do
-					if mariolivecount ~= false then
-						mariolives[i] = mariolives[i]+1
-						respawnplayers()
-					end
-				end
-				table.insert(scrollingscores, scrollingscore:new("1up", b.x, b.y))
-				playsound(oneupsound)
-			end
-			b:shotted("left")
-		end
-	end
+	self:hitenemy(a, b, "left")
 
 	if self.small == false and not self.frozen then
 		if self.t ~= "flying2" then
@@ -748,16 +667,24 @@ function koopa:rightcollide(a, b)
 	if self:globalcollide(a, b) then
 		return false
 	end
-	if a == "tile" then--check for jump through blocks
-		local x, y = b.cox, b.coy
-
-		--slant
-		if self.onslant == "left" and self.y+self.height-2/16 <= b.y then
-			self.y = b.y-self.height
-			return false
-		end
+	
+	if self:hitwall(a, b, "right") then
+		return false
 	end
 	
+	self:hitenemy(a, b, "right")
+
+	if self.small == false and not self.frozen then
+		if self.t ~= "flying2" then
+			self.animationdirection = "left"
+		end
+		self.speedx = -math.abs(self.speedx)
+	else
+		return false
+	end
+end
+
+function koopa:hitwall(a, b, dir)
 	if a == "tile" or a == "portalwall" or a == "spring" or a == "donut" or a == "springgreen" or a == "bigmole" or a == "muncher" or (a == "flipblock" and not b.flippable) or a == "frozencoin" or a == "buttonblock" or (a == "enemy" and (b.resistsenemykill or b.resistseverything)) or a == "clearpipesegment" then	
 		if self.small then
 			if not self.staystillfall then
@@ -801,25 +728,24 @@ function koopa:rightcollide(a, b)
 						end
 					end
 					if big and pass then
-						return false
+						return "pass"
 					end
 				else
 					playsound(blockhitsound)
 				end
+			end
+			if dir == "right" then
 				self.speedx = -math.abs(self.speedx)
 			else
-				self.speedx = -math.abs(self.speedx)
+				self.speedx = math.abs(self.speedx)
 			end
 			self.passivepass = false
 		end
 	end
-	
-	if a == "pixeltile" and b.dir == "left" and (not (self.t == "flying")) and (not (self.t == "flying2")) and self.y < b.y then
-		self.y = self.y - b.step
-		return false
-	end
-	
-	if a ~= "tile" and a ~= "portalwall" and a ~= "platform" and self.active and self.small and self.speedx ~= 0 and a ~= "player" and a ~= "spring" and a ~= "donut" and a ~= "springgreen" and a ~= "bigmole" and a ~= "muncher" and a ~= "koopaling" and a ~= "bowser" then
+end
+
+function koopa:hitenemy(a, b, dir)
+	if a ~= "tile" and a ~= "portalwall" and a ~= "platform" and (self.active or b.shellanimal) and self.small and self.speedx ~= 0 and a ~= "player" and a ~= "spring" and a ~= "donut" and a ~= "springgreen" and a ~= "bigmole" and a ~= "muncher" and a ~= "koopaling" and a ~= "bowser" then
 		if b.shotted and (not self.staystillfall) and (not (b.resistsenemykill or b.resistseverything)) then
 			if self.combo < #koopacombo then
 				self.combo = self.combo + 1
@@ -834,31 +760,12 @@ function koopa:rightcollide(a, b)
 				table.insert(scrollingscores, scrollingscore:new("1up", b.x, b.y))
 				playsound(oneupsound)
 			end
-			b:shotted("right")
+			b:shotted(dir)
 		end
-	end
-
-	if self.small == false and not self.frozen then
-		if self.t ~= "flying2" then
-			self.animationdirection = "left"
-		end
-		self.speedx = -math.abs(self.speedx)
-	else
-		return false
 	end
 end
 
 function koopa:passivecollide(a, b)
-	if a == "pixeltile" then
-		local x, y = b.cox, b.coy
-		if tilequads[map[x][y][1]].platform then
-			return false
-		elseif self.y+self.width >= b.y+b.step and b.dir == self.slant then
-			self.y = self.y - b.step
-			return true
-		end
-		return false
-	end
 	if a ~= "clearpipesegment" then
 		if self.speedx < 0 then
 			self:leftcollide(a, b, "passive")
@@ -923,15 +830,6 @@ function koopa:floorcollide(a, b)
 		if self.frozen == false then
 			self.speedy = -koopajumpforce
 		end
-	end
-
-	--slants/slopes
-	local onslant = (a == "pixeltile")
-	if onslant then
-		self.onslant = b.dir
-		self.onslantstep = b.step
-	else
-		self.onslant = false
 	end
 end
 

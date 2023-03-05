@@ -473,6 +473,18 @@ table.insert(toenter, {name = "ifnumber",
 	}
 })
 
+table.insert(toenter, {name = "requireplayers",
+	t= {
+		t="condition",
+		nicename="require players:",
+		entries={
+			{
+				t="levelselection",
+			},
+		}
+	}
+})
+
 --ACTIONS:
 
 table.insert(toenter, {name = "disablecontrols", 
@@ -1879,6 +1891,48 @@ table.insert(toenter, {name = "changeportal",
 			},
 			{
 				t="portalselection",
+			},
+		}
+	}
+})
+
+table.insert(toenter, {name = "makeinvincible", 
+	t = {
+		t="action",
+		nicename="make invincible",
+		entries={
+			{
+				t="numinput",
+			},
+			{
+				t="text",
+				value="for"
+			},
+			{
+				t="playerselection",
+			},
+		}
+	}
+})
+
+table.insert(toenter, {name = "changeswitchstate", 
+	t = {
+		t="action",
+		nicename="change switch state:",
+		entries={
+			{
+				t="text",
+				value="with color"
+			},
+			{
+				t="switchblockselection",
+			},
+			{
+				t="text",
+				value="global"
+			},
+			{
+				t="powerselection",
 			},
 		}
 	}

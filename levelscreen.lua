@@ -66,17 +66,24 @@ function levelscreen_load(reason, i)
 					end
 				end
 				if gamefinished then
-					gamestate = "mappackfinished"
-					blacktime = gameovertime
-					
-					if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/endingmusic.ogg") ~= nil or love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/endingmusic.mp3") ~= nil then
-						playsound(endingmusic)
+					if testlevel then
+						testlevelworld = 1
+						testlevellevel = 1
+						notice.new("You have finished this mappack!", notice.white, 5)
+						stoptestinglevel()
 					else
-						music:play("princessmusic")
-					end
-					if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/ending.png") ~= nil then
-						levelscreenimage = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/ending.png")
-						levelscreenimagecheck = true
+						gamestate = "mappackfinished"
+						blacktime = gameovertime
+						
+						if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/endingmusic.ogg") ~= nil or love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/endingmusic.mp3") ~= nil then
+							playsound(endingmusic)
+						else
+							music:play("princessmusic")
+						end
+						if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/ending.png") ~= nil then
+							levelscreenimage = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/ending.png")
+							levelscreenimagecheck = true
+						end
 					end
 				else
 					if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "-" .. mariolevel .. "levelscreen.png") ~= nil then

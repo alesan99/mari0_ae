@@ -34,6 +34,7 @@ ifnumber:i:>/</=:v				if a variable is equal/greater than something
 ifcoins:>/</=:v					if coin count is equal/greater than v
 ifcollectables:>/</=:v:i			if collectable count of a type is equal/greater than v
 ifpoints:>/</=:v				if points is equal/greater than v
+requireplayers:i				requires i players to trigger
 --]]
 
 --[[ ACTIONS:
@@ -109,6 +110,8 @@ settime:time						sets time
 setplayerlight:blocks				sets player's light in lights out mode
 waitforinput                        waits until a spesific/any player presses a button
 waitfrotrigger                      waits until a spesific animation is triggered
+makeinvincible:i					makes player invincible/give star for i or default seconds
+changeswitchstate:i					trigger switchblocks
 --]]
 
 function animation:init(path, name)
@@ -785,7 +788,7 @@ function animation:update(dt)
 						local s = t[2]:split("-") --find coords
 						local x, y = tonumber(s[1]), tonumber(s[2])
 						local coinblock = (ismaptile(x, y) and tilequads[map[x][y][1]].collision and tilequads[map[x][y][1]].coinblock)
-						objects["collectable"][t[2]] = collectable:new(x, y, map[x][y], false, coinblock)
+						objects["collectable"][tilemap(x,y)] = collectable:new(x, y, map[x][y], false, coinblock)
 					end
 				end
 				collectableslist[i] = {}
@@ -869,7 +872,7 @@ function animation:update(dt)
 				transformenemyanimation(v[2])
 			elseif v[1] == "killallenemies" then
 				for i2, v2 in pairs(objects) do
-					if i1 ~= "tile" and i2 ~= "pixeltile" and i2 ~= "buttonblock" then
+					if i1 ~= "tile" and i2 ~= "buttonblock" then
 						for i, v in pairs(objects[i2]) do
 							if v.active and v.shotted and (not v.resistseverything) then
 								local dir = "right"
@@ -938,8 +941,8 @@ function animation:update(dt)
 					for i = 1, #animationtriggerfuncs[v[2]] do
 						animationtriggerfuncs[v[2]][i]:trigger()
 					end
+					animationtriggerfuncs[v[2]].triggered = true
 				end
-				animationtriggerfuncs[v[2]].triggered = true
 				
 			elseif v[1] == "addkeys" then
 				if v[3] == "everyone" then
@@ -980,6 +983,31 @@ function animation:update(dt)
 			elseif v[1] == "setplayerlight" then
 				for i = 1, players do
 					objects["player"][i].light = tonumber(v[2])
+				end
+			elseif v[1] == "makeinvincible" then
+				local time = mariostarduration
+				if v[2] ~= "" and tonumber(v[2]) and tonumber(v[2]) > 0 then
+					time = tonumber(v[2])
+				end
+				if v[3] == "everyone" then
+					for i = 1, players do
+						if objects["player"][i].animation ~= "grow1" and objects["player"][i].animation ~= "grow2" and objects["player"][i].animation ~= "shrink" then
+							objects["player"][i]:star()
+							objects["player"][i].startimer = (mariostarduration-time)
+						end
+					end
+				else
+					local i = tonumber(string.sub(v[3], -1))
+					if objects["player"][i] then
+						if objects["player"][i].animation ~= "grow1" and objects["player"][i].animation ~= "grow2" and objects["player"][i].animation ~= "shrink" then
+							objects["player"][i]:star()
+							objects["player"][i].startimer = (mariostarduration-time)
+						end
+					end
+				end
+			elseif v[1] == "changeswitchstate" then
+				if tonumber(v[2]) and tonumber(v[2]) <= 4 then
+					changeswitchstate(tonumber(v[2]), (v[3] == "on"), true)
 				end
 			elseif v[1] == "setnumber" then
 				local name = tostring(v[2])
@@ -1179,6 +1207,11 @@ function animation:trigger()
 						end
 					end
 				end
+			elseif v[1] == "requireplayers" then
+				if players < tonumber(v[2]) then
+					pass = false
+					break
+				end	
 			end
 		end
 		

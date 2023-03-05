@@ -138,13 +138,7 @@ function loadenemy(filename)
 			local split = data:split("\n")
 			local base = string.sub(split[1], 6)
 			if enemiesdata[base] then
-				local newdata = ""
-				for i = 2, #split do
-					newdata = newdata .. split[i]
-					if i ~= #split then
-						newdata = newdata .. "\n"
-					end
-				end
+				local newdata = string.sub(data, #base+6, #data)
 				
 				enemiesdata[s] = usebase(enemiesdata[base])
 				

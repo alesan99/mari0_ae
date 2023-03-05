@@ -9,6 +9,7 @@ function mariotail:init(x, y, dir, v)
 	self.width = 2
 	self.height = 8/16
 	if v and v.size == 10 then
+		--should be cape instead
 		self.height = 1
 		self.y = self.y - 8/16
 	end
@@ -116,6 +117,9 @@ function mariotail:hitstuff(a, b)
 			end
 			b:flipshell(dir)
 			self.destroy = true
+			if (dir == "right" and self.player.speedx >= 0) or (dir == "left" and self.player.speedx <= 0) then
+				b.speedx = b.speedx + self.player.speedx
+			end
 		else
 			--kill normally
 			b:shotted(dir)
@@ -147,6 +151,9 @@ function mariotail:hitstuff(a, b)
 				makepoof(self.x+self.width, self.y+self.height/2, "pow")
 			else
 				makepoof(self.x, self.y+self.height/2, "pow")
+			end
+			if (dir == "right" and self.player.speedx >= 0) or (dir == "left" and self.player.speedx <= 0) then
+				b.speedx = b.speedx + self.player.speedx
 			end
 		elseif b:shotted(dir, false, false, true) ~= false then
 			--kill normally

@@ -528,6 +528,8 @@ function enemy:init(x, y, t, a, properties)
 		if self.throwntime then
 			self.throwntimer = 0
 		end
+		self.pickupready = false
+		self.pickupreadyplayers = {}
 	end
 
 	if self.jumps or self.noplayercollisiononthrow then
@@ -885,7 +887,7 @@ function enemy:update(dt)
 		if self.turnaroundoncliff and self.falling == false then
 			--check if nothing below
 			local x, y = math.floor(self.x + self.width/2+1), math.floor(self.y + self.height+1.5)
-			if inmap(x, y) and (not checkfortileincoord(x, y)) and ((inmap(x+.5, y) and checkfortileincoord(math.ceil(x+.5), y)) or (inmap(x-.5, y) and checkfortileincoord(math.floor(x-.5), y))) then
+			if inmap(x, y) and (not checkfortileincoord(x, y)) and ((inmap(x+.5, y) and checkfortileincoord(math.ceil(x+.5), y)) or (inmap(x-.5, y) and checkfortileincoord(math.floor(x-.5), y))) and (not (inmap(x,y-1) and objects["tile"][tilemap(x, y-1)] and objects["tile"][tilemap(x, y-1)].SLOPE)) then
 				if self.speedx < 0 then
 					self.x = x-self.width/2
 				else
@@ -2223,10 +2225,12 @@ function enemy:update(dt)
 		else
 			self.pickupready = false
 			for j, w in pairs(objects["player"]) do
+				self.pickupreadyplayers[w.playernumber] = false
 				local col = checkrect(self.x+self.carryrange[1], self.y+self.carryrange[2], self.carryrange[3], self.carryrange[4], {"player"})
 				if #col > 0 then
 					w.pickupready = self
 					self.pickupready = true
+					self.pickupreadyplayers[w.playernumber] = true
 					
 					--carry if holding button
 					if (self.carryifholdingrunbutton and runkey(w.playernumber)) and not w.pickup then
@@ -2279,6 +2283,32 @@ function enemy:update(dt)
 				end
 				if (not self.blowstrong) and a == "player" and b.speedy < 0 then
 					b.falling = true
+				end
+			end
+		end
+	end
+
+	--collect coins and collectables if enemy is over tile
+	if (self.collectscoins or self.collectscollectables or self.collectscoinsinshell) and not ((self.collectscoinsinshell or self.collectscollectablesinshell) and not self.small) then --if it collects coins, it will collect collectables. But not the other way
+		local collectscoins = self.collectscoins or self.collectscoinsinshell
+		local collectscollectables = true
+		if self.collectscollectables == false then --ignore collectables if explicitly set to false
+			collectscollectables = false
+		end
+		for x = math.ceil(self.x), math.ceil(self.x+self.width) do
+			for y = math.ceil(self.y), math.ceil(self.y+self.height) do
+				if ismaptile(x, y) then
+					if collectscoins and tilequads[map[x][y][1]].coin then
+						collectcoin(x, y)
+					elseif collectscoins and objects["coin"][tilemap(x, y)] then
+						collectcoinentity(x, y)
+					elseif collectscollectables and objects["collectable"][tilemap(x, y)] and not objects["collectable"][tilemap(x, y)].coinblock then
+						local collectableid = objects["collectable"][tilemap(x, y)].t
+						if not (self.collectscollectables and type(self.collectscollectables) == "table" and not self.collectscollectables[collectableid]) then
+							--if the the property is set to a table, only collect collectable if the id number is set to true in the table
+							getcollectable(x, y)
+						end
+					end
 				end
 			end
 		end
@@ -2752,7 +2782,7 @@ function enemy:globalcollide(a, b, c, d, dir)
 	
 	if self.killsenemies and ((self.killsenemiesonsides and (dir == "left" or dir == "right")) or (self.killsenemiesonbottom and dir == "floor") or (self.killsenemiesontop and dir == "ceil") or
 		(self.killsenemiesonleft and dir == "left") or (self.killsenemiesonright and dir == "right") or (self.killsenemiesonpassive and dir == "passive"))
-		and a == "enemy" and not (b.resistsenemykill or b.resistseverything) then
+		and a == "enemy" and (not (b.resistsenemykill or b.resistseverything)) and (not b.killsenemies) then
 		return true
 	end
 	
@@ -2803,6 +2833,23 @@ function enemy:globalcollide(a, b, c, d, dir)
 		if b.enemykillsdontflyaway then
 			self.doesntflyawayonfireball = true
 		end
+		if b.small and not b.nocombo then
+			if b.combo < #koopacombo then
+				b.combo = b.combo + 1
+				addpoints(koopacombo[b.combo], self.x, self.y)
+			else
+				for i = 1, players do
+					if mariolivecount ~= false then
+						mariolives[i] = mariolives[i]+1
+						respawnplayers()
+					end
+				end
+				table.insert(scrollingscores, scrollingscore:new("1up", self.x, self.y))
+				playsound(oneupsound)
+			end
+		else
+			addpoints((firepoints[self.t] or 200), self.x, self.y)
+		end
 		self:shotted(dir)
 
 		if b.bouncesonenemykill then
@@ -2814,7 +2861,6 @@ function enemy:globalcollide(a, b, c, d, dir)
 			self:output()
 		end
 		
-		addpoints((firepoints[self.t] or 200), self.x, self.y)
 		return true
 	end
 	
@@ -2857,20 +2903,6 @@ function enemy:leftcollide(a, b, c, d)
 	end
 
 	if self.ignoreleftcollide or b.ignorerightcollide then --AE ADDITION
-		return false
-	end
-	
-	if a == "tile" then
-		--AE ADDITION
-		--slant
-		if self.onslant == "right" and self.y+self.height-2/16 <= b.y then
-			self.y = b.y-self.height
-			return false
-		end
-	end
-
-	if a == "pixeltile" and b.dir == "right" and self.y < b.y then --AE ADDITION
-		self.y = self.y - b.step
 		return false
 	end
 	
@@ -2974,20 +3006,6 @@ function enemy:rightcollide(a, b, c, d)
 	end
 
 	if self.ignorerightcollide or b.ignoreleftcollide then --AE ADDITION
-		return false
-	end
-	
-	if a == "tile" then
-		--AE ADDITION
-		--slant
-		if self.onslant == "left" and self.y+self.height-2/16 <= b.y then
-			self.y = b.y-self.height
-			return false
-		end
-	end
-
-	if a == "pixeltile" and b.dir == "left" and self.y < b.y then --AE ADDITION
-		self.y = self.y - b.step
 		return false
 	end
 	
@@ -3210,15 +3228,6 @@ function enemy:floorcollide(a, b, c, d)
 			self.speedy = -self.crawlspeed
 			return true
 		end
-	end
-
-	--slants/slopes --AE ADDITION
-	local onslant = (a == "pixeltile")
-	if onslant then
-		self.onslant = b.dir
-		self.onslantstep = b.step
-	else
-		self.onslant = false
 	end
 	
 	if (not self.frozen) and (self.reflects or self.reflectsy) then
