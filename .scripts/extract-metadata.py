@@ -11,7 +11,7 @@ import os
 from pathlib import Path
 import re
 
-game_path: Path = Path(__file__).parent.resolve()
+game_path: Path = Path(__file__).parent.parent.resolve()
 main_path: Path = game_path / 'main.lua'
 conf_path: Path = game_path / 'conf.lua'
 toml_path: Path = game_path / 'makelove.toml'
