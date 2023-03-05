@@ -339,7 +339,7 @@ function loadcustombackground(filename)
 
 	-- was no background loaded? Lets try a "global" background from the mappack folder
 	if #custombackgroundimg == 0 then
-		while love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/background" .. i .. ".png") do
+		while love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/background" .. i .. ".png") ~= nil do
 			loadbg(i, mappackfolder .. "/" .. mappack .. "/background" .. i)
 			i = i+1
 		end
