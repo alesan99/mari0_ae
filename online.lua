@@ -70,7 +70,7 @@ function downloadmappack(url, out, size)
 			else
 				love.filesystem.write("alesans_entities/onlinemappacks/" .. out .. ".png", data)
 				data = nil
-				if love.filesystem.getInfo("alesans_entities/onlinemappacks/" .. out .. ".png") ~= nil then
+				if love.filesystem.getInfo("alesans_entities/onlinemappacks/" .. out .. ".png") then
 					return imagetofile(size, out)
 				else
 					return false
@@ -169,7 +169,7 @@ function directRequest(url,method,data,out)
 	https.timer = os.time();
 	local ok = false
 	while true do
-		if love.filesystem.getInfo("alesans_entities/onlinemappacks/status.txt") ~= nil and love.filesystem.getInfo("alesans_entities/onlinemappacks/" .. out .. ".zip") ~= nil then
+		if love.filesystem.getInfo("alesans_entities/onlinemappacks/status.txt") and love.filesystem.getInfo("alesans_entities/onlinemappacks/" .. out .. ".zip") then
 			https.status = tonumber(love.filesystem.read("alesans_entities/onlinemappacks/status.txt"):sub(1,3));
 			--https.body = love.filesystem.read(out .. ".zip");
 			--print("len:" .. https.body:len());

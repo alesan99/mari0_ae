@@ -5,7 +5,7 @@ function enemies_load()
 	customenemies = {}
 
 	--HATS (for custom powerups)
-	if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/hats/") ~= nil then
+	if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/hats/") then
 		local files = love.filesystem.getDirectoryItems(mappackfolder .. "/" .. mappack .. "/hats/")
 		for i, v in pairs(files) do
 			if string.sub(v, -5, -1) == ".json" then
@@ -17,10 +17,10 @@ function enemies_load()
 	--ENEMIIIIEEES
 	loaddelayed = {}
 	
-	local enemiesexist = love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/enemies/") ~= nil
+	local enemiesexist = love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/enemies/")
 	if (not enemiesexist) and (not editormode) then
 		for i = 1, #mariocharacter do
-			if mariocharacter[i] and love.filesystem.getInfo("alesans_entities/characters/" .. mariocharacter[i] .. "/enemies/") ~= nil then
+			if mariocharacter[i] and love.filesystem.getInfo("alesans_entities/characters/" .. mariocharacter[i] .. "/enemies/") then
 				enemiesexist = true
 				break
 			end
@@ -55,7 +55,7 @@ function enemies_load()
 	--load enemies for custom characters
 	local characterenemiesloaded = {} --don't load the same enemy multiple times
 	for i = 1, #mariocharacter do
-		if mariocharacter[i] and (not characterenemiesloaded[mariocharacter[i]]) and love.filesystem.getInfo("alesans_entities/characters/" .. mariocharacter[i] .. "/enemies/") ~= nil then
+		if mariocharacter[i] and (not characterenemiesloaded[mariocharacter[i]]) and love.filesystem.getInfo("alesans_entities/characters/" .. mariocharacter[i] .. "/enemies/") then
 			local fl3 = love.filesystem.getDirectoryItems("alesans_entities/characters/" .. mariocharacter[i] .. "/enemies/")
 			for i2 = 1, #fl3 do
 				local cepath = "alesans_entities/characters/" .. mariocharacter[i] .. "/enemies/" .. fl3[i2]
@@ -231,9 +231,9 @@ function loadenemy(filename)
 		end
 		
 		--Load graphics if it exists
-		if love.filesystem.getInfo(folder .. s .. ".png") ~= nil then
+		if love.filesystem.getInfo(folder .. s .. ".png") then
 			enemiesdata[s].graphic = love.graphics.newImage(folder .. s .. ".png")
-		elseif love.filesystem.getInfo(folder .. s .. ".PNG") ~= nil then --case sensitivity FTW
+		elseif love.filesystem.getInfo(folder .. s .. ".PNG") then --case sensitivity FTW
 			enemiesdata[s].graphic = love.graphics.newImage(folder .. s .. ".PNG")
 			if editormode then
 				notice.new("graphic for " .. s .. " needs\na lowercase file extension!", notice.red, 4)
@@ -241,17 +241,17 @@ function loadenemy(filename)
 		end
 		
 		--Load icon if it exists
-		if love.filesystem.getInfo(folder .. s .. "-icon.png") ~= nil then
+		if love.filesystem.getInfo(folder .. s .. "-icon.png") then
 			enemiesdata[s].icongraphic = love.graphics.newImage(folder .. s .. "-icon.png")
 		end
 
 		--Load tooltop if it exists
-		if love.filesystem.getInfo(folder .. s .. "-tooltip.png") ~= nil then
+		if love.filesystem.getInfo(folder .. s .. "-tooltip.png") then
 			enemiesdata[s].tooltipgraphic = love.graphics.newImage(folder .. s .. "-tooltip.png")
 		end
 
 		--Load sound if it exists
-		if love.filesystem.getInfo(folder .. s .. ".ogg") ~= nil then
+		if love.filesystem.getInfo(folder .. s .. ".ogg") then
 			enemiesdata[s].sound = love.audio.newSource(folder .. s .. ".ogg", "static")
 		end
 		

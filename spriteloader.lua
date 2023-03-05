@@ -53,7 +53,7 @@ local loadedcustomsprites = {} --lists which graphics have been changed
 function loadcustomsprites(initial) --Sprite loader
 	local imgtable = imagestable
 	local imgdatatable = imagedatatable
-	local customspritesexist = love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/custom") ~= nil
+	local customspritesexist = love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/custom")
 	if customspritesexist then
 		local files = love.filesystem.getDirectoryItems(mappackfolder .. "/" .. mappack .. "/custom")
 		if #files == 0 then
@@ -126,7 +126,7 @@ function loadcustomsprites(initial) --Sprite loader
 	customsprites = true
 	
 	for i = 1, #imgtable do
-		if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/custom/" .. string.gsub(string.gsub(imgtable[i], "img", ""), "image", "") .. ".png") ~= nil then
+		if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/custom/" .. string.gsub(string.gsub(imgtable[i], "img", ""), "image", "") .. ".png") then
 			local imgdata = love.image.newImageData(mappackfolder .. "/" .. mappack .. "/custom/" .. string.gsub(string.gsub(imgtable[i], "img", ""), "image", "") .. ".png")
 			_G[imgtable[i]] = love.graphics.newImage(imgdata)
 			_G[imgdatatable[i]] = imgdata
@@ -185,10 +185,10 @@ function loadcustomsprites(initial) --Sprite loader
 	--fix old custom graphics
 	fixsprites()
 	
-	if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/custom/title.png") ~= nil then
+	if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/custom/title.png") then
 		titleimage = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/custom/title.png")
 		titlewidth = titleimage:getWidth()
-		if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/custom/title.txt") ~= nil then
+		if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/custom/title.txt") then
 			local s = love.filesystem.read(mappackfolder .. "/" .. mappack .. "/custom/title.txt")
 			local lines
 			if string.find(s, "\r\n") then
@@ -1755,7 +1755,7 @@ function fixsprites(reset)
 		SPRITESfixfont = false
 	end
 	
-	if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/custom/smbtiles.png") ~= nil and (not reset) then
+	if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/custom/smbtiles.png") and (not reset) then
 		customsmbtiles = true
 		loadtiles("smbcustom")
 		collectgarbage()
@@ -1765,7 +1765,7 @@ function fixsprites(reset)
 		customsmbtiles = false
 	end
 
-	if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/custom/entities.png") ~= nil and (not reset) then
+	if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/custom/entities.png") and (not reset) then
 		loadtiles("entity")
 		customentityquads = true
 	elseif customentityquads then

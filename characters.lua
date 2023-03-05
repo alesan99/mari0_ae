@@ -33,7 +33,7 @@ function loadcustomplayers()
 		local folder = "alesans_entities/characters/" .. v
 		local skip = false
 
-		if love.filesystem.getInfo(folder .. "/config.json") == nil then
+		if not love.filesystem.getInfo(folder .. "/config.json") then
 			skip = true
 		end
 		if (not NoCharacterZipNotices) and v:sub(-4,-1) == ".zip" then
@@ -354,8 +354,8 @@ function loadcustomplayers()
 			playerstuff.imgs = {} --list of imgs
 
 			--load properties
-			local jsonexists = love.filesystem.getInfo(folder .. "/config.json") ~= nil
-			if jsonexists or love.filesystem.getInfo(folder .. "/config.txt") ~= nil then
+			local jsonexists = love.filesystem.getInfo(folder .. "/config.json")
+			if jsonexists or love.filesystem.getInfo(folder .. "/config.txt") then
 				--read .json
 				local s
 				if jsonexists then
@@ -408,7 +408,7 @@ function loadcustomplayers()
 
 			for i2, n in pairs(animfiles) do
 				local n = n .. "animations"
-				if love.filesystem.getInfo(folder .. "/" .. n .. ".png") ~= nil or love.filesystem.getInfo(folder .. "/" .. n .. "1.png") ~= nil then
+				if love.filesystem.getInfo(folder .. "/" .. n .. ".png") or love.filesystem.getInfo(folder .. "/" .. n .. "1.png") then
 					playerstuff.imgs[n] = true
 				end
 			end
@@ -435,7 +435,7 @@ function loadcustomplayers()
 				if not characters.data[i]["animations"] then
 					for i2, v in pairs(animfiles) do
 						local n = v .. "animations"
-						if imgs[n] and love.filesystem.getInfo(folder .. "/" .. n .. "1.png") == nil then
+						if imgs[n] and not love.filesystem.getInfo(folder .. "/" .. n .. "1.png") then
 							characters.data[i][n] = {}
 							local imgdata = splitimage("alesans_entities/characters/" .. i .. "/" .. n .. ".png", characters.data[i].splitcolors, true, "imagedata")
 							imgdata:encode("png", "alesans_entities/characters/" .. i .. "/" .. n .. "0.png")
@@ -532,11 +532,11 @@ end
 
 function setcustomplayer(i, pn, initial) --name, player number, initial (don't change colors to defaults)
 	if i and characters.data[i] then
-		if love.filesystem.getInfo("alesans_entities/characters/" .. i .. "/config.txt") ~= nil then
+		if love.filesystem.getInfo("alesans_entities/characters/" .. i .. "/config.txt") then
 			--incompatible probably
-			if love.filesystem.getInfo("alesans_entities/characters/" .. i .. "/animationsBAK.png") ~= nil then --SE Character
+			if love.filesystem.getInfo("alesans_entities/characters/" .. i .. "/animationsBAK.png") then --SE Character
 				notice.new("Incompatible Character Detected\nUse characters made for mari0:AE!", notice.red, 5)
-			elseif love.filesystem.getInfo("alesans_entities/characters/" .. i .. "/config.json") == nil then --Old Character Format
+			elseif not love.filesystem.getInfo("alesans_entities/characters/" .. i .. "/config.json") then --Old Character Format
 				notice.new("Incompatible Character Detected\nUse characters made for\nmari0:AE version " .. VERSIONSTRING .. "!", notice.red, 5)
 			end
 		end
@@ -552,9 +552,9 @@ function setcustomplayer(i, pn, initial) --name, player number, initial (don't c
 						for j = 1, #characters.data[i].colorables do
 							characters.data[i][n][j] = splitimage("alesans_entities/characters/" .. i .. "/" .. n .. ".png", characters.data[i].colors[j])
 						end
-					elseif love.filesystem.getInfo("alesans_entities/characters/" .. i .. "/" .. n .. "1.png") ~= nil then
+					elseif love.filesystem.getInfo("alesans_entities/characters/" .. i .. "/" .. n .. "1.png") then
 						for j = 0, #characters.data[i].colorables do
-							if love.filesystem.getInfo("alesans_entities/characters/" .. i .. "/" .. n .. j .. ".png") == nil then
+							if not love.filesystem.getInfo("alesans_entities/characters/" .. i .. "/" .. n .. j .. ".png") then
 								characters.data[i][n][j] = blankimg
 							else
 								characters.data[i][n][j] = love.graphics.newImage("alesans_entities/characters/" .. i .. "/" .. n .. j .. ".png")
@@ -571,14 +571,14 @@ function setcustomplayer(i, pn, initial) --name, player number, initial (don't c
 				end
 			end
 			--cape and bunnyears
-			if love.filesystem.getInfo("alesans_entities/characters/" .. i .. "/cape.png") ~= nil then
+			if love.filesystem.getInfo("alesans_entities/characters/" .. i .. "/cape.png") then
 				characters.data[i].capeimg = love.graphics.newImage("alesans_entities/characters/" .. i .. "/cape.png")
 			end
-			if love.filesystem.getInfo("alesans_entities/characters/" .. i .. "/bunnyears.png") ~= nil then
+			if love.filesystem.getInfo("alesans_entities/characters/" .. i .. "/bunnyears.png") then
 				characters.data[i].bunnyears = love.graphics.newImage("alesans_entities/characters/" .. i .. "/bunnyears.png")
 			end
 			--health counter
-			if love.filesystem.getInfo("alesans_entities/characters/" .. i .. "/health.png") ~= nil then
+			if love.filesystem.getInfo("alesans_entities/characters/" .. i .. "/health.png") then
 				local img = love.graphics.newImage("alesans_entities/characters/" .. i .. "/health.png")
 				characters.data[i].healthimg = img
 				local w, h = img:getWidth(), img:getHeight()

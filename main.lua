@@ -241,7 +241,7 @@ function love.load()
 	fontindexOLD["D"] = "↓"
 	fontindexOLD["U"] = "↑"
 
-	if love.filesystem.getInfo("alesans_entities/familyfriendly.txt") ~= nil then FamilyFriendly = true end
+	if love.filesystem.getInfo("alesans_entities/familyfriendly.txt") then FamilyFriendly = true end
 	
 	math.randomseed(os.time());math.random();math.random()
 	
@@ -333,10 +333,10 @@ function love.load()
 	local zips = love.filesystem.getDirectoryItems("alesans_entities/dlc_mappacks")
 	if #zips > 0 then
 		for j, w in pairs(zips) do
-			if love.filesystem.getInfo("alesans_entities/onlinemappacks/" .. w) == nil then
+			if not love.filesystem.getInfo("alesans_entities/onlinemappacks/" .. w) then
 				local filedata = love.filesystem.newFileData("alesans_entities/dlc_mappacks/" .. w)
 				love.filesystem.write("alesans_entities/onlinemappacks/" .. w, filedata)
-				if j == 1 and love.filesystem.getInfo("alesans_entities/onlinemappacks/" .. w) == nil then
+				if j == 1 and not love.filesystem.getInfo("alesans_entities/onlinemappacks/" .. w) then
 					break
 				end
 			end
@@ -353,7 +353,7 @@ function love.load()
 		end
 	end
 	
-	if checkmappack and love.filesystem.getInfo(mappackfolder .. "/" .. checkmappack .. "/") ~= nil then
+	if checkmappack and love.filesystem.getInfo(mappackfolder .. "/" .. checkmappack .. "/") then
 		mappack = checkmappack
 		checkmappack = nil
 		saveconfig()
@@ -365,7 +365,7 @@ function love.load()
 	datet = {os.date("%m"),os.date("%d"),os.date("%Y")}
 	DChigh = {"-", "-", "-"}
 	DChightemp = false
-	if love.filesystem.getInfo("alesans_entities/dc.txt") ~= nil then
+	if love.filesystem.getInfo("alesans_entities/dc.txt") then
 		local s = love.filesystem.read("alesans_entities/dc.txt")
 		local s2 = s:split("~")
 		DCcompleted = tonumber(s2[1])
@@ -1371,9 +1371,9 @@ function loadconfig(nodefaultconfig)
 	end
 	
 	local s
-	if love.filesystem.getInfo("alesans_entities/options.txt") ~= nil then
+	if love.filesystem.getInfo("alesans_entities/options.txt") then
 		s = love.filesystem.read("alesans_entities/options.txt")
-	elseif love.filesystem.getInfo("options.txt") ~= nil then
+	elseif love.filesystem.getInfo("options.txt") then
 		s = love.filesystem.read("options.txt")
 	else
 		return
@@ -1467,7 +1467,7 @@ function loadconfig(nodefaultconfig)
 		elseif s2[1] == "mouseowner" then
 			mouseowner = tonumber(s2[2])
 		elseif s2[1] == "mappack" then
-			if love.filesystem.getInfo(mappackfolder .. "/" .. s2[2] .. "/") ~= nil then
+			if love.filesystem.getInfo(mappackfolder .. "/" .. s2[2] .. "/") then
 				mappack = s2[2]
 			else
 				checkmappack = s2[2]
@@ -1678,7 +1678,7 @@ function suspendgame()
 end
 
 function continuegame()
-	if love.filesystem.getInfo("suspend") == nil then
+	if not love.filesystem.getInfo("suspend") then
 		return
 	end
 	
@@ -2860,7 +2860,7 @@ function loadnitpicks()
 	--shit i don't want to add
 	--if people complain about stuff they can use this
 	nitpicks = false
-	if love.filesystem.getInfo("alesans_entities/nitpicks.json") ~= nil then
+	if love.filesystem.getInfo("alesans_entities/nitpicks.json") then
 		local data = love.filesystem.read("alesans_entities/nitpicks.json")
 		t = JSON:decode(data or "")
 		--CASE INSENSITVE THING

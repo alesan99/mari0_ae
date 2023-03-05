@@ -54,11 +54,11 @@ function levelscreen_load(reason, i)
 			--check if next level doesn't exist
 			if not dcplaying then
 				local gamefinished = false
-				if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "-" .. mariolevel .. ".txt") == nil then
+				if not love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "-" .. mariolevel .. ".txt") then
 					gamefinished = true
 					--check incase there are fewer than 4 levels in the world
 					if reason == "next" and tonumber(mariolevel) and mariolevel <= 4 then
-						if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. marioworld+1 .. "-1.txt") ~= nil then
+						if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. marioworld+1 .. "-1.txt") then
 							marioworld = marioworld + 1
 							mariolevel = 1
 							gamefinished = false
@@ -75,24 +75,24 @@ function levelscreen_load(reason, i)
 						gamestate = "mappackfinished"
 						blacktime = gameovertime
 						
-						if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/endingmusic.ogg") ~= nil or love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/endingmusic.mp3") ~= nil then
+						if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/endingmusic.ogg") or love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/endingmusic.mp3") then
 							playsound(endingmusic)
 						else
 							music:play("princessmusic")
 						end
-						if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/ending.png") ~= nil then
+						if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/ending.png") then
 							levelscreenimage = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/ending.png")
 							levelscreenimagecheck = true
 						end
 					end
 				else
-					if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "-" .. mariolevel .. "levelscreen.png") ~= nil then
+					if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "-" .. mariolevel .. "levelscreen.png") then
 						levelscreenimage = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "-" .. mariolevel .. "levelscreen.png")
 						levelscreenimagecheck = true
-					elseif love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "levelscreen.png") ~= nil then
+					elseif love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "levelscreen.png") then
 						levelscreenimage = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "levelscreen.png")
 						levelscreenimagecheck = true
-					elseif love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/levelscreen.png") ~= nil then
+					elseif love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/levelscreen.png") then
 						levelscreenimage = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/levelscreen.png")
 						levelscreenimagecheck = true
 					end
@@ -110,13 +110,13 @@ function levelscreen_load(reason, i)
 			end
 			
 			if not dcplaying then
-				if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "-" .. mariolevel .. "levelscreen.png") ~= nil then
+				if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "-" .. mariolevel .. "levelscreen.png") then
 					levelscreenimage = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "-" .. mariolevel .. "levelscreen.png")
 					levelscreenimagecheck = true
-				elseif love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "levelscreen.png") ~= nil then
+				elseif love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "levelscreen.png") then
 					levelscreenimage = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "levelscreen.png")
 					levelscreenimagecheck = true
-				elseif love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/levelscreen.png") ~= nil then
+				elseif love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/levelscreen.png") then
 					levelscreenimage = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/levelscreen.png")
 					levelscreenimagecheck = true
 				end
@@ -128,7 +128,7 @@ function levelscreen_load(reason, i)
 		playsound(gameoversound)
 		checkpointx = nil
 		
-		if not dcplaying and love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/gameover.png") ~= nil then
+		if not dcplaying and love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/gameover.png") then
 			levelscreenimage = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/gameover.png")
 			levelscreenimagecheck = true
 		end
