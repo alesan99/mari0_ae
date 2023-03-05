@@ -158,11 +158,11 @@ function love.load()
 	love.window.setTitle( "Mari0: AE" )
 	
 	--version check by checking for a const that was added in 0.8.0
-	if love._version_major == nil then error("You have an outdated version of Love! Get 11.4 or higher and retry.") end
+	if love._version_major == nil or love._version_major < 11 then error("You have an outdated version of Love2d! Get 11.4 or higher and retry.") end
 	
 	love.window.setIcon(love.image.newImageData("graphics/icon.png"))
 	
-	love.graphics.setDefaultFilter("nearest")
+	love.graphics.setDefaultFilter("nearest", "nearest")
 	
 	love.graphics.setBackgroundColor(0, 0, 0)
 	
@@ -1740,8 +1740,10 @@ end
 
 function changescale(s, fullscreen)
 	if android or (s == 5) then
+		local window_resizable = true
 		if android then
 			scale = 1
+			window_resizable = false
 		elseif fullscreen then
 			local w, h = love.window.getDesktopDimensions()
 			scale = math.max(1, math.floor(w/(width*16)))
@@ -1751,7 +1753,7 @@ function changescale(s, fullscreen)
 		resizable = true
 		
 		uispace = math.floor(width*16*scale/4)
-		love.window.setMode(width*16*scale, 224*scale, {fullscreen=fullscreen, vsync=vsync, msaa=fsaa, resizable=true, minwidth=width*16, minheight=224}) --27x14 blocks (15 blocks actual height)
+		love.window.setMode(width*16*scale, 224*scale, {fullscreen=fullscreen, vsync=vsync, msaa=fsaa, resizable=window_resizable, minwidth=width*16, minheight=224}) --27x14 blocks (15 blocks actual height)
 		
 		gamewidth, gameheight = love.graphics.getDimensions()
 		if android then
