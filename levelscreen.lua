@@ -347,7 +347,7 @@ function levelscreen_draw()
 			if levelscreenimagecheck then
 				love.graphics.draw(levelscreenimage, 0, 0, 0, scale, scale)
 			end
-			love.graphics.setColor(getendingtextcolor())
+			love.graphics.setColor(endingtextcolor)
 			
 			properprintfunc(endingtext[1], width*8*scale-string.len(endingtext[1])*4*scale, 120*scale)
 			properprintfunc(endingtext[2], width*8*scale-string.len(endingtext[2])*4*scale, 140*scale)

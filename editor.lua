@@ -347,8 +347,8 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	guielements["openfoldersoundscustom"] = guielement:new("button", 184, 105, TEXT["open folder"], opencustomimagefolder, 2, {"sounds"})
 	guielements["openfoldermusiccustom"] = guielement:new("button", 184, 164, TEXT["open folder"], opencustomimagefolder, 2, {"music"})
 	guielements["savesounds"] = guielement:new("button", 176, 199, TEXT["update sounds"], savecustomimage, 2)
-	guielements["savesounds"].bordercolor = {255, 0, 0}
-	guielements["savesounds"].bordercolorhigh = {255, 127, 127}
+	guielements["savesounds"].bordercolor = {1, 0, 0}
+	guielements["savesounds"].bordercolorhigh = {1, 127/255, 127/255}
 
 	--custom enemies
 	changecurrentenemy(1, true)
@@ -3250,12 +3250,12 @@ function editor_draw()
 		end
 		
 		if confirmmenuopen then
-			love.graphics.setColor(0,0,0,200)
+			love.graphics.setColor(0,0,0,200/255)
 			love.graphics.rectangle("fill", 0, 0, width*16*scale, height*16*scale)
 			love.graphics.setColor(0,0,0)
 			love.graphics.rectangle("fill", 69*scale, 71*scale, 262*scale, 82*scale)
-			love.graphics.setColor(255,255,255)
-			drawrectangle(70, 72, 260, 80)
+			love.graphics.setColor(1,1,1)
+			drawrectangle(70/255, 72/255, 260/255, 80/255)
 
 			properprintF(TEXT["are you sure?"], (200-utf8.len(TEXT["are you sure?"])*4)*scale, 80*scale)
 			properprintF(TEXT["unsaved changes will be lost!"], (200-utf8.len(TEXT["unsaved changes will be lost!"])*4)*scale, 92*scale)
@@ -3746,8 +3746,8 @@ function openconfirmmenu(menutype, args)
 	guielements["confirmsave"].x = guielements["confirmsave"].x - (guielements["confirmsave"].width / 2) - 3
 	guielements["confirmexit"].x = guielements["confirmexit"].x - (guielements["confirmexit"].width / 2) - 3
 	--guielements["confirmcancel"].x = guielements["confirmcancel"].x - (guielements["confirmcancel"].width / 2) - 3
-	guielements["confirmsave"].bordercolor = {255, 0, 0}
-	guielements["confirmsave"].bordercolorhigh = {255, 127, 127}
+	guielements["confirmsave"].bordercolor = {1, 0, 0}
+	guielements["confirmsave"].bordercolorhigh = {1, 127/255, 127/255}
 end
 
 function closeconfirmmenu()

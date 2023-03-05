@@ -164,7 +164,6 @@ end
 function track:draw()
 	if self.switch then
 		--draw switch light
-		local color = self.color
 		love.graphics.draw(trackimg, trackquad["switch"][self.color][self.activepath], math.floor(((self.cox-xscroll-.5)*16)*scale), math.floor(((self.coy-yscroll-1.5)*16+8)*scale), 0, scale, scale, 8, 8)
 	end
 end

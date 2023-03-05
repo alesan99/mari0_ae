@@ -3749,7 +3749,7 @@ function drawHUD()
 	if hudoutline then
 		properprintfunc = properprintFbackground
 	end
-	love.graphics.setColor(gethudtextcolor())
+	love.graphics.setColor(hudtextcolor)
 	love.graphics.translate(0, -yoffset*scale)
 	if yoffset < 0 then
 		love.graphics.translate(0, yoffset*scale)
@@ -3763,7 +3763,7 @@ function drawHUD()
 		--properprintfunc(playername .. " * " .. tostring(mariolives[1]), 16*scale, 8*scale)
 		love.graphics.setColor(1, 1, 1)
 		love.graphics.draw(coinanimationimage, coinanimationquads[spriteset or 1][coinframe or 1], 16*scale, 12*scale, 0, scale, scale)
-		love.graphics.setColor(gethudtextcolor())
+		love.graphics.setColor(hudtextcolor)
 		properprintfunc("*" .. addzeros((mariocoincount or 0), 2), 24*scale, 12*scale)
 		
 		properprintfunc(addzeros((marioscore or 0), 9), (width*16-56-(9*8))*scale, 12*scale)
@@ -3780,7 +3780,7 @@ function drawHUD()
 		
 		love.graphics.setColor(1, 1, 1)
 		love.graphics.draw(coinanimationimage, coinanimationquads[spriteset or 1][coinframe or 1], uispace*1.5-16*scale, 16*scale, 0, scale, scale)
-		love.graphics.setColor(gethudtextcolor())
+		love.graphics.setColor(hudtextcolor)
 		properprintfunc("*" .. addzeros((mariocoincount or 0), 2), uispace*1.5-8*scale, 16*scale)
 		
 		properprintfunc(TEXT["world"], uispace*2.5 - 20*scale, 8*scale)
@@ -3818,7 +3818,7 @@ function drawHUD()
 			if collectablescount[i] > 0 and (not hudhidecollectables[i]) then
 				love.graphics.setColor(1, 1, 1)
 				love.graphics.draw(collectableuiimg, collectableuiquad[spriteset or 1][i][coinframe or 1], 16*scale, cy*scale, 0, scale, scale)
-				love.graphics.setColor(gethudtextcolor())
+				love.graphics.setColor(hudtextcolor)
 				properprintfunc("*" .. collectablescount[i], 24*scale, cy*scale)
 				cy = cy + 10
 			end
@@ -3827,7 +3827,7 @@ function drawHUD()
 		if players == 1 and objects["player"][1].key and objects["player"][1].key > 0 then
 			love.graphics.setColor(1, 1, 1)
 			love.graphics.draw(keyuiimg, keyuiquad[spriteset or 1][coinframe or 1], 16*scale, cy*scale, 0, scale, scale)
-			love.graphics.setColor(gethudtextcolor())
+			love.graphics.setColor(hudtextcolor)
 			properprintfunc("*" .. objects["player"][1].key, 24*scale, cy*scale)
 			cy = cy + 10
 		end

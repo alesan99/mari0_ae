@@ -95,7 +95,7 @@ function loadcustomtext()
 				local s4 = s2[2]:split(",")
 				
 				for j = 1, 3 do
-					endingtextcolor[j] = tonumber(s4[j])
+					endingtextcolor[j] = tonumber(s4[j])/255
 				end
 			elseif s3[1] == "endingtext" then
 				local s4 = s2[2]:split(",")
@@ -113,7 +113,7 @@ function loadcustomtext()
 				local s4 = s2[2]:split(",")
 				
 				for j = 1, 3 do
-					hudtextcolor[j] = tonumber(s4[j])
+					hudtextcolor[j] = tonumber(s4[j])/255
 				end
 			elseif s3[1] == "hudcolorname" then
 				hudtextcolorname = s2[2]
@@ -162,9 +162,7 @@ function loadcustomtext()
 end
 
 function defaultcustomtext(initial)
-	-- colors here have intentionally been left as 0..255
-	-- the conversion to 0..1 is handled in levelscreen.lua
-	endingtextcolor = {255, 255, 255}
+	endingtextcolor = {1, 1, 1}
 	endingtextcolorname = "white"
 	endingtext = {"congratulations!", "you have finished this mappack!"}
 	toadtext = {"thank you mario!", "but our princess is in", "another castle!"}
@@ -178,7 +176,7 @@ function defaultcustomtext(initial)
 			playername = "mario"
 		end
 	end
-	hudtextcolor = {255, 255, 255}
+	hudtextcolor = {1, 1, 1}
 	hudtextcolorname = "white"
 	hudvisible = true
 	hudworldletter = false
@@ -190,13 +188,13 @@ end
 function savecustomtext()
 	local s = ""
 	local color = textcolors[textcolorl]
-	s = s .. string.format("endingtextcolor=%s, %s, %s", unpack(color))
+	s = s .. string.format("endingtextcolor=%s, %s, %s", round(color[1]*255), round(color[2]*255), round(color[3]*255))
 	s = s .. "\r\nendingcolorname=" .. textcolorl
 	s = s .. "\r\nendingtext=" .. guielements["editendingtext1"].value .. "," .. guielements["editendingtext2"].value
 	s = s .. "\r\nplayername=" .. guielements["editplayername"].value
 	s = s .. "\r\n"
 	color = textcolors[textcolorp]
-	s = s .. string.format("hudtextcolor=%s, %s, %s", unpack(color))
+	s = s .. string.format("hudtextcolor=%s, %s, %s", round(color[1]*255), round(color[2]*255), round(color[3]*255))
 	s = s .. "\r\nhudcolorname=" .. textcolorp
 	s = s .. "\r\nhudvisible=" .. tostring(hudvisible)
 	s = s .. "\r\nhudworldletter=" .. tostring(hudworldletter)
@@ -233,14 +231,6 @@ function savecustomtext()
 	love.filesystem.write(mappackfolder .. "/" .. mappack .. "/text.txt", s)
 	loadcustomtext()
 	notice.new("Saved custom text!", notice.white, 2)
-end
-
-function getendingtextcolor()
-	return endingtextcolor[1] / 255, endingtextcolor[2] / 255, endingtextcolor[3] / 255
-end
-
-function gethudtextcolor()
-	return hudtextcolor[1] / 255, hudtextcolor[2] / 255, hudtextcolor[3] / 255
 end
 
 function loadcustombackground(filename)
