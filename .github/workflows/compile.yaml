@@ -24,7 +24,7 @@ jobs:
       run: cd main && python3 -m makelove && cd ..
     - name: Build (Android)
       id: build-android
-      uses: love-actions/love-actions-android@v1
+      uses: qixils/love-actions-android@v1
       with:
         app-name: ${{ steps.metadata.outputs.title }}
         bundle-id: net.stabyourself.${{ steps.metadata.outputs.id }}
