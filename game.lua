@@ -8001,7 +8001,9 @@ function checkkey(s,i,n)
 			end
 		end
 	elseif s[1] then
-		if love.keyboard.isDown(s[1]) then
+		if s[1] == "" then
+			return false
+		elseif love.keyboard.isDown(s[1]) then
 			return true
 		elseif android then
 			return androidButtonDown(i,n)
