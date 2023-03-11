@@ -8003,7 +8003,12 @@ function checkkey(s,i,n)
 	elseif s[1] then
 		if s[1] == "" then
 			return false
-		elseif love.keyboard.isDown(s[1]) then
+		end
+		local success, keyIsDown = pcall(love.keyboard.isDown, s[1])
+		if not success then
+			print("Invalid key: '" .. s[1] .. "'")
+			return false
+		elseif keyIsDown then
 			return true
 		elseif android then
 			return androidButtonDown(i,n)
