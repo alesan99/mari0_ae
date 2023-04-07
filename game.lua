@@ -4806,6 +4806,7 @@ function loadmap(filename)
 	for i = 1, #animatedtiles do
 		if animatedtiles[i].cache then
 			animatedtiles[i].cache = {}
+			tilequads[i+90000].cache = {}
 		end
 	end
 
