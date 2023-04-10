@@ -537,7 +537,7 @@ function editor_update(dt)
 	if editormenuopen == false or minimapmoving then
 		--key scroll
 		local speed = 30
-		if love.keyboard.isDown("lalt") then
+		if love.keyboard.isDown("rshift") then
 			speed = 70
 		end
 		if (love.keyboard.isDown("left") or (android and leftkey(1) and not autoscroll)) and (rightclickmenuopen or (not brushsizetoggle)) then
