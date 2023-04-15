@@ -4823,6 +4823,7 @@ function loadmap(filename)
 
 	--ANIMATED TIMERS
 	animatedtimers = {}
+	animatedtimerlist = {}
 	for x = 1, mapwidth do
 		animatedtimers[x] = {}
 	end
