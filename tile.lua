@@ -105,7 +105,7 @@ function tile:init(x, y)
 			end
 			if ismaptile(self.cox, self.coy-1) and tilequads[map[self.cox][self.coy-1][1]] then
 				local tq = tilequads[map[self.cox][self.coy-1][1]]
-				tabove = (tq.leftslant or tq.rightslant) and (not tq.downslant) and (not tq.slab)
+				tabove = (tq.leftslant or tq.rightslant) and (not tq.downslant) and (not tq.slab) and (not (tq.platform and not tq.platformdown))
 				if tabove and (t.platform or (self.SLOPE and not self.UPSIDEDOWNSLOPE)) then
 					tabove = false
 				end
