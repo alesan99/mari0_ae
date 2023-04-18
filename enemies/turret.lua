@@ -603,7 +603,7 @@ function turretshot:draw()
 	love.graphics.setLineStyle("rough")
 	love.graphics.setLineWidth(1*scale)
 	love.graphics.line((startx-xscroll)*16*scale, (starty-yscroll-.5)*16*scale, (endx-xscroll)*16*scale, (endy-yscroll-.5)*16*scale)
-	if HITBOXDEBUG then
+	if HITBOXDEBUG and (editormode or testlevel) then
 		love.graphics.setLineWidth(1)
 		handlePlayerCollisions(startx, starty, endx, endy, self.knockback)
 	end
@@ -619,7 +619,7 @@ function handlePlayerCollisions(sx, sy, ex, ey, knockback)
 				local tw = math.abs(ex - sx)
 				local th = math.abs(ey - sy)
 				
-				if HITBOXDEBUG then
+				if HITBOXDEBUG and (editormode or testlevel) then
 					love.graphics.setColor(255, 255, 255)
 					love.graphics.rectangle("line", (math.min(sx, ex)-xscroll)*16*scale, (math.min(sy, ey)-yscroll-.5)*16*scale, tw*16*scale, th*16*scale)
 				end
