@@ -9355,8 +9355,7 @@ function dchighscore()
 		highscore = true
 	end
 	if highscore then
-		s = ""
-		s = s .. tostring(DCcompleted) .. "~" .. datet[1] .. "/" .. datet[2] .. "/" .. datet[3]
+		local s = tostring(DCcompleted) .. "~" .. datet[1] .. "/" .. datet[2] .. "/" .. datet[3]
 		love.filesystem.write("alesans_entities/dc.txt", s)
 	end
 end
