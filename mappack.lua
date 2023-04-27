@@ -364,7 +364,7 @@ function loadcustomforeground(filename)
 	local realflnames = {}
 	local fl = love.filesystem.getDirectoryItems(mappackfolder .. "/" .. mappack .. "/backgrounds/")
 	for b = 1, #fl do
-		if love.filesystem.isDirectory(mappackfolder .. "/" .. mappack .. "/backgrounds/" .. fl[b]) then
+		if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/backgrounds/" .. fl[b]) then
 			-- load BG's from folder
 			local fl2 = love.filesystem.getDirectoryItems(mappackfolder .. "/" .. mappack .. "/backgrounds/" .. fl[b])
 			for b2 = 1, #fl2 do
@@ -447,7 +447,7 @@ function loadcustombackgrounds()
 	custombackgrounds = {"default"}
 	local fl = love.filesystem.getDirectoryItems(mappackfolder .. "/" .. mappack .. "/backgrounds")
 	for i = 1, #fl do
-		if love.filesystem.isDirectory(mappackfolder .. "/" .. mappack .. "/backgrounds/" .. fl[i]) then
+		if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/backgrounds/" .. fl[i]) then
 			-- load BG from folder
 			local fl2 = love.filesystem.getDirectoryItems(mappackfolder .. "/" .. mappack .. "/backgrounds/" .. fl[i])
 			for i2 = 1, #fl2 do
