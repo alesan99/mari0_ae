@@ -3218,6 +3218,28 @@ function mario:runanimation(dt, speed, animationspeed)
 end
 
 function mario:underwatermovement(dt)
+	local runningkey = runkey(self.playernumber)
+	local mariojumpkey = jumpkey(self.playernumber)
+	local mariorightkey = rightkey(self.playernumber)
+	local marioleftkey = leftkey(self.playernumber)
+	if self.gravitydir == "right" then
+		mariorightkey = leftkey(self.playernumber)
+		marioleftkey = rightkey(self.playernumber)
+	else
+		mariorightkey = rightkey(self.playernumber)
+		marioleftkey = leftkey(self.playernumber)
+	end
+	if android and editormode and (not autoscroll) then mariorightkey = false; marioleftkey = false end
+	if self.reversecontrols then
+		local oldmariorightkey = mariorightkey
+		mariorightkey = marioleftkey
+		marioleftkey = oldmariorightkey
+	end
+	local speedx, speedy = "speedx", "speedy"
+	if self.gravitydir == "left" or self.gravitydir == "right" then
+		speedx, speedy = "speedy", "speedx"
+	end
+
 	if self.jumping or self.falling then
 		--Swim animation
 		if self.animationstate == "jumping" or self.animationstate == "falling" and not self.float then
@@ -3261,7 +3283,7 @@ function mario:underwatermovement(dt)
 	end
 	
 	--HORIZONTAL MOVEMENT	
-	if self.controlsenabled and rightkey(self.playernumber) and not self.statue and not (self.ducking and not (self.jumping or self.falling)) then --MOVEMENT RIGHT
+	if self.controlsenabled and mariorightkey and not self.statue and not (self.ducking and not (self.jumping or self.falling)) then --MOVEMENT RIGHT
 		self.animationdirection = "right"
 		if self.jumping or self.falling then --IN AIR
 			if not self.frog then
@@ -3269,46 +3291,46 @@ function mario:underwatermovement(dt)
 				if self.size == 14 then
 					max = self.characterdata.uwmaxairshellwalkspeed
 				end
-				if self.speedx < max then
-					if self.speedx < 0 then
-						self.speedx = self.speedx + self.characterdata.uwwalkaccelerationair*dt*self.characterdata.uwairslidefactor
+				if self[speedx] < max then
+					if self[speedx] < 0 then
+						self[speedx] = self[speedx] + self.characterdata.uwwalkaccelerationair*dt*self.characterdata.uwairslidefactor
 					else
-						self.speedx = self.speedx + self.characterdata.uwwalkaccelerationair*dt
+						self[speedx] = self[speedx] + self.characterdata.uwwalkaccelerationair*dt
 					end
 					
-					if self.speedx > max then
-						self.speedx = max
+					if self[speedx] > max then
+						self[speedx] = max
 					end
 				end
 			end
 		else --ON GROUND
-			if self.speedx < self.characterdata.uwmaxwalkspeed then
-				if self.speedx < 0 then
-					if self.speedx < -self.characterdata.uwmaxrunspeed then
-						self.speedx = self.speedx + self.uwsuperfriction*dt + self.characterdata.uwrunacceleration*dt
+			if self[speedx] < self.characterdata.uwmaxwalkspeed then
+				if self[speedx] < 0 then
+					if self[speedx] < -self.characterdata.uwmaxrunspeed then
+						self[speedx] = self[speedx] + self.uwsuperfriction*dt + self.characterdata.uwrunacceleration*dt
 					else
-						self.speedx = self.speedx + self.uwfriction*dt + self.characterdata.uwrunacceleration*dt
+						self[speedx] = self[speedx] + self.uwfriction*dt + self.characterdata.uwrunacceleration*dt
 					end
 					self.animationstate = "sliding"
 					self.animationdirection = "right"
 				else
-					self.speedx = self.speedx + self.characterdata.uwwalkacceleration*dt
+					self[speedx] = self[speedx] + self.characterdata.uwwalkacceleration*dt
 					self.animationstate = "running"
 					self.animationdirection = "right"
 				end
 				
-				if self.speedx > self.characterdata.uwmaxwalkspeed then
-					self.speedx = self.characterdata.uwmaxwalkspeed
+				if self[speedx] > self.characterdata.uwmaxwalkspeed then
+					self[speedx] = self.characterdata.uwmaxwalkspeed
 				end
 			else
-				self.speedx = self.speedx - self.uwfriction*dt
-				if self.speedx < self.characterdata.uwmaxwalkspeed then
-					self.speedx = self.characterdata.uwmaxwalkspeed
+				self[speedx] = self[speedx] - self.uwfriction*dt
+				if self[speedx] < self.characterdata.uwmaxwalkspeed then
+					self[speedx] = self.characterdata.uwmaxwalkspeed
 				end
 			end
 		end
 		
-	elseif self.controlsenabled and leftkey(self.playernumber) and not self.statue and not (self.ducking and not (self.jumping or self.falling)) then --MOVEMENT LEFT
+	elseif self.controlsenabled and marioleftkey and not self.statue and not (self.ducking and not (self.jumping or self.falling)) then --MOVEMENT LEFT
 		self.animationdirection = "left"
 		if self.jumping or self.falling then --IN AIR
 			if not self.frog then
@@ -3316,80 +3338,80 @@ function mario:underwatermovement(dt)
 				if self.size == 14 then
 					max = self.characterdata.uwmaxairshellwalkspeed
 				end
-				if self.speedx > -max then
-					if self.speedx > 0 then
-						self.speedx = self.speedx - self.characterdata.uwwalkaccelerationair*dt*self.characterdata.uwairslidefactor
+				if self[speedx] > -max then
+					if self[speedx] > 0 then
+						self[speedx] = self[speedx] - self.characterdata.uwwalkaccelerationair*dt*self.characterdata.uwairslidefactor
 					else
-						self.speedx = self.speedx - self.characterdata.uwwalkaccelerationair*dt
+						self[speedx] = self[speedx] - self.characterdata.uwwalkaccelerationair*dt
 					end
 				
-					if self.speedx < -max then
-						self.speedx = -max
+					if self[speedx] < -max then
+						self[speedx] = -max
 					end
 				end
 			end
 		else --ON GROUND
-			if self.speedx > -self.characterdata.uwmaxwalkspeed then
-				if self.speedx > 0 then
-					if self.speedx > self.characterdata.uwmaxrunspeed then
-						self.speedx = self.speedx - self.uwsuperfriction*dt - self.characterdata.uwrunacceleration*dt
+			if self[speedx] > -self.characterdata.uwmaxwalkspeed then
+				if self[speedx] > 0 then
+					if self[speedx] > self.characterdata.uwmaxrunspeed then
+						self[speedx] = self[speedx] - self.uwsuperfriction*dt - self.characterdata.uwrunacceleration*dt
 					else
-						self.speedx = self.speedx - self.uwfriction*dt - self.characterdata.uwrunacceleration*dt
+						self[speedx] = self[speedx] - self.uwfriction*dt - self.characterdata.uwrunacceleration*dt
 					end
 					self.animationstate = "sliding"
 					self.animationdirection = "left"
 				else
-					self.speedx = self.speedx - self.characterdata.uwwalkacceleration*dt
+					self[speedx] = self[speedx] - self.characterdata.uwwalkacceleration*dt
 					self.animationstate = "running"
 					self.animationdirection = "left"
 				end
 				
-				if self.speedx < -self.characterdata.uwmaxwalkspeed then
-					self.speedx = -self.characterdata.uwmaxwalkspeed
+				if self[speedx] < -self.characterdata.uwmaxwalkspeed then
+					self[speedx] = -self.characterdata.uwmaxwalkspeed
 				end
 			else
-				self.speedx = self.speedx + self.uwfriction*dt
-				if self.speedx > -self.characterdata.uwmaxwalkspeed then
-					self.speedx = -self.characterdata.uwmaxwalkspeed
+				self[speedx] = self[speedx] + self.uwfriction*dt
+				if self[speedx] > -self.characterdata.uwmaxwalkspeed then
+					self[speedx] = -self.characterdata.uwmaxwalkspeed
 				end
 			end
 		end
 	
 	else --NO MOVEMENT
 		if self.jumping or self.falling then
-			if self.speedx > 0 then
-				self.speedx = self.speedx - self.uwfrictionair*dt
-				if self.speedx < 0 then
-					self.speedx = 0
+			if self[speedx] > 0 then
+				self[speedx] = self[speedx] - self.uwfrictionair*dt
+				if self[speedx] < 0 then
+					self[speedx] = 0
 					self.runframe = 1
 				end
 			else
-				self.speedx = self.speedx + self.uwfrictionair*dt
-				if self.speedx > 0 then
-					self.speedx = 0
+				self[speedx] = self[speedx] + self.uwfrictionair*dt
+				if self[speedx] > 0 then
+					self[speedx] = 0
 					self.runframe = 1
 				end
 			end
 		else
-			if self.speedx > 0 then
-				if self.speedx > self.characterdata.uwmaxrunspeed then
-					self.speedx = self.speedx - self.uwsuperfriction*dt
+			if self[speedx] > 0 then
+				if self[speedx] > self.characterdata.uwmaxrunspeed then
+					self[speedx] = self[speedx] - self.uwsuperfriction*dt
 				else	
-					self.speedx = self.speedx - self.uwfriction*dt
+					self[speedx] = self[speedx] - self.uwfriction*dt
 				end
-				if self.speedx < 0 then
-					self.speedx = 0
+				if self[speedx] < 0 then
+					self[speedx] = 0
 					self.runframe = 1
 					--self.animationstate = "idle"
 				end
 			else
-				if self.speedx < -self.characterdata.uwmaxrunspeed then
-					self.speedx = self.speedx + self.uwsuperfriction*dt
+				if self[speedx] < -self.characterdata.uwmaxrunspeed then
+					self[speedx] = self[speedx] + self.uwsuperfriction*dt
 				else	
-					self.speedx = self.speedx + self.uwfriction*dt
+					self[speedx] = self[speedx] + self.uwfriction*dt
 				end
-				if self.speedx > 0 then
-					self.speedx = 0
+				if self[speedx] > 0 then
+					self[speedx] = 0
 					self.runframe = 1
 					--self.animationstate = "idle"
 				end
@@ -3800,11 +3822,22 @@ function mario:jump(force)
 			if not self.frog then --don't use bad swimming when frog mario
 				playsound(swimsound)
 				
-				if self.gravitydir == "up" then
-					self.speedy = self.characterdata.uwjumpforce + (math.abs(self.speedx) / self.characterdata.maxrunspeed)*self.characterdata.uwjumpforceadd
-				else
-					self.speedy = -self.characterdata.uwjumpforce - (math.abs(self.speedx) / self.characterdata.maxrunspeed)*self.characterdata.uwjumpforceadd
+				local speedx = self.speedx
+				if self.gravitydir == "right" or self.gravitydir == "left" then
+					speedx = self.speedy
 				end
+				local force = self.characterdata.uwjumpforce + (math.abs(speedx) / self.characterdata.maxrunspeed)*self.characterdata.uwjumpforceadd
+				print(force)
+				if self.gravitydir == "up" then
+					self.speedy = force
+				elseif self.gravitydir == "down" then
+					self.speedy = -force
+				elseif self.gravitydir == "right" then
+					self.speedx = -force
+				elseif self.gravitydir == "left" then
+					self.speedx = force
+				end
+
 				self.jumping = true
 				if self.characterdata.swimpushframes > 0 then
 					if (not self.swimpush) then 

@@ -4814,6 +4814,7 @@ function loadmap(filename)
 	for i = 1, #animatedtiles do
 		if animatedtiles[i].cache then
 			animatedtiles[i].cache = {}
+			tilequads[i+90000].cache = {}
 		end
 	end
 
@@ -4830,6 +4831,7 @@ function loadmap(filename)
 
 	--ANIMATED TIMERS
 	animatedtimers = {}
+	animatedtimerlist = {}
 	for x = 1, mapwidth do
 		animatedtimers[x] = {}
 	end
@@ -9364,8 +9366,7 @@ function dchighscore()
 		highscore = true
 	end
 	if highscore then
-		s = ""
-		s = s .. tostring(DCcompleted) .. "~" .. datet[1] .. "/" .. datet[2] .. "/" .. datet[3]
+		local s = tostring(DCcompleted) .. "~" .. datet[1] .. "/" .. datet[2] .. "/" .. datet[3]
 		love.filesystem.write("alesans_entities/dc.txt", s)
 	end
 end
