@@ -2593,11 +2593,7 @@ function mario:update(dt)
 			end
 		end
 		
-		if self.gravitydir == "up" and self.y < 0 then
-			self:die("pit")
-		elseif (self.gravitydir == "left" or self.gravitydir == "right") and (self.y < 0 or self.y >= mapheight) then
-			self:die("pit")
-		elseif self.y >= mapheight then
+		if self.y >= mapheight or (self.gravitydir ~= "down" and self.y < -self.height) then
 			self:die("pit")
 		elseif flagx and self.x+self.width >= flagx+6/16 and (flagborder or (self.x <= flagx+10/16 and self.y < flagy+1)) and self.y > flagy-10.8 then
 			self:flag()
