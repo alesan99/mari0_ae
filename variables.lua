@@ -187,7 +187,7 @@ fireballkill = {
 	goomba = t, koopa = t, hammerbro = t, plant = t, cheep = t, bowser = t, squid = t, flyingfish = t, lakito = t, sidestepper = t, icicle = t, splunkin = t, ninji = t, mole = t, pokey = t, barrel = t, rockywrench = t, koopaling = t, spike = t, magikoopa = t, plantcreeper = t, fuzzy = t,
 	}
 iceballfreeze = {
-	goomba = t, koopa = t, hammerbro = t, plant = t, cheep = t, bowser = t, squid = t, flyingfish = t, lakito = t, sidestepper = t, icicle = t, splunkin = t, ninji = t, mole = t, firebro = t, bomb = t, koopaling = t, drybones = t, spike = t, magikoopa = t, bowser = t, hammer = t, spikeball = t, bulletbill = t, bigbill = t, sidestepper = t, barrel = t, enemy = t, fuzzy = t, amp = t
+	goomba = t, koopa = t, hammerbro = t, plant = t, cheep = t, bowser = t, squid = t, flyingfish = t, lakito = t, sidestepper = t, icicle = t, splunkin = t, ninji = t, mole = t, firebro = t, bomb = t, koopaling = t, drybones = t, spike = t, magikoopa = t, hammer = t, spikeball = t, bulletbill = t, bigbill = t, barrel = t, enemy = t, fuzzy = t, amp = t
 	}
 mariohammerkill = {
 	goomba = t, koopa = t, hammerbro = t, plant = t, cheep = t, bowser = t, squid = t, flyingfish = t, lakito = t, sidestepper = t, icicle = t, splunkin = t, ninji = t, drygoomba = t, drybones = t, fishbone = t, boo = t, mole = t, bomb = t, bulletbill = t, torpedoted = t, parabeetle = t, pokey = t, barrel = t, chainchomp = t, thwomp = t, thwimp = t, rockywrench = t, koopaling = t, spike = t, spikeball = t, magikoopa = t, plantcreeper = t, fuzzy = t
