@@ -51,6 +51,38 @@
 	-----------------------------------------------------------------------------
 ]]
 
+function preload(module, path)
+	local full_path = module .. "/" .. path
+	-- read from .love
+	local data = love.filesystem.read("libs/" .. full_path)
+	-- write to save directory
+	love.filesystem.setIdentity("mari0_libs")
+	if not love.filesystem.exists(module) then
+		love.filesystem.createDirectory(module)
+	end
+	love.filesystem.write(full_path, data)
+	-- preload module
+	package.preload[module] = package.loadlib(love.filesystem.getSaveDirectory() .. "/" .. full_path, "luaopen_" .. module)
+	love.filesystem.setIdentity("mari0")
+end
+
+-- preload https module from bundled libs folder
+local system_os = love.system.getOS()
+if system_os == "Windows" and jit.arch == "x64" then
+	preload("https", "win64.dll")
+elseif system_os == "Windows" and jit.arch == "x86" then
+	preload("https", "win32.dll")
+elseif system_os == "Linux" then
+	preload("https", "linux.so")
+elseif system_os == "OS X" then
+	preload("https", "osx.so")
+end
+
+local https_status, https = pcall(require, "https")
+if not https_status then
+	https = nil
+end
+
 local debugconsole = false --debug
 if debugconsole then debuginputon = true; debuginput = "print()"; print("DEBUG ON") end
 local debugGraph,fpsGraph,memGraph,drawGraph
