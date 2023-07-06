@@ -67,6 +67,8 @@ function preload(module, path)
 end
 
 -- preload https module from bundled libs folder
+-- to be removed in LÖVE 12.0
+-- note: not required for android
 local system_os = love.system.getOS()
 if system_os == "Windows" and jit.arch == "x64" then
 	preload("https", "win64.dll")
@@ -81,6 +83,12 @@ end
 local https_status, https = pcall(require, "https")
 if not https_status then
 	https = nil
+end
+
+if https then
+	code, body, headers = https.request("https://example.com")
+else
+	code, body, headers = 0, "", {}
 end
 
 local debugconsole = false --debug
@@ -1253,6 +1261,11 @@ function lovedraw()
 		love.graphics.setColor(1, 1, 1)
 		love.graphics.print(debuginput, 2, 2)
 	end
+
+	love.graphics.setColor(0, 0, 0)
+	love.graphics.print(tostring(code) .. " " .. body, 1, 1)
+	love.graphics.setColor(1, 1, 1)
+	love.graphics.print(tostring(code) .. " " .. body, 2, 2)
 	--testing sublevels (i KNOW you'll need this)
 	--love.graphics.setColor(1, 1, 1)
 	--properprint("mariosublevel: " .. tostring(mariosublevel) .. "\nprevsublevel: " .. tostring(prevsublevel) .. "\nactualsublevel: " .. tostring(actualsublevel), 2, 2)
