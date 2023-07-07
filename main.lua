@@ -68,7 +68,7 @@ end
 
 -- preload https module from bundled libs folder
 -- to be removed in LÖVE 12.0
--- note: not required for android
+-- TODO: ARM64 support
 local system_os = love.system.getOS()
 if system_os == "Windows" and jit.arch == "x64" then
 	preload("https", "win64.dll")

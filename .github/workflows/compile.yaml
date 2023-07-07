@@ -27,24 +27,6 @@ jobs:
       run: pip3 install git+https://github.com/pfirsich/makelove/
     - name: Build
       run: cd main && python3 -m makelove && cd ..
-    - name: Build (Android)
-      id: build-android
-      uses: qixils/love-actions-android@v1
-      with:
-        app-name: ${{ steps.metadata.outputs.title }}
-        bundle-id: love.to.androidmari0 # backwards compatibility
-        product-name: ${{ steps.metadata.outputs.id }}
-        resource-path: "main/.android-resources"
-        love-ref: ${{ steps.metadata.outputs.love-version }}
-        love-package: main/makelove-build/love/${{ env.ARTIFACT_NAME_LOVE }}
-        remote-libs: "https://github.com/love2d/lua-https"
-        version-string: ${{ steps.metadata.outputs.version }}
-        version-code: ${{ steps.metadata.outputs.android-version }}
-        output-folder: "main/makelove-build/android"
-        keystore-alias: ${{ env.KEYSTORE_ALIAS }}
-        keystore-base64: ${{ env.KEYSTORE_BASE64 }}
-        keystore-key-password: ${{ env.KEYSTORE_KEYPASSWORD }}
-        keystore-store-password: ${{ env.KEYSTORE_STOREPASSWORD }}
     - name: Artifact (LÖVE)
       uses: actions/upload-artifact@v3
       with:
@@ -70,6 +52,24 @@ jobs:
       with:
         name: ${{ steps.metadata.outputs.id }}-macos
         path: main/makelove-build/macos/${{ env.ARTIFACT_NAME_MACOS }}
+    - name: Build (Android)
+      id: build-android
+      uses: qixils/love-actions-android@v1
+      with:
+        app-name: ${{ steps.metadata.outputs.title }}
+        bundle-id: love.to.androidmari0 # backwards compatibility
+        product-name: ${{ steps.metadata.outputs.id }}
+        resource-path: "main/.android-resources"
+        love-ref: ${{ steps.metadata.outputs.love-version }}
+        love-package: main/makelove-build/love/${{ env.ARTIFACT_NAME_LOVE }}
+        remote-libs: "https://github.com/love2d/lua-https"
+        version-string: ${{ steps.metadata.outputs.version }}
+        version-code: ${{ steps.metadata.outputs.android-version }}
+        output-folder: "main/makelove-build/android"
+        keystore-alias: ${{ env.KEYSTORE_ALIAS }}
+        keystore-base64: ${{ env.KEYSTORE_BASE64 }}
+        keystore-key-password: ${{ env.KEYSTORE_KEYPASSWORD }}
+        keystore-store-password: ${{ env.KEYSTORE_STOREPASSWORD }}
     - name: Artifact (Android Debug)
       uses: actions/upload-artifact@v3
       with:
