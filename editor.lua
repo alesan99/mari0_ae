@@ -7729,6 +7729,9 @@ function savesettings()
 	if nolowtime then
 		s = s .. "nolowtime=t\n"
 	end
+	if nocoinlimit then
+		s = s .. "nocoinlimit=t\n"
+	end
 	
 	love.filesystem.createDirectory( mappackfolder )
 	love.filesystem.createDirectory( mappackfolder .. "/" .. mappack )
