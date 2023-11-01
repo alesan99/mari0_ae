@@ -11,7 +11,8 @@ function animationsystem_load()
 	if not dcplaying then
 		local fl = love.filesystem.getDirectoryItems(mappackfolder .. "/" .. mappack .. "/animations")
 		for i = 1, #fl do
-			if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/animations/" .. fl[i]) then
+			local fsinfo = love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/animations/" .. fl[i])
+			if fsinfo and fsinfo.type == "directory" then
 				--load animations from folder
 				local fl2 = love.filesystem.getDirectoryItems(mappackfolder .. "/" .. mappack .. "/animations/" .. fl[i])
 				for i2 = 1, #fl2 do
