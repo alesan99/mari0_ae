@@ -60,7 +60,7 @@ function preload(module, path)
 	local data = love.filesystem.read("libs/" .. full_path)
 	-- write to save directory
 	love.filesystem.setIdentity("mari0_libs")
-	if not love.filesystem.exists(module) then
+	if not love.filesystem.getInfo(module) then
 		love.filesystem.createDirectory(module)
 	end
 	love.filesystem.write(full_path, data)
