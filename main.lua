@@ -51,6 +51,9 @@
 	-----------------------------------------------------------------------------
 ]]
 
+--version check
+if love._version_major ~= 11 then error("You have an outdated version of Love2d! Get 11.4 and retry.") end
+
 function preload(module, path)
 	local full_path = module .. "/" .. path
 	-- read from .love
@@ -189,9 +192,6 @@ function love.load()
 	end
 
 	love.window.setTitle( "Mari0: AE" )
-	
-	--version check by checking for a const that was added in 0.8.0
-	if love._version_major == nil or love._version_major < 11 then error("You have an outdated version of Love2d! Get 11.4 or higher and retry.") end
 	
 	love.window.setIcon(love.image.newImageData("graphics/icon.png"))
 	
