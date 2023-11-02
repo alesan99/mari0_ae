@@ -3255,7 +3255,7 @@ function editor_draw()
 			love.graphics.setColor(0,0,0)
 			love.graphics.rectangle("fill", 69*scale, 71*scale, 262*scale, 82*scale)
 			love.graphics.setColor(1,1,1)
-			drawrectangle(70/255, 72/255, 260/255, 80/255)
+			drawrectangle(70, 72, 260, 80)
 
 			properprintF(TEXT["are you sure?"], (200-utf8.len(TEXT["are you sure?"])*4)*scale, 80*scale)
 			properprintF(TEXT["unsaved changes will be lost!"], (200-utf8.len(TEXT["unsaved changes will be lost!"])*4)*scale, 92*scale)
