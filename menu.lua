@@ -145,20 +145,14 @@ function menu_update(dt)
 		end
 	end
 	
-	if onlinemappackiconthread and onlinemappackiconthread:isRunning() then
+	if onlinemappackiconchannel2 and onlinemappackiconchannel2:peek() then
 		local v = onlinemappackiconchannel2:pop()
-		if v then
-			if v[1] == "error" then
-				onlinemappackiconchannel:push("stop")
-			elseif v[1] == "img" then
-				onlinemappackiconimage = love.graphics.newImage(v[2])
-				onlinemappackiconchannel:push("stop")
-				onlinemappackiconquad = {}
-				local w, h = onlinemappackiconimage:getWidth(), onlinemappackiconimage:getHeight()
-				for y = 1, math.floor(h/50) do
-					for x = 1, math.floor(w/50) do
-						table.insert(onlinemappackiconquad, love.graphics.newQuad((x-1)*50, (y-1)*50, 50, 50, w, h))
-					end
+		if v[1] == "img" then
+			local image = love.graphics.newImage(v[3])
+			local url = v[2]
+			for i, asset in pairs(onlineassetlist) do
+				if asset.icon_url == url then
+					asset.icon = image
 				end
 			end
 		end
@@ -775,8 +769,8 @@ function menu_draw()
 			
 			love.graphics.translate(round(mappackhorscrollrange*scale - mappackhorscrollsmooth*scale*mappackhorscrollrange), 0)
 			
-			if mappackhorscrollsmooth > 0 and mappackhorscrollsmooth < 2 and onlinemappacklist then
-				if #onlinemappacklist == 0 then
+			if mappackhorscrollsmooth > 0 and mappackhorscrollsmooth < 2 and onlineassetlist then
+				if #onlineassetlist == 0 then -- todo uhh i dont think this can be reached, it looks broken
 					properprintF("something went wrong\n\n      sorry d:\n\nmaybe your internet\ndoes not work right?", 40*scale, 80*scale)
 				end
 				
@@ -797,12 +791,12 @@ function menu_draw()
 						properprintF("download error!\nsomething went\nwrong while\ndownloading\nyour mappack.\ntry again.\nsorry.", 244*scale, 130*scale)
 						love.graphics.setColor(1, 1, 1, 1)
 					end
-					if onlinemappackfilename[onlinemappackselection] and onlinemappackfilename[onlinemappackselection] == "enemies" then
+					if onlineassetlist[onlinemappackselection] and onlineassetlist[onlinemappackselection].type == "enemy" then
 						love.graphics.setColor(1, 150/255, 150/255, 1)
 						properprintF(TEXT["dlc enemy instructions"], 244*scale, 160*scale)
 						love.graphics.setColor(1, 1, 1, 1)
 					end
-					if onlinemappackfilename[onlinemappackselection] and onlinemappackfilename[onlinemappackselection] == "character" then
+					if onlineassetlist[onlinemappackselection] and onlineassetlist[onlinemappackselection].type == "character" then
 						love.graphics.setColor(1, 150/255, 150/255, 1)
 						properprintF(TEXT["dlc character instructions"], 244*scale, 170*scale)
 						love.graphics.setColor(1, 1, 1, 1)
@@ -817,8 +811,9 @@ function menu_draw()
 				
 				--scrollbar offset
 				love.graphics.translate(0, -round(onlinemappackscrollsmooth*60*scale))
-				for i = math.max(1, math.floor(onlinemappackscrollsmooth+1)), math.min(#onlinemappacklist, math.floor(onlinemappackscrollsmooth+5)) do
-					local bonuscontent = (onlinemappackfilename[i] == "enemies" or onlinemappackfilename[i] == "character")
+				for i = math.max(1, math.floor(onlinemappackscrollsmooth+1)), math.min(#onlineassetlist, math.floor(onlinemappackscrollsmooth+5)) do
+					local asset = onlineassetlist[i]
+					local bonuscontent = asset.type == "enemy" or asset.type == "character"
 
 					--back
 					if downloadedmappacks[i] then
@@ -834,31 +829,23 @@ function menu_draw()
 					
 					--icon
 					love.graphics.setColor(1, 1, 1)
-					
-					if not onlinedlc then
-						if onlinemappackicon[i] then
-							local scale2w = scale*50 / math.max(1, onlinemappackicon[i]:getWidth())
-							local scale2h = scale*50 / math.max(1, onlinemappackicon[i]:getHeight())
-							love.graphics.draw(onlinemappackicon[i], 29*scale, (24+(i-1)*60)*scale, 0, scale2w, scale2h)
-						end
-					elseif onlinemappackiconimage and onlinemappackiconquad[i] then
-						local quadi = i
-						if onlinemappackiconi[i] and onlinemappackiconquad[onlinemappackiconi[i]] then
-							quadi = onlinemappackiconi[i]
-						end
-						love.graphics.draw(onlinemappackiconimage, onlinemappackiconquad[quadi], 29*scale, (24+(i-1)*60)*scale, 0, scale, scale)
+					if asset.icon then
+						local scale2w = scale*50 / math.max(1, asset.icon:getWidth())
+						local scale2h = scale*50 / math.max(1, asset.icon:getHeight())
+						love.graphics.draw(asset.icon, 29*scale, (24+(i-1)*60)*scale, 0, scale2w, scale2h)
 					else
 						love.graphics.draw(mappackonlineicon, mappackonlineiconquad[1], 29*scale, (24+(i-1)*60)*scale, 0, scale, scale)
 					end
+
 					love.graphics.draw(mappackoverlay, 29*scale, (24+(i-1)*60)*scale, 0, scale, scale)
 					local qi = 2
 					if (not onlinedlc) then
 						qi = 3
-					elseif onlinemappackfilename[i] == "enemies" then
+					elseif asset.type[i] == "enemy" then
 						qi = 5
-					elseif onlinemappackfilename[i] == "character" then
+					elseif asset.type[i] == "character" then
 						qi = 6
-					elseif onlinemappackfilename[i] == "video" then
+					elseif asset.type[i] == "video" then
 						qi = 7
 					end
 					love.graphics.setColor(0, 0, 0, 150/255)
@@ -872,7 +859,7 @@ function menu_draw()
 						love.graphics.setColor(1, 1, 1)
 					end
 					
-					properprint(string.sub(onlinemappackname[i]:lower(), 1, 17), 83*scale, (26+(i-1)*60)*scale)
+					properprint(string.sub(asset.name:lower(), 1, 17), 83*scale, (26+(i-1)*60)*scale)
 					
 					--author
 					love.graphics.setColor(100/255, 100/255, 100/255)
@@ -880,11 +867,11 @@ function menu_draw()
 						love.graphics.setColor(100/255, 100/255, 100/255)
 					end
 					
-					if onlinemappackauthor[i] then
+					if asset.author then
 						if #TEXT["by"] ~= utf8.len(TEXT["by"]) then
-							properprintF(string.sub(TEXT["by"] .. onlinemappackauthor[i]:lower(), 1, 17), 83*scale, (35+(i-1)*60)*scale)
+							properprintF(string.sub(TEXT["by"] .. asset.author:lower(), 1, 17), 83*scale, (35+(i-1)*60)*scale)
 						else
-							properprint(string.sub(TEXT["by"] .. onlinemappackauthor[i]:lower(), 1, 17), 83*scale, (35+(i-1)*60)*scale)
+							properprint(string.sub(TEXT["by"] .. asset.author:lower(), 1, 17), 83*scale, (35+(i-1)*60)*scale)
 						end
 					end
 					
@@ -894,15 +881,32 @@ function menu_draw()
 						love.graphics.setColor(180/255, 180/255, 180/255)
 					end
 					
-					if onlinemappackdescription[i] then
-						properprint( string.sub(onlinemappackdescription[i]:lower(), 1, 17), 83*scale, (47+(i-1)*60)*scale)
-						
-						if onlinemappackdescription[i]:len() > 17 then
-							properprint( string.sub(onlinemappackdescription[i]:lower(), 18, 34), 83*scale, (56+(i-1)*60)*scale)
+					if asset.description then
+						-- compute description lines (max 3 lines, max length 17 char per line, accept newline)
+						local description = asset.description:lower()
+						local lines = {}
+						local line = ""
+						for ci = 1, #description do
+							local c = description:sub(ci,ci)
+							if c == "\n" then
+								table.insert(lines, line)
+								if #lines >= 3 then break end
+								line = ""
+							elseif #line >= 17 then
+								table.insert(lines, line)
+								if #lines >= 3 then break end
+								line = c
+							else
+								line = line .. c
+							end
 						end
-						
-						if onlinemappackdescription[i]:len() > 34 then
-							properprint( string.sub(onlinemappackdescription[i]:lower(), 35, 51), 83*scale, (65+(i-1)*60)*scale)
+						if line ~= "" then
+							table.insert(lines, line)
+						end
+
+						-- display lines
+						for li = 1, #lines do
+							properprint(lines[li], 83*scale, (47+(li-1)*9+(i-1)*60)*scale)
 						end
 					end
 					
@@ -916,7 +920,7 @@ function menu_draw()
 			
 				love.graphics.translate(0, round(onlinemappackscrollsmooth*60*scale))
 			
-				local i = onlinemappackscrollsmooth / (#onlinemappacklist-3.233)
+				local i = onlinemappackscrollsmooth / (#onlineassetlist-3.233)
 			
 				love.graphics.draw(mappackscrollbar, 227*scale, (20+i*160)*scale, 0, scale, scale)
 			end
@@ -1011,8 +1015,8 @@ function menu_draw()
 			love.graphics.rectangle("fill", ((width*16)/2-100)*scale, (224/2-15)*scale, 200*scale, 30*scale)
 			love.graphics.setColor(1, 1, 1)
 			if onlinedlc then
-				if onlinemappacksize[onlinemappackselection] == "url" then
-					properprint(TEXT["opening link..."], ((width*16)/2-(string.len("opening link...")*8/2))*scale, (224/2-4)*scale)
+				if not onlineassetlist[onlinemappackselection].downloadable then
+					properprint(TEXT["opening link..."], ((width*16)/2-(string.len(TEXT["opening link..."])*8/2))*scale, (224/2-4)*scale)
 				else
 					properprint("downloading mappack...", ((width*16)/2-(string.len("downloading mappack...")*8/2))*scale, (224/2-4)*scale)
 				end
@@ -1864,7 +1868,7 @@ function mappacks()
 		openmappacksbutton.active = true
 		mappacksearchbar.active = true
 	elseif mappackhorscroll == 1 then
-		if (not onlinemappacklist) or onlinemappacklisterror then
+		if (not onlineassetlist) or onlinemappacklisterror then
 			loadonlinemappacks()
 		end
 		mappacktype = "online"
@@ -1955,80 +1959,57 @@ function loadonlinemappacks()
 	mappacktype = "online"
 	if onlinedlc then
 		onlinemappacklisterror = nil
-		local s, iconlink = downloadmappackinfo()
-		if not s then
+		local assetdata = downloadassetdata()
+		if not (assetdata and assetdata.assets) then
 			onlinemappackscroll = 0
 			onlineupdatescroll()
 			onlinemappackscrollsmooth = onlinemappackscroll
-			onlinemappacklist = {1}
-			onlinemappackname = {"error"}
-			onlinemappackauthor = {"error"}
-			onlinemappackdescription = {"error"}
-			onlinemappackbackground = {"1-1"}
-			onlinemappackurl = {"error"}
-			onlinemappackfilename = {"error"}
-			onlinemappacksize = {"error"}
+			local asset = {}
+			asset.type = "error"
+			asset.name = "error"
+			asset.author = "error"
+			asset.description = "error"
+			asset.download = "error"
+			asset.filename = "error"
+			onlineassetlist = {asset}
 			onlinemappacklisterror = true
 			return false
 		end
 		
-		--get info
-		onlinemappackname = {}
-		onlinemappackauthor = {}
-		onlinemappackdescription = {}
-		onlinemappackbackground = {}
-		onlinemappackurl = {}
-		onlinemappackfilename = {}
-		onlinemappacksize = {} --can be byte number, or the string "url"
-		onlinemappackiconi = {}
-		onlinemappackicon = false
-		onlinemappackiconquad = {}
+		-- prepare icon thread
+		onlinemappackiconchannel = love.thread.getChannel("image_input")
+		onlinemappackiconchannel2 = love.thread.getChannel("image_output")
+		onlinemappackiconthread = love.thread.newThread("onlineimage.lua")
+		onlinemappackiconthread:start()
+
+		-- get asset info
+		onlineassetlist = {}
+		local assets = assetdata.assets
 		
-		local onlinemappackinfo = s:split(";")
-		onlinemappacklist = s:split(";")
-		
-		for i = 1, #onlinemappackinfo do
-			onlinemappackname[i] = "error"
-			onlinemappackauthor[i] = "error"
-			onlinemappackdescription[i] = "error"
-			onlinemappackbackground[i] = "1-1"
-			onlinemappackurl[i] = "error"
-			onlinemappackfilename[i] = "error"
-			onlinemappacksize[i] = "error"
-			onlinemappackiconi[i] = false
-			
-			local s1 = onlinemappackinfo[i]:split("~")
-			for j = 1, #s1 do
-				if j == 1 then
-					onlinemappackurl[i] = s1[j]
-				elseif j == 2 then
-					onlinemappackfilename[i] = s1[j]
-				elseif j == 3 then
-					onlinemappackname[i] = s1[j]
-				elseif j == 4 then
-					onlinemappackauthor[i] = s1[j]
-				elseif j == 5 then
-					onlinemappackdescription[i] = s1[j]
-				elseif j == 6 then
-					if tonumber(s1[j]) then
-						onlinemappacksize[i] = tonumber(s1[j])
-					else
-						onlinemappacksize[i] = s1[j]
-					end
-				elseif j == 7 then
-					onlinemappackiconi[i] = tonumber(s1[j])
+		for i = 1, #assets do
+			local raw_asset = assets[i]
+			if raw_asset.game_version and hasvalue(raw_asset.game_version.derivative, "AE") then
+				local asset = {}
+				table.insert(onlineassetlist, asset)
+	
+				asset.type = raw_asset.type
+				asset.downloadable = asset.type == "mappack" -- todo: more
+				asset.name = raw_asset.name
+				asset.author = raw_asset.author
+				asset.description = raw_asset.short_description or raw_asset.description
+				asset.background = raw_asset.background
+				asset.download = raw_asset.download
+				asset.filename = raw_asset.filename
+				
+				if raw_asset.icon then
+					asset.icon_url = raw_asset.icon
+					onlinemappackiconchannel:push(asset)
 				end
+				-- todo: icon
 			end
 		end
 		
-		if iconlink then
-			onlinemappackiconchannel = love.thread.getChannel("command")
-			onlinemappackiconchannel2 = love.thread.getChannel("data")
-			onlinemappackiconthread = love.thread.newThread("onlineimage.lua")
-			onlinemappackiconchannel:push(iconlink)
-			onlinemappackiconthread:start()
-		end
-		
+		onlinemappackiconchannel:push("stop")
 		onlinemappackscroll = 0
 		onlineupdatescroll()
 		onlinemappackscrollsmooth = onlinemappackscroll
@@ -2058,18 +2039,18 @@ function loadonlinemappacks()
 		end
 
 		--mount dlc zip files
-		local zips = love.filesystem.getDirectoryItems("alesans_entities/onlinemappacks")
+		zips = love.filesystem.getDirectoryItems("alesans_entities/onlinemappacks")
 		if #zips > 0 then
 			for j, w in pairs(zips) do
 				mountmappack(w)
 			end
 		end
 
-		onlinemappacklist = love.filesystem.getDirectoryItems( mappackfolder )
+		local mappacks = love.filesystem.getDirectoryItems( mappackfolder )
 		
 		local delete = {}
-		for i = 1, #onlinemappacklist do
-			if (not (love.filesystem.getInfo("alesans_entities/onlinemappacks/" .. onlinemappacklist[i] .. ".zip") or love.filesystem.getInfo(mappackfolder .. "/" .. onlinemappacklist[i] .. "/version.txt"))) or not love.filesystem.getInfo( mappackfolder .. "/" .. onlinemappacklist[i] .. "/settings.txt") then
+		for i = 1, #mappacks do
+			if (not (love.filesystem.getInfo("alesans_entities/onlinemappacks/" .. mappacks[i] .. ".zip") or love.filesystem.getInfo(mappackfolder .. "/" .. mappacks[i] .. "/version.txt"))) or not love.filesystem.getInfo( mappackfolder .. "/" .. mappacks[i] .. "/settings.txt") then
 				table.insert(delete, i)
 			end
 		end
@@ -2077,58 +2058,45 @@ function loadonlinemappacks()
 		table.sort(delete, function(a,b) return a>b end)
 		
 		for i, v in pairs(delete) do
-			table.remove(onlinemappacklist, v) --remove
+			table.remove(mappacks, v) --remove
 		end
 
 		downloadingmappack = false
 		
-		onlinemappackicon = {}
-		
 		--get info
-		onlinemappackname = {}
-		onlinemappackauthor = {}
-		onlinemappackdescription = {}
-		onlinemappackbackground = {}
+		onlineassetlist = {}
 		
-		for i = 1, #onlinemappacklist do
-			if love.filesystem.getInfo( mappackfolder .. "/" .. onlinemappacklist[i] .. "/icon.png" ) then
-				onlinemappackicon[i] = love.graphics.newImage(mappackfolder .. "/" .. onlinemappacklist[i] .. "/icon.png")
-			else
-				onlinemappackicon[i] = nil
+		for i = 1, #mappacks do
+			local asset = {}
+			onlineassetlist[i] = asset
+
+			if love.filesystem.getInfo( mappackfolder .. "/" .. mappacks[i] .. "/icon.png" ) then
+				asset.icon = love.graphics.newImage(mappackfolder .. "/" .. mappacks[i] .. "/icon.png")
 			end
-			
-			onlinemappackauthor[i] = nil
-			onlinemappackdescription[i] = nil
-			onlinemappackbackground[i] = nil
-			if love.filesystem.getInfo( mappackfolder .. "/" .. onlinemappacklist[i] .. "/settings.txt" ) then
-				local s = love.filesystem.read( mappackfolder .. "/" .. onlinemappacklist[i] .. "/settings.txt" )
+
+			if love.filesystem.getInfo( mappackfolder .. "/" .. mappacks[i] .. "/settings.txt" ) then
+				local s = love.filesystem.read( mappackfolder .. "/" .. mappacks[i] .. "/settings.txt" )
 				local s1 = s:split("\n")
 				for j = 1, #s1 do
 					local s2 = s1[j]:split("=")
-					if s2[1] == "name" then
-						onlinemappackname[i] = s2[2]
-					elseif s2[1] == "author" then
-						onlinemappackauthor[i] = s2[2]
-					elseif s2[1] == "description" then
-						onlinemappackdescription[i] = s2[2]
-					elseif s2[1] == "background" then
-						onlinemappackbackground[i] = s2[2]
+					if s2[1] == "name" or s2[1] == "author" or s2[1] == "description" or s2[1] == "background" then
+						asset[s2[1]] = s2[2]
 					end
 				end
 			else
-				onlinemappackname[i] = onlinemappacklist[i]
+				asset.name = mappacks[i]
 			end
 		end
 		
 		--[[get the current cursorposition
-		for i = 1, #onlinemappacklist do
-			if onlinemappacklist[i] == mappack then
+		for i = 1, #mappacks do
+			if mappacks[i] == mappack then
 				onlinemappackselection = i
 			end
 		end
 		
-		if #onlinemappacklist >= 1 then
-			mappack = onlinemappacklist[onlinemappackselection]
+		if #mappacks >= 1 then
+			mappack = mappacks[onlinemappackselection]
 		end
 		
 		--load background
@@ -2272,7 +2240,7 @@ function menu_keypressed(key, unicode)
 					updatescroll()
 				end
 			elseif mappacktype == "online" then
-				if onlinemappackselection < #onlinemappacklist then
+				if onlinemappackselection < #onlineassetlist then
 					onlinemappackselection = onlinemappackselection + 1
 					
 					onlineupdatescroll()
@@ -2281,6 +2249,7 @@ function menu_keypressed(key, unicode)
 		elseif mappacktype == "online" and (key == "return" or key == "enter" or key == "kenter" or key == " ") then
 			if onlinedlc then
 				local i = onlinemappackselection
+				local asset = onlineassetlist[i]
 				local onlinemappackerror = false
 				--download mappack
 				downloadingmappack = true
@@ -2291,60 +2260,49 @@ function menu_keypressed(key, unicode)
 				menu_draw()
 				love.graphics.present()
 				
-				if onlinemappackurl[i] ~= "error" then
-					local filename = onlinemappackfilename[i]
-					if filename and filename == "" then
-						filename = onlinemappackname[i]:gsub(" ", "_")
-						filename = filename .. ".zip"
-					end
-					local downloaded
-					onlinemappackerror, downloaded = downloadmappack(onlinemappackurl[i], filename or "mappack.zip", onlinemappacksize[i])
-					onlinemappackerror = not onlinemappackerror
-					if onlinemappacksize[i] == "url" and ((not downloaded) or onlinemappackerror) then
+				if asset.download then
+					if not asset.downloadable then
 						--link
-						if not onlinemappackerror then
+						if love.system.openURL(asset.download) then
+							print("openend " .. asset.download)
 							notice.new(TEXT["Opened Download Link"], notice.white, 2)
 						else
+							love.system.setClipboardText(asset.download)
 							notice.new(TEXT["Couldn't Open Link\nLink copied to clipboard"], notice.red, 3)
-							love.system.setClipboardText(onlinemappackurl[i])
 						end
 					else
+						onlinemappackerror = not downloadasset(asset)
 						if not onlinemappackerror then
-							mountmappack(filename or "mappack.zip")
+							mountmappack(asset.filename)
 							loadmappacks()
 							mappackhorscroll = 0
 							mappacktype = "local"
 							downloadedmappacks[i] = true
-							local name = filename:sub(1,1)
-							for i = 1, #mappacklist do
-								if mappacklist[i]:sub(1,1) == name then
-									mappackselection = i
+							for mi = 1, #mappacklist do
+								if mappacklist[mi]:lower() == asset.name:lower() then
+									mappackselection = mi
 									break
 								end
 							end
 							updatescroll()
 							onlineupdatescroll()
-							notice.new("DLC downloaded!", notice.white, 2)
+							notice.new(TEXT["DLC downloaded!"], notice.white, 2)
 						else
-							downloadedmappacks[i] = "false"
-							notice.new("Download failed", notice.red, 2)
+							downloadedmappacks[i] = false
+							notice.new(TEXT["Download failed"], notice.red, 2)
 						end
 					end
 				else
 					onlinemappackerror = true
-					downloadedmappacks[i] = "false"
-					notice.new("DLC not found", notice.red, 2)
+					downloadedmappacks[i] = false
+					notice.new(TEXT["DLC not found"], notice.red, 2)
 				end
 				downloadingmappack = false
 			else
 				--local dlc
-				mappack = onlinemappacklist[onlinemappackselection]
+				mappack = onlineassetlist[onlinemappackselection]
 				--load background
-				if onlinemappackbackground[mappackselection] then
-					loadbackground(onlinemappackbackground[onlinemappackselection] .. ".txt")
-				else
-					loadbackground("1-1.txt")
-				end
+				loadbackground((mappack.background or "1-1") .. ".txt")
 				gamestate = "menu"
 				saveconfig()
 			end
@@ -2924,7 +2882,7 @@ function menu_mousepressed(x, y, button)
 			--mappack scrollbar
 			local i = mappackscrollsmooth / (#mappacklist-3.233)
 			if mappacktype == "online" then
-				i = onlinemappackscrollsmooth / (#onlinemappacklist-3.233)
+				i = onlinemappackscrollsmooth / (#onlineassetlist-3.233)
 			end
 			if x > 227*scale and x < 235*scale and y > (20+i*160)*scale and y < (52+i*160)*scale then --scrollbar
 				mappackscrollmouse = true
@@ -2985,7 +2943,7 @@ function menu_mousemoved(x, y, dx, dy)
 			local list = mappacklist
 			if mappacktype == "online" then
 				scrollsmooth = onlinemappackscrollsmooth
-				list = onlinemappacklist
+				list = onlineassetlist
 			end
 			for i = math.max(1, math.floor(scrollsmooth+1)), math.min(#list, math.floor(scrollsmooth+5)) do
 				if x > 25*scale and y > (20+(i-1)*60-round(scrollsmooth*60))*scale
@@ -3001,7 +2959,7 @@ function menu_mousemoved(x, y, dx, dy)
 		--mappack scrollbar
 		if mappackscrollmouse then
 			if mappacktype == "online" then
-				onlinemappackscroll = math.min(math.max(onlinemappackscroll+((dy/(159*scale)) * ((#onlinemappacklist-3.233))), 0), #onlinemappacklist-3.233)
+				onlinemappackscroll = math.min(math.max(onlinemappackscroll+((dy/(159*scale)) * ((#onlineassetlist-3.233))), 0), #onlineassetlist-3.233)
 				onlinemappackscrollsmooth = onlinemappackscroll
 				onlinemappackselection = math.min(math.max(math.ceil(onlinemappackscroll), onlinemappackselection), math.ceil(onlinemappackscroll)+3)
 			else
@@ -3221,7 +3179,7 @@ function selectworld()
 end
 
 function opendlcfolder()
-	if onlinemappackfilename[onlinemappackselection] and onlinemappackfilename[onlinemappackselection] == "character" then
+	if onlineassetlist[onlinemappackselection] and onlineassetlist[onlinemappackselection] == "character" then
 		--open characters folder (copy pasted code lel)
 		if android then
 			notice.new("On android use a file manager\nand go to:\nAndroid > data > Love.to.mario >\nfiles > save > mari0_android >\nalesans_entities > characters", notice.red, 15)
