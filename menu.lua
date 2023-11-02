@@ -1994,7 +1994,7 @@ function loadonlinemappacks()
 	
 				asset.type = raw_asset.type
 				asset.downloadable = asset.type == "mappack" -- todo: more
-				asset.name = raw_asset.name
+				asset.name = raw_asset.short_name or raw_asset.name
 				asset.author = raw_asset.author
 				asset.description = raw_asset.short_description or raw_asset.description
 				asset.background = raw_asset.background
