@@ -1994,12 +1994,12 @@ function loadonlinemappacks()
 				table.insert(onlineassetlist, asset)
 	
 				asset.type = raw_asset.type
-				asset.downloadable = asset.type == "mappack" or asset.type == "character"
+				asset.downloadable = raw_asset.download and raw_asset.filename and (asset.type == "mappack" or asset.type == "character")
 				asset.name = raw_asset.name or raw_asset.long_name
 				asset.author = raw_asset.author
 				asset.description = raw_asset.description or raw_asset.long_description
 				asset.background = raw_asset.background
-				asset.download = raw_asset.download
+				asset.download = raw_asset.download or raw_asset.homepage
 				asset.filename = raw_asset.filename
 				
 				if raw_asset.icon then
