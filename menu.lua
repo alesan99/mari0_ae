@@ -705,10 +705,11 @@ function menu_draw()
 					end
 					
 					if mappackauthor[i] then
-						if #TEXT["by"] ~= utf8.len(TEXT["by"]) then
-							properprintF(string.sub(TEXT["by"] .. (mappackauthor[i] or ""), 1, 17), 83*scale, (35+(i-1)*60)*scale)
+						local by = TEXT["by"]
+						if #by ~= utf8.len(by) then
+							properprintF(string.sub(by .. " " .. mappackauthor[i], 1, 17), 83*scale, (35+(i-1)*60)*scale)
 						else
-							properprint(string.sub(TEXT["by"] .. (mappackauthor[i] or ""), 1, 17), 83*scale, (35+(i-1)*60)*scale)
+							properprint(string.sub(by .. " " .. mappackauthor[i], 1, 17), 83*scale, (35+(i-1)*60)*scale)
 						end
 					end
 					
