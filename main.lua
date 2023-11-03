@@ -1136,9 +1136,9 @@ function love.draw()
 				love.graphics.setColor(0, 0, 0)
 				love.graphics.rectangle("fill", 0, 0, winwidth, winheight)
 			end
-			love.graphics.setCanvas(canvas)
+			love.graphics.setCanvas({canvas, stencil=true})
 			love.graphics.clear()
-			canvas:renderTo(lovedraw)
+			lovedraw()
 			love.graphics.setCanvas()
 			if letterboxfullscreen and not (shaders.passes[1].on or shaders.passes[2].on) then
 				love.graphics.setColor(0, 0, 0)
