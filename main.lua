@@ -330,7 +330,6 @@ function love.load()
 	love.filesystem.createDirectory("alesans_entities/mappacks")
 	love.filesystem.createDirectory("alesans_entities/onlinemappacks")
 	love.filesystem.createDirectory("alesans_entities/characters")
-	love.filesystem.createDirectory("alesans_entities/onlinecharacters")
 	love.filesystem.createDirectory("alesans_entities/hats")
 	
 	--[[copy included zip dlcs to save folder (because of course you can't mount from source directory :/)

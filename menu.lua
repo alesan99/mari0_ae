@@ -807,7 +807,7 @@ function menu_draw()
 						--love.graphics.setColor(1, 150/255, 150/255, 1)
 						--properprintF(TEXT["dlc character instructions"], 244*scale, 170*scale)
 						love.graphics.setColor(1, 1, 1, 1)
-						opendlcbutton.text = TEXT["open dlc folder"]--TEXT["characters folder"]
+						opendlcbutton.text = TEXT["characters folder"]
 					else
 						opendlcbutton.text = TEXT["open dlc folder"]
 					end
@@ -3181,7 +3181,7 @@ end
 function opendlcfolder()
 	local path
 	if onlineassetlist[onlinemappackselection] and onlineassetlist[onlinemappackselection].type == "character" then
-		path = "onlinecharacters"
+		path = "characters"
 	else
 		path = "onlinemappacks"
 	end
