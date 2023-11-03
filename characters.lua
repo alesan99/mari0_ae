@@ -29,21 +29,24 @@ end
 function loadcustomplayers()
 	characters = {list = {}, data = {}}
 	local dir = love.filesystem.getDirectoryItems("alesans_entities/characters")
+
+	-- mount zips
+	for i, v in ipairs(dir) do
+		if v:sub(-4, -1) == ".zip" then
+			mountto("alesans_entities/characters/" .. v, "alesans_entities/characters")
+		end
+	end
+	-- refresh with new mounted items
+	dir = love.filesystem.getDirectoryItems("alesans_entities/characters")
+
+	-- load characters
 	for i, v in ipairs(dir) do
 		local folder = "alesans_entities/characters/" .. v
-		local skip = false
 
-		if not love.filesystem.getInfo(folder .. "/config.json") then
-			skip = true
-		end
-		if (not NoCharacterZipNotices) and v:sub(-4,-1) == ".zip" then
-			notice.new(string.format(TEXT["Can't load %s!\nyou need to un-zip it!"],v), notice.red, 5)
-		end
-
-		if not skip then
+		if love.filesystem.getInfo(folder .. "/config.json") then
 			local playerstuff = {
 				--identification
-				name = v, 
+				name = v,
 				i = #characters["list"]+1,
 
 				--colors
@@ -354,54 +357,40 @@ function loadcustomplayers()
 			playerstuff.imgs = {} --list of imgs
 
 			--load properties
-			local jsonexists = love.filesystem.getInfo(folder .. "/config.json")
-			if jsonexists or love.filesystem.getInfo(folder .. "/config.txt") then
-				--read .json
-				local s
-				if jsonexists then
-					s = love.filesystem.read(folder .. "/config.json")
-				else
-					s = love.filesystem.read(folder .. "/config.txt")
-				end
-				--local temp = JSON:decode(s)
-				
-				JSONcrashgame = false
-				local temp
-				local suc, err = pcall(function() return JSON:decode(s) end)
-				if suc then
-					temp = err
-					--works! so set properties
-					for i, v in pairs(temp) do
-						-- convert numbers to 0..1
-						if iscolorvariable(i) then
-							convertcolors(v)
-						end
-						-- set properties
-						playerstuff[i] = v
-						if i == "health" or i == "fireenemy" then
-							playerstuff["advanced"] = true
-						end
+			local s = love.filesystem.read(folder .. "/config.json")
+			
+			JSONcrashgame = false
+			local temp
+			local suc, err = pcall(function() return JSON:decode(s) end)
+			if suc then
+				temp = err
+				--works! so set properties
+				for i, v in pairs(temp) do
+					-- convert numbers to 0..1
+					if iscolorvariable(i) then
+						convertcolors(v)
 					end
-				else
-					jsonerrorwindow:open("CHARACTER JSON ERROR! (" .. v .. ".json)", JSONerror[2], 
-						function() 
-							loadcustomplayers()
-							for i = 1, #mariocharacter do
-								if mariocharacter[i] then
-									setcustomplayer(mariocharacter[i], i, "initial")
-								end
-							end
-						end)
-					JSONcrashgame = true
+					-- set properties
+					playerstuff[i] = v
+					if i == "health" or i == "fireenemy" then
+						playerstuff["advanced"] = true
+					end
 				end
-				if playerstuff.fireenemy and type(playerstuff.fireenemy) == "table" then
-					for i, v in pairs(playerstuff.fireenemy) do
-						local a = i:lower()
-						if type(v) == "string" then
-							playerstuff.fireenemy[a] = v:lower()
-						else
-							playerstuff.fireenemy[a] = v
-						end
+			else
+				jsonerrorwindow:open("CHARACTER JSON ERROR! (" .. v .. ".json)", JSONerror[2],
+					function() 
+						loadcustomplayers()
+						resetcustomplayers()
+					end)
+				JSONcrashgame = true
+			end
+			if playerstuff.fireenemy and type(playerstuff.fireenemy) == "table" then
+				for i, v in pairs(playerstuff.fireenemy) do
+					local a = i:lower()
+					if type(v) == "string" then
+						playerstuff.fireenemy[a] = v:lower()
+					else
+						playerstuff.fireenemy[a] = v
 					end
 				end
 			end
@@ -447,6 +436,14 @@ function loadcustomplayers()
 					end
 				end
 			end
+		end
+	end
+end
+
+function resetcustomplayers()
+	for i = 1, #mariocharacter do
+		if mariocharacter[i] then
+			setcustomplayer(mariocharacter[i], i, "initial")
 		end
 	end
 end

@@ -780,7 +780,13 @@ function menu_draw()
 					love.graphics.setColor(0, 0, 0, 200/255)
 					love.graphics.rectangle("fill", 241*scale, 16*scale, 150*scale, 180*scale)
 					love.graphics.setColor(1, 1, 1, 1)
-					properprintF(TEXT["dlc instructions"], 244*scale, 19*scale)
+					local message
+					if onlineassetlist[onlinemappackselection] and onlineassetlist[onlinemappackselection].downloadable then
+						message = TEXT["dlc dl instructions"]
+					else
+						message = TEXT["dlc instructions"]
+					end
+					properprintF(message, 244*scale, 19*scale)
 					--properprintF("bonus content\nlike enemies\nand characters\nare here too!", 244*scale, 140*scale)
 					love.graphics.setColor(1, 1, 1, 1)
 					if outdated then
@@ -798,10 +804,10 @@ function menu_draw()
 						love.graphics.setColor(1, 1, 1, 1)
 					end
 					if onlineassetlist[onlinemappackselection] and onlineassetlist[onlinemappackselection].type == "character" then
-						love.graphics.setColor(1, 150/255, 150/255, 1)
-						properprintF(TEXT["dlc character instructions"], 244*scale, 170*scale)
+						--love.graphics.setColor(1, 150/255, 150/255, 1)
+						--properprintF(TEXT["dlc character instructions"], 244*scale, 170*scale)
 						love.graphics.setColor(1, 1, 1, 1)
-						opendlcbutton.text = TEXT["characters folder"]
+						opendlcbutton.text = TEXT["open dlc folder"]--TEXT["characters folder"]
 					else
 						opendlcbutton.text = TEXT["open dlc folder"]
 					end
@@ -1020,7 +1026,7 @@ function menu_draw()
 				if not onlineassetlist[onlinemappackselection].downloadable then
 					properprint(TEXT["opening link..."], ((width*16)/2-(string.len(TEXT["opening link..."])*8/2))*scale, (224/2-4)*scale)
 				else
-					properprint("downloading mappack...", ((width*16)/2-(string.len("downloading mappack...")*8/2))*scale, (224/2-4)*scale)
+					properprint(TEXT["downloading asset..."], ((width*16)/2-(string.len(TEXT["downloading asset..."])*8/2))*scale, (224/2-4)*scale)
 				end
 			else
 				properprint("loading mappacks...", ((width*16)/2-(string.len("loading mappacks...")*8/2))*scale, (224/2-4)*scale)
@@ -1885,14 +1891,7 @@ function loadmappacks()
 	mappacklist = love.filesystem.getDirectoryItems( mappackfolder )
 
 	if onlinedlc then
-		local zips = love.filesystem.getDirectoryItems("alesans_entities/onlinemappacks")
-		if #zips > 0 then
-			for j, w in pairs(zips) do
-				if not love.filesystem.getInfo(mappackfolder .. "/" .. w) then
-					mountmappack(w)
-				end
-			end
-		end
+		mountalldlc()
 	end
 	
 	local delete = {}
@@ -1995,7 +1994,7 @@ function loadonlinemappacks()
 				table.insert(onlineassetlist, asset)
 	
 				asset.type = raw_asset.type
-				asset.downloadable = asset.type == "mappack" -- todo: more
+				asset.downloadable = asset.type == "mappack" or asset.type == "character"
 				asset.name = raw_asset.name or raw_asset.long_name
 				asset.author = raw_asset.author
 				asset.description = raw_asset.description or raw_asset.long_description
@@ -2041,12 +2040,7 @@ function loadonlinemappacks()
 		end
 
 		--mount dlc zip files
-		zips = love.filesystem.getDirectoryItems("alesans_entities/onlinemappacks")
-		if #zips > 0 then
-			for j, w in pairs(zips) do
-				mountmappack(w)
-			end
-		end
+		mountalldlc()
 
 		local mappacks = love.filesystem.getDirectoryItems( mappackfolder )
 		
@@ -2274,8 +2268,13 @@ function menu_keypressed(key, unicode)
 					else
 						onlinemappackerror = not downloadasset(asset)
 						if not onlinemappackerror then
-							mountmappack(asset.filename)
-							loadmappacks()
+							mountasset(asset)
+							if asset.type == "mappack" then
+								loadmappacks()
+							elseif asset.type == "character" then
+								loadcustomplayers()
+								resetcustomplayers()
+							end
 							mappackhorscroll = 0
 							mappacktype = "local"
 							downloadedmappacks[i] = true
@@ -3180,26 +3179,21 @@ function selectworld()
 end
 
 function opendlcfolder()
-	if onlineassetlist[onlinemappackselection] and onlineassetlist[onlinemappackselection] == "character" then
-		--open characters folder (copy pasted code lel)
-		if android then
-			notice.new("On android use a file manager\nand go to:\nAndroid > data > Love.to.mario >\nfiles > save > mari0_android >\nalesans_entities > characters", notice.red, 15)
-			return false
-		end
-		if not love.filesystem.getInfo("alesans_entities/characters") then
-			love.filesystem.createDirectory("alesans_entities/characters")
-		end
-		love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/alesans_entities/characters")
+	local path
+	if onlineassetlist[onlinemappackselection] and onlineassetlist[onlinemappackselection].type == "character" then
+		path = "onlinecharacters"
 	else
-		if android then
-			notice.new("On android use a file manager\nand go to:\nAndroid > data > Love.to.mario >\nfiles > save > mari0_android >\nalesans_entities > onlinemappacks", notice.red, 15)
-			return false
-		end
-		if not love.filesystem.getInfo("alesans_entities/onlinemappacks") then
-			love.filesystem.createDirectory("alesans_entities/onlinemappacks")
-		end
-		love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/alesans_entities/onlinemappacks")
+		path = "onlinemappacks"
 	end
+
+	if android then
+		notice.new("On android use a file manager\nand go to:\nAndroid > data > Love.to.mario >\nfiles > save > mari0_android >\nalesans_entities > " .. path, notice.red, 15)
+		return false
+	end
+	if not love.filesystem.getInfo("alesans_entities/" .. path) then
+		love.filesystem.createDirectory("alesans_entities/" .. path)
+	end
+	love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/alesans_entities/" .. path)
 end
 
 --https://stackoverflow.com/questions/20459943/find-the-last-index-of-a-character-in-a-string/20461414
