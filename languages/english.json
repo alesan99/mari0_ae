@@ -78,7 +78,7 @@
 	"mappack folder fail": "press right to\naccess the dlc\n\ncould not\nopen your\nmappack folder",
 	"{new mappack}": "{new mappack}",
 	"new mappack description": "create a mappack from scratch withthis!",
-	"by": " by ",
+	"by": " by",
 "^_DLC":"",
 	"dlc instructions": "download mappacks!\n\npick a mappack to\nopen the link\n\nafter you download\nthe mappack, put\nthe .zip inside\nyour dlc folder\n\n\n\n*there's enemies/ \n characters too!",
 	"dlc enemy instructions": "open level editor\nto add enemies\nto your own maps",
