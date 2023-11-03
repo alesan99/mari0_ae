@@ -2264,7 +2264,6 @@ function menu_keypressed(key, unicode)
 					if not asset.downloadable then
 						--link
 						if love.system.openURL(asset.download) then
-							print("openend " .. asset.download)
 							notice.new(TEXT["Opened Download Link"], notice.white, 2)
 						else
 							love.system.setClipboardText(asset.download)
