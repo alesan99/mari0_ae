@@ -1,4 +1,4 @@
-local url = "https://raw.githubusercontent.com/qixils/mari0pository/main/data.json"
+local url = "https://raw.githubusercontent.com/qixils/mari0pository/v1/data.json"
 local mounted = {}
 
 --- Mounts a file to a folder.
