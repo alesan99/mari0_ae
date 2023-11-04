@@ -35,21 +35,21 @@ fencejumptime = 0.05 --how long mario jumps when holding up and jumping while cl
 
 --STARCOLORS
 starcolors = {}
-starcolors[1] = {{  0,   0,   0}, {200,  76,  12}, {252, 188, 176}}
-starcolors[2] = {{  0, 168,   0}, {252, 152,  56}, {252, 252, 252}}
-starcolors[3] = {{252, 216, 168}, {216,  40,   0}, {252, 152,  56}}
-starcolors[4] = {{216,  40,   0}, {252, 152,  56}, {252, 252, 252}}
+starcolors[1] = {{      0,       0,       0}, {200/255,  76/255,  12/255}, {252/255, 188/255, 176/255}}
+starcolors[2] = {{      0, 168/255,       0}, {252/255, 152/255,  56/255}, {252/255, 252/255, 252/255}}
+starcolors[3] = {{252/255, 216/255, 168/255}, {216/255,  40/255,       0}, {252/255, 152/255,  56/255}}
+starcolors[4] = {{216/255,  40/255,       0}, {252/255, 152/255,  56/255}, {252/255, 252/255, 252/255}}
 
-flowercolor = {{252, 216, 168}, {216,  40,   0}, {252, 152,  56}}
-hammersuitcolor = {{  0,   0,   0}, { 255, 255, 255}, {252, 152,  56}}
-frogsuitcolor = {{  0, 168,   0}, {  0,   0,   0}, {252, 152,  56}}
-leafcolor = {{224, 32,   0}, {136, 112,   0}, {252, 152,  56}}
-iceflowercolor = {{255, 255, 255}, {60, 188, 252}, {252, 152,  56}}
-tanookisuitcolor =  {{200,  76,   12}, {0, 0, 0}, {252, 152,  56}}
-statuecolor =  {{116, 116, 116}, {0, 0, 0}, {188, 188, 188}}
-superballcolor = {{100, 100, 50},{160, 160, 110},{230, 230, 180}}
-blueshellcolor = {{ 40, 0, 186}, { 255, 255, 255}, {252, 152,  56}}
-boomerangcolor = {{ 32, 56, 236}, { 255, 255, 255}, {252, 152,  56}}
+flowercolor = {{252/255, 216/255, 168/255}, {216/255, 40/255, 0}, {252/255, 152/255, 56/255}}
+hammersuitcolor = {{0, 0, 0}, {1, 1, 1}, {252/255, 152/255, 56/255}}
+frogsuitcolor = {{0, 168/255, 0}, {0, 0, 0}, {252/255, 152/255, 56/255}}
+leafcolor = {{224/255, 32/255, 0}, {136/255, 112/255, 0}, {252/255, 152/255, 56/255}}
+iceflowercolor = {{1, 1, 1}, {60/255, 188/255, 252/255}, {252/255, 152/255, 56/255}}
+tanookisuitcolor =  {{200/255, 76/255, 12/255}, {0, 0, 0}, {252/255, 152/255, 56/255}}
+statuecolor =  {{116/255, 116/255, 116/255}, {0, 0, 0}, {188/255, 188/255, 188/255}}
+superballcolor = {{100/255, 100/255, 50/255}, {160/255, 160/255, 110/255}, {230/255, 230/255, 180/255}}
+blueshellcolor = {{40/255, 0, 186/255}, {1, 1, 1}, {252/255, 152/255, 56/255}}
+boomerangcolor = {{32/255, 56/255, 236/255}, {1, 1, 1}, {252/255, 152/255, 56/255}}
 
 mariocombo = {100, 200, 400, 500, 800, 1000, 2000, 4000, 5000, 8000} --combo scores for bouncing on enemies
 koopacombo = {500, 800, 1000, 2000, 4000, 5000, 8000} --combo scores for series of koopa kills
@@ -483,7 +483,7 @@ portalprojectileparticledelay = 0.002
 emanceparticlespeed = 3
 emanceparticlespeedmod = 0.3
 emanceimgwidth = 64
-emancelinecolor = {100, 100, 255, 10}
+emancelinecolor = {100/255, 100/255, 1, 10/255}
 
 --excursion funnel
 funnelbuildupspeed = 50--1
@@ -809,7 +809,7 @@ autoscrollingdefaultspeed = 3
 autoscrollingmaxspeed = 8
 
 dropshadow = false
-dropshadowcolor = {0, 0, 0, 80}
+dropshadowcolor = {0, 0, 0, 80/255}
 --[[dropshadownooverlap = true --no overlapping dropshadows
 dropshadowoverlapshader = love.graphics.newShader[[
 	vec4 effect( vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords )
@@ -825,14 +825,14 @@ dropshadowoverlapshader = love.graphics.newShader[[
 anyiteminblock = false --allows any entity to be in block (doesn't work, use block=true instead)
 
 levelballfinishback = {
-	{0, 168, 0},
-	{0, 148, 0},
-	{200, 76, 12},
-	{252, 152, 56},
-	{0, 168, 0},
-	{0, 148, 0},
-	{200, 76, 12},
-	{252, 152, 56},}
+	{0, 168/255, 0},
+	{0, 148/255, 0},
+	{200/255, 76/255, 12/255},
+	{252/255, 152/255, 56/255},
+	{0, 168/255, 0},
+	{0, 148/255, 0},
+	{200/255, 76/255, 12/255},
+	{252/255, 152/255, 56/255},}
 --less eye hurt (not nes accurate but it's worth it to reduce the possiblity of a seizure)
 for i = 1, #levelballfinishback do
 	for i2 = 1, #levelballfinishback[i] do
@@ -841,13 +841,13 @@ for i = 1, #levelballfinishback do
 end
 
 --[[levelballfinishback = { --nes accurate
-	{0, 168, 0},
-	{252, 116, 180},
-	{0, 168, 0},
-	{255, 57, 0},
-	{0, 168, 0},
-	{255, 57, 0},
-	{0, 168, 0}}]] --background colors for level ball
+	{0, 168/255, 0},
+	{252/255, 116/255, 180/255},
+	{0, 168/255, 0},
+	{1, 57/255, 0},
+	{0, 168/255, 0},
+	{1, 57/255, 0},
+	{0, 168/255, 0}}]] --background colors for level ball
 
 helmetbounceforce = 14
 
@@ -868,36 +868,36 @@ onlysaveiflevelmodified = true
 --colors for text entity and hud
 textcolorsnames = {"black","blue","brown","gray","green","lime","maroon","orange","pink","purple","red","sky","white","yellow"}
 textcolors = {
-	white = {255,255,255},
+	white = {1,1,1},
 	black = {0,0,0},
-	gray = {120,120,120},
-	red = {216,40,0},
-	maroon = {168,0,16},
-	blue = {32,52,236},
-	sky = {60,188,252},
-	yellow = {240,188,60},
-	green = {0,168,0},
-	lime = {128,208,16},
-	orange = {252,152,56},
-	pink = {252,116,180},
-	purple = {116,0,116},
-	brown = {200,76,12},
+	gray = {120/255,120/255,120/255},
+	red = {216/255,40/255,0},
+	maroon = {168/255,0,16/255},
+	blue = {32/255,52/255,236/255},
+	sky = {60/255,188/255,252/255},
+	yellow = {240/255,188/255,60/255},
+	green = {0,168/255,0},
+	lime = {128/255,208/255,16/255},
+	orange = {252/255,152/255,56/255},
+	pink = {252/255,116/255,180/255},
+	purple = {116/255,0,116/255},
+	brown = {200/255,76/255,12/255},
 }
 
 --background colors in calendar image for every month
 calendarcolors = {
-	{248, 133, 43},
-	{252, 116, 180},
-	{128, 208, 16},
-	{0, 168, 0},
-	{168, 240, 188},
-	{92, 148, 252},
-	{32, 56, 236},
-	{228, 0, 88},
-	{200, 76, 12},
-	{216, 40, 0},
-	{60, 188, 252},
-	{156, 252, 240}
+	{248/255, 133/255, 43/255},
+	{252/255, 116/255, 180/255},
+	{128/255, 208/255, 16/255},
+	{0, 168/255, 0},
+	{168/255, 240/255, 188/255},
+	{92/255, 148/255, 252/255},
+	{32/255, 56/255, 236/255},
+	{228/255, 0, 88/255},
+	{200/255, 76/255, 12/255},
+	{216/255, 40/255, 0},
+	{60/255, 188/255, 252/255},
+	{156/255, 252/255, 240/255}
 }
 
 --snooping as usual i see
@@ -924,3 +924,17 @@ end
 maxtilespritebatchsprites = 1000
 
 emptytile = {1,gels={}}
+
+-- portal colors
+-- note: this should not be read directly due to mutation
+-- use getDefaultPortalColor(index) or getDefaultPortalColors() instead to get a copy of the color
+__defaultPortalColor = {{60/255, 188/255, 252/255}, {232/255, 130/255, 30/255}}
+
+function getDefaultPortalColor(index)
+	color = __defaultPortalColor[index]
+	return {color[1], color[2], color[3]}
+end
+
+function getDefaultPortalColors()
+	return {getDefaultPortalColor(1), getDefaultPortalColor(2)}
+end

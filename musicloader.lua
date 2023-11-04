@@ -26,18 +26,18 @@ function music:load(musicfile) -- can take a single file string or an array of f
 		for i, v in ipairs(musicfile) do
 			self:preload(musicpath:format(v), v)
 			--load fast music
-			if love.filesystem.exists(musicpath:format(v .. "-fast")) then
+			if love.filesystem.getInfo(musicpath:format(v .. "-fast")) then
 				self:preload(musicpath:format(v .. "-fast"), v .. "-fast")
 			end
 		end
 	else --custom music
 		self:preload(musicfile)
 		--load fast music
-		if love.filesystem.exists(musicfile:sub(1, -5) .. "-fast" .. musicfile:sub(-4, -1)) then
+		if love.filesystem.getInfo(musicfile:sub(1, -5) .. "-fast" .. musicfile:sub(-4, -1)) then
 			self:preload(musicfile:sub(1, -5) .. "-fast" .. musicfile:sub(-4, -1))
 		end
 		--load intro music
-		if love.filesystem.exists(musicfile:sub(1, -5) .. "-intro" .. musicfile:sub(-4, -1)) then
+		if love.filesystem.getInfo(musicfile:sub(1, -5) .. "-intro" .. musicfile:sub(-4, -1)) then
 			self:preloadintro(musicfile:sub(1, -5) .. "-intro" .. musicfile:sub(-4, -1))
 		end
 	end
@@ -133,7 +133,7 @@ end
 
 function music:getPlaying()
 	for name, source in pairs(self.loaded) do
-		if source:isPlaying() then
+		if isActive(source) then
 			return name, source
 		end
 	end
@@ -147,7 +147,7 @@ function music:update()
 		end
 	end
 	if intromusic then
-		if self.loaded[intromusic[1]] and self.loaded[intromusic[1]]:isStopped() then
+		if self.loaded[intromusic[1]] and not isActive(self.loaded[intromusic[1]]) then
 			music:play(intromusic[2], nil, true)
 			intromusic = false
 		end
@@ -156,7 +156,7 @@ end
 
 function music:playingmusic()
 	for name, source in pairs(self.loaded) do
-		if source ~= false and source:isPlaying() then
+		if source and isActive(source) then
 			return true
 		end
 	end

@@ -355,7 +355,7 @@ function turret:specifficupdate(dt)
 					local cox, coy, side, tend, x, y = traceline(self.x+self.width/2, self.y+self.height/2-3/16, -self.armrotation+math.pi/2+math.random()*0.05-.025)
 					table.insert(objects["turretshot"], turretshot:new(self.x+self.width/2-0.2, self.y+self.height/2-3/16, x, y, self.armrotation + math.pi, self.knockback))
 				end
-				if turretshotsound:isStopped() then
+				if not turretshotsound:isPlaying() then
 					playsound(turretshotsound)
 				end
 			end
@@ -446,7 +446,7 @@ function turret:frenzyturret(dt)
 		
 		if self.t ~= "turret2" then
 			table.insert(objects["turretshot"], turretshot:new(self.x+self.width/2, self.y+self.height/2-3/16, tx, ty, self.armrotation, self.knockback))
-			if turretshotsound:isStopped() then
+			if not turretshotsound:isPlaying() then
 				playsound(turretshotsound)
 			end
 		end
@@ -494,14 +494,14 @@ function turret:draw()
 		dirscale = -dirscale
 	end
 	
-	love.graphics.setColor(255, 255, 255)
+	love.graphics.setColor(1, 1, 1)
 	if not self.frenzy then
 		love.graphics.draw(self.graphic, turretquad[1], math.floor(((self.x-xscroll)*16+self.offsetX+1)*scale), ((self.y-.5-yscroll)*16+self.offsetY-1)*scale, 0, dirscale, scale, self.quadcenterX, self.quadcenterY)
 	else
 		love.graphics.draw(self.graphic, turretquad[1], math.floor(((self.x-xscroll)*16+self.offsetX+1)*scale), ((self.y-.5-yscroll)*16+self.offsetY)*scale,  self.rotation, dirscale, scale, self.quadcenterX, self.quadcenterY)
 	end
 	
-	love.graphics.setColor(255*(1-turretdarkenfactor*self.timer), 255*(1-turretdarkenfactor*self.timer), 255*(1-turretdarkenfactor*self.timer))
+	love.graphics.setColor(1-turretdarkenfactor*self.timer, 1-turretdarkenfactor*self.timer, 1-turretdarkenfactor*self.timer)
 
 	if not self.frenzy then
 		love.graphics.draw(self.graphic, turretquad[2], math.floor(((self.x-xscroll)*16+self.armoffsetX)*scale), ((self.y-.5-yscroll)*16+self.armoffsetY-1)*scale, self.armrotation+self.rotation, dirscale, scale, self.armquadcenterX, self.armquadcenterY)
@@ -597,7 +597,7 @@ function turretshot:draw()
 	local endx = self.x + (self.tx - self.x)*(i+.1)
 	local endy = self.y + (self.ty - self.y)*(i+.1)
 	
-	love.graphics.setColor(255, 0, 0)
+	love.graphics.setColor(1, 0, 0)
 	local linestyle = love.graphics.getLineStyle()
 	local linewidth = love.graphics.getLineWidth()
 	love.graphics.setLineStyle("rough")
@@ -620,7 +620,7 @@ function handlePlayerCollisions(sx, sy, ex, ey, knockback)
 				local th = math.abs(ey - sy)
 				
 				if HITBOXDEBUG and (editormode or testlevel) then
-					love.graphics.setColor(255, 255, 255)
+					love.graphics.setColor(1, 1, 1)
 					love.graphics.rectangle("line", (math.min(sx, ex)-xscroll)*16*scale, (math.min(sy, ey)-yscroll-.5)*16*scale, tw*16*scale, th*16*scale)
 				end
 				if aabb(math.min(sx, ex), math.min(sy, ey), tw, th, w.x, w.y, w.width, w.height) then

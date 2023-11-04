@@ -1970,13 +1970,13 @@ function animationguiline:init(tabl, t2)
 	local firstwidth = 22--#animationstrings[self.type][start]
 	
 	self.deletebutton = guielement:new("button", 0, 0, "x", function() self:delete() end, nil, nil, nil, 8, 0.1)
-	self.deletebutton.textcolor = {200, 0, 0}
+	self.deletebutton.textcolor = {200/255, 0, 0}
 	
 	self.downbutton = guielement:new("button", 0, 0, "↓", function() self:movedown() end, nil, nil, nil, 8, 0.1)
-	self.downbutton.textcolor = {255, 255, 255}
+	self.downbutton.textcolor = {1, 1, 1}
 	
 	self.upbutton = guielement:new("button", 0, 0, "↑", function() self:moveup() end, nil, nil, nil, 8, 0.1)
-	self.upbutton.textcolor = {255, 255, 255}
+	self.upbutton.textcolor = {1, 1, 1}
 	
 	self.elements[1].gui = guielement:new("dropdown", 0, 0, firstwidth, function(val) self:changemainthing(val) end, start, unpack(animationstrings[self.type]))
 	self.elements[1].width = 14+firstwidth*8
@@ -2182,7 +2182,7 @@ end
 function animationguiline:draw(x, y)
 	love.graphics.setColor(0, 0, 0)
 	love.graphics.rectangle("fill", x*scale, y*scale, (width*16-x)*scale, 11*scale)
-	love.graphics.setColor(255, 255, 255)
+	love.graphics.setColor(1, 1, 1)
 	
 	local xadd = 0
 	self.deletebutton.x = x+xadd
@@ -2202,7 +2202,7 @@ function animationguiline:draw(x, y)
 	
 	for i = 1, #self.elements do
 		if self.elements[i].t == "text" then
-			love.graphics.setColor(255, 255, 255)
+			love.graphics.setColor(1, 1, 1)
 			properprintF(self.elements[i].value, (x+xadd-1)*scale, (y+2)*scale)
 			xadd = xadd + self.elements[i].width
 		else

@@ -72,7 +72,7 @@ function glados:update(dt)
 	end
 
 	if self.state == "start" then
-		if glados1sound:isStopped() then
+		if not glados1sound:isPlaying() then
 			self:spawncore(self.hp)
 			self.state = "running"
 		end
@@ -100,7 +100,7 @@ function glados:update(dt)
 	if self.explodetimer > 4 then
 		nextlevel()
 		return true
-	elseif boomsound:isStopped() then
+	elseif not boomsound:isPlaying() then
 		earthquake = 20
 		playsound(boomsound)
 		makepoof(self.x+self.width*math.random(), self.y+self.height*math.random(), "poof")

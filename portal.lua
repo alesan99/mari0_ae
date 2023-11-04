@@ -2,8 +2,8 @@ portal = class:new()
 
 function portal:init(number, c1, c2)	
 	self.number = number
-	self.portal1color = c1 or {60, 188, 252}
-	self.portal2color = c2 or {232, 130, 30}
+	self.portal1color = c1 or getDefaultPortalColor(1)
+	self.portal2color = c2 or getDefaultPortalColor(2)
 	self.animationtimer = 0
 	self.portalframe = 1
 	self.openscale = {0, 0}
@@ -53,11 +53,6 @@ function portal:createportal(i, cox, coy, side, tendency)
 				modifyportaltiles(oldx, oldy, 0, -1, self, i, "add")
 			elseif oldfacing == "right" then	
 				modifyportaltiles(oldx, oldy, 0, 1, self, i, "add")
-			end
-			
-			local otheri = 1
-			if i == 1 then
-				otheri = 2
 			end
 			
 			if oldx == false then --Remove blocks from other portal
@@ -188,9 +183,9 @@ function portal:draw()
 			local glowalpha = 100
 			if self.x2 and self.x1 then
 				--portal glow
-				love.graphics.setColor(255, 255, 255, 80 - math.abs(self.portalframe-3)*10)
+				love.graphics.setColor(1, 1, 1, (80 - math.abs(self.portalframe-3)*10)/255)
 				love.graphics.draw(portalglowimg, math.floor(((self["x" .. i]-1-xscroll)*16+offsetx)*scale), math.floor(((self["y" .. i]-yscroll-1)*16+offsety)*scale), rotation, scale*self.openscale[i], scale, 16, 20)
-				love.graphics.setColor(255, 255, 255, 255)
+				love.graphics.setColor(1, 1, 1, 1)
 			end
 			
 			love.graphics.setColor(unpack(self["portal" .. i .. "color"]))
