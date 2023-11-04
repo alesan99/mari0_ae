@@ -7446,7 +7446,7 @@ function opencustomimagefolder(f)
 			love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/" .. mappackfolder .. "/" .. mappack .. "/animated")
 		end
 	elseif customtabstate == "backgrounds" then
-		if not love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/backgrounds") then
+		if not love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/backgrounds", "directory") then
 			love.filesystem.createDirectory( mappackfolder .. "/" .. mappack .. "/backgrounds")
 		end
 		love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/" .. mappackfolder .. "/" .. mappack .. "/backgrounds")
