@@ -66,3 +66,15 @@ function hasvalue(tab, val)
     end
     return false
 end
+
+function isPaused(source)
+    return pausedaudio and hasvalue(pausedaudio, source)
+end
+
+function isStopped(source)
+    return not source:isPlaying() and not isPaused(source)
+end
+
+function isActive(source)
+    return source:isPlaying() or isPaused(source)
+end

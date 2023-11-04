@@ -133,7 +133,7 @@ end
 
 function music:getPlaying()
 	for name, source in pairs(self.loaded) do
-		if source:isPlaying() then
+		if isActive(source) then
 			return name, source
 		end
 	end
@@ -147,7 +147,7 @@ function music:update()
 		end
 	end
 	if intromusic then
-		if self.loaded[intromusic[1]] and not self.loaded[intromusic[1]]:isPlaying() then
+		if self.loaded[intromusic[1]] and not isActive(self.loaded[intromusic[1]]) then
 			music:play(intromusic[2], nil, true)
 			intromusic = false
 		end
@@ -156,7 +156,7 @@ end
 
 function music:playingmusic()
 	for name, source in pairs(self.loaded) do
-		if source ~= false and source:isPlaying() then
+		if source and isActive(source) then
 			return true
 		end
 	end
