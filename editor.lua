@@ -7432,7 +7432,7 @@ function opencustomimagefolder(f)
 		return false
 	end
 	if customtabstate == "graphics" then
-		if not love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/custom") then
+		if not love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/custom", "directory") then
 			love.filesystem.createDirectory( mappackfolder .. "/" .. mappack .. "/custom")
 		end
 		love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/" .. mappackfolder .. "/" .. mappack .. "/custom")
@@ -7440,7 +7440,7 @@ function opencustomimagefolder(f)
 		if f == "tiles" then
 			love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/" .. mappackfolder .. "/" .. mappack)
 		elseif f == "animated" then
-			if not love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/animated") then
+			if not love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/animated", "directory") then
 				love.filesystem.createDirectory( mappackfolder .. "/" .. mappack .. "/animated")
 			end
 			love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/" .. mappackfolder .. "/" .. mappack .. "/animated")
@@ -7452,18 +7452,18 @@ function opencustomimagefolder(f)
 		love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/" .. mappackfolder .. "/" .. mappack .. "/backgrounds")
 	elseif customtabstate == "sounds" then
 		if f == "sounds" then
-			if not love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/sounds") then
+			if not love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/sounds", "directory") then
 				love.filesystem.createDirectory( mappackfolder .. "/" .. mappack .. "/sounds")
 			end
 			love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/" .. mappackfolder .. "/" .. mappack .. "/sounds")
 		else
-			if not love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/music") then
+			if not love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/music", "directory") then
 				love.filesystem.createDirectory( mappackfolder .. "/" .. mappack .. "/music")
 			end
 			love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/" .. mappackfolder .. "/" .. mappack .. "/music")
 		end
 	elseif customtabstate == "enemies" then
-		if not love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/enemies") then
+		if not love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/enemies", "directory") then
 			love.filesystem.createDirectory( mappackfolder .. "/" .. mappack .. "/enemies")
 		end
 		love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/" .. mappackfolder .. "/" .. mappack .. "/enemies")
