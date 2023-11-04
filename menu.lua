@@ -1965,13 +1965,16 @@ function loadonlinemappacks()
 			onlinemappackscroll = 0
 			onlineupdatescroll()
 			onlinemappackscrollsmooth = onlinemappackscroll
-			local asset = {}
-			asset.type = "error"
-			asset.name = "error"
-			asset.author = "error"
-			asset.description = "error"
-			asset.download = "error"
-			asset.filename = "error"
+			local asset = {
+				type = "error",
+				name = "error",
+				author = "error",
+				description = "error",
+				download = {
+					url = "error",
+					filename = "error",
+				},
+			}
 			onlineassetlist = {asset}
 			onlinemappacklisterror = true
 			return false
@@ -1990,23 +1993,24 @@ function loadonlinemappacks()
 		for i = 1, #assets do
 			local raw_asset = assets[i]
 			if raw_asset.game_version and hasvalue(raw_asset.game_version.derivative, "AE") then
-				local asset = {}
-				table.insert(onlineassetlist, asset)
-	
-				asset.type = raw_asset.type
-				asset.downloadable = raw_asset.download and raw_asset.filename and (asset.type == "mappack" or asset.type == "character")
-				asset.name = raw_asset.name or raw_asset.long_name
-				asset.author = raw_asset.author
-				asset.description = raw_asset.description or raw_asset.long_description
-				asset.background = raw_asset.background
-				asset.download = raw_asset.download or raw_asset.homepage
-				asset.filename = raw_asset.filename
+				local asset = {
+					type = raw_asset.type,
+					downloadable = raw_asset.download and (raw_asset.type == "mappack" or raw_asset.type == "character"),
+					name = raw_asset.name or raw_asset.long_name,
+					author = raw_asset.author,
+					description = raw_asset.description or raw_asset.long_description,
+					background = raw_asset.background,
+					download = raw_asset.download or {
+						url = raw_asset.homepage,
+					},
+				}
 				
 				if raw_asset.icon then
 					asset.icon_url = raw_asset.icon
 					onlinemappackiconchannel:push(asset)
 				end
-				-- todo: icon
+
+				table.insert(onlineassetlist, asset)
 			end
 		end
 		
@@ -2259,10 +2263,10 @@ function menu_keypressed(key, unicode)
 				if asset.download then
 					if not asset.downloadable then
 						--link
-						if love.system.openURL(asset.download) then
+						if love.system.openURL(asset.download.url) then
 							notice.new(TEXT["Opened Download Link"], notice.white, 2)
 						else
-							love.system.setClipboardText(asset.download)
+							love.system.setClipboardText(asset.download.url)
 							notice.new(TEXT["Couldn't Open Link\nLink copied to clipboard"], notice.red, 3)
 						end
 					else

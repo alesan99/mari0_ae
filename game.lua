@@ -5192,7 +5192,7 @@ function game_keypressed(key, textinput)
 		elseif (key == "return" or key == "enter" or key == "kpenter" or key == " ") then
 			if pausemenuoptions[pausemenuselected] == "resume" then
 				pausemenuopen = false
-				if pausedaudio ~= nil then
+				if pausedaudio then
 					love.audio.play(pausedaudio)
 					pausedaudio = nil
 				else
@@ -5217,7 +5217,7 @@ function game_keypressed(key, textinput)
 			end
 		elseif key == "escape" then
 			pausemenuopen = false
-			if pausedaudio ~= nil then
+			if pausedaudio then
 				love.audio.play(pausedaudio)
 				pausedaudio = nil
 			else

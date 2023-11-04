@@ -34,9 +34,9 @@ end
 ---@return boolean success Whether the asset was mounted successfully.
 function mountasset(asset)
     if asset.type == "mappack" then
-        return mountmappack(asset.filename)
+        return mountmappack(asset.download.filename)
     elseif asset.type == "character" then
-        return mountcharacter(asset.filename)
+        return mountcharacter(asset.download.filename)
     end
     return false
 end
@@ -85,12 +85,12 @@ end
 ---@param asset table<string, boolean|string|number|table|nil> The asset to download.
 ---@return boolean success Whether the asset was downloaded successfully.
 function downloadasset(asset)
-    local code, body = https.request(asset.download)
+    local code, body = https.request(asset.download.url)
     if code ~= 200 then
         notice.new(body, notice.red, 4)
         return false
     end
-    local filename = asset.filename
+    local filename = asset.download.filename
     if asset.type == "mappack" then
         filename = "alesans_entities/onlinemappacks/" .. filename
     elseif asset.type == "character" then
