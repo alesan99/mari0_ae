@@ -1298,9 +1298,7 @@ function saveconfig()
 		s = s .. "scale:" .. scale .. ";"
 	end
 
-	if letterboxfullscreen then
-		s = s .. "letterbox;"
-	end
+	s = s .. "letterbox:" .. tostring(letterboxfullscreen) .. ";"
 	
 	s = s .. "shader1:" .. shaderlist[currentshaderi1] .. ";"
 	s = s .. "shader2:" .. shaderlist[currentshaderi2] .. ";"
@@ -1438,7 +1436,11 @@ function loadconfig(nodefaultconfig)
 				scale = tonumber(s2[2])
 			end
 		elseif s2[1] == "letterbox" then
-			letterboxfullscreen = true
+			if s2[2] then
+				letterboxfullscreen = (s2[2] == "true")
+			else
+				letterboxfullscreen = true
+			end
 		elseif s2[1] == "shader1" then
 			for i = 1, #shaderlist do
 				if shaderlist[i] == s2[2] then
@@ -1604,7 +1606,7 @@ function defaultconfig()
 		scale = 2
 	end
 	resizable = true
-	letterboxfullscreen = false
+	letterboxfullscreen = true
 	volume = 1
 	mappack = "smb"
 	vsync = false
