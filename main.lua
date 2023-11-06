@@ -1750,7 +1750,7 @@ function changescale(s, fullscreen)
 		resizable = true
 		
 		uispace = math.floor(width*16*scale/4)
-		love.window.setMode(width*16*scale, 224*scale, {fullscreen=fullscreen, vsync=vsync, msaa=fsaa, resizable=window_resizable, minwidth=width*16, minheight=224}) --27x14 blocks (15 blocks actual height)
+		love.window.setMode(width*16*scale, 224*scale, {fullscreen=fullscreen, vsync=vsync, msaa=fsaa, resizable=window_resizable, minwidth=width*16, minheight=224, highdpi=false, usedpiscale=false}) --27x14 blocks (15 blocks actual height)
 		
 		gamewidth, gameheight = love.graphics.getDimensions()
 		if android then
@@ -1773,11 +1773,11 @@ function changescale(s, fullscreen)
 		if fullscreen then
 			fullscreen = true
 			scale = 2
-			love.window.setMode(800, 600, {fullscreen=fullscreen, vsync=vsync, msaa=fsaa})
+			love.window.setMode(800, 600, {fullscreen=fullscreen, vsync=vsync, msaa=fsaa, highdpi=false, usedpiscale=false})
 		end
 		
 		uispace = math.floor(width*16*scale/4)
-		love.window.setMode(width*16*scale, height*16*scale, {fullscreen=fullscreen,vsync=vsync, msaa=fsaa}) --27x14 blocks (15 blocks actual height)
+		love.window.setMode(width*16*scale, height*16*scale, {fullscreen=fullscreen,vsync=vsync, msaa=fsaa, highdpi=false, usedpiscale=false}) --27x14 blocks (15 blocks actual height)
 		
 		gamewidth, gameheight = love.graphics.getDimensions()
 		winwidth, winheight = getWindowSize()
