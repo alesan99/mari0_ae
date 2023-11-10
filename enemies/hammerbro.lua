@@ -723,7 +723,7 @@ function brofireball:hitstuff(a, b)
 		if a == "tile" or a == "portalwall" or a == "spring" or a == "kingbill" or a == "angrysun" or a == "springgreen" or a == "thwomp" or a == "fishbone" or a == "muncher" or (a == "bigkoopa" and b.t == "bigbeetle") or a == "meteor" or a == "dryplant" or a == "drydownplant" or a == "parabeetle" or a == "boo" or a == "torpedoted" then
 			playsound(iciclesound)
 		elseif a == "player" then
-			if b.animationtimer == 0 or (not b.frozen and not b.invincible) then
+			if (b.animationtimer == 0 or not (b.frozen or b.invincible)) and not (b.startimer < mariostarduration) then
 				b:freeze()
 			end
 			self:explode()
