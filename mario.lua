@@ -9000,8 +9000,9 @@ function mario:turretshot(tx, ty, sx, sy, knockback) --turret
 end
 
 function mario:groundshock()--for sledge bros
+	local groundfreezetime = 1
 	if self.speedy == 0 and not self.groundfreeze and (not self.vine) and (not self.fence) and (not self.clearpipe) then
-		self.groundfreeze = 2
+		self.groundfreeze = groundfreezetime
 		self.speedx = 0
 		self.animationstate = "idle"
 		self:setquad()
@@ -9009,10 +9010,11 @@ function mario:groundshock()--for sledge bros
 end
 
 function mario:freeze() --ice ball
+	local icefreezetime = 1
 	if not self.frozen then
 		self.static = true
 		self.jumping = false
-		self.groundfreeze = 1
+		self.groundfreeze = icefreezetime
 		self.frozen = true
 		self.speedx = 0
 		self.animationstate = "idle"
