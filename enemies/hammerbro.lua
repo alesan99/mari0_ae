@@ -669,8 +669,8 @@ function brofireball:leftcollide(a, b)
 	end
 	self.x = self.x-.5
 	self:hitstuff(a, b)
+	self:explode()
 	
-	self.speedx = fireballspeed
 	return false
 end
 
@@ -679,7 +679,8 @@ function brofireball:rightcollide(a, b)
 		return false
 	end
 	self:hitstuff(a, b)
-	self.speedx = -fireballspeed
+	self:explode()
+	
 	return false
 end
 
