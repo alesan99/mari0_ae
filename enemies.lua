@@ -258,6 +258,9 @@ function loadenemy(filename, s)
 				for i, v in pairs(temp) do
 					enemiesdata[s][i] = v
 				end
+				if (temp.animationstart or temp.quadno) then --fix dc bugs
+					loadenemyquad(s)
+				end
 			end
 		else
 			--Put enemy for later loading because base hasn't been loaded yet
@@ -318,17 +321,6 @@ function loadenemy(filename, s)
 		--doing it up there messed up the order or something
 		enemiesdata[s][i] = v
 	end
-
-	if enemiesdata[s].fireenemy then
-		for i, v in pairs(enemiesdata[s].fireenemy) do
-			local a = i:lower()
-			if type(v) == "string" then
-				enemiesdata[s].fireenemy[a] = v:lower()
-			else
-				enemiesdata[s].fireenemy[a] = v
-			end
-		end
-	end
 		
 	for i, v in pairs(defaultvalues) do
 		if enemiesdata[s][i] == nil then
@@ -365,12 +357,6 @@ end
 
 function loadenemyimage(filename, s)
 	--Load graphics
-
-
-	--print(filename)
-	--print(s)
-	--debug.debug()
-
 	local img = love.graphics.newImage(filename)
 	if string.sub(filename, -9) == "-icon.png" then
 		enemiesdata[s].icongraphic = img
@@ -385,6 +371,7 @@ function loadenemyimage(filename, s)
 			local quadheight = imgheight/4
 			
 			if math.floor(quadwidth) == quadwidth and (math.floor(quadheight) == quadheight or enemiesdata[s].nospritesets) then
+				enemiesdata[s].drawable = true
 				enemiesdata[s].quadbase = {}
 				local qb = enemiesdata[s].quadbase
 				if enemiesdata[s].nospritesets then
@@ -403,6 +390,7 @@ function loadenemyimage(filename, s)
 						end
 					end
 				end
+				loadenemyquad(s)
 			elseif math.floor(quadwidth) ~= quadwidth then
 				print("IMAGE FOR " .. s .. " NOT DIVISIBLE BY QUADCOUNT")
 				notice.new("image width for " .. s .. "\nnot divisible by quadcount", notice.red, 5)
@@ -411,7 +399,6 @@ function loadenemyimage(filename, s)
 				notice.new("image height for " .. s .. "\nnot divisible by 4 spritesets", notice.red, 5)
 			end
 		end
-		loadenemyquad(s)
 	end
 end
 
@@ -422,20 +409,19 @@ end
 function loadenemyquad(s, no_notices)
 	--make sure enemy is using the up-to-date spriteset
 
-	--check if graphic for enemy exists
-	if enemiesdata[s].quadbase and enemiesdata[s].graphic then
-		enemiesdata[s].drawable = true
-		enemiesdata[s].quadgroup = enemiesdata[s].quadbase[spriteset]
-		if enemiesdata[s].animationtype == "frames" or enemiesdata[s].animationtype == "character" then
+	local data = enemiesdata[s]
+	if data.quadbase then --check if quads for enemy exists
+		data.quadgroup = data.quadbase[spriteset]
+		if data.animationtype == "frames" or data.animationtype == "character" then
 			if not no_notices then
-				if not enemiesdata[s].animationstart then
+				if not data.animationstart then
 					print(s .. " IS MISSING ANIMATIONSTART")
 					notice.new(s .. " is missing\nanimationstart frame", notice.red, 5)
 				end
 			end
-			enemiesdata[s].quad = enemiesdata[s].quadgroup[enemiesdata[s].animationstart]
+			data.quad = data.quadgroup[data.animationstart]
 		else
-			enemiesdata[s].quad = enemiesdata[s].quadgroup[enemiesdata[s].quadno]
+			data.quad = data.quadgroup[data.quadno]
 		end
 	end
 end
