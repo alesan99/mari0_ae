@@ -137,7 +137,7 @@ end
 function getname(filename)
 	if string.sub(filename, -4) == "json" then
 		return filename:match("^.+/(.*)%.json$"):lower()
-	elseif string.sub(filename, -3) == "png" then
+	elseif string.sub(filename, -3):lower() == "png" then
 		return filename:match("^.+/([^%-%.]*)"):lower()
 	elseif string.sub(filename, -3) == "ogg" then
 		return filename:match("^.+/(.*)%.ogg$"):lower()
@@ -150,7 +150,7 @@ function loadfile(filename, s)
 			--print(s)
 		local succ = loadenemy(filename, s)
 		if not succ then return false end
-	elseif string.sub(filename, -3) == "png" then
+	elseif string.sub(filename, -3):lower() == "png" then
 		--print(filename)
 			--print(s)
 		if enemiesdata[s] then
@@ -358,9 +358,9 @@ end
 function loadenemyimage(filename, s)
 	--Load graphics
 	local img = love.graphics.newImage(filename)
-	if string.sub(filename, -9) == "-icon.png" then
+	if string.sub(filename, -9):lower() == "-icon.png" then
 		enemiesdata[s].icongraphic = img
-	elseif string.sub(filename, -12) == "-tooltip.png" then
+	elseif string.sub(filename, -12):lower() == "-tooltip.png" then
 		enemiesdata[s].tooltipgraphic = img
 	else
 		enemiesdata[s].graphic = img
