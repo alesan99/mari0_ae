@@ -9333,6 +9333,10 @@ function getdrawrange(xscroll,yscroll,spritebatch)
 			yoff = math.ceil(yscroll)+math.fmod(yscroll, 1)
 		end
 	end
+	if spritebatch and dropshadow then -- fix shadows disappearing too early, .1875 equals to 3 pixels (3/16)
+		xfromdraw = math.floor(math.max(xfromdraw - .1875, 1))
+		yfromdraw = math.floor(math.max(yfromdraw - .1875, 1))
+	end
 	return xfromdraw,xtodraw, yfromdraw,ytodraw, xoff,yoff
 end
 
