@@ -6365,6 +6365,11 @@ function mario:globalcollide(a, b)
 					self.dofireenemy = self.fireenemy
 					if b.makesmariocolor then
 						self.customcolors = b.makesmariocolor
+						for i, v in pairs(self.customcolors) do
+							for j, w in pairs(v) do
+								w = w/255
+							end
+						end
 						self.basecolors = self.customcolors
 						self.colors = self.basecolors
 					else
