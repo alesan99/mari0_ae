@@ -19,7 +19,7 @@ function dialogbox:init(text, speaker, color)
 	self.text = self.text:gsub("%%player%%",playername)
 	
 	--initialize colors
-	local curcolor = {255, 255, 255}
+	local curcolor = {1, 1, 1}
 	local newcolor = true
 	local i = 1
 	self.textcolors = {}
@@ -45,7 +45,7 @@ function dialogbox:init(text, speaker, color)
 			self.text = string.sub(self.text, 1, i-1) .. string.sub(self.text, j+1)
 		else
 			if newcolor then
-				self.textcolors[i] = {tonumber(curcolor[1]), tonumber(curcolor[2]), tonumber(curcolor[3])}
+				self.textcolors[i] = {tonumber(curcolor[1])/255, tonumber(curcolor[2])/255, tonumber(curcolor[3])/255}
 				newcolor = false
 			end
 			i = i + 1
@@ -72,9 +72,9 @@ function dialogbox:draw()
 	local boxheight = 45
 	local margin = 4
 	local lineheight = 10
-	love.graphics.setColor(0, 0, 0, 127)
+	love.graphics.setColor(0, 0, 0, .5)
 	love.graphics.rectangle("fill", scale*margin, (height*16-boxheight-margin)*scale, (width*16-margin*2)*scale, boxheight*scale)
-	love.graphics.setColor(255, 255, 255)
+	love.graphics.setColor(1, 1, 1)
 	drawrectangle(5, (height*16-margin-boxheight+1), (width*16-margin*2-2), boxheight-2)
 	
 	local availablepixelsx = width*16-margin*2-6
@@ -99,10 +99,10 @@ function dialogbox:draw()
 	end
 	
 	if self.speaker and #self.speaker ~= 0 then
-		love.graphics.setColor(0, 0, 0, 127)
+		love.graphics.setColor(0, 0, 0, .5)
 		love.graphics.rectangle("fill", scale*margin, (height*16-boxheight-margin-10)*scale, (5+#self.speaker*8)*scale, 10*scale)
 		
-		--love.graphics.setColor(255, 255, 255)
+		--love.graphics.setColor(1, 1, 1)
 		--drawrectangle(5, (height*16-margin-boxheight+1-10), (3+#self.speaker*8), 11)
 		
 		love.graphics.setColor(self.color or textcolors["orange"])

@@ -82,7 +82,7 @@
 	"mappack folder fail": "empuja → para\nacceder al dlc\n\ncould not\nopen your\nmappack folder",
 	"{new mappack}": "{nuevo mappack}",
 	"new mappack description": "crea un nuevo    mappack con esto!",
-	"by": "por ",
+	"by": "por",
 "^_DLC":"",
 	"dlc instructions": "descarga niveles!\n\nelije un mappack\npara el enlace\n\ndespués de\ndescargar el mapa,\ncoloqa el .zip\ndentro de tu\ncarpeta dlc\n\n* hay enemigos\ny personajes\ntambién!",
 	"dlc enemy instructions": "usa el editor para\nagregar enemigos\na tus mapas",

@@ -19,8 +19,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 // modified by slime73 for use with love pixeleffects
 
 
-#define glarebasesize 0.42
-#define power 0.5 // 0.50 is good
+const float glarebasesize = 0.42;
+const float power = 0.5; // 0.50 is good
 
 extern vec2 textureSize;
 

@@ -1,29 +1,57 @@
 --I have no idea what i'm even doing
+local colorvariables = {"colors", "defaultcolors", "starcolors", "flowercolor", "hammersuitcolor", "frogsuitcolor", "leafcolor", "iceflowercolor", "tanookisuitcolor", "statuecolor", "superballcolor", "blueshellcolor", "boomerangcolor"}
 local animfiles = {"", "big", "fire", "ice", "superball", "hammer", "frog", "raccoon", "tiny", "tanooki", "skinny", "cape", "shell", "boomerang"}
 local blankimg = love.graphics.newImage(love.image.newImageData(1, 1))
 local splitimage
 
+local function iscolorvariable(key)
+	for i, v in ipairs(colorvariables) do
+		if v == key then
+			return true
+		end
+	end
+	return false
+end
+
+local function convertcolors(table)
+	if table == nil or #table == 0 then
+		return
+	end
+	for i, v in ipairs(table) do
+		if type(v) == "table" then
+			convertcolors(v)
+		else
+			table[i] = tonumber(v)/255
+		end
+	end
+end
+
 function loadcustomplayers()
 	characters = {list = {}, data = {}}
 	local dir = love.filesystem.getDirectoryItems("alesans_entities/characters")
+
+	-- mount zips
+	for i, v in ipairs(dir) do
+		if v:sub(-4, -1) == ".zip" then
+			mountto("alesans_entities/characters/" .. v, "alesans_entities/characters")
+		end
+	end
+	-- refresh with new mounted items
+	dir = love.filesystem.getDirectoryItems("alesans_entities/characters")
+
+	-- load characters
 	for i, v in ipairs(dir) do
 		local folder = "alesans_entities/characters/" .. v
-		local skip = false
 
-		if (not love.filesystem.exists(folder .. "/config.json")) then
-			skip = true
-		end
-		if (not NoCharacterZipNotices) and v:sub(-4,-1) == ".zip" then
-			notice.new(string.format(TEXT["Can't load %s!\nyou need to un-zip it!"],v), notice.red, 5)
-		end
-
-		if not skip then
+		if love.filesystem.getInfo(folder .. "/config.json") then
 			local playerstuff = {
 				--identification
-				name = v, 
+				name = v,
 				i = #characters["list"]+1,
 
 				--colors
+				-- !! MAKE SURE to add any new RGB variables to `colorvariables` at the top !!
+				-- !! to ensure they get automatically converted from 0..255 to 0..1        !!
 				colorables = {"hat", "hair", "skin"},
 				colors = {},
 				defaultcolors = false,
@@ -329,56 +357,47 @@ function loadcustomplayers()
 			playerstuff.imgs = {} --list of imgs
 
 			--load properties
-			local jsonexists = love.filesystem.exists(folder .. "/config.json")
-			if jsonexists or love.filesystem.exists(folder .. "/config.txt") then
-				--read .json
-				local s
-				if jsonexists then
-					s = love.filesystem.read(folder .. "/config.json")
-				else
-					s = love.filesystem.read(folder .. "/config.txt")
-				end
-				--local temp = JSON:decode(s)
-				
-				JSONcrashgame = false
-				local temp
-				local suc, err = pcall(function() return JSON:decode(s) end)
-				if suc then
-					temp = err
-					--works! so set properties
-					for i, v in pairs(temp) do
-						playerstuff[i] = v
-						if i == "health" or i == "fireenemy" then
-							playerstuff["advanced"] = true
-						end
+			local s = love.filesystem.read(folder .. "/config.json")
+			
+			JSONcrashgame = false
+			local temp
+			local suc, err = pcall(function() return JSON:decode(s) end)
+			if suc then
+				temp = err
+				--works! so set properties
+				for i, v in pairs(temp) do
+					-- convert numbers to 0..1
+					if iscolorvariable(i) then
+						convertcolors(v)
 					end
-				else
-					jsonerrorwindow:open("CHARACTER JSON ERROR! (" .. v .. ".json)", JSONerror[2], 
-						function() 
-							loadcustomplayers()
-							for i = 1, #mariocharacter do
-								if mariocharacter[i] then
-									setcustomplayer(mariocharacter[i], i, "initial")
-								end
-							end
-						end)
-					JSONcrashgame = true
+					-- set properties
+					playerstuff[i] = v
+					if i == "health" or i == "fireenemy" then
+						playerstuff["advanced"] = true
+					end
 				end
-				if playerstuff.fireenemy and type(playerstuff.fireenemy) == "table" then
-					for i, v in pairs(playerstuff.fireenemy) do
-						local a = i:lower()
-						if type(v) == "string" then
-							playerstuff.fireenemy[a] = v:lower()
-						else
-							playerstuff.fireenemy[a] = v
-						end
+			else
+				jsonerrorwindow:open("CHARACTER JSON ERROR! (" .. v .. ".json)", JSONerror[2],
+					function() 
+						loadcustomplayers()
+						resetcustomplayers()
+					end)
+				JSONcrashgame = true
+			end
+			if playerstuff.fireenemy and type(playerstuff.fireenemy) == "table" then
+				for i, v in pairs(playerstuff.fireenemy) do
+					local a = i:lower()
+					if type(v) == "string" then
+						playerstuff.fireenemy[a] = v:lower()
+					else
+						playerstuff.fireenemy[a] = v
 					end
 				end
 			end
 
 			for i2, n in pairs(animfiles) do
 				local n = n .. "animations"
-				if love.filesystem.exists(folder .. "/" .. n .. ".png") or love.filesystem.exists(folder .. "/" .. n .. "1.png") then
+				if love.filesystem.getInfo(folder .. "/" .. n .. ".png") or love.filesystem.getInfo(folder .. "/" .. n .. "1.png") then
 					playerstuff.imgs[n] = true
 				end
 			end
@@ -405,7 +424,7 @@ function loadcustomplayers()
 				if not characters.data[i]["animations"] then
 					for i2, v in pairs(animfiles) do
 						local n = v .. "animations"
-						if imgs[n] and not love.filesystem.exists(folder .. "/" .. n .. "1.png") then
+						if imgs[n] and not love.filesystem.getInfo(folder .. "/" .. n .. "1.png") then
 							characters.data[i][n] = {}
 							local imgdata = splitimage("alesans_entities/characters/" .. i .. "/" .. n .. ".png", characters.data[i].splitcolors, true, "imagedata")
 							imgdata:encode("png", "alesans_entities/characters/" .. i .. "/" .. n .. "0.png")
@@ -417,6 +436,14 @@ function loadcustomplayers()
 					end
 				end
 			end
+		end
+	end
+end
+
+function resetcustomplayers()
+	for i = 1, #mariocharacter do
+		if mariocharacter[i] then
+			setcustomplayer(mariocharacter[i], i, "initial")
 		end
 	end
 end
@@ -456,7 +483,7 @@ function splitimage(img, color, exclude, imagedata) --split singe image into col
 		love.graphics.setCanvas(output)
 		love.graphics.setShader(splitShader)
 		splitShader:send("inputImage", input)
-		splitShader:send("splitColor", {color[1]/255,color[2]/255,color[3]/255})
+		splitShader:send("splitColor", {color[1],color[2],color[3]})
 		love.graphics.draw(input,0,0)
 		love.graphics.setShader()
 		love.graphics.setCanvas(c)
@@ -468,17 +495,18 @@ function splitimage(img, color, exclude, imagedata) --split singe image into col
 		for x = 0, input:getWidth()-1 do
 			for y = 0, input:getHeight()-1 do
 				local r, g, b, a = input:getPixel(x, y)
+				local rr, rg, rb = r, g, b
 				local place = false
 				if exclude then
 					place = true
 					for i, c in pairs(color) do
-						if r == c[1] and g == c[2] and b == c[3] then
+						if rr == c[1] and rg == c[2] and rb == c[3] then
 							place = false
 							break
 						end
 					end
 				else
-					if r == color[1] and g == color[2] and b == color[3] then
+					if rr == color[1] and rg == color[2] and rb == color[3] then
 						place = true
 					end
 				end
@@ -486,7 +514,7 @@ function splitimage(img, color, exclude, imagedata) --split singe image into col
 					if exclude then
 						output:setPixel(x, y, r, g, b, a)
 					else
-						output:setPixel(x, y, 255, 255, 255, a)
+						output:setPixel(x, y, 1, 1, 1, a)
 					end
 				end
 			end
@@ -501,11 +529,11 @@ end
 
 function setcustomplayer(i, pn, initial) --name, player number, initial (don't change colors to defaults)
 	if i and characters.data[i] then
-		if love.filesystem.exists("alesans_entities/characters/" .. i .. "/config.txt") then
+		if love.filesystem.getInfo("alesans_entities/characters/" .. i .. "/config.txt") then
 			--incompatible probably
-			if love.filesystem.exists("alesans_entities/characters/" .. i .. "/animationsBAK.png") then --SE Character
+			if love.filesystem.getInfo("alesans_entities/characters/" .. i .. "/animationsBAK.png") then --SE Character
 				notice.new("Incompatible Character Detected\nUse characters made for mari0:AE!", notice.red, 5)
-			elseif not love.filesystem.exists("alesans_entities/characters/" .. i .. "/config.json") then --Old Character Format
+			elseif not love.filesystem.getInfo("alesans_entities/characters/" .. i .. "/config.json") then --Old Character Format
 				notice.new("Incompatible Character Detected\nUse characters made for\nmari0:AE version " .. VERSIONSTRING .. "!", notice.red, 5)
 			end
 		end
@@ -521,9 +549,9 @@ function setcustomplayer(i, pn, initial) --name, player number, initial (don't c
 						for j = 1, #characters.data[i].colorables do
 							characters.data[i][n][j] = splitimage("alesans_entities/characters/" .. i .. "/" .. n .. ".png", characters.data[i].colors[j])
 						end
-					elseif love.filesystem.exists("alesans_entities/characters/" .. i .. "/" .. n .. "1.png") then
+					elseif love.filesystem.getInfo("alesans_entities/characters/" .. i .. "/" .. n .. "1.png") then
 						for j = 0, #characters.data[i].colorables do
-							if not love.filesystem.exists("alesans_entities/characters/" .. i .. "/" .. n .. j .. ".png") then
+							if not love.filesystem.getInfo("alesans_entities/characters/" .. i .. "/" .. n .. j .. ".png") then
 								characters.data[i][n][j] = blankimg
 							else
 								characters.data[i][n][j] = love.graphics.newImage("alesans_entities/characters/" .. i .. "/" .. n .. j .. ".png")
@@ -540,14 +568,14 @@ function setcustomplayer(i, pn, initial) --name, player number, initial (don't c
 				end
 			end
 			--cape and bunnyears
-			if love.filesystem.exists("alesans_entities/characters/" .. i .. "/cape.png") then
+			if love.filesystem.getInfo("alesans_entities/characters/" .. i .. "/cape.png") then
 				characters.data[i].capeimg = love.graphics.newImage("alesans_entities/characters/" .. i .. "/cape.png")
 			end
-			if love.filesystem.exists("alesans_entities/characters/" .. i .. "/bunnyears.png") then
+			if love.filesystem.getInfo("alesans_entities/characters/" .. i .. "/bunnyears.png") then
 				characters.data[i].bunnyears = love.graphics.newImage("alesans_entities/characters/" .. i .. "/bunnyears.png")
 			end
 			--health counter
-			if love.filesystem.exists("alesans_entities/characters/" .. i .. "/health.png") then
+			if love.filesystem.getInfo("alesans_entities/characters/" .. i .. "/health.png") then
 				local img = love.graphics.newImage("alesans_entities/characters/" .. i .. "/health.png")
 				characters.data[i].healthimg = img
 				local w, h = img:getWidth(), img:getHeight()

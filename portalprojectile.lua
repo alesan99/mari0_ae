@@ -48,8 +48,7 @@ function portalprojectile:update(dt)
 			local ty = self.starty + (self.endy-self.starty)*(t/self.time)
 			
 			--INNER LINE
-			local r, g, b = unpack(self.color)			
-			table.insert(self.particles, portalprojectileparticle:new(tx, ty, {r, g, b}))
+			table.insert(self.particles, portalprojectileparticle:new(tx, ty, self.color))
 			
 			--OUTER LINES
 			local r, g, b = unpack(self.color)
@@ -114,7 +113,7 @@ end
 
 portalprojectileparticle = class:new()
 
-function portalprojectileparticle:init(x, y, color, r, g, b)
+function portalprojectileparticle:init(x, y, color)
 	self.x = x
 	self.y = y
 	self.color = color
@@ -122,7 +121,7 @@ function portalprojectileparticle:init(x, y, color, r, g, b)
 	self.speedx = math.random(-10, 10)/70
 	self.speedy = math.random(-10, 10)/70
 	
-	self.alpha = 150
+	self.alpha = 150/255
 	
 	self.timer = 0
 end
@@ -136,7 +135,7 @@ function portalprojectileparticle:update(dt)
 	self.x = self.x + self.speedx*dt
 	self.y = self.y + self.speedy*dt
 	
-	self.alpha = self.alpha - dt*300
+	self.alpha = self.alpha - dt*(300/255)
 	if self.alpha < 0 then
 		self.alpha = 0
 		return true

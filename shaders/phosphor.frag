@@ -23,15 +23,15 @@ extern vec2 textureSize;
 
 // 0.5 = the spot stays inside the original pixel
 // 1.0 = the spot bleeds up to the center of next pixel
-#define PHOSPHOR_WIDTH  0.9
-#define PHOSPHOR_HEIGHT 0.65
+const float PHOSPHOR_WIDTH = 0.9;
+const float PHOSPHOR_HEIGHT = 0.65;
 
 // Used to counteract the desaturation effect of weighting.
-#define COLOR_BOOST 1.9
+const float COLOR_BOOST = 1.9;
 
 // Constants used with gamma correction.
-#define InputGamma 2.4
-#define OutputGamma 2.2
+const float InputGamma = 2.4;
+const float OutputGamma = 2.2;
 
 // Uncomment to only draw every third pixel, which highlights the shape
 // of individual (remaining) spots.
@@ -82,14 +82,14 @@ vec4 grid_color( vec2 coords )
 {
 		vec2 snes = floor( coords * textureSize );
 		if ( (mod(snes.x, 3.0) == 0.0) && (mod(snes.y, 3.0) == 0.0) )
-				return texture2D(_tex0_, coords);
+				return Texel(texture, coords);
 		else
 				return vec4(0.0);
 }
 #define TEX2D(coords)   GAMMA_IN( grid_color( coords ) )
 
 #else // DEBUG
-#define TEX2D(coords)   GAMMA_IN( texture2D(_tex0_, coords) )
+#define TEX2D(coords)   GAMMA_IN( Texel(texture, coords) )
 
 #endif // DEBUG
 

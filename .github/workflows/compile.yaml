@@ -2,51 +2,82 @@ name: Compile
 on: [push, pull_request]
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
+    env:
+      KEYSTORE_ALIAS: ${{ secrets.ANDROID_KEYSTORE_ALIAS }}
+      KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      KEYSTORE_KEYPASSWORD: ${{ secrets.ANDROID_KEYSTORE_KEYPASSWORD }}
+      KEYSTORE_STOREPASSWORD: ${{ secrets.ANDROID_KEYSTORE_STOREPASSWORD }}
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         path: main
         submodules: true
       name: Checkout Repository
+    - name: Extract Metadata
+      id: metadata
+      run: python3 main/.scripts/extract-metadata.py
+    - name: Add Universe Repository
+      run: sudo add-apt-repository universe
     - name: Update Packages
       run: sudo apt-get update
     - name: Install Dependencies
-      run: sudo apt-get install --assume-yes wine-stable wine64 python3-pip
+      run: sudo apt-get install --assume-yes wine-stable wine64 python3-pip libfuse2
     - name: Install makelove
-      run:
-        pip3 install git+https://github.com/pfirsich/makelove/
+      run: pip3 install git+https://github.com/pfirsich/makelove/
     - name: Build
-      run: cd main && python3 -m makelove
-    - name: Prepare Artifact Names
-      run: |
-        echo "ARTIFACT_NAME_LOVE=$(ls main/makelove-build/love | head -n1)" >> $GITHUB_ENV
-        echo "ARTIFACT_NAME_APPIMAGE=$(ls main/makelove-build/appimage | head -n1)" >> $GITHUB_ENV
-        echo "ARTIFACT_NAME_WIN64=$(ls main/makelove-build/win64 | head -n1)" >> $GITHUB_ENV
-        echo "ARTIFACT_NAME_WIN32=$(ls main/makelove-build/win32 | head -n1)" >> $GITHUB_ENV
-        echo "ARTIFACT_NAME_MACOS=$(ls main/makelove-build/macos | head -n1)" >> $GITHUB_ENV
+      run: cd main && python3 -m makelove && cd ..
     - name: Artifact (LÖVE)
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
-        name: ${{ env.ARTIFACT_NAME_LOVE }}
+        name: ${{ steps.metadata.outputs.id }}-source
         path: main/makelove-build/love/${{ env.ARTIFACT_NAME_LOVE }}
     - name: Artifact (AppImage)
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
-        name: ${{ env.ARTIFACT_NAME_APPIMAGE }}
+        name: ${{ steps.metadata.outputs.id }}-linux
         path: main/makelove-build/appimage/${{ env.ARTIFACT_NAME_APPIMAGE }}
     - name: Artifact (Win64)
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
-        name: ${{ env.ARTIFACT_NAME_WIN64 }}
+        name: ${{ steps.metadata.outputs.id }}-win64
         path: main/makelove-build/win64/${{ env.ARTIFACT_NAME_WIN64 }}
     - name: Artifact (Win32)
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
-        name: ${{ env.ARTIFACT_NAME_WIN32 }}
+        name: ${{ steps.metadata.outputs.id }}-win32
         path: main/makelove-build/win32/${{ env.ARTIFACT_NAME_WIN32 }}
     - name: Artifact (MacOS)
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
-        name: ${{ env.ARTIFACT_NAME_MACOS }}
+        name: ${{ steps.metadata.outputs.id }}-macos
         path: main/makelove-build/macos/${{ env.ARTIFACT_NAME_MACOS }}
+    - name: Build (Android)
+      id: build-android
+      uses: qixils/love-actions-android@v1
+      with:
+        app-name: ${{ steps.metadata.outputs.title }}
+        bundle-id: love.to.androidmari0 # backwards compatibility
+        product-name: ${{ steps.metadata.outputs.id }}
+        resource-path: "main/.android-resources"
+        love-ref: ${{ steps.metadata.outputs.love-version }}
+        love-package: main/makelove-build/love/${{ env.ARTIFACT_NAME_LOVE }}
+        remote-libs: "https://github.com/love2d/lua-https"
+        version-string: ${{ steps.metadata.outputs.version }}
+        version-code: ${{ steps.metadata.outputs.android-version }}
+        output-folder: "main/makelove-build/android"
+        keystore-alias: ${{ env.KEYSTORE_ALIAS }}
+        keystore-base64: ${{ env.KEYSTORE_BASE64 }}
+        keystore-key-password: ${{ env.KEYSTORE_KEYPASSWORD }}
+        keystore-store-password: ${{ env.KEYSTORE_STOREPASSWORD }}
+    - name: Artifact (Android Debug)
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ steps.metadata.outputs.id }}-android-debug
+        path: main/makelove-build/android/${{ steps.metadata.outputs.id }}-debug.apk
+    - name: Artifact (Android Release)
+      if: env.KEYSTORE_ALIAS != '' && env.KEYSTORE_BASE64 != '' && env.KEYSTORE_KEYPASSWORD != '' && env.KEYSTORE_STOREPASSWORD != ''
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ steps.metadata.outputs.id }}-android-release
+        path: main/makelove-build/android/${{ steps.metadata.outputs.id }}-release.apk

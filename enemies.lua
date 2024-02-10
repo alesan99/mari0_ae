@@ -5,7 +5,7 @@ function enemies_load()
 	customenemies = {}
 
 	--HATS (for custom powerups)
-	if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/hats/") then
+	if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/hats/") then
 		local files = love.filesystem.getDirectoryItems(mappackfolder .. "/" .. mappack .. "/hats/")
 		for i, v in pairs(files) do
 			if string.sub(v, -5, -1) == ".json" then
@@ -17,10 +17,10 @@ function enemies_load()
 	--ENEMIIIIEEES
 	loaddelayed = {}
 	
-	local enemiesexist = love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/enemies/")
+	local enemiesexist = love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/enemies/")
 	if (not enemiesexist) and (not editormode) then
 		for i = 1, #mariocharacter do
-			if mariocharacter[i] and love.filesystem.exists("alesans_entities/characters/" .. mariocharacter[i] .. "/enemies/") then
+			if mariocharacter[i] and love.filesystem.getInfo("alesans_entities/characters/" .. mariocharacter[i] .. "/enemies/") then
 				enemiesexist = true
 				break
 			end
@@ -39,31 +39,33 @@ function enemies_load()
 	end
 	
 	for i = 1, #fl2 do
-		if love.filesystem.isDirectory(mappackfolder .. "/" .. mappack .. "/enemies/" .. fl2[i]) then
+		local mpepath = mappackfolder .. "/" .. mappack .. "/enemies/" .. fl2[i]
+		if love.filesystem.getInfo(mpepath, "directory") then
 			--load enemies from folder
-			local fl3 = love.filesystem.getDirectoryItems(mappackfolder .. "/" .. mappack .. "/enemies/" .. fl2[i])
+			local fl3 = love.filesystem.getDirectoryItems(mpepath)
 			for i2 = 1, #fl3 do
-				table.insert(realfl, mappackfolder .. "/" .. mappack .. "/enemies/" .. fl2[i] .. "/" .. fl3[i2])
+				table.insert(realfl, mpepath .. "/" .. fl3[i2])
 			end
 		else
-			table.insert(realfl, mappackfolder .. "/" .. mappack .. "/enemies/" .. fl2[i]) --MAPPACK ENEMIES
+			table.insert(realfl, mpepath) --MAPPACK ENEMIES
 		end
 	end
 
 	--load enemies for custom characters
 	local characterenemiesloaded = {} --don't load the same enemy multiple times
 	for i = 1, #mariocharacter do
-		if mariocharacter[i] and (not characterenemiesloaded[mariocharacter[i]]) and love.filesystem.exists("alesans_entities/characters/" .. mariocharacter[i] .. "/enemies/") then
+		if mariocharacter[i] and (not characterenemiesloaded[mariocharacter[i]]) and love.filesystem.getInfo("alesans_entities/characters/" .. mariocharacter[i] .. "/enemies/") then
 			local fl3 = love.filesystem.getDirectoryItems("alesans_entities/characters/" .. mariocharacter[i] .. "/enemies/")
 			for i2 = 1, #fl3 do
-				if love.filesystem.isDirectory("alesans_entities/characters/" .. mariocharacter[i] .. "/enemies/" .. fl3[i2]) then
+				local cepath = "alesans_entities/characters/" .. mariocharacter[i] .. "/enemies/" .. fl3[i2]
+				if love.filesystem.getInfo(cepath, "directory") then
 					--load enemies from folder
-					local fl4 = love.filesystem.getDirectoryItems("alesans_entities/characters/" .. mariocharacter[i] .. "/enemies/" .. fl3[i2])
+					local fl4 = love.filesystem.getDirectoryItems(cepath)
 					for i3 = 1, #fl4 do
-						table.insert(realfl, "alesans_entities/characters/" .. mariocharacter[i] .. "/enemies/" .. fl3[i2] .. "/" .. fl4[i3])
+						table.insert(realfl, cepath .. "/" .. fl4[i3])
 					end
 				else
-					table.insert(realfl, "alesans_entities/characters/" .. mariocharacter[i] .. "/enemies/" .. fl3[i2]) --CHARACTER ENEMIES
+					table.insert(realfl, cepath) --CHARACTER ENEMIES
 				end
 			end
 			characterenemiesloaded[mariocharacter[i]] = true
@@ -227,9 +229,9 @@ function loadenemy(filename)
 		end
 		
 		--Load graphics if it exists
-		if love.filesystem.exists(folder .. s .. ".png") then
+		if love.filesystem.getInfo(folder .. s .. ".png") then
 			enemiesdata[s].graphic = love.graphics.newImage(folder .. s .. ".png")
-		elseif love.filesystem.exists(folder .. s .. ".PNG") then --case sensitivity FTW
+		elseif love.filesystem.getInfo(folder .. s .. ".PNG") then --case sensitivity FTW
 			enemiesdata[s].graphic = love.graphics.newImage(folder .. s .. ".PNG")
 			if editormode then
 				notice.new("graphic for " .. s .. " needs\na lowercase file extension!", notice.red, 4)
@@ -237,17 +239,17 @@ function loadenemy(filename)
 		end
 		
 		--Load icon if it exists
-		if love.filesystem.exists(folder .. s .. "-icon.png") then
+		if love.filesystem.getInfo(folder .. s .. "-icon.png") then
 			enemiesdata[s].icongraphic = love.graphics.newImage(folder .. s .. "-icon.png")
 		end
 
 		--Load tooltop if it exists
-		if love.filesystem.exists(folder .. s .. "-tooltip.png") then
+		if love.filesystem.getInfo(folder .. s .. "-tooltip.png") then
 			enemiesdata[s].tooltipgraphic = love.graphics.newImage(folder .. s .. "-tooltip.png")
 		end
 
 		--Load sound if it exists
-		if love.filesystem.exists(folder .. s .. ".ogg") then
+		if love.filesystem.getInfo(folder .. s .. ".ogg") then
 			enemiesdata[s].sound = love.audio.newSource(folder .. s .. ".ogg", "static")
 		end
 		

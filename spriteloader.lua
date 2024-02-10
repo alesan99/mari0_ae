@@ -28,6 +28,12 @@ imagestable = {  	"1", "2", "3", "blockdebrisimage", "coinblockanimationimage", 
 						"cannonballcannonimg", "clearpipeimg", "plantcreeperimg", "trackimg", "pneumatictubeimg", "dustimg", "platformtrackimg", "checkpointflagimg", "iceimg",
 						"snowspikeimg", "grinderimg", "fuzzyimg", "muncherfrozenimg"}
 
+-- clone imagestable to imagedatatable
+imagedatatable = {}
+for i,v in pairs(imagestable) do
+	imagedatatable[i] = v .. "_data"
+end
+
 table.sort(imagestable, function(a, b) return a < b end)--sort alphabetically
 imagestable[1] = "smbtilesimg"
 imagestable[2] = "portaltilesimg"
@@ -46,7 +52,8 @@ local loadedcustomsprites = {} --lists which graphics have been changed
 
 function loadcustomsprites(initial) --Sprite loader
 	local imgtable = imagestable
-	local customspritesexist = love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/custom")
+	local imgdatatable = imagedatatable
+	local customspritesexist = love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/custom")
 	if customspritesexist then
 		local files = love.filesystem.getDirectoryItems(mappackfolder .. "/" .. mappack .. "/custom")
 		if #files == 0 then
@@ -56,7 +63,9 @@ function loadcustomsprites(initial) --Sprite loader
 	if (not customspritesexist) and customsprites then
 		for i = 1, #imgtable do
 			if initial or loadedcustomsprites[imgtable[i]] then
-				_G[imgtable[i]] = love.graphics.newImage("graphics/" .. graphicspack .. "/" .. string.gsub(string.gsub(imgtable[i], "img", ""), "image", "") .. ".png")
+				local imgdata = love.image.newImageData("graphics/" .. graphicspack .. "/" .. string.gsub(string.gsub(imgtable[i], "img", ""), "image", "") .. ".png")
+				_G[imgtable[i]] = love.graphics.newImage(imgdata)
+				_G[imgdatatable[i]] = imgdata
 				loadedcustomsprites[imgtable[i]] = nil
 			end
 		end
@@ -117,12 +126,16 @@ function loadcustomsprites(initial) --Sprite loader
 	customsprites = true
 	
 	for i = 1, #imgtable do
-		if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/custom/" .. string.gsub(string.gsub(imgtable[i], "img", ""), "image", "") .. ".png") then
-			_G[imgtable[i]] = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/custom/" .. string.gsub(string.gsub(imgtable[i], "img", ""), "image", "") .. ".png")
+		if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/custom/" .. string.gsub(string.gsub(imgtable[i], "img", ""), "image", "") .. ".png") then
+			local imgdata = love.image.newImageData(mappackfolder .. "/" .. mappack .. "/custom/" .. string.gsub(string.gsub(imgtable[i], "img", ""), "image", "") .. ".png")
+			_G[imgtable[i]] = love.graphics.newImage(imgdata)
+			_G[imgdatatable[i]] = imgdata
 			loadedcustomsprites[imgtable[i]] = true
 		else
 			if initial or loadedcustomsprites[imgtable[i]] then
-				_G[imgtable[i]] = love.graphics.newImage("graphics/" .. graphicspack .. "/" .. string.gsub(string.gsub(imgtable[i], "img", ""), "image", "") .. ".png")
+				local imgdata = love.image.newImageData("graphics/" .. graphicspack .. "/" .. string.gsub(string.gsub(imgtable[i], "img", ""), "image", "") .. ".png")
+				_G[imgtable[i]] = love.graphics.newImage(imgdata)
+				_G[imgdatatable[i]] = imgdata
 				loadedcustomsprites[imgtable[i]] = nil
 			end
 		end
@@ -172,10 +185,10 @@ function loadcustomsprites(initial) --Sprite loader
 	--fix old custom graphics
 	fixsprites()
 	
-	if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/custom/title.png") then
+	if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/custom/title.png") then
 		titleimage = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/custom/title.png")
 		titlewidth = titleimage:getWidth()
-		if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/custom/title.txt") then
+		if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/custom/title.txt") then
 			local s = love.filesystem.read(mappackfolder .. "/" .. mappack .. "/custom/title.txt")
 			local lines
 			if string.find(s, "\r\n") then
@@ -228,7 +241,7 @@ function loadcustomsprites(initial) --Sprite loader
 end
 
 function rgbaToInt(r,g,b,a)
-	return r*1000000000 + g+1000000 + b*1000 + a
+	return round(r*255)*1000000000 + round(g*255)*1000000 + round(b*255)*1000 + round(a*255)
 end
 
 function loaddebris()
@@ -242,18 +255,15 @@ function loaddebris()
 		end
 	end
 	--custom
-	if blockdebrisimage.getData then --TODO
-		local blockdebrisimgd = blockdebrisimage:getData()
-		for i = 2, math.floor(blockdebrisimage:getWidth()/17) do
-			local r, g, b, a = blockdebrisimgd:getPixel(i*17-1, 0)
-			--id of block debris is r,g,b,a
-			local name = rgbaToInt(r,g,b,a)
-			blockdebrisquads[name] = {}
-			for y = 1, 4 do
-				blockdebrisquads[name][y] = {}
-				for x = 1, 2 do
-					blockdebrisquads[name][y][x] = love.graphics.newQuad(17*(i-1)+(x-1)*8, (y-1)*8, 8, 8, blockdebrisimage:getWidth(), 32)
-				end
+	for i = 2, math.floor(blockdebrisimage_data:getWidth()/17) do
+		local r, g, b, a = blockdebrisimage_data:getPixel((i-1)*17, 0)
+		--id of block debris is r,g,b,a
+		local name = rgbaToInt(r,g,b,a)
+		blockdebrisquads[name] = {}
+		for y = 1, 4 do
+			blockdebrisquads[name][y] = {}
+			for x = 1, 2 do
+				blockdebrisquads[name][y][x] = love.graphics.newQuad(17*(i-1)+(x-1)*8, (y-1)*8, 8, 8, blockdebrisimage:getWidth(), 32)
 			end
 		end
 	end
@@ -1745,7 +1755,7 @@ function fixsprites(reset)
 		SPRITESfixfont = false
 	end
 	
-	if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/custom/smbtiles.png") and (not reset) then
+	if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/custom/smbtiles.png") and (not reset) then
 		customsmbtiles = true
 		loadtiles("smbcustom")
 		collectgarbage()
@@ -1755,7 +1765,7 @@ function fixsprites(reset)
 		customsmbtiles = false
 	end
 
-	if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/custom/entities.png") and (not reset) then
+	if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/custom/entities.png") and (not reset) then
 		loadtiles("entity")
 		customentityquads = true
 	elseif customentityquads then

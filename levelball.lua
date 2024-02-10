@@ -60,7 +60,7 @@ function levelball:update(dt)
 		else
 			love.graphics.setBackgroundColor(backgroundcolor[background])
 		end
-		if (not self.sound and self.finish > 6.9) or (self.sound and self.sound:isStopped()) then
+		if (not self.sound and self.finish > 6.9) or (self.sound and not self.sound:isPlaying()) then
 			--subtract score but it takes too long
 			if mariotime > 0 then
 				if subtractscore then

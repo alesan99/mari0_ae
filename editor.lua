@@ -101,13 +101,13 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	mtsavehighlighttime = 5
 	mtsavetimer = 0
 	mtjustsaved = false
-	mtsavecolors = {255, 112, 112, 128}
+	mtsavecolors = {1, 112/255, 112/255, .5}
 	pastingtiles = false
 	pastemode = 1
 	pastecenter = {0, 0}
 	mtclipboard = {} -- fill with x, y, tile
 	
-	tooltipa = -1000
+	tooltipa = -(1000/255)
 	
 	minimapscroll = 0
 	minimapx = 3
@@ -139,17 +139,17 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	selectiontoolselection = {}
 	
 	guielements["tabmain"] = guielement:new("button", 1, 1, TEXT["main"], maintab, 3)
-	guielements["tabmain"].fillcolor = {63, 63, 63}
+	guielements["tabmain"].fillcolor = {63/255, 63/255, 63/255}
 	guielements["tabtiles"] = guielement:new("button", guielements["tabmain"].x+guielements["tabmain"].width+10, 1, TEXT["tiles"], tilestab, 3)
-	guielements["tabtiles"].fillcolor = {63, 63, 63}
+	guielements["tabtiles"].fillcolor = {63/255, 63/255, 63/255}
 	guielements["tabtools"] = guielement:new("button", guielements["tabtiles"].x+guielements["tabtiles"].width+10, 1, TEXT["tools"], toolstab, 3)
-	guielements["tabtools"].fillcolor = {63, 63, 63}
+	guielements["tabtools"].fillcolor = {63/255, 63/255, 63/255}
 	guielements["tabmaps"] = guielement:new("button", guielements["tabtools"].x+guielements["tabtools"].width+10, 1, TEXT["maps"], mapstab, 3)
-	guielements["tabmaps"].fillcolor = {63, 63, 63}
+	guielements["tabmaps"].fillcolor = {63/255, 63/255, 63/255}
 	guielements["tabcustom"] = guielement:new("button", guielements["tabmaps"].x+guielements["tabmaps"].width+10, 1, TEXT["custom"], customtab, 3)
-	guielements["tabcustom"].fillcolor = {63, 63, 63}
+	guielements["tabcustom"].fillcolor = {63/255, 63/255, 63/255}
 	guielements["tabanimations"] = guielement:new("button", guielements["tabcustom"].x+guielements["tabcustom"].width+10, 1, TEXT["animations"], animationstab, 3)
-	guielements["tabanimations"].fillcolor = {63, 63, 63}
+	guielements["tabanimations"].fillcolor = {63/255, 63/255, 63/255}
 	
 	--MAIN
 	if android then
@@ -165,9 +165,9 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 		end
 	end
 	--guielements["backgrounddropdown"] = guielement:new("dropdown", 17, 85, 6, changebackground, background, "blue", "black", "water", "rgb")
-	guielements["backgroundinput1"] = guielement:new("input", 65, 78, 3, changebackgroundrgb, backgroundrgb[1], 3, nil, nil, 0)
-	guielements["backgroundinput2"] = guielement:new("input", 93, 78, 3, changebackgroundrgb, backgroundrgb[2], 3, nil, nil, 0)
-	guielements["backgroundinput3"] = guielement:new("input", 121, 78, 3, changebackgroundrgb, backgroundrgb[3], 3, nil, nil, 0)
+	guielements["backgroundinput1"] = guielement:new("input", 65, 78, 3, changebackgroundrgb, round(backgroundrgb[1]*255), 3, nil, nil, 0)
+	guielements["backgroundinput2"] = guielement:new("input", 93, 78, 3, changebackgroundrgb, round(backgroundrgb[2]*255), 3, nil, nil, 0)
+	guielements["backgroundinput3"] = guielement:new("input", 121, 78, 3, changebackgroundrgb, round(backgroundrgb[3]*255), 3, nil, nil, 0)
 	guielements["backgroundinput1"].numdrag = {0,255}
 	guielements["backgroundinput2"].numdrag = {0,255}
 	guielements["backgroundinput3"].numdrag = {0,255}
@@ -196,8 +196,8 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	guielements["menubutton"] = guielement:new("button", guielements["savebutton"].x+guielements["savebutton"].width+12, 200, TEXT["exit"], function() openconfirmmenu("exit") end, 2)
 	guielements["testbutton"] = guielement:new("button", guielements["menubutton"].x+guielements["menubutton"].width+12, 200, TEXT["test level"], test_level, 2)
 	guielements["testbuttonplayer"] = guielement:new("button", guielements["testbutton"].x+guielements["testbutton"].width+12, 200, TEXT["quick test"], function() test_level(objects["player"][1].x, objects["player"][1].y) end, 2)
-	guielements["savebutton"].bordercolor = {255, 0, 0}
-	guielements["savebutton"].bordercolorhigh = {255, 127, 127}
+	guielements["savebutton"].bordercolor = {1, 0, 0}
+	guielements["savebutton"].bordercolorhigh = {1, .5, .5}
 	
 	--guielements["levelpropertiesdropdown"] = guielement:new("dropdown", 200, 69, 20, function() end, 1, "level properties")
 	guielements["levelpropertiesdropdown"] = guielement:new("button", 200, 69, TEXT["level properties      ↓"], levelpropertiestoggle, 1)
@@ -266,17 +266,17 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	
 	--TOOLS
 	guielements["linkbutton"] = guielement:new("button", 5, 22, TEXT["link tool"], linkbutton, 2, false, 1, 120)
-	guielements["linkbutton"].bordercolor = {0, 255, 0}
-	guielements["linkbutton"].bordercolorhigh = {220, 255, 220}
+	guielements["linkbutton"].bordercolor = {0, 1, 0}
+	guielements["linkbutton"].bordercolorhigh = {220/255, 1, 220/255}
 	guielements["portalbutton"] = guielement:new("button", 5, 40, TEXT["portal gun"], portalbutton, 2, false, 1, 120)
-	guielements["portalbutton"].bordercolor = {0, 0, 255}
-	guielements["portalbutton"].bordercolorhigh = {127, 127, 255}
+	guielements["portalbutton"].bordercolor = {0, 0, 1}
+	guielements["portalbutton"].bordercolorhigh = {.5, .5, 1}
 	guielements["selectionbutton"] = guielement:new("button", 5, 58, TEXT["selection tool"], selectionbutton, 2, false, 1, 120)
-	guielements["selectionbutton"].bordercolor = {255, 106, 0}
-	guielements["selectionbutton"].bordercolorhigh = {255, 206, 127}
+	guielements["selectionbutton"].bordercolor = {1, 106/255, 0}
+	guielements["selectionbutton"].bordercolorhigh = {1, 206/255, .5}
 	guielements["powerlinebutton"] = guielement:new("button", 5, 76, TEXT["power line draw"], powerlinebutton, 2, false, 1, 120)
-	guielements["powerlinebutton"].bordercolor = {255, 216, 0}
-	guielements["powerlinebutton"].bordercolorhigh = {255, 255, 220}
+	guielements["powerlinebutton"].bordercolor = {1, 216/255, 0}
+	guielements["powerlinebutton"].bordercolorhigh = {1, 1, 220/255}
 	currenttooldesc = 1 --what description should be displayed for the buttons
 	
 	guielements["livesdecrease"] = guielement:new("button", 294, 104, "{", livesdecrease, 0)
@@ -294,8 +294,8 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	--MAPS
 	guielements["savebutton2"] = guielement:new("button", 300, 196, TEXT["save level"], guielements["savebutton"].func, 0, nil, 2.4, 94, true)
 	--guielements["autosavecheckbox"] = guielement:new("checkbox", 300, guielements["savebutton2"].y+16, function() autosave = not autosave; guielements["autosavecheckbox"].var = autosave end, autosave, TEXT["autosave"])
-	guielements["savebutton2"].bordercolor = {255, 0, 0}
-	guielements["savebutton2"].bordercolorhigh = {255, 127, 127}
+	guielements["savebutton2"].bordercolor = {1, 0, 0}
+	guielements["savebutton2"].bordercolorhigh = {1, .5, .5}
 	
 	guielements["worldscrollbar"] = guielement:new("scrollbar", 90, 20, 201, 11, 75, 0, "ver")
 	guielements["levelscrollbar"] = guielement:new("scrollbar", 383, 20, 173, 14, 60, oldlevelscrollbar or 0, "ver")
@@ -325,8 +325,8 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	guielements["exportimagetemplate"] = guielement:new("button", 184, 88, TEXT["export template"], exportcustomimage, 2)
 	guielements["openfoldercustom"] = guielement:new("button", 184, 105, TEXT["open folder"], opencustomimagefolder, 2)
 	guielements["saveimage"] = guielement:new("button", 176, 199, TEXT["update image"], savecustomimage, 2)
-	guielements["saveimage"].bordercolor = {255, 0, 0}
-	guielements["saveimage"].bordercolorhigh = {255, 127, 127}
+	guielements["saveimage"].bordercolor = {1, 0, 0}
+	guielements["saveimage"].bordercolorhigh = {1, .5, .5}
 	guielements["resetimage"] = guielement:new("button", guielements["saveimage"].x+guielements["saveimage"].width+8, 199, TEXT["reset"], resetcustomimage, 2)
 	
 	--custom tiles
@@ -347,8 +347,8 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	guielements["openfoldersoundscustom"] = guielement:new("button", 184, 105, TEXT["open folder"], opencustomimagefolder, 2, {"sounds"})
 	guielements["openfoldermusiccustom"] = guielement:new("button", 184, 164, TEXT["open folder"], opencustomimagefolder, 2, {"music"})
 	guielements["savesounds"] = guielement:new("button", 176, 199, TEXT["update sounds"], savecustomimage, 2)
-	guielements["savesounds"].bordercolor = {255, 0, 0}
-	guielements["savesounds"].bordercolorhigh = {255, 127, 127}
+	guielements["savesounds"].bordercolor = {1, 0, 0}
+	guielements["savesounds"].bordercolorhigh = {1, 127/255, 127/255}
 
 	--custom enemies
 	changecurrentenemy(1, true)
@@ -364,8 +364,8 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	
 	--custom text
 	guielements["savecustomtext"] = guielement:new("button", 10, 201, "save text", savecustomtext, 2)
-	guielements["savecustomtext"].bordercolor = {255, 0, 0}
-	guielements["savecustomtext"].bordercolorhigh = {255, 127, 127}
+	guielements["savecustomtext"].bordercolor = {1, 0, 0}
+	guielements["savecustomtext"].bordercolorhigh = {1, .5, .5}
 
 	guielements["hudtexttab"] = guielement:new("button", 10, 40, TEXT["hud"], texttabtab, 2, {"hud"})
 	guielements["endingtexttab"] = guielement:new("button", guielements["hudtexttab"].x+guielements["hudtexttab"].width+8, 40, TEXT["ending"], texttabtab, 2, {"ending"})
@@ -418,19 +418,19 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	end
 
 	addanimationtriggerbutton = guielement:new("button", 0, 0, "+", addanimationtrigger, nil, nil, nil, 8)
-	addanimationtriggerbutton.textcolor = {0, 200, 0}
+	addanimationtriggerbutton.textcolor = {0, 200/255, 0}
 	
 	addanimationconditionbutton = guielement:new("button", 0, 0, "+", addanimationcondition, nil, nil, nil, 8)
-	addanimationconditionbutton.textcolor = {0, 200, 0}
+	addanimationconditionbutton.textcolor = {0, 200/255, 0}
 	
 	addanimationactionbutton = guielement:new("button", 0, 0, "+", addanimationaction, nil, nil, nil, 8)
-	addanimationactionbutton.textcolor = {0, 200, 0}
+	addanimationactionbutton.textcolor = {0, 200/255, 0}
 	
 	--get current description and shit
 	local mappackname = ""
 	local mappackauthor = ""
 	local mappackdescription = ""
-	if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/settings.txt") then
+	if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/settings.txt") then
 		local data = love.filesystem.read(mappackfolder .. "/" .. mappack .. "/settings.txt")
 		local split1 = data:split("\n")
 		for i = 1, #split1 do
@@ -444,7 +444,7 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 			end
 		end
 	end
-	if love.filesystem.exists( mappackfolder .. "/" .. mappack .. "/icon.png" ) then
+	if love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/icon.png" ) then
 		editmappackicon = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/icon.png")
 	else
 		editmappackicon = nil
@@ -464,8 +464,8 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	guielements["editauthor"] = guielement:new("input", 5, 140, 13, nil, mappackauthor, 13)
 	guielements["editdescription"] = guielement:new("input", 5, 165, 17, nil, mappackdescription, 51, 3)
 	guielements["savesettings"] = guielement:new("button", 5, 203, TEXT["save settings"], savesettings, 2)
-	guielements["savesettings"].bordercolor = {255, 0, 0}
-	guielements["savesettings"].bordercolorhigh = {255, 127, 127}
+	guielements["savesettings"].bordercolor = {1, 0, 0}
+	guielements["savesettings"].bordercolorhigh = {1, .5, .5}
 	
 	confirmmenuopen = false
 	confirmmenuguisave = false
@@ -487,7 +487,7 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	end
 	
 	if PersistentEditorTools then
-		if PersistentEditorToolsLocal and (not editorsavedata) and love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/editorsave.json") then
+		if PersistentEditorToolsLocal and (not editorsavedata) and love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/editorsave.json") then
 			local data = love.filesystem.read(mappackfolder .. "/" .. mappack .. "/editorsave.json")
 			editorsavedata = JSON:decode(data)
 		end
@@ -1051,9 +1051,9 @@ function editor_update(dt)
 			
 			if tile and (tooltipimages[tile] or type(tile) == "string") then
 				entitytooltipobject:update(dt)
-				tooltipa = math.min(255, tooltipa + dt*4000)
+				tooltipa = math.min(1, tooltipa + dt*(4000/255))
 			else
-				tooltipa = math.max(-2000, tooltipa - dt*4000)
+				tooltipa = math.max(-(2000/255), tooltipa - dt*(4000/255))
 			end
 
 			prevtile = tile
@@ -1220,20 +1220,20 @@ function editor_update(dt)
 end
 
 function editor_draw()
-	love.graphics.setColor(255, 255, 255)
+	love.graphics.setColor(1, 1, 1)
 	
 	local mousex, mousey = love.mouse.getPosition()
 	
 	--EDITOR
 	if not editormenuopen then
 		if customrcopen and customrcopen == "trackpath" then
-			love.graphics.setColor(255, 255, 255, 200)
+			love.graphics.setColor(1, 1, 1, 200/255)
 			properprintF(TEXT["erase: click previous track\nchange ends: right click\nchange grabbing: right click"], 1*scale, (height*16-3*10)*scale)
 		elseif tileselection and tileselection.finished then
-			love.graphics.setColor(255, 255, 255, 200)
+			love.graphics.setColor(1, 1, 1, 200/255)
 			properprintF(TEXT["move:left click\ncopy:ctrl+c\npaste:ctrl+v\ncut:ctrl+x\ndelete:backspace/delete\nsave as object:ctrl+s"], 1*scale, (height*16-6*10)*scale)
 		elseif ctrlpressed and not love.mouse.isDown("l") then
-			love.graphics.setColor(255, 255, 255, 200)
+			love.graphics.setColor(1, 1, 1, 200/255)
 			properprintF(TEXT["undo:ctrl+z\ntile selection:left click\nentity selection:ctrl+e\nselect entire map:ctrl+a"], 1*scale, (height*16-4*10)*scale)
 		elseif backgroundtilemode or assistmode or editorstate == "linktool" or editorstate == "portalgun" or editorstate == "selectiontool" or editorstate == "powerline" then
 			local s
@@ -1250,11 +1250,11 @@ function editor_draw()
 			elseif editorstate == "powerline" then
 				s = TEXT["power line draw"]
 			end
-			love.graphics.setColor(0, 0, 0, 120)
+			love.graphics.setColor(0, 0, 0, 120/255)
 			properprintF(s, 3*scale, 211*scale)
-			love.graphics.setColor(255, 255, 255, 180)
+			love.graphics.setColor(1, 1, 1, 180/255)
 			properprintF(s, 2*scale, 210*scale)
-			love.graphics.setColor(255, 255, 255, 255)
+			love.graphics.setColor(1, 1, 1, 1)
 		end
 		
 		--links!
@@ -1282,24 +1282,24 @@ function editor_draw()
 							local printlabels = false
 							
 							if (rightclickmenuopen and x == rightclickmenucox and y == rightclickmenucoy) then
-								love.graphics.setColor(0, 255, 0, 150)
+								love.graphics.setColor(0, 1, 0, 150/255)
 							elseif (cox == x and coy == y and (not love.mouse.isDown("l"))) then
-								love.graphics.setColor(0, 255, 0, 255)
+								love.graphics.setColor(0, 1, 0, 1)
 								if tablecontains(r, "link")  then
 									drawline = true
 									printlabels = true
 								end
 							elseif tablecontains(r, "link") then
-								love.graphics.setColor(150, 255, 150, 100)
+								love.graphics.setColor(150/255, 1, 150/255, 100/255)
 								drawline = true
 							elseif tablecontains(outputsi, map[x][y][2]) and cox == x and coy == y and linktoolX and love.mouse.isDown("l") then
-								love.graphics.setColor(255, 255, 0, 255)
+								love.graphics.setColor(1, 1, 0, 1)
 							elseif tablecontains(outputsi, map[x][y][2]) then
-								love.graphics.setColor(255, 255, 150, 150)
+								love.graphics.setColor(1, 1, 150/255, 150/255)
 							elseif cox == x and coy == y and not love.mouse.isDown("l") then
-								love.graphics.setColor(255, 0, 0, 255)
+								love.graphics.setColor(1, 0, 0, 1)
 							else
-								love.graphics.setColor(255, 150, 150, 150)
+								love.graphics.setColor(1, 150/255, 150/255, 150/255)
 							end
 							love.graphics.rectangle("fill", math.floor((x-splitxscroll[1]-1)*16*scale), ((y-splityscroll[1]-1)*16-8)*scale, 16*scale, 16*scale)
 							
@@ -1328,12 +1328,12 @@ function editor_draw()
 								
 								for i = 1, #drawtable do
 									local x1, y1, x2, y2, t = unpack(drawtable[i])
-									love.graphics.setColor(127, 127, 255*(i/#drawtable), 255)
+									love.graphics.setColor(.5, .5, i/#drawtable, 1)
 									
 									love.graphics.line(x1, y1, x2, y2)
 									
 									if printlabels then
-										properprintFbackground(t, math.floor(x2-string.len(t)*4*scale), y2+10*scale)--, {0, 0, 0, 255}) --why would the text be black? wtf, {0, 0, 0, 255})
+										properprintFbackground(t, math.floor(x2-string.len(t)*4*scale), y2+10*scale)--, {0, 0, 0, 1}) --why would the text be black? wtf, {0, 0, 0, 1})
 									end
 								end
 							end
@@ -1351,7 +1351,7 @@ function editor_draw()
 					if t[1] then
 						local platwidth = math.floor((rightclickobjects[8].value*9+1)*2)/2
 						local x, y = rightclickmenucox, rightclickmenucoy
-						love.graphics.setColor(255, 255, 255, 200)
+						love.graphics.setColor(1, 1, 1, 200/255)
 						love.graphics.draw(seesawimg, seesawquad[spriteset][1], math.floor((x-1-xscroll)*16*scale), (y-1.5-yscroll)*16*scale, 0, scale, scale)
 						love.graphics.draw(seesawimg, seesawquad[spriteset][2], math.floor((x-1+t[1]-xscroll)*16*scale), (y-1.5-yscroll)*16*scale, 0, scale, scale)
 						for i = 1, t[1]-1 do
@@ -1405,15 +1405,15 @@ function editor_draw()
 							elseif i == platwidth then
 								q = 3
 							end
-							love.graphics.setColor(255,255,255,255)
+							love.graphics.setColor(1,1,1,1)
 							love.graphics.draw(platformimg, platformquad[q], math.floor((x+i-2-xscroll+offx)*16*scale), math.floor((y-yscroll-23/16+offy)*16*scale), 0, scale, scale)
-							love.graphics.setColor(255,255,255,100)
+							love.graphics.setColor(1,1,1,100/255)
 							love.graphics.draw(platformimg, platformquad[q], math.floor((x+dx+i-2-xscroll+offx)*16*scale), math.floor((y+dy-yscroll-23/16+offy)*16*scale), 0, scale, scale)
 						end
 						if math.ceil(platwidth) ~= platwidth then
-							love.graphics.setColor(255,255,255,255)
+							love.graphics.setColor(1,1,1,1)
 							love.graphics.draw(platformimg, platformquad[3], math.floor((x+platwidth-2-xscroll+offx)*16*scale), math.floor((y-yscroll-23/16+offy)*16*scale), 0, scale, scale)
-							love.graphics.setColor(255,255,255,100)
+							love.graphics.setColor(1,1,1,100/255)
 							love.graphics.draw(platformimg, platformquad[3], math.floor((x+dx+platwidth-2-xscroll+offx)*16*scale), math.floor((y+dy-yscroll-23/16+offy)*16*scale), 0, scale, scale)
 						end
 					end
@@ -1430,9 +1430,9 @@ function editor_draw()
 
 						local transparent = false
 						while (t[4] == "down" and y+offy < mapheight+0.5) or (t[4] == "up" and y+offy > 0) do
-							love.graphics.setColor(255,255,255,255)
+							love.graphics.setColor(1, 1, 1, 1)
 							if transparent then
-								love.graphics.setColor(255, 255, 255, 100)
+								love.graphics.setColor(1, 1, 1, 100/255)
 							end
 							for i = 1, platwidth do
 								local q = 2
@@ -1469,7 +1469,7 @@ function editor_draw()
 						ox = -1
 						qi = 2
 					end
-					love.graphics.setColor(255, 255, 255, 200)
+					love.graphics.setColor(1, 1, 1, 200/255)
 					love.graphics.draw(bowserimg, bowserquad[qi][1][1], math.floor((x+ox-xscroll)*16*scale), (y-2.5-yscroll+1/16)*16*scale, 0, scale, scale)
 				elseif customrcopen == "text" then
 					if rightclickvalues2[1] then
@@ -1515,13 +1515,13 @@ function editor_draw()
 							y = tonumber(s[3])
 							tile = tonumber(command:sub(s2+4, -1))
 						end
-						love.graphics.setColor(255,255,255,150)
+						love.graphics.setColor(1, 1, 1, 150/255)
 						local tx, ty = getMouseTile(mousex, mousey+8*screenzoom*scale)
 						properprint(tx .. "-" .. ty, mousex, mousey)
 					end
 					--tile tool preview selection
 					if tile and tilequads[tile] then
-						love.graphics.setColor(255, 255, 255, 150)
+						love.graphics.setColor(1, 1, 1, 150/255)
 						if mod then
 							love.graphics.draw(tilequads[tile].image, tilequads[tile].quad, math.floor((x-xscroll-1)*16*scale), math.floor(((y-yscroll-2)*16+8)*scale), 0, scale, scale)
 						else
@@ -1560,7 +1560,7 @@ function editor_draw()
 						table.insert(pointstable, ((y+yoffset)-yscroll-.5)*16*scale)
 					until y+yoffset > yscroll+height+.5
 					
-					love.graphics.setColor(62, 213, 244, 160)
+					love.graphics.setColor(62/255, 213/255, 244/255, 160/255)
 					love.graphics.setLineWidth(3)
 					love.graphics.line(pointstable)
 				elseif customrcopen == "snakeblock" then
@@ -1647,7 +1647,7 @@ function editor_draw()
 						end
 					end
 				elseif customrcopen == "trackpath" then
-					love.graphics.setColor(255,255,255)
+					love.graphics.setColor(1, 1, 1)
 					local rcp = rightclicktrack
 					local lx, ly = rcp.last[1], rcp.last[2]--last pos
 					for i = 1, #rcp.path do
@@ -1693,15 +1693,15 @@ function editor_draw()
 								end
 								local cox, coy = getMouseTile(mousex, mousey+8*screenzoom*scale)
 								if (cox == tx and coy == ty and not trackrightclickmenu.active) or (trackrightclickmenu.active and trackrightclickmenustage == i) then
-									love.graphics.setColor(255,216,0,255)
+									love.graphics.setColor(1,216/255,0,1)
 								end
 								love.graphics.draw(trackmarkerimg, trackmarkerquad[quadi], math.floor(((tx-xscroll-.5)*16)*scale), math.floor(((ty-yscroll-1)*16)*scale), r, scale, scale, 8, 8)
-								love.graphics.setColor(255,255,255)
+								love.graphics.setColor(1,1,1)
 							end
 						end
 					end
 					--next track
-					love.graphics.setColor(255,216,0,150)
+					love.graphics.setColor(1,216/255,0,150/255)
 					local left, right, up, down, leftup, leftdown, rightup, rightdown = true,true,true,true,true,true,true,true
 					for i = #rcp.path, 1, -1 do
 						--check overlap
@@ -1747,9 +1747,9 @@ function editor_draw()
 								if inmap(x, y) and #map[x][y] > 1 and map[x][y][2] == v then							
 									local r = map[x][y]
 									if tablecontains(outputsi, map[x][y][2]) then
-										love.graphics.setColor(255, 255, 150, 150)
+										love.graphics.setColor(1, 1, 150/255, 150/255)
 									else
-										love.graphics.setColor(255, 150, 150, 150)
+										love.graphics.setColor(1, 150/255, 150/255, 150/255)
 									end
 									love.graphics.rectangle("fill", math.floor((x-splitxscroll[1]-1)*16*scale), ((y-splityscroll[1]-1)*16-8)*scale, 16*scale, 16*scale)
 								end
@@ -1757,11 +1757,11 @@ function editor_draw()
 						end
 					end
 					
-					love.graphics.setColor(255, 172, 47, 255)
+					love.graphics.setColor(1, 172/255, 47/255, 1)
 					
 					drawlinkline(x1, y1, x2, y2)
 					
-					love.graphics.setColor(200, 140, 30, 255)
+					love.graphics.setColor(200/255, 140/255, 30/255, 1)
 					
 					love.graphics.draw(linktoolpointerimg, x2-math.ceil(scale/2), y2, 0, scale, scale, 3, 3)
 					
@@ -1789,7 +1789,7 @@ function editor_draw()
 					
 					for i = 1, #drawtable do
 						local x1, y1, x2, y2, t = unpack(drawtable[i])
-						love.graphics.setColor(127, 127, 255*(i/#drawtable), 255)
+						love.graphics.setColor(.5, .5, i/#drawtable, 1)
 						
 						if math.fmod(i, 2) == 0 then
 							drawlinkline2(x1, y1, x2, y2)
@@ -1797,14 +1797,14 @@ function editor_draw()
 							drawlinkline(x1, y1, x2, y2)
 						end
 						
-						properprintFbackground(t, math.floor(x2-string.len(t)*4*scale), y2+10*scale, true)--, {0, 0, 0, 255}) --why would the text be black? wtf
+						properprintFbackground(t, math.floor(x2-string.len(t)*4*scale), y2+10*scale, true)--, {0, 0, 0, 1}) --why would the text be black? wtf
 					end
 					
 					--draw actual menu
-					love.graphics.setColor(10, 10, 10, 190)
+					love.graphics.setColor(10/255, 10/255, 10/255, 190/255)
 					love.graphics.rectangle("fill", rightclickobjects.x*scale, rightclickobjects.y*scale, rightclickobjects.width*scale, rightclickobjects.height*scale)
 					--draw them bottom to top to make drop-downs work
-					love.graphics.setColor(255, 255, 255)
+					love.graphics.setColor(1, 1, 1)
 					local ontop = {} --drop ups drawn on top
 					for i = #rightclickobjects, 1, -1  do
 						local obj = rightclickobjects[i]
@@ -1837,28 +1837,28 @@ function editor_draw()
 								--w = tonumber(w)
 								local tilei = w[1]
 								if tilei == 1 and pastemode == 1 then
-									love.graphics.setColor(255, 255, 255, 8)
+									love.graphics.setColor(1, 1, 1, 8/255)
 									love.graphics.draw(tilequads[tilei].image, tilequads[tilei].quad, math.floor((x-splitxscroll[1]-1 + pastecenter[1])*16*scale)+(i-1)*16*scale, ((y-splityscroll[1]-1 + pastecenter[2])*16+8)*scale+((j-1)*16*scale), 0, scale, scale)
 								else
-									love.graphics.setColor(255, 255, 255, 72)
+									love.graphics.setColor(1, 1, 1, 72/255)
 									love.graphics.draw(tilequads[tilei].image, tilequads[tilei].quad, math.floor((x-splitxscroll[1]-1 + pastecenter[1])*16*scale)+(i-1)*16*scale, ((y-splityscroll[1]-1 + pastecenter[2])*16+8)*scale+((j-1)*16*scale), 0, scale, scale)
 								end
 								local entityi = w[2]
 								if entityi and type(w[2]) == "number" then
-									love.graphics.setColor(255, 255, 255, 72)
+									love.graphics.setColor(1, 1, 1, 72/255)
 									love.graphics.draw(entityquads[entityi].image, entityquads[entityi].quad, math.floor((x-splitxscroll[1]-1 + pastecenter[1])*16*scale)+(i-1)*16*scale, ((y-splityscroll[1]-1 + pastecenter[2])*16+8)*scale+((j-1)*16*scale), 0, scale, scale)
 								end
 							end
 						end
 					--end
 					if android then
-						love.graphics.setColor(255, 255, 255, 200)
+						love.graphics.setColor(1, 1, 1, 200/255)
 						love.graphics.setLineWidth(1*scale)
 						love.graphics.rectangle("line",math.floor((x-splitxscroll[1]-1)*16*scale), math.floor(((y-splityscroll[1]-1)*16+8)*scale), 16*scale, 16*scale)
 					end
 				end
 			
-				love.graphics.setColor(255, 255, 255, 200)
+				love.graphics.setColor(1, 1, 1, 200/255)
 				if tileselection or ctrlpressed or tileselectionmoving then
 					local x1, y1 = x, y+1
 					local x2, y2 = x, y+1
@@ -1872,9 +1872,9 @@ function editor_draw()
 					x1, y1 = math.max(xscroll-1, x1), math.max(yscroll-1, y1)
 					x2, y2 = math.min(xscroll+width*screenzoom2+1, x2), math.min(yscroll+height*screenzoom2+1, y2)
 					local sx, sy, sw, sh = x1-1, y1-1, x2-x1+1, y2-y1+1
-					love.graphics.setColor(0, 131, 255, 45)
+					love.graphics.setColor(0, 131/255, 1, 45/255)
 					love.graphics.rectangle("fill", ((sx-xscroll)*16)*scale,((sy-yscroll)*16-8)*scale, sw*16*scale, sh*16*scale)
-					love.graphics.setColor(255,255,255)
+					love.graphics.setColor(1, 1, 1)
 					love.graphics.stencil(function() 
 						love.graphics.setLineWidth(scale)
 						love.graphics.rectangle("line", (math.floor((sx-xscroll)*16)+.5)*scale, (math.floor((sy-yscroll)*16)-8+.5)*scale, (sw*16-1)*scale, (sh*16-1)*scale) end, "increment")
@@ -1898,7 +1898,7 @@ function editor_draw()
 					end
 					if editortilemousescroll and (brushsizex <= 1 and brushsizey <= 1) then
 						for i = 1, 2 do
-							love.graphics.setColor(255, 255, 255, 200-(i*70))
+							love.graphics.setColor(1, 1, 1, (200-(i*70))/255)
 							if currenttile - i >= 1 then
 								if currenttile - i >= 89996 and currenttile - i < 90001 then
 								else
@@ -1907,7 +1907,7 @@ function editor_draw()
 							end
 						end
 						for i = 1, 2 do
-							love.graphics.setColor(255, 255, 255, 200-(i*70))
+							love.graphics.setColor(1, 1, 1, (200-(i*70))/255)
 							if (currenttile + i > smbtilecount+portaltilecount+customtilecount and currenttile + i < 90000) or (currenttile + i > animatedtilecount+90000 and currenttile + i > 89996) then
 							else
 								love.graphics.draw(tilequads[currenttile+i].image, tilequads[currenttile+i].quad, math.floor((x-splitxscroll[1]-1)*16*scale), math.floor(((y-splityscroll[1]-1)*16+8+((i*16)+i))*scale), 0, scale, scale)
@@ -1918,7 +1918,7 @@ function editor_draw()
 							for yl = 1, brushsizey do
 								if yl == 1 and xl == 1 then
 								else
-									love.graphics.setColor(255, 255, 255, 200)	
+									love.graphics.setColor(1, 1, 1, 200/255)
 									love.graphics.draw(tilequads[currenttile].image, tilequads[currenttile].quad, math.floor((x-splitxscroll[1]-1+xl-1)*16*scale), math.floor(((y-splityscroll[1]-1+yl-1)*16+8)*scale), 0, scale, scale)
 								end
 							end
@@ -1930,7 +1930,7 @@ function editor_draw()
 						for x = math.floor(xscroll)+1, math.min(mapwidth, math.floor(xscroll+width)+1) do
 							for y = math.floor(yscroll)+1, math.min(mapheight, math.floor(yscroll+height)+1) do
 								if onscreen(x-1, y-1, 1, 1) and ontile == map[x][y][1] then
-									love.graphics.setColor(255, 255, 255, 200)
+									love.graphics.setColor(1, 1, 1, 200/255)
 									love.graphics.draw(tilequads[currenttile].image, tilequads[currenttile].quad, math.floor((x-splitxscroll[1]-1)*16*scale), math.floor(((y-splityscroll[1]-2)*16+8)*scale), 0, scale, scale)
 								end
 							end
@@ -1944,7 +1944,7 @@ function editor_draw()
 						for i, t in pairs(replacetiles) do
 							local x, y = t[1], t[2]
 							--if onscreen(x-1, y-1, 1, 1) then
-								love.graphics.setColor(255, 255, 255, 200)
+								love.graphics.setColor(1, 1, 1, 200/255)
 								love.graphics.draw(tilequads[currenttile].image, tilequads[currenttile].quad, math.floor((x-splitxscroll[1]-1)*16*scale), math.floor(((y-splityscroll[1]-2)*16+8)*scale), 0, scale, scale)
 							--end
 						end
@@ -1988,26 +1988,26 @@ function editor_draw()
 						if type(editortilemousescroll) == "table" then
 							local t = editortilemousescroll
 							for i = 1, 2 do
-								love.graphics.setColor(255, 255, 255, 200-(i*70))
+								love.graphics.setColor(1, 1, 1, (200-(i*70))/255)
 								if tonumber(t[i]) and t[i] > 0 then
 									love.graphics.draw(entityquads[t[i]].image, entityquads[t[i]].quad, math.floor((x-splitxscroll[1]-1)*16*scale), math.floor(((y-splityscroll[1]-1)*16+8-((i*16)+i))*scale), 0, scale, scale)
 								end
 							end
 							for i = 1, 2 do
-								love.graphics.setColor(255, 255, 255, 200-(i*70))
+								love.graphics.setColor(1, 1, 1, (200-(i*70))/255)
 								if tonumber(t[2+i]) and t[2+i] > 0 then
 									love.graphics.draw(entityquads[t[2+i]].image, entityquads[t[2+i]].quad, math.floor((x-splitxscroll[1]-1)*16*scale), math.floor(((y-splityscroll[1]-1)*16+8+((i*16)+i))*scale), 0, scale, scale)
 								end
 							end
 						elseif type(currenttile) == "number" then
 							for i = 1, 2 do
-								love.graphics.setColor(255, 255, 255, 200-(i*70))
+								love.graphics.setColor(1, 1, 1, (200-(i*70))/255)
 								if currenttile - i > 0 then
 									love.graphics.draw(entityquads[currenttile-i].image, entityquads[currenttile-i].quad, math.floor((x-splitxscroll[1]-1)*16*scale), math.floor(((y-splityscroll[1]-1)*16+8-((i*16)+i))*scale), 0, scale, scale)
 								end
 							end
 							for i = 1, 2 do
-								love.graphics.setColor(255, 255, 255, 200-(i*70))
+								love.graphics.setColor(1, 1, 1, (200-(i*70))/255)
 								if currenttile + i < #entitylist then
 									love.graphics.draw(entityquads[currenttile+i].image, entityquads[currenttile+i].quad, math.floor((x-splitxscroll[1]-1)*16*scale), math.floor(((y-splityscroll[1]-1)*16+8+((i*16)+i))*scale), 0, scale, scale)
 								end
@@ -2026,7 +2026,7 @@ function editor_draw()
 										love.graphics.draw(v.graphic, v.quad, math.floor((x-splitxscroll[1]-1+xl-1)*16*scale+xoff), math.floor(((y-splityscroll[1]-1+yl-1)*16+16)*scale+yoff), 0, scale, scale)
 									end
 								else
-									love.graphics.setColor(255, 255, 255, 200)	
+									love.graphics.setColor(1, 1, 1, 200/255)
 									love.graphics.draw(entityquads[currenttile].image, entityquads[currenttile].quad, math.floor((x-splitxscroll[1]-1+xl-1)*16*scale), math.floor(((y-splityscroll[1]-1+yl-1)*16+8)*scale), 0, scale, scale)
 								end
 							end
@@ -2038,9 +2038,9 @@ function editor_draw()
 		end
 		
 		if assistmode and not editormenuopen then --quickmenu
-			love.graphics.setColor(0, 0, 0, 110)
+			love.graphics.setColor(0, 0, 0, 110/255)
 			love.graphics.rectangle("fill", ((width*8)-30)*scale, (quickmenuy-7)*scale, 60*scale, 7*scale)
-			love.graphics.setColor(255, 255, 255, 200)
+			love.graphics.setColor(1, 1, 1, 200/255)
 			
 			if quickmenuopen then
 				love.graphics.draw(quickmenuarrowimg, ((width*8)-3)*scale, (quickmenuy-1)*scale, 0, scale, -scale)
@@ -2049,15 +2049,15 @@ function editor_draw()
 			end
 			
 			if quickmenuy ~= quickmenuclosedy then
-				love.graphics.setColor(0, 0, 0, 180)
+				love.graphics.setColor(0, 0, 0, 180/255)
 				love.graphics.rectangle("fill", ((width*8)-((#latesttiles*24)/2))*scale, (quickmenuy)*scale, (#latesttiles*24)*scale, 24*scale)
 				
-				love.graphics.setColor(0, 0, 0, 200)
+				love.graphics.setColor(0, 0, 0, 200/255)
 				love.graphics.rectangle("fill", ((width*8)-((#latesttiles*24)/2)+47)*scale,  (quickmenuy+2)*scale, 2*scale, 20*scale)
 				
 				for i = 1, #latesttiles do
 					local t = latesttiles[i]
-					love.graphics.setColor(255, 255, 255, 255)
+					love.graphics.setColor(1, 1, 1, 1)
 					local x = (((width*8)-((#latesttiles*24)/2))+(24*(i-1))+4)
 					if t[1] == 1 and tilequads[t[2]] then
 						love.graphics.draw(tilequads[t[2]].image, tilequads[t[2]].quad, x*scale, (quickmenuy+4)*scale, 0, scale, scale)
@@ -2078,13 +2078,13 @@ function editor_draw()
 						end
 					end
 					if quickmenusel == i then
-						love.graphics.setColor(255, 255, 255, 127)
+						love.graphics.setColor(1, 1, 1, .5)
 						love.graphics.rectangle("fill", x*scale, (quickmenuy+4)*scale, 16*scale, 16*scale)
 					end
 				end
 			end
 			
-			love.graphics.setColor(255, 255, 255, 255)
+			love.graphics.setColor(1, 1, 1, 1)
 		end
 		if editorstate == "selectiontool" then
 			if selectiontoolclick[1][1] and selectiontoolclick[1][2] then
@@ -2094,7 +2094,7 @@ function editor_draw()
 				
 				love.graphics.setLineStyle("smooth")
 			elseif #selectiontoolselection > 0 and not rightclickmenuopen then
-				love.graphics.setColor(255, 255, 255, 120)
+				love.graphics.setColor(1, 1, 1, 120/255)
 				for i, t in pairs(selectiontoolselection) do
 					local x, y = t[1], t[2]
 					love.graphics.rectangle("fill", math.floor((x-splitxscroll[1]-1)*16*scale), ((y-splityscroll[1]-1)*16-8)*scale, 16*scale, 16*scale)
@@ -2102,7 +2102,7 @@ function editor_draw()
 			end
 		end
 		if love.keyboard.isDown("lalt") then
-			love.graphics.setColor(255, 255, 255, 120)
+			love.graphics.setColor(1, 1, 1, 120/255)
 			local tx, ty = getMouseTile(mousex, mousey+8*scale)
 			properprint(tx .. "-" .. ty, mousex, mousey)
 			-- .. " " .. tilemap(tx, ty)
@@ -2134,7 +2134,7 @@ function editor_draw()
 		
 		local mapx, mapy = (width*16 - w)/2, (height*16 - h)/2
 		
-		love.graphics.setColor(0, 0, 0, 200)
+		love.graphics.setColor(0, 0, 0, 200/255)
 		love.graphics.rectangle("fill", (mapx-2)*scale, (mapy-2)*scale, (w+4)*scale, (h+4)*scale)
 		
 		--minimap
@@ -2157,12 +2157,12 @@ function editor_draw()
 			end
 		end
 		
-		love.graphics.setColor(255, 0, 0, 255)
+		love.graphics.setColor(1, 0, 0, 1)
 		drawrectangle(mapx-1, mapy-1, w+2, h+2)
 		
 		--resizing stuff
 		if changemapwidthmenu then
-			love.graphics.setColor(255, 255, 255)
+			love.graphics.setColor(1, 1, 1)
 			properprintFbackground(TEXT["old width: "] .. mapwidth, 26*scale, (mapy-21)*scale, true)
 			properprintFbackground(TEXT["old height: "] .. mapheight, 26*scale, (mapy-11)*scale, true)
 			
@@ -2197,16 +2197,16 @@ function editor_draw()
 			guielements["mapwidthapply"]:draw()
 			guielements["mapwidthcancel"]:draw()
 		else --just moving camera
-			love.graphics.setColor(255,0,0)
+			love.graphics.setColor(1,0,0)
 			love.graphics.rectangle("line", (mapx+(xscroll+nmox)*s)*scale, (mapy+(yscroll+nmoy+.5)*s)*scale, width*s*scale, height*s*scale)
-			love.graphics.setColor(255,255,255)
+			love.graphics.setColor(1,1,1)
 			properprintFbackground(TEXT["toggle minimap with m"], 8*scale, (height*16-16)*scale)
 		end
 	else
 		if editorstate == "maps" then
-			love.graphics.setColor(0, 0, 0, 100)
+			love.graphics.setColor(0, 0, 0, 100/255)
 		else
-			love.graphics.setColor(0, 0, 0, 230)
+			love.graphics.setColor(0, 0, 0, 230/255)
 		end
 		
 		if not minimapdragging then
@@ -2222,9 +2222,9 @@ function editor_draw()
 		guielements["tabcustom"]:draw()
 		guielements["tabanimations"]:draw()
 		
-		if editorstate == "tiles" then			
+		if editorstate == "tiles" then
 			--TILES
-			love.graphics.setColor(255, 255, 255)
+			love.graphics.setColor(1, 1, 1)
 			
 			--properprint("tilelist", 3*scale, 24*scale)
 			guielements["tilesall"]:draw()
@@ -2247,18 +2247,18 @@ function editor_draw()
 				if #multitileobjects > 0 then
 					for i = 1, #multitileobjects do
 						if i < 10 then
-							love.graphics.setColor(127, 127, 127, 255)
+							love.graphics.setColor(.5, .5, .5, 1)
 							love.graphics.rectangle("fill", 6*scale, math.floor(i-1)*17*scale+39*scale-tilesoffset, 14*scale, 14*scale)
-							love.graphics.setColor(0, 0, 0, 255)
+							love.graphics.setColor(0, 0, 0, 1)
 							love.graphics.rectangle("fill", 7*scale, math.floor(i-1)*17*scale+39*scale-tilesoffset+1*scale, 14*scale-2*scale, 14*scale-2*scale)
-							love.graphics.setColor(255, 255, 255, 255)
+							love.graphics.setColor(1, 1, 1, 1)
 							properprint(i .. " " .. multitileobjectnames[i], 8*scale, math.floor(i-1)*17*scale+42*scale-tilesoffset)
 						else
 							properprint(multitileobjectnames[i], 8*scale, math.floor(i-1)*17*scale+42*scale-tilesoffset)
 						end
 					end
 				else
-					love.graphics.setColor(255, 255, 255)
+					love.graphics.setColor(1, 1, 1)
 					properprintF(TEXT["no objects saved"], (194-utf8.len(TEXT["no objects saved"])*4)*scale, 52*scale)
 					properprintF(TEXT["press ctrl in map to save tile selection"], (194-utf8.len(TEXT["press ctrl in map to save tile selection"])*4)*scale, 62*scale)
 					properprintF(TEXT["as an object"], (194-utf8.len(TEXT["as an object"])*4)*scale, 72*scale)
@@ -2286,20 +2286,20 @@ function editor_draw()
 				--nice and organized entities
 				for list = 1, #entitiesform do
 					if entitiesform[list].hidden then
-						love.graphics.setColor(127, 127, 127)
+						love.graphics.setColor(.5, .5, .5)
 						properprint("+", (368)*scale, (40+entitiesform[list].y-10)*scale-tilesoffset)
 					else
-						love.graphics.setColor(255, 255, 255)
+						love.graphics.setColor(1, 1, 1)
 						properprint("-", (367)*scale, (40+entitiesform[list].y-10)*scale-tilesoffset)
 					end
 					properprintF(TEXT[entitiesform[list].name], (5)*scale, (40+entitiesform[list].y-10)*scale-tilesoffset)
-					love.graphics.setColor(255, 255, 255)
+					love.graphics.setColor(1, 1, 1)
 					if not entitiesform[list].hidden then
 						for i = 1, #entitiesform[list] do
 							local t = entitiesform[list][i]
 							local x = math.fmod((i-1), 22)*17*scale+5*scale
 							local y = (math.floor((i-1)/22)*17*scale+(39+entitiesform[list].y)*scale)
-							love.graphics.setColor(255, 255, 255)
+							love.graphics.setColor(1, 1, 1)
 							if tonumber(t) then
 								love.graphics.draw(entityquads[t].image, entityquads[t].quad, x, y-tilesoffset, 0, scale, scale)
 							else
@@ -2327,7 +2327,7 @@ function editor_draw()
 						end
 					end
 				end
-				love.graphics.setColor(255, 255, 255)
+				love.graphics.setColor(1, 1, 1)
 			end
 			
 			local mtbutton
@@ -2338,7 +2338,7 @@ function editor_draw()
 					local t = tilestampselection
 
 					love.graphics.setLineWidth(2*scale)
-					love.graphics.setColor(255, 255, 255, 127)
+					love.graphics.setColor(1, 1, 1, .5)
 					love.graphics.rectangle("line", t.mx, t.my, mousex-t.mx, mousey-t.my)
 
 					local x1, y1, x2, y2 = t.x, t.y, mousex, mousey
@@ -2358,14 +2358,14 @@ function editor_draw()
 						for ty = 1, math.ceil((y2-y1)/(17*scale)) do
 							local tile = gettilelistpos(x1+(17*scale)*(tx-1), y1+(17*scale)*(ty-1))
 							if tile and tile <= tilelistcount+1 then
-								love.graphics.setColor(255, 255, 255, 127)
+								love.graphics.setColor(1, 1, 1, .5)
 								love.graphics.rectangle("fill", (5+math.fmod((tile-1), 22)*17)*scale, (38+math.floor((tile-1)/22)*17)*scale-tilesoffset, 16*scale, 16*scale)
 							end
 						end
 					end
 				else
 					if tile and tile <= tilelistcount+1 then
-						love.graphics.setColor(255, 255, 255, 127)
+						love.graphics.setColor(1, 1, 1, .5)
 						love.graphics.rectangle("fill", (5+math.fmod((tile-1), 22)*17)*scale, (38+math.floor((tile-1)/22)*17)*scale-tilesoffset, 16*scale, 16*scale)
 					end
 				end
@@ -2374,18 +2374,18 @@ function editor_draw()
 					entry = getlistpos(mousex, mousey)
 					mtbutton = getmtbutton(mousex) -- 0 1 2 3 = nobutton up down delete
 					if entry and entry <= #multitileobjects-1 then
-						love.graphics.setColor(255, 255, 255, 64)
+						love.graphics.setColor(1, 1, 1, 64/255)
 						love.graphics.rectangle("fill", 5*scale, (38+math.floor((tile-1)/22)*17)*scale-tilesoffset, 373*scale, 16*scale)
 						--buttons
 						for i = 1, 3 do
-							if mtbutton == i then love.graphics.setColor(255, 255, 255, 255)
-							else love.graphics.setColor(127, 127, 127, 255) end
+							if mtbutton == i then love.graphics.setColor(1, 1, 1, 1)
+							else love.graphics.setColor(.5, .5, .5, 1) end
 							love.graphics.rectangle("fill", (333+15*(i-1))*scale, (39+math.floor((tile-1)/22)*17)*scale-tilesoffset, 14*scale, 14*scale)
-							love.graphics.setColor(0, 0, 0, 255)
+							love.graphics.setColor(0, 0, 0, 255/255)
 							love.graphics.rectangle("fill", (333+15*(i-1)+1)*scale, (39+math.floor((tile-1)/22)*17)*scale-tilesoffset+1*scale, 14*scale-2*scale, 14*scale-2*scale)
-							if mtbutton == i then if i == 3 then love.graphics.setColor(255, 0, 0, 255)
-							else love.graphics.setColor(255, 255, 255, 255) end
-							else love.graphics.setColor(127, 127, 127, 255) end
+							if mtbutton == i then if i == 3 then love.graphics.setColor(1, 0, 0, 1)
+							else love.graphics.setColor(1, 1, 1, 1) end
+							else love.graphics.setColor(.5, .5, .5, 1) end
 							if i == 1 then
 								--up
 								love.graphics.draw(uparrowimg, (333+15*(i-1)+3)*scale, (38+math.floor((tile-1)/22)*17)*scale-tilesoffset+3*scale, 0, scale, scale)
@@ -2408,12 +2408,12 @@ function editor_draw()
 				if tile then
 					local x = (5+math.fmod((tile-1), 22)*17)*scale
 					local y = (math.floor(((tile-1))/22)*17*scale+(39+entitiesform[list].y)*scale)
-					love.graphics.setColor(255, 255, 255, 127)
+					love.graphics.setColor(1, 1, 1, .5)
 					love.graphics.rectangle("fill", x, y-tilesoffset, 16*scale, 16*scale)
 				elseif list then
 					local x = (5)*scale
 					local y = ((39+entitiesform[list].y-10)*scale)
-					love.graphics.setColor(255, 255, 255, 127)
+					love.graphics.setColor(1, 1, 1, .5)
 					love.graphics.rectangle("fill", x, y-tilesoffset, 373*scale, 9*scale)
 				end
 			end
@@ -2476,49 +2476,49 @@ function editor_draw()
 						actualtile = tile+tileliststart-1+90000
 					end
 					if tilequads[actualtile] then
-						love.graphics.setColor(255, 255, 255, 255)
+						love.graphics.setColor(1, 1, 1, 1)
 						if tilequads[actualtile].collision and tilequads[actualtile].platform then
-							love.graphics.setColor(255, 255, 255, 255)
+							love.graphics.setColor(1, 1, 1, 1)
 							properprint("collision : semi.", 3*scale, 205*scale)
 						elseif tilequads[actualtile].collision then
-							love.graphics.setColor(255, 255, 255, 255)
+							love.graphics.setColor(1, 1, 1, 1)
 							properprint("collision : yes", 3*scale, 205*scale)
 						else
-							love.graphics.setColor(255, 255, 255, 127)
+							love.graphics.setColor(1, 1, 1, .5)
 							properprint("collision : no", 3*scale, 205*scale)
 						end
 						if tilequads[actualtile].collision and tilequads[actualtile].portalable then
-							love.graphics.setColor(255, 255, 255, 255)
+							love.graphics.setColor(1, 1, 1, 1)
 							properprint("portalable: yes", 3*scale, 215*scale)
 						else
-							love.graphics.setColor(255, 255, 255, 127)
+							love.graphics.setColor(1, 1, 1, .5)
 							properprint("portalable: no", 3*scale, 215*scale)
 						end
 						if tilequads[actualtile].collision and (tilequads[actualtile].debris and blockdebrisquads[tilequads[actualtile].debris]) then
-							love.graphics.setColor(255, 255, 255, 255)
+							love.graphics.setColor(1, 1, 1, 1)
 							properprint("breakable : hard", 140*scale, 205*scale)
 						elseif tilequads[actualtile].collision and tilequads[actualtile].breakable then
-							love.graphics.setColor(255, 255, 255, 255)
+							love.graphics.setColor(1, 1, 1, 1)
 							properprint("breakable : yes", 140*scale, 205*scale)
 						else
-							love.graphics.setColor(255, 255, 255, 127)
+							love.graphics.setColor(1, 1, 1, .5)
 							properprint("breakable : no", 140*scale, 205*scale)
 						end
 						if tilequads[actualtile].foreground then
-							love.graphics.setColor(255, 255, 255, 255)
+							love.graphics.setColor(1, 1, 1, 1)
 							properprint("foreground: yes", 140*scale, 215*scale)
 						else
-							love.graphics.setColor(255, 255, 255, 127)
+							love.graphics.setColor(1, 1, 1, .5)
 							properprint("foreground: no", 140*scale, 215*scale)
 						end
 						
-						love.graphics.setColor(255, 255, 255, 255)
+						love.graphics.setColor(1, 1, 1, 1)
 						properprint("id: " .. actualtile, (396-(#("id: " .. actualtile)*8))*scale, 215*scale)
 					end
 				end
 			end
 			
-			love.graphics.setColor(255, 255, 255)
+			love.graphics.setColor(1, 1, 1)
 
 			if editentities and not editenemies and editorstate == "tiles" and editormenuopen and entitytooltipobject then
 				entitytooltipobject:draw(math.max(0, tooltipa))
@@ -2528,7 +2528,7 @@ function editor_draw()
 			love.graphics.pop()
 		elseif editorstate == "main" then		
 			--MINIMAP
-			love.graphics.setColor(255, 255, 255)
+			love.graphics.setColor(1, 1, 1)
 			properprintF(TEXT["minimap"], 3*scale, 21*scale)
 			love.graphics.rectangle("fill", minimapx*scale, minimapy*scale, 394*scale, 34*scale)
 			love.graphics.setColor(unpack(backgroundcolor[background]))
@@ -2563,7 +2563,7 @@ function editor_draw()
 			
 			love.graphics.setScissor()
 			
-			love.graphics.setColor(255, 0, 0)
+			love.graphics.setColor(1, 0, 0)
 			drawrectangle(splitxscroll[1]*2+minimapx-minimapscroll*2, minimapy, (width+2)*2, 34)
 			drawrectangle(splitxscroll[1]*2+minimapx-minimapscroll*2+1, minimapy+1, (width+1)*2, 32)
 			guielements["autoscrollcheckbox"]:draw()
@@ -2618,9 +2618,9 @@ function editor_draw()
 				guielements["autoscrollingcheckbox"]:draw()
 				guielements["autoscrollingscrollbar"]:draw()
 				if autoscrolling then
-					love.graphics.setColor(255, 255, 255, 255)
+					love.graphics.setColor(1, 1, 1, 1)
 				else
-					love.graphics.setColor(150, 150, 150, 255)
+					love.graphics.setColor(150/255, 150/255, 150/255, 1)
 				end
 				properprint(formatscrollnumber(autoscrollingspeed), (guielements["autoscrollingscrollbar"].x+1+guielements["autoscrollingscrollbar"].xrange*guielements["autoscrollingscrollbar"].value)*scale, (guielements["autoscrollingscrollbar"].y+1)*scale)
 
@@ -2628,15 +2628,15 @@ function editor_draw()
 				guielements["customforegroundcheckbox"]:draw()
 				
 				if custombackground then
-					love.graphics.setColor(255, 255, 255, 255)
+					love.graphics.setColor(1, 1, 1, 1)
 				else
-					love.graphics.setColor(150, 150, 150, 255)
+					love.graphics.setColor(150/255, 150/255, 150/255, 1)
 				end
 				properprintF(TEXT["scrollfactor"], 199*scale, 146*scale)
 				if customforeground then
-					love.graphics.setColor(255, 255, 255, 255)
+					love.graphics.setColor(1, 1, 1, 1)
 				else
-					love.graphics.setColor(150, 150, 150, 255)
+					love.graphics.setColor(150/255, 150/255, 150/255, 1)
 				end
 				properprintF(TEXT["scrollfactor"], 199*scale, 178*scale)
 				
@@ -2645,21 +2645,21 @@ function editor_draw()
 				guielements["scrollfactor2yscrollbar"]:draw()
 				guielements["scrollfactor2xscrollbar"]:draw()
 				if custombackground then
-					love.graphics.setColor(255, 255, 255, 255)
+					love.graphics.setColor(1, 1, 1, 1)
 				else
-					love.graphics.setColor(150, 150, 150, 255)
+					love.graphics.setColor(150/255, 150/255, 150/255, 1)
 				end
 				properprint(formatscrollnumber(scrollfactor), (guielements["scrollfactorxscrollbar"].x+1+guielements["scrollfactorxscrollbar"].xrange*guielements["scrollfactorxscrollbar"].value)*scale, 146*scale)
 				properprint(formatscrollnumber(scrollfactory), (guielements["scrollfactorxscrollbar"].x+1+guielements["scrollfactoryscrollbar"].xrange*guielements["scrollfactoryscrollbar"].value)*scale, 156*scale)
 				if customforeground then
-					love.graphics.setColor(255, 255, 255, 255)
+					love.graphics.setColor(1, 1, 1, 1)
 				else
-					love.graphics.setColor(150, 150, 150, 255)
+					love.graphics.setColor(150/255, 150/255, 150/255, 1)
 				end
 				properprint(formatscrollnumber(scrollfactor2), (guielements["scrollfactor2xscrollbar"].x+1+guielements["scrollfactor2xscrollbar"].xrange*guielements["scrollfactor2xscrollbar"].value)*scale, 178*scale)
 				properprint(formatscrollnumber(scrollfactor2y), (guielements["scrollfactor2xscrollbar"].x+1+guielements["scrollfactor2yscrollbar"].xrange*guielements["scrollfactor2yscrollbar"].value)*scale, 188*scale)
 
-				love.graphics.setColor(255, 255, 255, 255)
+				love.graphics.setColor(1, 1, 1, 1)
 
 				--level properties
 				guielements["levelpropertiesdropdown"]:draw()
@@ -2679,9 +2679,9 @@ function editor_draw()
 					love.graphics.setColor(0,0,0)
 					love.graphics.rectangle("fill", (lpd.x+1)*scale, (lpd.y+12)*scale, (lpd.width+5-2)*scale, (8*len+1-1)*scale)
 					if high then
-						love.graphics.setColor(255,255,255)
+						love.graphics.setColor(1,1,1)
 					else
-						love.graphics.setColor(127,127,127)
+						love.graphics.setColor(.5,.5,.5)
 					end
 					drawrectangle(lpd.x, lpd.y+12, lpd.width+5, 8*len+1)
 					guielements["intermissioncheckbox"]:draw()
@@ -2694,10 +2694,10 @@ function editor_draw()
 				end
 			end
 		elseif editorstate == "maps" then
-			love.graphics.setColor(0, 0, 0, 210)
+			love.graphics.setColor(0, 0, 0, 210/255)
 			love.graphics.rectangle("fill", 2*scale, 19*scale, 100*scale, 203*scale)
 			love.graphics.rectangle("fill", 103*scale, 195*scale, 295*scale, 27*scale)
-			love.graphics.setColor(0, 0, 0, 50)
+			love.graphics.setColor(0, 0, 0, 50/255)
 			love.graphics.rectangle("fill", 103*scale, 19*scale, 295*scale, 175*scale)
 			
 			guielements["worldscrollbar"]:draw()
@@ -2718,7 +2718,7 @@ function editor_draw()
 			for j = 1, #mappacklevels[i] do --level
 				local y = (46+((j-1)*39)-(guielements["levelscrollbar"].value*math.max(0, (#mappacklevels[currentworldselection]*39)+17-173)))
 				if y > 0 and y < height*16 then
-					love.graphics.setColor(255, 255, 255)
+					love.graphics.setColor(1, 1, 1)
 					properprint("sub", 106*scale, y*scale)
 					for k = 0, mappacklevels[i][j] do --sublevel
 						local name = i .. "-" .. j .. "_" .. k
@@ -2733,7 +2733,7 @@ function editor_draw()
 
 			love.graphics.setScissor()
 			
-			love.graphics.setColor(255, 255, 255)
+			love.graphics.setColor(1, 1, 1)
 			properprintF(TEXT["do not forget to save\nyour current level!"], 108*scale, 200*scale)
 			guielements["savebutton2"]:draw()
 			--guielements["autosavecheckbox"]:draw()
@@ -2747,13 +2747,13 @@ function editor_draw()
 			guielements["selectionbutton"]:draw()
 			guielements["powerlinebutton"]:draw()
 			
-			love.graphics.setColor(51, 51, 51)
+			love.graphics.setColor(51/255, 51/255, 51/255)
 			love.graphics.rectangle("fill", 140*scale, 22*scale, 255*scale, 69*scale)
 			love.graphics.rectangle("fill", 132*scale, (22+(currenttooldesc-1)*18)*scale, 8*scale, 15*scale)
 			love.graphics.setColor(0, 0, 0)
 			love.graphics.rectangle("fill", 141*scale, 23*scale, 253*scale, 67*scale)
 			love.graphics.rectangle("fill", 132*scale, (23+(currenttooldesc-1)*18)*scale, 9*scale, 13*scale)
-			love.graphics.setColor(255, 255, 255)
+			love.graphics.setColor(1, 1, 1)
 			properprintF(TEXT["tool descriptions"][currenttooldesc], 143*scale, 26*scale)
 			
 			properprintF(TEXT["mappack title:"], 5*scale, 106*scale)
@@ -2787,14 +2787,14 @@ function editor_draw()
 			properprintF("icon:", 150*scale, 138*scale)
 			
 			if mousex > 151*scale and mousey > 146*scale and mousex < 203*scale and mousey < 198*scale then
-				love.graphics.setColor(255, 255, 255)
+				love.graphics.setColor(1, 1, 1)
 			else
-				love.graphics.setColor(127, 127, 127)
+				love.graphics.setColor(.5, .5, .5)
 			end
 			local w = love.graphics.getLineWidth()
 			love.graphics.setLineWidth(scale)
 			love.graphics.rectangle("line", 151.5*scale, 146.5*scale, 51*scale, 51*scale)
-			love.graphics.setColor(255, 255, 255)
+			love.graphics.setColor(1, 1, 1)
 			if editmappackicon ~= nil then
 				local scale2w = scale*50 / math.max(1, editmappackicon:getWidth())
 				local scale2h = scale*50 / math.max(1, editmappackicon:getHeight())
@@ -2804,7 +2804,7 @@ function editor_draw()
 			end
 			love.graphics.setLineWidth(w)
 		elseif editorstate == "custom" then
-			love.graphics.setColor(255, 255, 255)
+			love.graphics.setColor(1, 1, 1)
 			love.graphics.rectangle("fill", 5*scale, 37*scale, 390*scale, scale)
 			love.graphics.rectangle("fill", 394*scale, 38*scale, scale, 180*scale)
 			love.graphics.rectangle("fill", 5*scale, 38*scale, scale, 180*scale)
@@ -2818,7 +2818,7 @@ function editor_draw()
 			guielements["enemiescustomtab"]:draw()
 			
 			if customtabstate == "graphics" then
-				love.graphics.setColor(255, 255, 255)
+				love.graphics.setColor(1, 1, 1)
 				properprint(currentcustomimage[3], 10*scale, 41*scale)
 				love.graphics.rectangle("fill", 10*scale, 50*scale, 164*scale, 164*scale)
 				love.graphics.draw(customimagebackimg, 12*scale, 52*scale, 0, scale, scale)
@@ -2838,10 +2838,10 @@ function editor_draw()
 				properprintF(TEXT["current image"], 176*scale, 54*scale)
 				properprintF(TEXT["image template"], 176*scale, 79*scale)
 				properprintF(TEXT["replace image"], 176*scale, 125*scale)
-				love.graphics.setColor(127, 127, 127)
+				love.graphics.setColor(.5, .5, .5)
 				properprintF(TEXT["drag an image file into\nthe square to replace it!"], 184*scale, 134*scale)
 				properprintF(TEXT["or 'open folder' and\nchange the image there!"], 184*scale, 157*scale)
-				love.graphics.setColor(255, 255, 255)
+				love.graphics.setColor(1, 1, 1)
 				
 				guielements["exportimagetemplate"]:draw()
 				guielements["openfoldercustom"]:draw()
@@ -2849,7 +2849,7 @@ function editor_draw()
 				guielements["resetimage"]:draw()
 				guielements["currentimagedropdown"]:draw()
 			elseif customtabstate == "tiles" then
-				love.graphics.setColor(255, 255, 255)
+				love.graphics.setColor(1, 1, 1)
 				properprintF(TEXT["custom tileset"], 10*scale, 41*scale)
 				love.graphics.rectangle("fill", 10*scale, 50*scale, 164*scale, 164*scale)
 				love.graphics.draw(customimagebackimg, 12*scale, 52*scale, 0, scale, scale)
@@ -2877,35 +2877,35 @@ function editor_draw()
 				properprintF(TEXT["tileset template"], 176*scale, 54*scale)
 				properprintF(TEXT["add tileset"], 176*scale, 100*scale)
 				properprintF(TEXT["animated tiles"], 176*scale, 154*scale)
-				love.graphics.setColor(127, 127, 127)
+				love.graphics.setColor(.5, .5, .5)
 				properprintF(TEXT["drag an image file into\nthe square to replace it!"], 184*scale, 109*scale)
 				properprintF(TEXT["or 'open folder' and\nchange the image there!"], 184*scale, 132*scale)
-				love.graphics.setColor(255, 255, 255)
+				love.graphics.setColor(1, 1, 1)
 				
 				guielements["exporttilestemplate"]:draw()
 				guielements["exportanimatedtilestemplate"]:draw()
 				guielements["openfoldertilescustom"]:draw()
 				guielements["openfolderanimatedtilescustom"]:draw()
 				guielements["saveimage"]:draw()
-				love.graphics.setColor(127, 127, 127)
+				love.graphics.setColor(.5, .5, .5)
 				if mx > 375*scale and mx < (375+15)*scale and my > 199*scale and my < (199+15)*scale then
-					love.graphics.setColor(255, 255, 255)
+					love.graphics.setColor(1, 1, 1)
 				end
 				love.graphics.rectangle("fill", 375*scale, 199*scale, 15*scale, 15*scale)
 				love.graphics.setColor(0, 0, 0)
 				love.graphics.rectangle("fill", (375+1)*scale, (199+1)*scale, 13*scale, 13*scale)
-				love.graphics.setColor(255, 255, 255)
+				love.graphics.setColor(1, 1, 1)
 				love.graphics.draw(tilepropertiesimg, (375+2)*scale, (199+2)*scale, 0, (11/tilepropertiesimg:getWidth())*scale, (11/tilepropertiesimg:getHeight())*scale)
 			elseif customtabstate == "backgrounds" then
-				love.graphics.setColor(255, 255, 255)
+				love.graphics.setColor(1, 1, 1)
 				properprintF(TEXT["custom background"], 10*scale, 41*scale)
 				love.graphics.rectangle("fill", 10*scale, 50*scale, 164*scale, 164*scale)
 				love.graphics.draw(customimagebackimg, 12*scale, 52*scale, 0, scale, scale)
 				
 				if editorbackgroundstate == "background" then
-					love.graphics.setColor(255, 255, 255)
+					love.graphics.setColor(1, 1, 1)
 				else
-					love.graphics.setColor(255, 255, 255, 150)
+					love.graphics.setColor(1, 1, 1, 150/255)
 				end
 				local w, h = width*16, height*16
 				local sx, sy = math.max(1, math.floor(160/w)), math.max(1, math.floor(160/w))
@@ -2920,9 +2920,9 @@ function editor_draw()
 					love.graphics.setScissor()
 				end
 				if editorbackgroundstate == "foreground" then
-					love.graphics.setColor(255, 255, 255)
+					love.graphics.setColor(1, 1, 1)
 				else
-					love.graphics.setColor(255, 255, 255, 150)
+					love.graphics.setColor(1, 1, 1, 150/255)
 				end
 				if customforegroundimg then
 					love.graphics.push()
@@ -2933,21 +2933,21 @@ function editor_draw()
 					love.graphics.pop()
 					love.graphics.setScissor()
 				end
-				love.graphics.setColor(255, 255, 255)
+				love.graphics.setColor(1, 1, 1)
 				properprintF(TEXT["current"], 176*scale, 54*scale)
 				properprintF(TEXT["add background"], 176*scale, 79*scale)
-				love.graphics.setColor(127, 127, 127)
+				love.graphics.setColor(.5, .5, .5)
 				properprintF(TEXT["drag file to add custom\nbackground or foreground!"], 184*scale, 88*scale)
 				properprintF(TEXT["or just put a .png\nin the backgrounds folder"], 184*scale, 112*scale)
 				properprintF(TEXT["add a .json file\nfor animated backgrounds"], 184*scale, 159*scale)
-				love.graphics.setColor(255, 255, 255)
+				love.graphics.setColor(1, 1, 1)
 				properprintF(TEXT["animated backgrounds"], 176*scale, 150*scale)
 
 				guielements["openfolderbackgroundscustom"]:draw()
 				guielements["currentbackgrounddropdown"]:draw()
 				guielements["saveimage"]:draw()
 			elseif customtabstate == "sounds" then
-				love.graphics.setColor(255, 255, 255)
+				love.graphics.setColor(1, 1, 1)
 				properprintF(TEXT["custom sounds"], 10*scale, 41*scale)
 				love.graphics.rectangle("fill", 10*scale, 50*scale, 164*scale, 164*scale)
 				love.graphics.draw(customimagebackimg, 12*scale, 52*scale, 0, scale, scale)
@@ -2956,10 +2956,10 @@ function editor_draw()
 				properprintF(TEXT["sound template"], 176*scale, 79*scale)
 				properprintF(TEXT["replace sound"], 176*scale, 124*scale)
 				properprintF(TEXT["add music"], 176*scale, 155*scale)
-				love.graphics.setColor(127, 127, 127)
+				love.graphics.setColor(.5, .5, .5)
 				properprintF(TEXT["open sounds folder to\nreplace sounds!"], 184*scale, 133*scale)
 				properprintF(TEXT["put any .mp3 or .ogg\nin the music folder!"], 184*scale, 181*scale)
-				love.graphics.setColor(255, 255, 255)
+				love.graphics.setColor(1, 1, 1)
 				
 				guielements["exportimagetemplate"]:draw()
 				guielements["openfoldersoundscustom"]:draw()
@@ -2982,7 +2982,7 @@ function editor_draw()
 					--guielements["endingcolor>"]:draw()
 					guielements["endingcolor"]:draw()
 				elseif textstate == "hud" then
-					love.graphics.setColor(255, 255, 255)
+					love.graphics.setColor(1, 1, 1)
 					properprintF(TEXT["player name"], 11*scale, 57*scale)
 					guielements["editplayername"]:draw()
 					--love.graphics.setColor(textcolors[textcolorp])
@@ -2995,7 +2995,7 @@ function editor_draw()
 					guielements["hudsimplecheckbox"]:draw()
 					guielements["hudcolor"]:draw()
 				elseif textstate == "castle" then
-					love.graphics.setColor(255, 255, 255)
+					love.graphics.setColor(1, 1, 1)
 					properprintF(TEXT["toad"], 11*scale, 57*scale)
 					guielements["edittoadtext1"]:draw()
 					guielements["edittoadtext2"]:draw()
@@ -3008,7 +3008,7 @@ function editor_draw()
 					guielements["editpeachtext5"]:draw()
 					guielements["stevecheckbox"]:draw()
 				elseif textstate == "levelscreen" then
-					love.graphics.setColor(255, 255, 255)
+					love.graphics.setColor(1, 1, 1)
 					local sublev = ""
 					if mariosublevel ~= 0 then
 						sublev = "-" .. mariosublevel
@@ -3016,10 +3016,10 @@ function editor_draw()
 					properprintF(TEXT["level "] .. marioworld .. "-" .. mariolevel .. sublev, 11*scale, 57*scale)
 					properprintF(TEXT["caption"], 11*scale, 70*scale)
 					guielements["editlevelscreentext"]:draw()
-					love.graphics.setColor(127, 127, 127)
+					love.graphics.setColor(.5, .5, .5)
 					properprintF(TEXT["add a background image\nby naming it\n'"] .. marioworld .. "-" .. mariolevel .. "levelscreen.png'", 159*scale, 110*scale)
 					properprintF(TEXT["or drag an image file\ninto the square!"], 159*scale, 143*scale)
-					love.graphics.setColor(255, 255, 255)
+					love.graphics.setColor(1, 1, 1)
 					love.graphics.rectangle("fill", 11*scale, 110*scale, 144*scale, 82*scale)
 					properprintF(TEXT["preview"], 11*scale, 100*scale)
 					
@@ -3031,7 +3031,7 @@ function editor_draw()
 					
 					love.graphics.setColor(0, 0, 0)
 					love.graphics.rectangle("fill", 0, 0, 400*scale, 224*scale)
-					love.graphics.setColor(255, 255, 255)
+					love.graphics.setColor(1, 1, 1)
 					
 					if levelscreenimage then
 						love.graphics.draw(levelscreenimage, 0, 0, 0, scale, scale)
@@ -3064,7 +3064,7 @@ function editor_draw()
 					if #mariohats[i] > 1 or mariohats[i][1] ~= 1 then
 						local yadd = 0
 						for j = 1, #mariohats[i] do
-							love.graphics.setColor(255, 255, 255)
+							love.graphics.setColor(1, 1, 1)
 							love.graphics.draw(hat[mariohats[i][j]].graphic, hat[mariohats[i][j]].quad[1], x+(v.smalloffsetX)*scale, y+(11-v.smalloffsetY)*scale, 0, scale, scale, v.smallquadcenterX - hat[mariohats[i][j]].x + offsets[1], v.smallquadcenterY - hat[mariohats[i][j]].y + offsets[2] + yadd)
 							yadd = yadd + hat[mariohats[i][j]].height
 						end
@@ -3073,7 +3073,7 @@ function editor_draw()
 						love.graphics.draw(hat[mariohats[i][1]].graphic, hat[mariohats[i][1]].quad[1], x+(v.smalloffsetX)*scale, y+(11-v.smalloffsetY)*scale, 0, scale, scale, v.smallquadcenterX - hat[mariohats[i][1]].x + offsets[1], v.smallquadcenterY - hat[mariohats[i][1]].y + offsets[2])
 					end
 				
-					love.graphics.setColor(255, 255, 255, 255)
+					love.graphics.setColor(1, 1, 1, 1)
 					
 					if playertype == "classic" or playertype == "cappy" or not portalgun then--no portal gun
 						love.graphics.draw(v["animations"][0], v["small"]["idle"][5], x+(v.smalloffsetX)*scale, y+(11-v.smalloffsetY)*scale, 0, scale, scale, v.smallquadcenterX, v.smallquadcenterY)
@@ -3091,7 +3091,7 @@ function editor_draw()
 					love.graphics.setScissor()
 				end
 			elseif customtabstate == "enemies" then
-				love.graphics.setColor(255, 255, 255)
+				love.graphics.setColor(1, 1, 1)
 				if currentcustomenemy[2] then
 					properprint(currentcustomenemy[2], 10*scale, 41*scale)
 				else
@@ -3133,10 +3133,10 @@ function editor_draw()
 				properprintF(TEXT["current enemy"], 176*scale, 54*scale)
 				properprintF(TEXT["enemy template"], 176*scale, 79*scale)
 				properprintF(TEXT["add new enemies"], 176*scale, 125*scale)
-				love.graphics.setColor(127, 127, 127)
+				love.graphics.setColor(.5, .5, .5)
 				properprintF(TEXT["'open folder' to add\nmore enemies!"], 184*scale, 134*scale)
 				properprintF(TEXT["making enemies is simple!\nno coding required.\nopen the .json file\nto add/change properties"], 184*scale, 158*scale)
-				love.graphics.setColor(255, 255, 255)
+				love.graphics.setColor(1, 1, 1)
 				
 				guielements["exportimagetemplate"]:draw()
 				guielements["openfolderenemiescustom"]:draw()
@@ -3162,7 +3162,7 @@ function editor_draw()
 				
 				local offx = -math.max(0, guielements["animationsscrollbarhor"].value/1*(completewidth-(animationguiarea[3]-animationguiarea[1])))
 				
-				love.graphics.setColor(255, 255, 255)
+				love.graphics.setColor(1, 1, 1)
 				
 				local y = animationguiarea[2]+1-offy
 				y = y + 2
@@ -3217,7 +3217,7 @@ function editor_draw()
 				
 				love.graphics.setScissor()
 				
-				love.graphics.setColor(90, 90, 90)
+				love.graphics.setColor(90/255, 90/255, 90/255)
 				drawrectangle(animationguiarea[1]-10, animationguiarea[4], 10, 10)
 			end
 			
@@ -3250,11 +3250,11 @@ function editor_draw()
 		end
 		
 		if confirmmenuopen then
-			love.graphics.setColor(0,0,0,200)
+			love.graphics.setColor(0,0,0,200/255)
 			love.graphics.rectangle("fill", 0, 0, width*16*scale, height*16*scale)
 			love.graphics.setColor(0,0,0)
 			love.graphics.rectangle("fill", 69*scale, 71*scale, 262*scale, 82*scale)
-			love.graphics.setColor(255,255,255)
+			love.graphics.setColor(1,1,1)
 			drawrectangle(70, 72, 260, 80)
 
 			properprintF(TEXT["are you sure?"], (200-utf8.len(TEXT["are you sure?"])*4)*scale, 80*scale)
@@ -3281,11 +3281,11 @@ function maintab()
 	tilemenumoving = false
 	
 	guielements["tabmain"].fillcolor = {0, 0, 0}
-	guielements["tabtiles"].fillcolor = {63, 63, 63}
-	guielements["tabtools"].fillcolor = {63, 63, 63}
-	guielements["tabmaps"].fillcolor = {63, 63, 63}
-	guielements["tabcustom"].fillcolor = {63, 63, 63}
-	guielements["tabanimations"].fillcolor = {63, 63, 63}
+	guielements["tabtiles"].fillcolor = {63/255, 63/255, 63/255}
+	guielements["tabtools"].fillcolor = {63/255, 63/255, 63/255}
+	guielements["tabmaps"].fillcolor = {63/255, 63/255, 63/255}
+	guielements["tabcustom"].fillcolor = {63/255, 63/255, 63/255}
+	guielements["tabanimations"].fillcolor = {63/255, 63/255, 63/255}
 	guielements["tabmain"].active = true
 	guielements["tabtiles"].active = true
 	guielements["tabtools"].active = true
@@ -3346,9 +3346,9 @@ end
 function levelpropertiestoggle()
 	levelpropertiesdropdown = not levelpropertiesdropdown
 	if levelpropertiesdropdown then
-		guielements["levelpropertiesdropdown"].textcolor = {127, 127, 127}
+		guielements["levelpropertiesdropdown"].textcolor = {.5, .5, .5}
 	else
-		guielements["levelpropertiesdropdown"].textcolor = {255, 255, 255}
+		guielements["levelpropertiesdropdown"].textcolor = {1, 1, 1}
 	end
 	levelpropertiesactive(levelpropertiesdropdown)
 end
@@ -3365,12 +3365,12 @@ function tilestab()
 	tilemenuy = 0
 	tilemenumoving = false
 	
-	guielements["tabmain"].fillcolor = {63, 63, 63}
+	guielements["tabmain"].fillcolor = {63/255, 63/255, 63/255}
 	guielements["tabtiles"].fillcolor = {0, 0, 0}
-	guielements["tabtools"].fillcolor = {63, 63, 63}
-	guielements["tabmaps"].fillcolor = {63, 63, 63}
-	guielements["tabcustom"].fillcolor = {63, 63, 63}
-	guielements["tabanimations"].fillcolor = {63, 63, 63}
+	guielements["tabtools"].fillcolor = {63/255, 63/255, 63/255}
+	guielements["tabmaps"].fillcolor = {63/255, 63/255, 63/255}
+	guielements["tabcustom"].fillcolor = {63/255, 63/255, 63/255}
+	guielements["tabanimations"].fillcolor = {63/255, 63/255, 63/255}
 	guielements["tabmain"].active = true
 	guielements["tabtiles"].active = true
 	guielements["tabtools"].active = true
@@ -3410,12 +3410,12 @@ function toolstab()
 	tilemenuy = 0
 	tilemenumoving = false
 	
-	guielements["tabmain"].fillcolor = {63, 63, 63}
-	guielements["tabtiles"].fillcolor = {63, 63, 63}
+	guielements["tabmain"].fillcolor = {63/255, 63/255, 63/255}
+	guielements["tabtiles"].fillcolor = {63/255, 63/255, 63/255}
 	guielements["tabtools"].fillcolor = {0, 0, 0}
-	guielements["tabmaps"].fillcolor = {63, 63, 63}
-	guielements["tabcustom"].fillcolor = {63, 63, 63}
-	guielements["tabanimations"].fillcolor = {63, 63, 63}
+	guielements["tabmaps"].fillcolor = {63/255, 63/255, 63/255}
+	guielements["tabcustom"].fillcolor = {63/255, 63/255, 63/255}
+	guielements["tabanimations"].fillcolor = {63/255, 63/255, 63/255}
 	guielements["tabmain"].active = true
 	guielements["tabtiles"].active = true
 	guielements["tabtools"].active = true
@@ -3454,12 +3454,12 @@ function mapstab()
 	tilemenuy = 0
 	tilemenumoving = false
 	
-	guielements["tabmain"].fillcolor = {63, 63, 63}
-	guielements["tabtiles"].fillcolor = {63, 63, 63}
-	guielements["tabtools"].fillcolor = {63, 63, 63}
+	guielements["tabmain"].fillcolor = {63/255, 63/255, 63/255}
+	guielements["tabtiles"].fillcolor = {63/255, 63/255, 63/255}
+	guielements["tabtools"].fillcolor = {63/255, 63/255, 63/255}
 	guielements["tabmaps"].fillcolor = {0, 0, 0}
-	guielements["tabcustom"].fillcolor = {63, 63, 63}
-	guielements["tabanimations"].fillcolor = {63, 63, 63}
+	guielements["tabcustom"].fillcolor = {63/255, 63/255, 63/255}
+	guielements["tabanimations"].fillcolor = {63/255, 63/255, 63/255}
 	guielements["tabmain"].active = true
 	guielements["tabtiles"].active = true
 	guielements["tabtools"].active = true
@@ -3502,12 +3502,12 @@ function customtabtab(t)
 	for i, v in pairs(guielements) do
 		v.active = false
 	end
-	guielements["tabmain"].fillcolor = {63, 63, 63}
-	guielements["tabtiles"].fillcolor = {63, 63, 63}
-	guielements["tabtools"].fillcolor = {63, 63, 63}
-	guielements["tabmaps"].fillcolor = {63, 63, 63}
+	guielements["tabmain"].fillcolor = {63/255, 63/255, 63/255}
+	guielements["tabtiles"].fillcolor = {63/255, 63/255, 63/255}
+	guielements["tabtools"].fillcolor = {63/255, 63/255, 63/255}
+	guielements["tabmaps"].fillcolor = {63/255, 63/255, 63/255}
 	guielements["tabcustom"].fillcolor = {0, 0, 0}
-	guielements["tabanimations"].fillcolor = {63, 63, 63}
+	guielements["tabanimations"].fillcolor = {63/255, 63/255, 63/255}
 	guielements["tabmain"].active = true
 	guielements["tabtiles"].active = true
 	guielements["tabtools"].active = true
@@ -3515,12 +3515,12 @@ function customtabtab(t)
 	guielements["tabcustom"].active = true
 	guielements["tabanimations"].active = true
 	
-	guielements["graphicscustomtab"].textcolor = {127, 127, 127}
-	guielements["tilescustomtab"].textcolor = {127, 127, 127}
-	guielements["backgroundscustomtab"].textcolor = {127, 127, 127}
-	guielements["soundscustomtab"].textcolor = {127, 127, 127}
-	guielements["textcustomtab"].textcolor = {127, 127, 127}
-	guielements["enemiescustomtab"].textcolor = {127, 127, 127}
+	guielements["graphicscustomtab"].textcolor = {.5, .5, .5}
+	guielements["tilescustomtab"].textcolor = {.5, .5, .5}
+	guielements["backgroundscustomtab"].textcolor = {.5, .5, .5}
+	guielements["soundscustomtab"].textcolor = {.5, .5, .5}
+	guielements["textcustomtab"].textcolor = {.5, .5, .5}
+	guielements["enemiescustomtab"].textcolor = {.5, .5, .5}
 	guielements["graphicscustomtab"].active = true
 	guielements["tilescustomtab"].active = true
 	guielements["backgroundscustomtab"].active = true
@@ -3529,27 +3529,27 @@ function customtabtab(t)
 	guielements["enemiescustomtab"].active = true
 	
 	if t == "graphics" then
-		guielements["graphicscustomtab"].textcolor = {255, 255, 255}
+		guielements["graphicscustomtab"].textcolor = {1, 1, 1}
 		guielements["currentimagedropdown"].active = true
 		guielements["exportimagetemplate"].active = true
 		guielements["openfoldercustom"].active = true
 		guielements["saveimage"].active = true
 		guielements["resetimage"].active = true
 	elseif t == "tiles" then
-		guielements["tilescustomtab"].textcolor = {255, 255, 255}
+		guielements["tilescustomtab"].textcolor = {1, 1, 1}
 		guielements["exporttilestemplate"].active = true
 		guielements["exportanimatedtilestemplate"].active = true
 		guielements["openfoldertilescustom"].active = true
 		guielements["openfolderanimatedtilescustom"].active = true
 		guielements["saveimage"].active = true
 	elseif t == "backgrounds" then
-		guielements["backgroundscustomtab"].textcolor = {255, 255, 255}
+		guielements["backgroundscustomtab"].textcolor = {1, 1, 1}
 		guielements["saveimage"].active = true
 		guielements["openfolderbackgroundscustom"].active = true
 		guielements["currentbackgrounddropdown"].active = true
 	elseif t == "sounds" then
 		guielements["currentsounddropdown"].active = true
-		guielements["soundscustomtab"].textcolor = {255, 255, 255}
+		guielements["soundscustomtab"].textcolor = {1, 1, 1}
 		guielements["exportimagetemplate"].active = true
 		guielements["openfoldersoundscustom"].active = true
 		guielements["openfoldermusiccustom"].active = true
@@ -3557,7 +3557,7 @@ function customtabtab(t)
 	elseif t == "text" then
 		texttabtab(textstate)
 	elseif t == "enemies" then
-		guielements["enemiescustomtab"].textcolor = {255, 255, 255}
+		guielements["enemiescustomtab"].textcolor = {1, 1, 1}
 		guielements["currentenemydropdown"].active = true
 		guielements["exportimagetemplate"].active = true
 		guielements["openfolderenemiescustom"].active = true
@@ -3571,12 +3571,12 @@ function texttabtab(t)
 	for i, v in pairs(guielements) do
 		v.active = false
 	end
-	guielements["tabmain"].fillcolor = {63, 63, 63}
-	guielements["tabtiles"].fillcolor = {63, 63, 63}
-	guielements["tabtools"].fillcolor = {63, 63, 63}
-	guielements["tabmaps"].fillcolor = {63, 63, 63}
+	guielements["tabmain"].fillcolor = {63/255, 63/255, 63/255}
+	guielements["tabtiles"].fillcolor = {63/255, 63/255, 63/255}
+	guielements["tabtools"].fillcolor = {63/255, 63/255, 63/255}
+	guielements["tabmaps"].fillcolor = {63/255, 63/255, 63/255}
 	guielements["tabcustom"].fillcolor = {0, 0, 0}
-	guielements["tabanimations"].fillcolor = {63, 63, 63}
+	guielements["tabanimations"].fillcolor = {63/255, 63/255, 63/255}
 	guielements["tabmain"].active = true
 	guielements["tabtiles"].active = true
 	guielements["tabtools"].active = true
@@ -3584,12 +3584,12 @@ function texttabtab(t)
 	guielements["tabcustom"].active = true
 	guielements["tabanimations"].active = true
 	
-	guielements["graphicscustomtab"].textcolor = {127, 127, 127}
-	guielements["tilescustomtab"].textcolor = {127, 127, 127}
-	guielements["backgroundscustomtab"].textcolor = {127, 127, 127}
-	guielements["soundscustomtab"].textcolor = {127, 127, 127}
-	guielements["textcustomtab"].textcolor = {255, 255, 255}
-	guielements["enemiescustomtab"].textcolor = {127, 127, 127}
+	guielements["graphicscustomtab"].textcolor = {.5, .5, .5}
+	guielements["tilescustomtab"].textcolor = {.5, .5, .5}
+	guielements["backgroundscustomtab"].textcolor = {.5, .5, .5}
+	guielements["soundscustomtab"].textcolor = {.5, .5, .5}
+	guielements["textcustomtab"].textcolor = {1, 1, 1}
+	guielements["enemiescustomtab"].textcolor = {.5, .5, .5}
 	guielements["graphicscustomtab"].active = true
 	guielements["tilescustomtab"].active = true
 	guielements["backgroundscustomtab"].active = true
@@ -3597,10 +3597,10 @@ function texttabtab(t)
 	guielements["textcustomtab"].active = true
 	guielements["enemiescustomtab"].active = true
 	
-	guielements["endingtexttab"].textcolor = {127, 127, 127}
-	guielements["hudtexttab"].textcolor = {127, 127, 127}
-	guielements["castletexttab"].textcolor = {127, 127, 127}
-	guielements["levelscreentexttab"].textcolor = {127, 127, 127}
+	guielements["endingtexttab"].textcolor = {.5, .5, .5}
+	guielements["hudtexttab"].textcolor = {.5, .5, .5}
+	guielements["castletexttab"].textcolor = {.5, .5, .5}
+	guielements["levelscreentexttab"].textcolor = {.5, .5, .5}
 	guielements["endingtexttab"].active = true
 	guielements["hudtexttab"].active = true
 	guielements["castletexttab"].active = true
@@ -3608,7 +3608,7 @@ function texttabtab(t)
 	guielements["savecustomtext"].active = true
 	
 	if t == "hud" then
-		guielements["hudtexttab"].textcolor = {255, 255, 255}
+		guielements["hudtexttab"].textcolor = {1, 1, 1}
 		guielements["editplayername"].active = true
 		guielements["hudcolor"].active = true
 		--guielements["hudcolor<"].active = true
@@ -3618,14 +3618,14 @@ function texttabtab(t)
 		guielements["hudoutlinecheckbox"].active = true
 		guielements["hudsimplecheckbox"].active = true
 	elseif t == "ending" then
-		guielements["endingtexttab"].textcolor = {255, 255, 255}
+		guielements["endingtexttab"].textcolor = {1, 1, 1}
 		guielements["editendingtext1"].active = true
 		guielements["editendingtext2"].active = true
 		guielements["endingcolor"].active = true
 		--guielements["endingcolor<"].active = true
 		--guielements["endingcolor>"].active = true
 	elseif t == "castle" then
-		guielements["castletexttab"].textcolor = {255, 255, 255}
+		guielements["castletexttab"].textcolor = {1, 1, 1}
 		guielements["edittoadtext1"].active = true
 		guielements["edittoadtext2"].active = true
 		guielements["edittoadtext3"].active = true
@@ -3636,15 +3636,15 @@ function texttabtab(t)
 		guielements["editpeachtext5"].active = true
 		guielements["stevecheckbox"].active = true
 	elseif t == "levelscreen" then
-		guielements["levelscreentexttab"].textcolor = {255, 255, 255}
+		guielements["levelscreentexttab"].textcolor = {1, 1, 1}
 		guielements["editlevelscreentext"].active = true
 		--levelscreenimage
 		if levelscreenimagecheck ~= mappack .. "-" .. marioworld .. "-" .. mariolevel then
-			if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "-" .. mariolevel .. "levelscreen.png") then
+			if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "-" .. mariolevel .. "levelscreen.png") then
 				levelscreenimage = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "-" .. mariolevel .. "levelscreen.png")
-			elseif love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "levelscreen.png") then
+			elseif love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "levelscreen.png") then
 				levelscreenimage = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "levelscreen.png")
-			elseif love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/levelscreen.png") then
+			elseif love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/levelscreen.png") then
 				levelscreenimage = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/levelscreen.png")
 			else
 				levelscreenimage = false
@@ -3668,11 +3668,11 @@ function animationstab()
 	tilemenuy = 0
 	tilemenumoving = false
 	
-	guielements["tabmain"].fillcolor = {63, 63, 63}
-	guielements["tabtiles"].fillcolor = {63, 63, 63}
-	guielements["tabtools"].fillcolor = {63, 63, 63}
-	guielements["tabmaps"].fillcolor = {63, 63, 63}
-	guielements["tabcustom"].fillcolor = {63, 63, 63}
+	guielements["tabmain"].fillcolor = {63/255, 63/255, 63/255}
+	guielements["tabtiles"].fillcolor = {63/255, 63/255, 63/255}
+	guielements["tabtools"].fillcolor = {63/255, 63/255, 63/255}
+	guielements["tabmaps"].fillcolor = {63/255, 63/255, 63/255}
+	guielements["tabcustom"].fillcolor = {63/255, 63/255, 63/255}
 	guielements["tabanimations"].fillcolor = {0, 0, 0}
 	guielements["tabmain"].active = true
 	guielements["tabtiles"].active = true
@@ -3746,8 +3746,8 @@ function openconfirmmenu(menutype, args)
 	guielements["confirmsave"].x = guielements["confirmsave"].x - (guielements["confirmsave"].width / 2) - 3
 	guielements["confirmexit"].x = guielements["confirmexit"].x - (guielements["confirmexit"].width / 2) - 3
 	--guielements["confirmcancel"].x = guielements["confirmcancel"].x - (guielements["confirmcancel"].width / 2) - 3
-	guielements["confirmsave"].bordercolor = {255, 0, 0}
-	guielements["confirmsave"].bordercolorhigh = {255, 127, 127}
+	guielements["confirmsave"].bordercolor = {1, 0, 0}
+	guielements["confirmsave"].bordercolorhigh = {1, 127/255, 127/255}
 end
 
 function closeconfirmmenu()
@@ -3826,7 +3826,7 @@ function createnewanimation(name,dont_generate_gui)
 	
 	if not name then
 		local i = 1
-		while love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/animations/animation" .. i .. ".json") do
+		while love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/animations/animation" .. i .. ".json") do
 			i = i + 1
 		end
 		name = "animation" .. i
@@ -4159,13 +4159,13 @@ function updatelevelscrollbar()
 end
 
 function tilesall()
-	guielements["tilesall"].textcolor = {255, 255, 255}
-	guielements["tilessmb"].textcolor = {127, 127, 127}
-	guielements["tilesportal"].textcolor = {127, 127, 127}
-	guielements["tilescustom"].textcolor = {127, 127, 127}
-	guielements["tilesanimated"].textcolor = {127, 127, 127}
-	guielements["tilesentities"].textcolor = {127, 127, 127}
-	guielements["tilesobjects"].textcolor = {127, 127, 127}
+	guielements["tilesall"].textcolor = {1, 1, 1}
+	guielements["tilessmb"].textcolor = {.5, .5, .5}
+	guielements["tilesportal"].textcolor = {.5, .5, .5}
+	guielements["tilescustom"].textcolor = {.5, .5, .5}
+	guielements["tilesanimated"].textcolor = {.5, .5, .5}
+	guielements["tilesentities"].textcolor = {.5, .5, .5}
+	guielements["tilesobjects"].textcolor = {.5, .5, .5}
 	
 	tileliststart = 1
 	tilelistcount = smbtilecount + portaltilecount + customtilecount -1
@@ -4181,13 +4181,13 @@ function tilesall()
 end
 
 function tilessmb()
-	guielements["tilesall"].textcolor = {127, 127, 127}
-	guielements["tilessmb"].textcolor = {255, 255, 255}
-	guielements["tilesportal"].textcolor = {127, 127, 127}
-	guielements["tilescustom"].textcolor = {127, 127, 127}
-	guielements["tilesanimated"].textcolor = {127, 127, 127}
-	guielements["tilesentities"].textcolor = {127, 127, 127}
-	guielements["tilesobjects"].textcolor = {127, 127, 127}
+	guielements["tilesall"].textcolor = {.5, .5, .5}
+	guielements["tilessmb"].textcolor = {1, 1, 1}
+	guielements["tilesportal"].textcolor = {.5, .5, .5}
+	guielements["tilescustom"].textcolor = {.5, .5, .5}
+	guielements["tilesanimated"].textcolor = {.5, .5, .5}
+	guielements["tilesentities"].textcolor = {.5, .5, .5}
+	guielements["tilesobjects"].textcolor = {.5, .5, .5}
 	
 	tileliststart = 1
 	tilelistcount = smbtilecount-1
@@ -4203,13 +4203,13 @@ function tilessmb()
 end
 
 function tilesportal()
-	guielements["tilesall"].textcolor = {127, 127, 127}
-	guielements["tilessmb"].textcolor = {127, 127, 127}
-	guielements["tilesportal"].textcolor = {255, 255, 255}
-	guielements["tilescustom"].textcolor = {127, 127, 127}
-	guielements["tilesanimated"].textcolor = {127, 127, 127}
-	guielements["tilesentities"].textcolor = {127, 127, 127}
-	guielements["tilesobjects"].textcolor = {127, 127, 127}
+	guielements["tilesall"].textcolor = {.5, .5, .5}
+	guielements["tilessmb"].textcolor = {.5, .5, .5}
+	guielements["tilesportal"].textcolor = {1, 1, 1}
+	guielements["tilescustom"].textcolor = {.5, .5, .5}
+	guielements["tilesanimated"].textcolor = {.5, .5, .5}
+	guielements["tilesentities"].textcolor = {.5, .5, .5}
+	guielements["tilesobjects"].textcolor = {.5, .5, .5}
 	
 	tileliststart = smbtilecount + 1
 	tilelistcount = portaltilecount - 1
@@ -4225,13 +4225,13 @@ function tilesportal()
 end
 
 function tilescustom()
-	guielements["tilesall"].textcolor = {127, 127, 127}
-	guielements["tilessmb"].textcolor = {127, 127, 127}
-	guielements["tilesportal"].textcolor = {127, 127, 127}
-	guielements["tilescustom"].textcolor = {255, 255, 255}
-	guielements["tilesanimated"].textcolor = {127, 127, 127}
-	guielements["tilesentities"].textcolor = {127, 127, 127}
-	guielements["tilesobjects"].textcolor = {127, 127, 127}
+	guielements["tilesall"].textcolor = {.5, .5, .5}
+	guielements["tilessmb"].textcolor = {.5, .5, .5}
+	guielements["tilesportal"].textcolor = {.5, .5, .5}
+	guielements["tilescustom"].textcolor = {1, 1, 1}
+	guielements["tilesanimated"].textcolor = {.5, .5, .5}
+	guielements["tilesentities"].textcolor = {.5, .5, .5}
+	guielements["tilesobjects"].textcolor = {.5, .5, .5}
 	
 	tileliststart = smbtilecount + portaltilecount + 1
 	tilelistcount = customtilecount - 1
@@ -4247,13 +4247,13 @@ function tilescustom()
 end
 
 function tilesanimated()
-	guielements["tilesall"].textcolor = {127, 127, 127}
-	guielements["tilessmb"].textcolor = {127, 127, 127}
-	guielements["tilesportal"].textcolor = {127, 127, 127}
-	guielements["tilescustom"].textcolor = {127, 127, 127}
-	guielements["tilesanimated"].textcolor = {255, 255, 255}
-	guielements["tilesentities"].textcolor = {127, 127, 127}
-	guielements["tilesobjects"].textcolor = {127, 127, 127}
+	guielements["tilesall"].textcolor = {.5, .5, .5}
+	guielements["tilessmb"].textcolor = {.5, .5, .5}
+	guielements["tilesportal"].textcolor = {.5, .5, .5}
+	guielements["tilescustom"].textcolor = {.5, .5, .5}
+	guielements["tilesanimated"].textcolor = {1, 1, 1}
+	guielements["tilesentities"].textcolor = {.5, .5, .5}
+	guielements["tilesobjects"].textcolor = {.5, .5, .5}
 	
 	animatedtilelist = true
 	tilelistcount = animatedtilecount - 1
@@ -4269,13 +4269,13 @@ function tilesanimated()
 end
 
 function tilesentities()
-	guielements["tilesall"].textcolor = {127, 127, 127}
-	guielements["tilessmb"].textcolor = {127, 127, 127}
-	guielements["tilesportal"].textcolor = {127, 127, 127}
-	guielements["tilescustom"].textcolor = {127, 127, 127}
-	guielements["tilesanimated"].textcolor = {127, 127, 127}
-	guielements["tilesentities"].textcolor = {255, 255, 255}
-	guielements["tilesobjects"].textcolor = {127, 127, 127}
+	guielements["tilesall"].textcolor = {.5, .5, .5}
+	guielements["tilessmb"].textcolor = {.5, .5, .5}
+	guielements["tilesportal"].textcolor = {.5, .5, .5}
+	guielements["tilescustom"].textcolor = {.5, .5, .5}
+	guielements["tilesanimated"].textcolor = {.5, .5, .5}
+	guielements["tilesentities"].textcolor = {1, 1, 1}
+	guielements["tilesobjects"].textcolor = {.5, .5, .5}
 	
 	animatedtilelist = false
 	tilescrollbarheight = math.max(0, entitiesform[#entitiesform].y+entitiesform[#entitiesform].h - 164)
@@ -4289,13 +4289,13 @@ function tilesentities()
 end
 
 function tilesobjects()
-	guielements["tilesall"].textcolor = {127, 127, 127}
-	guielements["tilessmb"].textcolor = {127, 127, 127}
-	guielements["tilesportal"].textcolor = {127, 127, 127}
-	guielements["tilescustom"].textcolor = {127, 127, 127}
-	guielements["tilesanimated"].textcolor = {127, 127, 127}
-	guielements["tilesobjects"].textcolor = {255, 255, 255}
-	guielements["tilesentities"].textcolor = {127, 127, 127}
+	guielements["tilesall"].textcolor = {.5, .5, .5}
+	guielements["tilessmb"].textcolor = {.5, .5, .5}
+	guielements["tilesportal"].textcolor = {.5, .5, .5}
+	guielements["tilescustom"].textcolor = {.5, .5, .5}
+	guielements["tilesanimated"].textcolor = {.5, .5, .5}
+	guielements["tilesobjects"].textcolor = {1, 1, 1}
+	guielements["tilesentities"].textcolor = {.5, .5, .5}
 	
 	tilescrollbarheight = math.max(0, math.ceil((#multitileobjects))*17 - 1 - (17*9) - 12)
 	editentities = false
@@ -4650,11 +4650,11 @@ function getmaps()
 			world = alphabet:sub(world-9, world-9)
 		end
 		guielements["world-" .. i] = guielement:new("button", 3, 20+((i-1)*16), TEXT["world "] .. world, switchworldselection, 0, {i}, 1.4, 83, true)
-		guielements["world-" .. i].bordercolor = {150, 150, 150}
-		guielements["world-" .. i].bordercolorhigh = {255, 255, 255}
+		guielements["world-" .. i].bordercolor = {150/255, 150/255, 150/255}
+		guielements["world-" .. i].bordercolorhigh = {1, 1, 1}
 		guielements["world-" .. i].fillcolor = {0, 0, 0}
 		if i == marioworld then
-			guielements["world-" .. i].fillcolor = {30, 30, 30}
+			guielements["world-" .. i].fillcolor = {30/255, 30/255, 30/255}
 		end
 		guielements["world-" .. i].clickswithinyrange = clickablerange
 		
@@ -4662,8 +4662,8 @@ function getmaps()
 	end
 	
 	guielements["newworld"] = guielement:new("button", 3, 20+(#mappacklevels*16), TEXT["new world"], addworld, 0, nil, 1.4, 83, true)
-	guielements["newworld"].bordercolor = {150, 150, 150}
-	guielements["newworld"].bordercolorhigh = {255, 255, 255}
+	guielements["newworld"].bordercolor = {150/255, 150/255, 150/255}
+	guielements["newworld"].bordercolorhigh = {1, 1, 1}
 	guielements["newworld"].fillcolor = {0, 0, 0}
 end
 
@@ -4686,32 +4686,32 @@ function createlevelbuttons(i)
 				s = s .. "_" .. k
 			end
 			s = s .. ".txt"
-			if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/" .. s) then
+			if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. s) then
 				existingmaps[i][j][k] = true
-				guielements[name].textcolor = {255, 255, 255}
+				guielements[name].textcolor = {1, 1, 1}
 				if meta_data and meta_data[i .. "~" .. j .. "~" .. k] then
 					local d = meta_data[i .. "~" .. j .. "~" .. k]
 					if d.img then
 						guielements[name].image = d.img
-						guielements[name].imagecolor = {128, 128, 128}
+						guielements[name].imagecolor = {.5, .5, .5}
 						guielements[name].imageoffsetx = 2
 						guielements[name].imageoffsety = 2
 					end
 					--guielements[name].fillcolor = meta_data[i .. "~" .. j .. "~" .. k]
 				end
 			else
-				guielements[name].textcolor = {50, 50, 50}
+				guielements[name].textcolor = {50/255, 50/255, 50/255}
 			end
 			
 			if i == marioworld and j == mariolevel and k == mariosublevel then
 				if existingmaps[i][j][k] == true  then
 					guielements[name].textcolor = {0, 0, 0}
 				else
-					guielements[name].textcolor = {100, 100, 100}
+					guielements[name].textcolor = {100/255, 100/255, 100/255}
 				end
 					
-				guielements[name].bordercolorhigh = {255, 255, 255}
-				guielements[name].fillcolor = {255, 255, 255}
+				guielements[name].bordercolorhigh = {1, 1, 1}
+				guielements[name].fillcolor = {1, 1, 1}
 				guielements[name].image = false
 			end
 			
@@ -4725,8 +4725,8 @@ function createlevelbuttons(i)
 	end
 	
 	guielements["newlevel-" .. i] = guielement:new("button", 104, 20+(#mappacklevels[i]*39), TEXT["new level"], addlevel, 0, nil, 1.6, 83, true)
-	guielements["newlevel-" .. i].bordercolor = {150, 150, 150}
-	guielements["newlevel-" .. i].bordercolorhigh = {255, 255, 255}
+	guielements["newlevel-" .. i].bordercolor = {150/255, 150/255, 150/255}
+	guielements["newlevel-" .. i].bordercolorhigh = {1, 1, 1}
 	guielements["newlevel-" .. i].fillcolor = {0, 0, 0}
 end
 
@@ -4737,10 +4737,10 @@ function switchworldselection(w)
 	
 	for i = 1, #mappacklevels do
 		if i == w then
-			guielements["world-" .. i].fillcolor = {80, 80, 80}
+			guielements["world-" .. i].fillcolor = {80/255, 80/255, 80/255}
 		else
 			if i == marioworld then
-				guielements["world-" .. i].fillcolor = {30, 30, 30}
+				guielements["world-" .. i].fillcolor = {30/255, 30/255, 30/255}
 			else
 				guielements["world-" .. i].fillcolor = {0, 0, 0}
 			end
@@ -4774,14 +4774,14 @@ function addworld()
 			world = alphabet:sub(world-9, world-9)
 		end
 		guielements["world-" .. i] = guielement:new("button", 3, 20+((i-1)*16), TEXT["world "] .. world, switchworldselection, 0, {i}, 1.4, 83, true)
-		guielements["world-" .. i].bordercolor = {150, 150, 150}
-		guielements["world-" .. i].bordercolorhigh = {255, 255, 255}
+		guielements["world-" .. i].bordercolor = {150/255, 150/255, 150/255}
+		guielements["world-" .. i].bordercolorhigh = {1, 1, 1}
 		guielements["world-" .. i].fillcolor = {0, 0, 0}
 		
 		guielements["newworld"].y = guielements["newworld"].y + 16
 		updatelevelscrollbar()
 	else
-		guielements["newworld"].fillcolor = {100, 0, 0}
+		guielements["newworld"].fillcolor = {100/255, 0, 0}
 	end
 end
 
@@ -4796,7 +4796,7 @@ function addlevel()
 		guielements["newlevel-" .. w].y = guielements["newlevel-" .. w].y + 39
 		updatelevelscrollbar()
 	else
-		guielements["newlevel-" .. w].fillcolor = {100, 0, 0}
+		guielements["newlevel-" .. w].fillcolor = {100/255, 0, 0}
 	end
 end
 
@@ -4817,7 +4817,7 @@ function addsublevel(l)
 
 		--guielements["newsublevel-" .. w .. "-" .. l].x = guielements["newsublevel-" .. w .. "-" .. l].x + 19
 	else
-		guielements["newsublevel-" .. w .. "-" .. l].textcolor = {100, 0, 0}
+		guielements["newsublevel-" .. w .. "-" .. l].textcolor = {100/255, 0, 0}
 	end
 end
 
@@ -5601,7 +5601,7 @@ function openrightclickmenu(x, y, tileX, tileY)
 			local obj = i+extraobjects
 			width = 0
 			if v.rightclick[i][1] == "text" then
-				table.insert(rightclickobjects, guielement:new("text", rx, ry, v.rightclick[i][2], {255, 255, 255}))
+				table.insert(rightclickobjects, guielement:new("text", rx, ry, v.rightclick[i][2], {1, 1, 1}))
 				width = 8*#v.rightclick[i][2]
 				addv = 10
 			elseif v.rightclick[i][1] == "dropdown" then
@@ -5704,7 +5704,7 @@ function openrightclickmenu(x, y, tileX, tileY)
 			local width = 0
 			local ttype = type(t)
 			if ttype == "string" then
-				table.insert(rightclickobjects, guielement:new("text", rx, ry, t, {255, 255, 255}))
+				table.insert(rightclickobjects, guielement:new("text", rx, ry, t, {1, 1, 1}))
 				width = 8*#t
 				addv = 10
 			elseif ttype == "table" then
@@ -5810,18 +5810,18 @@ function openrightclickmenu(x, y, tileX, tileY)
 							rightclickvalues2[variablenum] = dir
 							for i = objstart, objstart+objs-1 do
 								if i == obj then
-									rightclickobjects[i].bordercolorhigh = {255,127,127}
-									rightclickobjects[i].bordercolor = {255,0,0}
+									rightclickobjects[i].bordercolorhigh = {1, .5, .5}
+									rightclickobjects[i].bordercolor = {1, 0, 0}
 								else
-									rightclickobjects[i].bordercolorhigh = {255,255,255}
-									rightclickobjects[i].bordercolor = {127,127,127}
+									rightclickobjects[i].bordercolorhigh = {1, 1, 1}
+									rightclickobjects[i].bordercolor = {.5, .5, .5}
 								end
 							end
 						end
 						local b = guielement:new("button", rx+width, ry, bt[i][1], buttonfunc, 0, {t[2], bt[i][2], #rightclickobjects+1, buttonsstart, #bt}, 1, 8)
 						if rightclickvalues2[t[2]] == bt[i][2] then--is the direction selected
-							b.bordercolorhigh = {255, 127, 127}
-							b.bordercolor = {255, 0, 0}
+							b.bordercolorhigh = {1, .5, .5}
+							b.bordercolor = {1, 0, 0}
 						end
 						table.insert(rightclickobjects, b)
 						width = width + 8+4
@@ -5850,7 +5850,7 @@ function openrightclickmenu(x, y, tileX, tileY)
 					addv = 13
 				elseif obj == "slider" then
 					local d = guielement:new("scrollbar", rx, ry, 100, 33, 9, vt[t[2]], "hor")
-					d.backgroundcolor = {0,0,0}
+					d.backgroundcolor = {0, 0, 0}
 					d.scrollstep = 0
 					d.displayfunction = t[3]
 					d.rightclickvalue = t[2]
@@ -6954,7 +6954,7 @@ function loadmtobjects()
 	multitileobjects = {}
 	multitileobjectnames = nil
 	multitileobjectnames = {}
-	if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/objects.txt") then
+	if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/objects.txt") then
 		local data = love.filesystem.read(mappackfolder .. "/" .. mappack .. "/objects.txt")
 		if #data > 0 then
 			data = string.sub(data, 1, -2)
@@ -7184,7 +7184,7 @@ function changebackgroundrgb()
 		guielements["backgroundinput3"].value = 0
 		thev = tonumber(guielements["backgroundinput3"].value)
 	end
-	backgroundrgb = {guielements["backgroundinput1"].value, guielements["backgroundinput2"].value, guielements["backgroundinput3"].value}
+	backgroundrgb = {guielements["backgroundinput1"].value/255, guielements["backgroundinput2"].value/255, guielements["backgroundinput3"].value/255}
 	backgroundcolor[4] = backgroundrgb
 	changebackground(4)
 	guielements["backgroundinput1"].inputting = false
@@ -7200,9 +7200,9 @@ function defaultbackground(i)
 
 	if i == 4 then
 		backgroundcolor[4] = backgroundrgb
-		guielements["backgroundinput1"].value = backgroundrgb[1]
-		guielements["backgroundinput2"].value = backgroundrgb[2]
-		guielements["backgroundinput3"].value = backgroundrgb[3]
+		guielements["backgroundinput1"].value = round(backgroundrgb[1]*255)
+		guielements["backgroundinput2"].value = round(backgroundrgb[2]*255)
+		guielements["backgroundinput3"].value = round(backgroundrgb[3]*255)
 	end
 
 	love.graphics.setBackgroundColor(backgroundcolor[i])
@@ -7377,13 +7377,13 @@ function changecurrentenemy(var, initial)
 end
 function exportcustomimage(arg)
 	if customtabstate == "graphics" then
-		if not love.filesystem.exists( mappackfolder .. "/" .. mappack .. "/custom") then
+		if not love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/custom") then
 			love.filesystem.createDirectory( mappackfolder .. "/" .. mappack .. "/custom")
 		end
 		love.filesystem.write(mappackfolder .. "/" .. mappack .. "/custom/" .. currentcustomimage[3], love.filesystem.read("graphics/" .. graphicspack .. "/" .. currentcustomimage[3]))
 	elseif customtabstate == "tiles" then
 		if arg == "animated" then
-			if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/animated/1.png") then
+			if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/animated/1.png") then
 				love.filesystem.write(mappackfolder .. "/" .. mappack .. "/animated/template.png", love.filesystem.read("graphics/templates/animated/1.png"))
 				love.filesystem.write(mappackfolder .. "/" .. mappack .. "/animated/template.txt", love.filesystem.read("graphics/templates/animated/1.txt"))
 			else
@@ -7391,14 +7391,14 @@ function exportcustomimage(arg)
 				love.filesystem.write(mappackfolder .. "/" .. mappack .. "/animated/1.txt", love.filesystem.read("graphics/templates/animated/1.txt"))
 			end
 		else
-			if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/tiles.png") then
+			if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/tiles.png") then
 				love.filesystem.write(mappackfolder .. "/" .. mappack .. "/tilestemplate.png", love.filesystem.read("graphics/" .. graphicspack .. "/smbtiles.png"))
 			else
 				love.filesystem.write(mappackfolder .. "/" .. mappack .. "/tiles.png", love.filesystem.read("graphics/" .. graphicspack .. "/smbtiles.png"))
 			end
 		end
 	elseif customtabstate == "sounds" then
-		if not love.filesystem.exists( mappackfolder .. "/" .. mappack .. "/sounds") then
+		if not love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/sounds") then
 			love.filesystem.createDirectory( mappackfolder .. "/" .. mappack .. "/sounds")
 		end
 		love.filesystem.write(mappackfolder .. "/" .. mappack .. "/sounds/" .. currentcustomsound[3], love.filesystem.read("sounds/" .. currentcustomsound[3]))
@@ -7407,20 +7407,20 @@ function exportcustomimage(arg)
 		if not enemy then
 			enemy = "goomba"
 		end
-		if not love.filesystem.exists( mappackfolder .. "/" .. mappack .. "/enemies") then
+		if not love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/enemies") then
 			love.filesystem.createDirectory( mappackfolder .. "/" .. mappack .. "/enemies")
 		end
-		if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/enemies/" .. enemy .. ".json") then
+		if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/enemies/" .. enemy .. ".json") then
 			love.filesystem.write(mappackfolder .. "/" .. mappack .. "/enemies/" .. enemy .. ".json", love.filesystem.read(mappackfolder .. "/" .. mappack .. "/enemies/" .. enemy .. ".json"))
-			if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/enemies/" .. enemy .. ".png") then
+			if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/enemies/" .. enemy .. ".png") then
 				love.filesystem.write(mappackfolder .. "/" .. mappack .. "/enemies/" .. enemy .. ".png", love.filesystem.read(mappackfolder .. "/" .. mappack .. "/enemies/" .. enemy .. ".png"))
 			end
-			if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/enemies/" .. enemy .. ".ogg") then
+			if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/enemies/" .. enemy .. ".ogg") then
 				love.filesystem.write(mappackfolder .. "/" .. mappack .. "/enemies/" .. enemy .. ".ogg", love.filesystem.read(mappackfolder .. "/" .. mappack .. "/enemies/" .. enemy .. ".ogg"))
 			end
-		elseif love.filesystem.exists("customenemies/" .. enemy .. ".json") then
+		elseif love.filesystem.getInfo("customenemies/" .. enemy .. ".json") then
 			love.filesystem.write(mappackfolder .. "/" .. mappack .. "/enemies/" .. enemy .. ".json", love.filesystem.read("customenemies/" .. enemy .. ".json"))
-			if love.filesystem.exists("customenemies/" .. enemy .. ".png") then
+			if love.filesystem.getInfo("customenemies/" .. enemy .. ".png") then
 				love.filesystem.write(mappackfolder .. "/" .. mappack .. "/enemies/" .. enemy .. ".png", love.filesystem.read("customenemies/" .. enemy .. ".png"))
 			end
 		end
@@ -7432,7 +7432,7 @@ function opencustomimagefolder(f)
 		return false
 	end
 	if customtabstate == "graphics" then
-		if not love.filesystem.exists( mappackfolder .. "/" .. mappack .. "/custom") then
+		if not love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/custom", "directory") then
 			love.filesystem.createDirectory( mappackfolder .. "/" .. mappack .. "/custom")
 		end
 		love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/" .. mappackfolder .. "/" .. mappack .. "/custom")
@@ -7440,30 +7440,30 @@ function opencustomimagefolder(f)
 		if f == "tiles" then
 			love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/" .. mappackfolder .. "/" .. mappack)
 		elseif f == "animated" then
-			if not love.filesystem.exists( mappackfolder .. "/" .. mappack .. "/animated") then
+			if not love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/animated", "directory") then
 				love.filesystem.createDirectory( mappackfolder .. "/" .. mappack .. "/animated")
 			end
 			love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/" .. mappackfolder .. "/" .. mappack .. "/animated")
 		end
 	elseif customtabstate == "backgrounds" then
-		if not love.filesystem.exists( mappackfolder .. "/" .. mappack .. "/backgrounds") then
+		if not love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/backgrounds", "directory") then
 			love.filesystem.createDirectory( mappackfolder .. "/" .. mappack .. "/backgrounds")
 		end
 		love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/" .. mappackfolder .. "/" .. mappack .. "/backgrounds")
 	elseif customtabstate == "sounds" then
 		if f == "sounds" then
-			if not love.filesystem.exists( mappackfolder .. "/" .. mappack .. "/sounds") then
+			if not love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/sounds", "directory") then
 				love.filesystem.createDirectory( mappackfolder .. "/" .. mappack .. "/sounds")
 			end
 			love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/" .. mappackfolder .. "/" .. mappack .. "/sounds")
 		else
-			if not love.filesystem.exists( mappackfolder .. "/" .. mappack .. "/music") then
+			if not love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/music", "directory") then
 				love.filesystem.createDirectory( mappackfolder .. "/" .. mappack .. "/music")
 			end
 			love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/" .. mappackfolder .. "/" .. mappack .. "/music")
 		end
 	elseif customtabstate == "enemies" then
-		if not love.filesystem.exists( mappackfolder .. "/" .. mappack .. "/enemies") then
+		if not love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/enemies", "directory") then
 			love.filesystem.createDirectory( mappackfolder .. "/" .. mappack .. "/enemies")
 		end
 		love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/" .. mappackfolder .. "/" .. mappack .. "/enemies")
@@ -7479,7 +7479,7 @@ function savecustomimage()
 		collectgarbage()
 		notice.new("Updated sprites", notice.white, 2)
 	elseif customtabstate == "tiles" then
-		if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/tiles.png") then
+		if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/tiles.png") then
 			--remove custom sprites
 			for i = smbtilecount+portaltilecount+1, #tilequads do
 				tilequads[i] = nil
@@ -7507,7 +7507,7 @@ function savecustomimage()
 			customtilecount = 0
 			notice.new("No tiles found!", notice.red, 2)
 		end
-		if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/animated/1.png") then
+		if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/animated/1.png") then
 			loadanimatedtiles()
 			notice.new("Updated animated tiles", notice.white, 2)
 		end
@@ -7550,7 +7550,7 @@ function replacecustomimage(file)
 			end
 		elseif customtabstate == "text" and textstate == "levelscreen" then
 			d:encode("png", mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "-" .. mariolevel .. "levelscreen.png")
-			if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "-" .. mariolevel .. "levelscreen.png") then
+			if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "-" .. mariolevel .. "levelscreen.png") then
 				levelscreenimage = love.graphics.newImage(mappackfolder .. "/" .. mappack .. "/" .. marioworld .. "-" .. mariolevel .. "levelscreen.png")
 			else
 				levelscreenimage = false
@@ -7741,7 +7741,7 @@ end
 function savemtobject(objecttable, name)
 	-- 1 read objects file
 	local data, data2, datalines, objectname
-	if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/objects.txt") then
+	if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/objects.txt") then
 		data = love.filesystem.read(mappackfolder .. "/" .. mappack .. "/objects.txt")
 	else
 		data = ""
@@ -7788,7 +7788,7 @@ function savemtobject(objecttable, name)
 end
 
 function changemtname(linenumber)
-	if not love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/objects.txt") then
+	if not love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/objects.txt") then
 		return false
 	end
 	
@@ -7812,7 +7812,7 @@ function changemtname(linenumber)
 end
 
 function moveline(file, line, direction)
-	if love.filesystem.exists(file) == false then
+	if not love.filesystem.getInfo(file) then
 		return false
 	end
 	if direction ~= "up" then
@@ -7860,7 +7860,7 @@ function moveline(file, line, direction)
 end
 
 function deleteline(file, line)
-	if love.filesystem.exists(file) == false then
+	if not love.filesystem.getInfo(file) then
 		return false
 	end
 	line = tonumber(line)
@@ -7878,7 +7878,7 @@ function deleteline(file, line)
 end
 
 function changeline(file, linenumber, newstring)
-	if love.filesystem.exists(file) == false then
+	if not love.filesystem.getInfo(file) then
 		return false
 	end
 	line = tonumber(line)
@@ -8075,7 +8075,7 @@ function levelrightclickmenuclick(i)
 		filename = filename .. "_" .. levelrightclickmenu.level[3]
 	end
 	if i == 2 then --copy
-		if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/" .. filename .. ".txt") then
+		if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. filename .. ".txt") then
 			levelrightclickmenu.copy = love.filesystem.newFileData(mappackfolder .. "/" .. mappack .. "/" .. filename .. ".txt")
 			notice.new("Level Copied", notice.white, 3)
 		else
@@ -8091,7 +8091,7 @@ function levelrightclickmenuclick(i)
 			notice.new("No level copied", notice.red, 3)
 		end
 	elseif i == 4 then --delete
-		if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/" .. filename .. ".txt") then
+		if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. filename .. ".txt") then
 			local readd = love.filesystem.read(mappackfolder .. "/" .. mappack .. "/" .. filename .. ".txt")
 			if readd then
 				levelrightclickmenu.copy = readd
@@ -8104,12 +8104,12 @@ function levelrightclickmenuclick(i)
 			end
 		end
 	end
-	if love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/" .. filename .. ".txt") then
+	if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/" .. filename .. ".txt") then
 		existingmaps[levelrightclickmenu.level[1]][levelrightclickmenu.level[2]][levelrightclickmenu.level[3]] = true
-		levelrightclickmenu.button.textcolor = {255, 255, 255}
+		levelrightclickmenu.button.textcolor = {1, 1, 1}
 	else
 		existingmaps[levelrightclickmenu.level[1]][levelrightclickmenu.level[2]][levelrightclickmenu.level[3]] = false
-		levelrightclickmenu.button.textcolor = {80, 80, 80}
+		levelrightclickmenu.button.textcolor = {80/255, 80/255, 80/255}
 	end
 	levelrightclickmenu.active = false
 end
@@ -8217,7 +8217,7 @@ function loadeditormetadata()
 		end
 	end
 	--[[
-	if not love.filesystem.exists(mappackfolder .. "/" .. mappack .. "/editor.txt") then
+	if not love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/editor.txt") then
 		return false
 	end
 	local s = love.filesystem.read(mappackfolder .. "/" .. mappack .. "/editor.txt")
