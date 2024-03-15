@@ -102,6 +102,8 @@ local loadingbardraw = function(add)
 end
 
 function love.load()
+	LOCAL_PLAYERS = 8
+
 	loadingbarv = 0
 
 	marioversion = 1006
@@ -1248,14 +1250,18 @@ function saveconfig()
 	
 	if mariocharacter then
 		s = s .. "mariocharacter:"
-		for i = 1, 4 do
+		for i = 1, LOCAL_PLAYERS do
 			if mariocharacter[i] then
-				s = s .. mariocharacter[i] .. ","
+				s = s .. mariocharacter[i]
 			else
-				s = s .. "mario,"
+				s = s .. "mario"
+			end
+			if i < #mariocharacter then
+				s = s .. ","
+			else
+				s = s ..";"
 			end
 		end
-		s = s .. ";"
 	end
 	
 	for i = 1, #mariocolors do
@@ -1370,10 +1376,13 @@ function loadconfig(nodefaultconfig)
 	
 	local s
 	if love.filesystem.getInfo("alesans_entities/options.txt") then
+		print("Found alesans options")
 		s = love.filesystem.read("alesans_entities/options.txt")
 	elseif love.filesystem.getInfo("options.txt") then
+		print("Found default options")
 		s = love.filesystem.read("options.txt")
 	else
+		print("no options found")
 		return
 	end
 	
@@ -1500,6 +1509,7 @@ function loadconfig(nodefaultconfig)
 			localnick = s2[2]
 		elseif s2[1] == "mariocharacter" then
 			local s3 = s2[2]:split(",")
+			print("mariocharacter before for", #mariocharacter)
 			for i = 1, #s3 do
 				if s3[i] == "false" then
 					mariocharacter[i] = "mario"
@@ -1507,6 +1517,7 @@ function loadconfig(nodefaultconfig)
 					mariocharacter[i] = s3[i]
 				end
 			end
+			print("mariocharacter after for", #mariocharacter)
 		end
 	end
 	
@@ -1553,7 +1564,7 @@ function defaultconfig()
 	controls[i]["use"] = {"e"}
 	controls[i]["pause"] = {""}
 	
-	for i = 2, 4 do
+	for i = 2, LOCAL_PLAYERS do
 		controls[i] = {}
 		controls[i]["right"] = {"joy", i-1, "hat", 1, "r"}
 		controls[i]["left"] = {"joy", i-1, "hat", 1, "l"}
@@ -1575,15 +1586,15 @@ function defaultconfig()
 	
 	portalhues = {}
 	portalcolor = {}
-	for i = 1, 4 do
-		local players = 4
+	for i = 1, LOCAL_PLAYERS do
+		local players = LOCAL_PLAYERS
 		portalhues[i] = {(i-1)*(1/players), (i-1)*(1/players)+0.5/players}
 		portalcolor[i] = {getrainbowcolor(portalhues[i][1]), getrainbowcolor(portalhues[i][2])}
 	end
 	
 	--hats.
 	mariohats = {}
-	for i = 1, 4 do
+	for i = 1, LOCAL_PLAYERS do
 		mariohats[i] = {1}
 	end
 	
@@ -1599,11 +1610,15 @@ function defaultconfig()
 	mariocolors[2] = {{      1,       1,       1}, {      0, 160/255,       0}, {252/255, 152/255,  56/255}}
 	mariocolors[3] = {{      0,       0,       0}, {200/255,  76/255,  12/255}, {252/255, 188/255, 176/255}}
 	mariocolors[4] = {{ 32/255,  56/255, 236/255}, {      0, 128/255, 136/255}, {252/255, 152/255,  56/255}}
-	for i = 5, players do
+	for i = 5, LOCAL_PLAYERS do
 		mariocolors[i] = mariocolors[math.random(4)]
 	end
-
-	mariocharacter = {"mario", "mario", "mario", "mario"}
+	print("players: ", players)
+    print("mariocolors: ", #mariocolors)
+	mariocharacter = {}
+	for i=1, LOCAL_PLAYERS do
+		mariocharacter[i] = "mario"
+	end
 	
 	--options
 	scale = 2

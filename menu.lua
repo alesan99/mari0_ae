@@ -446,7 +446,7 @@ function menu_draw()
 		end
 	end]]
 	
-	for j = 1, math.min(4, players) do
+	for j = 1, math.min(LOCAL_PLAYERS, players) do
 		local char = mariocharacter[j]
 		local v = characters.data[char]
 		if (not v) or (not v["animations"]) then
@@ -466,7 +466,7 @@ function menu_draw()
 		for k = 1, #v.colorables do
 			if v["animations"] then
 				love.graphics.setColor(unpack(mariocolors[j][k] or {0,0,0}))
-				love.graphics.draw(v["animations"][k], v["small"]["idle"][idlei], (startx*16-6+v.smalloffsetX)*scale+8*(j-1)*scale, (starty*16-12-v.smalloffsetY)*scale, 0, scale, scale, v.smallquadcenterX, v.smallquadcenterY)
+				love.graphics.draw(v["animations"][k], v["small"]["idle"][idlei], (startx*16-26+v.smalloffsetX)*scale+8*(j-1)*scale, (starty*16-12-v.smalloffsetY)*scale, 0, scale, scale, v.smallquadcenterX, v.smallquadcenterY)
 			end
 		end
 		
@@ -477,18 +477,18 @@ function menu_draw()
 				local yadd = 0
 				for i = 1, #mariohats[j] do
 					love.graphics.setColor(1, 1, 1)
-					love.graphics.draw(hat[mariohats[j][i]].graphic, hat[mariohats[j][i]].quad[1], (startx*16-6+v.smalloffsetX)*scale+8*(j-1)*scale, (starty*16-12-v.smalloffsetY)*scale, 0, scale, scale, v.smallquadcenterX - hat[mariohats[j][i]].x + offsets[1], v.smallquadcenterY - hat[mariohats[j][i]].y + offsets[2] + yadd)
+					love.graphics.draw(hat[mariohats[j][i]].graphic, hat[mariohats[j][i]].quad[1], (startx*16-26+v.smalloffsetX)*scale+8*(j-1)*scale, (starty*16-12-v.smalloffsetY)*scale, 0, scale, scale, v.smallquadcenterX - hat[mariohats[j][i]].x + offsets[1], v.smallquadcenterY - hat[mariohats[j][i]].y + offsets[2] + yadd)
 					yadd = yadd + (hat[mariohats[j][i]].height or 0)
 				end
 			elseif #mariohats[j] == 1 then
 				love.graphics.setColor(mariocolors[j][1])
-				love.graphics.draw(hat[mariohats[j][1]].graphic, hat[mariohats[j][1]].quad[1], (startx*16-6+v.smalloffsetX)*scale+8*(j-1)*scale, (starty*16-12-v.smalloffsetY)*scale, 0, scale, scale, v.smallquadcenterX - hat[mariohats[j][1]].x + offsets[1], v.smallquadcenterY - hat[mariohats[j][1]].y + offsets[2])
+				love.graphics.draw(hat[mariohats[j][1]].graphic, hat[mariohats[j][1]].quad[1], (startx*16-26+v.smalloffsetX)*scale+8*(j-1)*scale, (starty*16-12-v.smalloffsetY)*scale, 0, scale, scale, v.smallquadcenterX - hat[mariohats[j][1]].x + offsets[1], v.smallquadcenterY - hat[mariohats[j][1]].y + offsets[2])
 			end
 		end
 		
 		if v["animations"] then
 			love.graphics.setColor(1, 1, 1, 1)
-			love.graphics.draw(v["animations"][0], v["small"]["idle"][idlei], (startx*16-6+v.smalloffsetX)*scale+8*(j-1)*scale, (starty*16-12-v.smalloffsetY)*scale, 0, scale, scale, v.smallquadcenterX, v.smallquadcenterY)
+			love.graphics.draw(v["animations"][0], v["small"]["idle"][idlei], (startx*16-26+v.smalloffsetX)*scale+8*(j-1)*scale, (starty*16-12-v.smalloffsetY)*scale, 0, scale, scale, v.smallquadcenterX, v.smallquadcenterY)
 		end
 	end
 	
@@ -1148,6 +1148,7 @@ function menu_draw()
 			love.graphics.setColor(1, 1, 1, 1)
 			for i = 1, #v.colorables do
 				if mariocolors[skinningplayer][i] then
+					--print("mariocolors: ", #mariocolors, " skinningplayer: ", skinningplayer, " i: ", i)
 					love.graphics.setColor(unpack(mariocolors[skinningplayer][i]))
 				end
 				if mariocharacter[skinningplayer] then
@@ -1201,6 +1202,7 @@ function menu_draw()
 					love.graphics.draw(v["animations"][0], v["small"]["jump"][3][1], (152+v.smalloffsetX)*scale, (2+((j-1)*32)+infmarioY-v.smalloffsetY)*scale, infmarioR, scale, scale, v.smallquadcenterX, v.smallquadcenterY)
 				end
 				for i = 1, #v.colorables do
+					--print(#v.colorables, #mariocolors, skinningplayer, i, #mariocolors[skinningplayer])
 					love.graphics.setColor(unpack(mariocolors[skinningplayer][i]))
 					love.graphics.draw(v["animations"][i], v["small"]["jump"][3][1], (152+v.smalloffsetX)*scale, (2+((j-1)*32)+infmarioY-v.smalloffsetY)*scale, infmarioR, scale, scale, v.smallquadcenterX, v.smallquadcenterY)
 				end
@@ -2207,8 +2209,8 @@ function menu_keypressed(key, unicode)
 			end
 		elseif (key == "right" or key == "d") then
 			players = players + 1
-			if players > 4 then
-				players = 4
+			if players > LOCAL_PLAYERS then
+				players = LOCAL_PLAYERS
 			end
 		end
 	elseif gamestate == "mappackmenu" then
@@ -2381,7 +2383,7 @@ function menu_keypressed(key, unicode)
 				end
 			elseif (key == "right" or key == "d") then
 				if optionstab == 2 or optionstab == 1 then
-					if skinningplayer < 4 then
+					if skinningplayer < LOCAL_PLAYERS then
 						skinningplayer = skinningplayer + 1
 						characteri = characters.data[mariocharacter[skinningplayer]].i
 						if players > #controls then

@@ -197,7 +197,7 @@ function mario:init(x, y, i, animation, size, t, properties)
 	
 	self.customscissor = nil
 	
-	if (players == 1 and (not CustomPortalColors)) or self.playernumber > 4 then
+	if (players == 1 and (not CustomPortalColors)) or self.playernumber > LOCAL_PLAYERS then
 		self.portal1color = getDefaultPortalColor(1)
 		self.portal2color = getDefaultPortalColor(2)
 	else
