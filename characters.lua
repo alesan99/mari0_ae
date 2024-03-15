@@ -528,7 +528,6 @@ function splitimage(img, color, exclude, imagedata) --split singe image into col
 end
 
 function setcustomplayer(i, pn, initial) --name, player number, initial (don't change colors to defaults)
-	print("setcustomplayer(i, pn, initial)", i, pn, initial)
 	if i and characters.data[i] then
 		if love.filesystem.getInfo("alesans_entities/characters/" .. i .. "/config.txt") then
 			--incompatible probably
@@ -595,10 +594,7 @@ function setcustomplayer(i, pn, initial) --name, player number, initial (don't c
 		if characters.data[i].defaultcolors and pn > #characters.data[i].defaultcolors then
 			color_index = (pn % #characters.data[i].defaultcolors) + 1
 		end
-		--print("name ", i, " characters.data[i].defaultcolors: ", characters.data[i].defaultcolors, "characters.data[i].defaultcolors[color_index]", characters.data[i].defaultcolors[color_index])
-
 		if characters.data[i].defaultcolors and characters.data[i].defaultcolors[color_index] then
-			--print("#mariocolors[pn]: ", #mariocolors[pn], "#characters.data[i].defaultcolors[color_index]", #characters.data[i].defaultcolors[color_index])
 			if (not initial) or (mariocolors[pn] and #mariocolors[pn] < #characters.data[i].defaultcolors[color_index]) then
 				mariocolors[pn] = {}
 				for j = 1, #characters.data[i].colorables do

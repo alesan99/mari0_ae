@@ -1376,13 +1376,10 @@ function loadconfig(nodefaultconfig)
 	
 	local s
 	if love.filesystem.getInfo("alesans_entities/options.txt") then
-		print("Found alesans options")
 		s = love.filesystem.read("alesans_entities/options.txt")
 	elseif love.filesystem.getInfo("options.txt") then
-		print("Found default options")
 		s = love.filesystem.read("options.txt")
 	else
-		print("no options found")
 		return
 	end
 	
@@ -1509,7 +1506,6 @@ function loadconfig(nodefaultconfig)
 			localnick = s2[2]
 		elseif s2[1] == "mariocharacter" then
 			local s3 = s2[2]:split(",")
-			print("mariocharacter before for", #mariocharacter)
 			for i = 1, #s3 do
 				if s3[i] == "false" then
 					mariocharacter[i] = "mario"
@@ -1517,7 +1513,6 @@ function loadconfig(nodefaultconfig)
 					mariocharacter[i] = s3[i]
 				end
 			end
-			print("mariocharacter after for", #mariocharacter)
 		end
 	end
 	
@@ -1613,8 +1608,7 @@ function defaultconfig()
 	for i = 5, LOCAL_PLAYERS do
 		mariocolors[i] = mariocolors[math.random(4)]
 	end
-	print("players: ", players)
-    print("mariocolors: ", #mariocolors)
+
 	mariocharacter = {}
 	for i=1, LOCAL_PLAYERS do
 		mariocharacter[i] = "mario"

@@ -1148,7 +1148,6 @@ function menu_draw()
 			love.graphics.setColor(1, 1, 1, 1)
 			for i = 1, #v.colorables do
 				if mariocolors[skinningplayer][i] then
-					--print("mariocolors: ", #mariocolors, " skinningplayer: ", skinningplayer, " i: ", i)
 					love.graphics.setColor(unpack(mariocolors[skinningplayer][i]))
 				end
 				if mariocharacter[skinningplayer] then
@@ -1202,7 +1201,6 @@ function menu_draw()
 					love.graphics.draw(v["animations"][0], v["small"]["jump"][3][1], (152+v.smalloffsetX)*scale, (2+((j-1)*32)+infmarioY-v.smalloffsetY)*scale, infmarioR, scale, scale, v.smallquadcenterX, v.smallquadcenterY)
 				end
 				for i = 1, #v.colorables do
-					--print(#v.colorables, #mariocolors, skinningplayer, i, #mariocolors[skinningplayer])
 					love.graphics.setColor(unpack(mariocolors[skinningplayer][i]))
 					love.graphics.draw(v["animations"][i], v["small"]["jump"][3][1], (152+v.smalloffsetX)*scale, (2+((j-1)*32)+infmarioY-v.smalloffsetY)*scale, infmarioR, scale, scale, v.smallquadcenterX, v.smallquadcenterY)
 				end
