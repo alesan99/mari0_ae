@@ -590,16 +590,16 @@ function setcustomplayer(i, pn, initial) --name, player number, initial (don't c
 			loadplayerquads(characters.data[i])
 		end
 
-		local color_index = pn
+		local colorindex = pn
 		if characters.data[i].defaultcolors and pn > #characters.data[i].defaultcolors then
-			color_index = (pn % #characters.data[i].defaultcolors) + 1
+			colorindex = (pn % #characters.data[i].defaultcolors) + 1
 		end
-		if characters.data[i].defaultcolors and characters.data[i].defaultcolors[color_index] then
-			if (not initial) or (mariocolors[pn] and #mariocolors[pn] < #characters.data[i].defaultcolors[color_index]) then
+		if characters.data[i].defaultcolors and characters.data[i].defaultcolors[colorindex] then
+			if (not initial) or (mariocolors[pn] and #mariocolors[pn] < #characters.data[i].defaultcolors[colorindex]) then
 				mariocolors[pn] = {}
 				for j = 1, #characters.data[i].colorables do
-					if characters.data[i].defaultcolors[color_index][j] then
-						mariocolors[pn][j] = shallowcopy(characters.data[i].defaultcolors[color_index][j])
+					if characters.data[i].defaultcolors[colorindex][j] then
+						mariocolors[pn][j] = shallowcopy(characters.data[i].defaultcolors[colorindex][j])
 					else
 						print("missing colorable:" .. j)
 					end

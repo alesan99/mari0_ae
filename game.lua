@@ -3870,9 +3870,9 @@ function drawmultiHUD()
 		end
 	end
 
-	local text_scale = 1
+	local textscale = 1
 	if players > 6 then
-		text_scale = 6/players
+		textscale = 6/players
 	end
 
 	if livesdisplay then
@@ -3884,22 +3884,22 @@ function drawmultiHUD()
 			else
 				s = "p" .. i
 			end
-			
+
 			local x = (width*16)/players/2 + (width*16)/players*(i-1)
-			local cx = x-string.len(s)*4*text_scale-4*text_scale
+			local cx = x-string.len(s)*4*textscale-4*textscale
 			local cy = 25 --offset y
 
 			--display lives
 			love.graphics.setColor(1, 1, 1, 1)
-			properprintfunc(s, (cx+8*text_scale)*scale, cy*scale, text_scale)
+			properprintfunc(s, (cx+8*textscale)*scale, cy*scale, textscale)
 			if hudoutline then
 				love.graphics.setColor(0, 0, 0)
-				love.graphics.rectangle("fill", (cx-1*text_scale)*scale, (cy-1)*scale, 9*scale*text_scale, 9*scale*text_scale)
+				love.graphics.rectangle("fill", (cx-1*textscale)*scale, (cy-1)*scale, 9*scale*textscale, 9*scale*textscale)
 			end
 			love.graphics.setColor(mariocolors[i][1])
-			love.graphics.rectangle("fill", (cx)*scale, cy*scale, 7*scale*text_scale, 7*scale*text_scale)
+			love.graphics.rectangle("fill", (cx)*scale, cy*scale, 7*scale*textscale, 7*scale*textscale)
 			love.graphics.setColor(1, 1, 1, 1)
-			cy = cy + 10*text_scale
+			cy = cy + 10*textscale
 
 			if objects and objects["player"] and objects["player"][i] then
 				local p = objects["player"][i]
@@ -3907,16 +3907,16 @@ function drawmultiHUD()
 				if p.health and p.characterdata.healthimg then
 					love.graphics.setColor(1, 1, 1)
 					local s = "hp: " .. p.health
-					properprintfunc(s, cx*scale, cy*scale, text_scale)
-					cy = cy + 10*text_scale
+					properprintfunc(s, cx*scale, cy*scale, textscale)
+					cy = cy + 10*textscale
 				end
 				--keys
 				if p.key and p.key > 0 then
 					love.graphics.setColor(1, 1, 1)
 					local s = "*" .. p.key
-					love.graphics.draw(keyuiimg, keyuiquad[spriteset or 1][coinframe or 1], cx*scale, cy*scale, 0, scale*text_scale, scale*text_scale)
-					properprintfunc(s, (cx+9*text_scale)*scale, cy*scale, text_scale)
-					cy = cy + 10*text_scale
+					love.graphics.draw(keyuiimg, keyuiquad[spriteset or 1][coinframe or 1], cx*scale, cy*scale, 0, scale*textscale, scale*textscale)
+					properprintfunc(s, (cx+9*textscale)*scale, cy*scale, textscale)
+					cy = cy + 10*textscale
 				end
 			end
 		end
