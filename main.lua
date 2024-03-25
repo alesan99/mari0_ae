@@ -2605,7 +2605,7 @@ function properprintF(s, x, y, size)
 		end
 	end
 end
-function properprintFbackground(s, x, y, include, color, size)
+function properprintFbackground(s, x, y, size, include, color)
 	--UTF-8 CAPITALS OUTLINE
 	if s then
 		local size = size or 1
