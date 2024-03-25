@@ -1606,7 +1606,7 @@ function defaultconfig()
 	mariocolors[3] = {{      0,       0,       0}, {200/255,  76/255,  12/255}, {252/255, 188/255, 176/255}}
 	mariocolors[4] = {{ 32/255,  56/255, 236/255}, {      0, 128/255, 136/255}, {252/255, 152/255,  56/255}}
 	for i = 5, LOCAL_PLAYERS do
-		mariocolors[i] = mariocolors[math.random(4)]
+		mariocolors[i] = mariocolors[((i-1)%4)+1]
 	end
 
 	mariocharacter = {}
