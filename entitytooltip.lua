@@ -46,7 +46,7 @@ function entitytooltip:draw(a)
 		if not self.customenemy then
 			s = entitylist[self.ent].name or entitylist[self.ent].t
 		end
-		properprintFbackground(s, self.x, self.y, true)
+		properprintFbackground(s, self.x, self.y, 1, true)
 		love.graphics.setColor(0, 0, 0, a)
 		drawrectangle(self.x/scale, self.y/scale+8, (twidth+4), (theight+4))
 		love.graphics.setColor(1, 1, 1, a)
@@ -74,7 +74,7 @@ function entitytooltip:draw(a)
 						s = "no\ngraphic"
 					end
 					love.graphics.setColor(216/255, 40/255, 0, a)
-					properprintFbackground(s, self.x+(2+32-#("broken")*4)*scale+xoff, self.y+(10+32)*scale+yoff, true)
+					properprintFbackground(s, self.x+(2+32-#("broken")*4)*scale+xoff, self.y+(10+32)*scale+yoff, 1, true)
 				end
 			end
 			love.graphics.setScissor()
