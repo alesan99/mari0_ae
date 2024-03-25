@@ -2589,6 +2589,45 @@ function properprintFastbackground(s, x, y, size)
 	love.graphics.print(s, x, y-scale, 0, size*scale, size*scale)
 end
 --UTF-8 Printing
+function properprintf(s, x, y, size)
+	--UTF-8
+	if s then
+		local size = size or 1
+		local startx = x
+		for i, char, b in utf8.chars(tostring(s)) do
+			if char == " " then
+			elseif char == "\n" then
+				x = startx-((i)*(8*size))*scale
+				y = y + (10*size)*scale
+			elseif fontquads[char] then
+				love.graphics.draw(fontimage, fontquads[char], x+((i-1)*(8*size))*scale, y, 0, size*scale, size*scale)
+			end
+		end
+	end
+end
+function properprintfbackground(s, x, y, include, color, size)
+	--UTF-8 outline
+	if s then
+		local size = size or 1
+		local startx, starty = x, y
+		for i, char, b in utf8.chars(tostring(s)) do
+			if char == " " then
+			elseif char == "\n" then
+				x = startx-((i)*(8*size))*scale
+				y = y + (10*size)*scale
+			elseif fontquadsback[char] then
+				love.graphics.draw(fontbackimage, fontquadsback[char], x+((i-1)*(8*size)-1*size)*scale, y-(1*size)*scale, 0, size*scale, size*scale)
+			end
+		end
+		
+		if include ~= false then
+			if color then
+				love.graphics.setColor(color)
+			end
+			properprintf(s, startx, starty, size)
+		end
+	end
+end
 function properprintF(s, x, y, size)
 	--UTF-8 CAPITALS
 	if s then
