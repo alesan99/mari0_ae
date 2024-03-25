@@ -2605,7 +2605,7 @@ function properprintf(s, x, y, size)
 		end
 	end
 end
-function properprintfbackground(s, x, y, include, color, size)
+function properprintfbackground(s, x, y, size, include, color)
 	--UTF-8 outline
 	if s then
 		local size = size or 1
