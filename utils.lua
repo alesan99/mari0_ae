@@ -59,12 +59,44 @@ end
 --------------
 
 function hasvalue(tab, val)
-    for i, value in ipairs(tab) do
+    for i, value in pairs(tab) do
         if value == val then
             return true
         end
     end
     return false
+end
+
+function spairs(t, compare)
+	local sorted = {}
+	for k in pairs(t) do
+		table.insert(sorted, k)
+	end
+
+	if compare then
+		table.sort(sorted, function(a,b) return compare(a,b,t) end)
+	else
+		table.sort(sorted)
+	end
+
+	-- iterator
+	local i = 0
+    return function()
+        i = i + 1
+        if sorted[i] then
+            return sorted[i], t[sorted[i]]
+        end
+    end
+end
+
+function kpairs(t, keys)
+	local i = 0
+	return function()
+		i = i + 1
+		if keys[i] then
+			return keys[i], t[keys[i]]
+		end
+	end
 end
 
 function isPaused(source)
