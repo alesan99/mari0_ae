@@ -715,7 +715,7 @@ function game_update(dt)
 	for i, v in kpairs(objects, objectskeys) do
 		if i ~= "tile" and i ~= "portalwall" and i ~= "screenboundary" and i ~= "coin" and i ~= "risingwater" and i ~= "clearpipesegment" and i ~= "tracksegment" and i ~= "funnel" and i ~= "clearpipe" then
 			delete = nil
-			for j, w in pairs(v) do
+			for j, w in spairs(v) do
 				if dropshadow and w.shot and w.rotation then
 					if not w.dropshadowrotation then
 						w.dropshadowrotation = w.rotation
