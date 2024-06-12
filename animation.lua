@@ -871,15 +871,15 @@ function animation:update(dt)
 			elseif v[1] == "transformenemy" then
 				transformenemyanimation(v[2])
 			elseif v[1] == "killallenemies" then
-				for i2, v2 in pairs(objects) do
-					if i1 ~= "tile" and i2 ~= "buttonblock" then
-						for i, v in pairs(objects[i2]) do
-							if v.active and v.shotted and (not v.resistseverything) then
+				for i2, v2 in kpairs(objects, objectskeys) do
+					if i2 ~= "tile" and i2 ~= "buttonblock" then
+						for i3, v3 in pairs(objects[i2]) do
+							if v3.active and v3.shotted and (not v3.resistseverything) then
 								local dir = "right"
 								if math.random(1,2) == 1 then
 									dir = "left"
 								end
-								v:shotted(dir)
+								v3:shotted(dir)
 							end
 						end
 					end

@@ -158,7 +158,7 @@ function smbsitem:action(b)
 		end
 		playsound(keysound)
 	elseif self.t == "luckystar" then
-		for i2, v2 in pairs(objects) do
+		for i2, v2 in kpairs(objects, objectskeys) do
 			if i1 ~= "tile" and i2 ~= "buttonblock" then
 				for i, v in pairs(objects[i2]) do
 					if v.active and v.shotted and onscreen(v.x,v.y) and (not v.resistspowblock) then
