@@ -104,9 +104,9 @@ function lobby_draw()
 	guielements.mappackright:draw()
 	
 	if usemagic and adjective and noun then
-		properprintFbackground("magicdns: " .. adjective .. " " .. noun, 4*scale, 98*scale, true)
+		properprintFbackground("magicdns: " .. adjective .. " " .. noun, 4*scale, 98*scale, 1, true)
 	else
-		properprintFbackground("port: " .. net_getport(), 4*scale, 98*scale, true)
+		properprintFbackground("port: " .. net_getport(), 4*scale, 98*scale, 1, true)
 	end
 	if SERVER then
 		guielements.startbutton:draw()
