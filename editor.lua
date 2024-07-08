@@ -1093,7 +1093,8 @@ function editor_update(dt)
 			for i = 1, #mappacklevels do --world
 				guielements["world-" .. i].y = math.floor(20+((i-1)*16)-v)
 			end
-			guielements["newworld"].y = math.floor(20+((#mappacklevels)*16)-v)
+			guielements["world-M"].y = math.floor(20+((#mappacklevels)*16)-v)
+			guielements["newworld"].y = math.floor(20+((#mappacklevels+1)*16)-v)
 		end
 		
 		oldworldscrollbarv = v
@@ -2704,7 +2705,7 @@ function editor_draw()
 			guielements["levelscrollbar"]:draw()
 			
 			love.graphics.setScissor(2*scale, 20*scale, 100*scale, 201*scale)
-			for i = 1, #mappacklevels do --world
+			for i, v in pairs(mappacklevels) do --world
 				if guielements["world-" .. i].y > 0 and guielements["world-" .. i].y < height*16 then
 					guielements["world-" .. i]:draw()
 				end
@@ -3470,7 +3471,7 @@ function mapstab()
 	guielements["worldscrollbar"].active = true
 	guielements["levelscrollbar"].active = true
 	
-	for i = 1, #mappacklevels do --world
+	for i, v in pairs(mappacklevels) do --world
 		guielements["world-" .. i].active = true
 	end
 	guielements["newworld"].active = true
@@ -4144,7 +4145,7 @@ end
 
 function updatelevelscrollbar()
 	local scrolllimit = 201
-	worldscrollbarheight = math.max(0, ((#mappacklevels+1-(1/16))*16)-scrolllimit)
+	worldscrollbarheight = math.max(0, ((#mappacklevels+2-(1/16))*16)-scrolllimit)
 	guielements["worldscrollbar"].yrange = guielements["worldscrollbar"].yrange + guielements["worldscrollbar"].height
 	guielements["worldscrollbar"].height = math.max(30, math.min(1, scrolllimit/(worldscrollbarheight+scrolllimit))*scrolllimit)
 	guielements["worldscrollbar"].yrange = guielements["worldscrollbar"].yrange - guielements["worldscrollbar"].height
@@ -4660,8 +4661,19 @@ function getmaps()
 		
 		createlevelbuttons(i)
 	end
+
+	guielements["world-M"] = guielement:new("button", 3, 20+(#mappacklevels*16), TEXT["world "] .. "-", switchworldselection, 0, {"M"}, 1.4, 83, true)
+	guielements["world-M"].bordercolor = {150/255, 150/255, 150/255}
+	guielements["world-M"].bordercolorhigh = {1, 1, 1}
+	guielements["world-M"].fillcolor = {0, 0, 0}
+	if marioworld == "M" then
+		guielements["world-M"].fillcolor = {30/255, 30/255, 30/255}
+	end
+	guielements["world-M"].clickswithinyrange = clickablerange
 	
-	guielements["newworld"] = guielement:new("button", 3, 20+(#mappacklevels*16), TEXT["new world"], addworld, 0, nil, 1.4, 83, true)
+	createlevelbuttons("M")
+	
+	guielements["newworld"] = guielement:new("button", 3, 20+((#mappacklevels+1)*16), TEXT["new world"], addworld, 0, nil, 1.4, 83, true)
 	guielements["newworld"].bordercolor = {150/255, 150/255, 150/255}
 	guielements["newworld"].bordercolorhigh = {1, 1, 1}
 	guielements["newworld"].fillcolor = {0, 0, 0}
@@ -4735,7 +4747,7 @@ function switchworldselection(w)
 	local w = w or 1
 	currentworldselection = w
 	
-	for i = 1, #mappacklevels do
+	for i, v in pairs(mappacklevels) do
 		if i == w then
 			guielements["world-" .. i].fillcolor = {80/255, 80/255, 80/255}
 		else
@@ -4778,6 +4790,11 @@ function addworld()
 		guielements["world-" .. i].bordercolorhigh = {1, 1, 1}
 		guielements["world-" .. i].fillcolor = {0, 0, 0}
 		
+		guielements["world-M"] = guielement:new("button", 3, 20+((i)*16), TEXT["world "] .. "-", switchworldselection, 0, {"M"}, 1.4, 83, true)
+		guielements["world-M"].bordercolor = {150/255, 150/255, 150/255}
+		guielements["world-M"].bordercolorhigh = {1, 1, 1}
+		guielements["world-M"].fillcolor = {0, 0, 0}
+
 		guielements["newworld"].y = guielements["newworld"].y + 16
 		updatelevelscrollbar()
 	else
