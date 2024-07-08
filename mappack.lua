@@ -743,4 +743,6 @@ function getmappacklevels()
 		--print("world: ", i, " levels: ", #levelcount, " sublevels: ", unpack(levelcount))
 		table.insert(mappacklevels, levelcount)
 	end
+
+	mappacklevels["M"] = {defaultsublevels,defaultsublevels,defaultsublevels,defaultsublevels}
 end
