@@ -11,5 +11,5 @@ hudsimple=false
 toadtext=thank you mario!,but our princess is in,another castle!
 peachtext=thank you mario!,your quest is over.,we present you a new quest.,push button b,to play as steve
 steve=true
-levelscreen=1|1|
+levelscreen=1|1|mappack by alesan99
 hudhidecollectables=f,f,f,f,f,f,f,f,f,f
