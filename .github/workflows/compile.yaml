@@ -62,7 +62,7 @@ jobs:
         resource-path: "main/.android-resources"
         love-ref: 11.5a
         love-package: main/makelove-build/love/${{ env.ARTIFACT_NAME_LOVE }}
-        remote-libs: "https://github.com/love2d/lua-https"
+        remote-libs: "https://github.com/qixils/lua-https"
         version-string: ${{ steps.metadata.outputs.version }}
         version-code: ${{ steps.metadata.outputs.android-version }}
         output-folder: "main/makelove-build/android"
