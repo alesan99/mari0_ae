@@ -2,7 +2,7 @@ name: Compile
 on: [push, pull_request]
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       KEYSTORE_ALIAS: ${{ secrets.ANDROID_KEYSTORE_ALIAS }}
       KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
