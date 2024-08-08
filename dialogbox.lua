@@ -45,7 +45,7 @@ function dialogbox:init(text, speaker, color)
 			self.text = string.sub(self.text, 1, i-1) .. string.sub(self.text, j+1)
 		else
 			if newcolor then
-				self.textcolors[i] = {tonumber(curcolor[1])/255, tonumber(curcolor[2])/255, tonumber(curcolor[3])/255}
+				self.textcolors[i] = {tonumber(curcolor[1]), tonumber(curcolor[2]), tonumber(curcolor[3])}
 				newcolor = false
 			end
 			i = i + 1

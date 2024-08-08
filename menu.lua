@@ -1803,7 +1803,7 @@ function loadbackground(background)
 				else
 					local s4 = s3[2]:split(",")
 					local backgroundrgbon = true
-					local backgroundrgb = {tonumber(s4[1]), tonumber(s4[2]), tonumber(s4[3])}
+					local backgroundrgb = {tonumber(s4[1])/255, tonumber(s4[2])/255, tonumber(s4[3])/255}
 					love.graphics.setBackgroundColor(unpack(backgroundrgb))
 				end
 			elseif s3[1] == "spriteset" then

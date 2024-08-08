@@ -3052,7 +3052,7 @@ function drawentity(j, w, i, v, currentscissor, drop)
 				local graphiccolor = {}
 				for gci = 1, #v.graphiccolor do
 					local color = tonumber(v.graphiccolor[gci])
-					graphiccolor[gci] = color and color/255
+					graphiccolor[gci] = color
 				end
 				love.graphics.setColor(graphiccolor)
 			end
@@ -3104,7 +3104,7 @@ function drawentity(j, w, i, v, currentscissor, drop)
 					if v.graphiccolor and (not drop) then
 						local graphiccolor = {}
 						for gci = 1, #v.graphiccolor do
-							graphiccolor[gci] = tonumber(v.graphiccolor[i])/255
+							graphiccolor[gci] = tonumber(v.graphiccolor[i])
 						end
 						love.graphics.setColor(graphiccolor)
 					end
