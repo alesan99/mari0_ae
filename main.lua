@@ -1125,39 +1125,37 @@ function love.update(dt)
 end
 
 function love.draw()
-	if resizable or android then
-		if canvassupported or android then
-			if letterboxfullscreen and (shaders.passes[1].on or shaders.passes[2].on) then
-				love.graphics.setColor(0, 0, 0)
-				love.graphics.rectangle("fill", 0, 0, winwidth, winheight)
-			end
-			love.graphics.setCanvas({canvas, stencil=true})
-			love.graphics.clear()
-			lovedraw()
-			love.graphics.setCanvas()
-			if letterboxfullscreen and not (shaders.passes[1].on or shaders.passes[2].on) then
-				love.graphics.setColor(0, 0, 0)
-				love.graphics.rectangle("fill", 0, 0, winwidth, winheight)
-				local cw, ch = canvas:getWidth(), canvas:getHeight()--current size
-				local tw, th = winwidth, winheight--target size
-				local s
-				if cw/tw > ch/th then s = tw/cw
-				else s = th/ch end
-				love.graphics.setColor(1, 1, 1)
-				love.graphics.draw(canvas, winwidth/2, winheight/2, 0, s, s, cw/2, ch/2)
-			else
-				love.graphics.setColor(1, 1, 1)
-				love.graphics.draw(canvas, 0, 0, 0, winwidth/(width*16*scale), winheight/(224*scale))
-			end
-
-			if android and not androidLowRes then
-				androidDraw()
-			end
+	if android then
+		if letterboxfullscreen and (shaders.passes[1].on or shaders.passes[2].on) then
+			love.graphics.setColor(0, 0, 0)
+			love.graphics.rectangle("fill", 0, 0, winwidth, winheight)
+		end
+		love.graphics.setCanvas({canvas, stencil=true})
+		love.graphics.clear()
+		lovedraw()
+		love.graphics.setCanvas()
+		if letterboxfullscreen and not (shaders.passes[1].on or shaders.passes[2].on) then
+			love.graphics.setColor(0, 0, 0)
+			love.graphics.rectangle("fill", 0, 0, winwidth, winheight)
+			local cw, ch = canvas:getWidth(), canvas:getHeight()--current size
+			local tw, th = winwidth, winheight--target size
+			local s
+			if cw/tw > ch/th then s = tw/cw
+			else s = th/ch end
+			love.graphics.setColor(1, 1, 1)
+			love.graphics.draw(canvas, winwidth/2, winheight/2, 0, s, s, cw/2, ch/2)
 		else
-			love.graphics.scale(winwidth/(width*16*scale), winheight/(224*scale))
-			lovedraw()
+			love.graphics.setColor(1, 1, 1)
+			love.graphics.draw(canvas, 0, 0, 0, winwidth/(width*16*scale), winheight/(224*scale))
+		end
+
+		if android and not androidLowRes then
+			androidDraw()
 		end
 	else
+		if resizable then
+			love.graphics.scale(winwidth/(width*16*scale), winheight/(224*scale))
+		end
 		lovedraw()
 	end
 	
@@ -1178,10 +1176,8 @@ function lovedraw()
 	shaders:predraw()
 	
 	if resizable then
-		if canvassupported then
-			love.graphics.setColor(love.graphics.getBackgroundColor())
-			love.graphics.rectangle("fill", 0, 0, width*16*scale, height*16*scale)
-		end
+		love.graphics.setColor(love.graphics.getBackgroundColor())
+		love.graphics.rectangle("fill", 0, 0, width*16*scale, height*16*scale)
 	end
 	love.graphics.setColor(1, 1, 1)
 	love.graphics.push()
@@ -1302,9 +1298,7 @@ function saveconfig()
 		s = s .. "scale:" .. scale .. ";"
 	end
 
-	if letterboxfullscreen then
-		s = s .. "letterbox;"
-	end
+	s = s .. "letterbox:" .. tostring(letterboxfullscreen) .. ";"
 	
 	s = s .. "shader1:" .. shaderlist[currentshaderi1] .. ";"
 	s = s .. "shader2:" .. shaderlist[currentshaderi2] .. ";"
@@ -1438,15 +1432,15 @@ function loadconfig(nodefaultconfig)
 			end
 			
 		elseif s2[1] == "scale" then
-			if not nodefaultconfig then
-				if android then
-					scale = 1
-				else
-					scale = tonumber(s2[2])
-				end
+			if not nodefaultconfig and not android then
+				scale = tonumber(s2[2])
 			end
 		elseif s2[1] == "letterbox" then
-			letterboxfullscreen = true
+			if s2[2] then
+				letterboxfullscreen = (s2[2] == "true")
+			else
+				letterboxfullscreen = true
+			end
 		elseif s2[1] == "shader1" then
 			for i = 1, #shaderlist do
 				if shaderlist[i] == s2[2] then
@@ -1606,9 +1600,13 @@ function defaultconfig()
 	mariocharacter = {"mario", "mario", "mario", "mario"}
 	
 	--options
-	scale = 2
+	if android then
+		scale = 1
+	else
+		scale = 2
+	end
 	resizable = true
-	letterboxfullscreen = false
+	letterboxfullscreen = true
 	volume = 1
 	mappack = "smb"
 	vsync = false
@@ -1752,7 +1750,7 @@ function changescale(s, fullscreen)
 		resizable = true
 		
 		uispace = math.floor(width*16*scale/4)
-		love.window.setMode(width*16*scale, 224*scale, {fullscreen=fullscreen, vsync=vsync, msaa=fsaa, resizable=window_resizable, minwidth=width*16, minheight=224}) --27x14 blocks (15 blocks actual height)
+		love.window.setMode(width*16*scale, 224*scale, {fullscreen=fullscreen, vsync=vsync, msaa=fsaa, resizable=window_resizable, minwidth=width*16, minheight=224, highdpi=false, usedpiscale=false}) --27x14 blocks (15 blocks actual height)
 		
 		gamewidth, gameheight = love.graphics.getDimensions()
 		if android then
@@ -1761,12 +1759,9 @@ function changescale(s, fullscreen)
 			gamewidth, gameheight = width*16*scale, height*16*scale
 		end
 		winwidth, winheight = getWindowSize()
-		
-		canvassupported = true--love.graphics.isSupported("canvas")
-		if canvassupported then
-			canvas = love.graphics.newCanvas(width*16*scale, height*16*scale)
-			canvas:setFilter("nearest", "nearest")
-		end
+
+		canvas = love.graphics.newCanvas(width*16*scale, height*16*scale)
+		canvas:setFilter("nearest", "nearest")
 		
 		if shaders then
 			shaders:refresh()
@@ -1778,11 +1773,11 @@ function changescale(s, fullscreen)
 		if fullscreen then
 			fullscreen = true
 			scale = 2
-			love.window.setMode(800, 600, {fullscreen=fullscreen, vsync=vsync, msaa=fsaa})
+			love.window.setMode(800, 600, {fullscreen=fullscreen, vsync=vsync, msaa=fsaa, highdpi=false, usedpiscale=false})
 		end
 		
 		uispace = math.floor(width*16*scale/4)
-		love.window.setMode(width*16*scale, height*16*scale, {fullscreen=fullscreen,vsync=vsync, msaa=fsaa}) --27x14 blocks (15 blocks actual height)
+		love.window.setMode(width*16*scale, height*16*scale, {fullscreen=fullscreen,vsync=vsync, msaa=fsaa, highdpi=false, usedpiscale=false}) --27x14 blocks (15 blocks actual height)
 		
 		gamewidth, gameheight = love.graphics.getDimensions()
 		winwidth, winheight = getWindowSize()
@@ -1796,7 +1791,7 @@ end
 --resizing stuff
 function love.resize(w, h)
 	winwidth, winheight = w, h
-	if resizable and canvassupported then
+	if resizable then
 		if winwidth < (width*16*scale)*1.5 or winheight < (224*scale)*1.5 then
 			canvas:setFilter("linear", "linear")
 		else
@@ -1837,9 +1832,6 @@ end
 lgs = love.graphics.setScissor
 function love.graphics.setScissor(x, y, w, h)
 	if x and y and w and h then
-		if resizable and not canvassupported then
-			x, y, w, h = x*(winwidth/gamewidth), y*(winheight/gameheight), w*(winwidth/gamewidth), h*(winheight/gameheight)
-		end
 		lgs(x, y, w, h)
 	else
 		lgs()
@@ -1853,7 +1845,7 @@ function love.mouse.getX()
 		return x
 	end
 	local x = lmx()
-	if resizable and letterboxfullscreen and canvassupported and canvas then
+	if resizable and letterboxfullscreen and canvas then
 		local cw, ch = canvas:getWidth(), canvas:getHeight()--current size
 		local tw, th = winwidth, winheight--target size
 		local s
@@ -1872,7 +1864,7 @@ function love.mouse.getY()
 		return y
 	end
 	local y = lmy()
-	if resizable and letterboxfullscreen and canvassupported and canvas then
+	if resizable and letterboxfullscreen and canvas then
 		local cw, ch = canvas:getWidth(), canvas:getHeight()--current size
 		local tw, th = winwidth, winheight--target size
 		local s
@@ -2021,7 +2013,7 @@ function love.mousepressed(x, y, button, istouch)
 			love.touchpressed(1,x,y)
 			return false
 		end
-	elseif resizable and letterboxfullscreen and canvassupported and canvas then
+	elseif resizable and letterboxfullscreen and canvas then
 		x, y = love.mouse.getPosition()
 	elseif resizable then
 		x, y = x/(winwidth/gamewidth), y/(winheight/gameheight)
@@ -2098,7 +2090,7 @@ function love.mousereleased(x, y, button, istouch)
 			love.touchreleased(1,x,y)
 			return false
 		end
-	elseif resizable and letterboxfullscreen and canvassupported and canvas then
+	elseif resizable and letterboxfullscreen and canvas then
 		x, y = love.mouse.getPosition()
 	elseif resizable then
 		x, y = x/(winwidth/gamewidth), y/(winheight/gameheight)
@@ -2135,7 +2127,7 @@ function love.mousemoved(x, y, dx, dy, istouch)
 			end
 			return false
 		end
-	elseif resizable and letterboxfullscreen and canvassupported and canvas then
+	elseif resizable and letterboxfullscreen and canvas then
 		x, y = love.mouse.getPosition()
 		local cw, ch = canvas:getWidth(), canvas:getHeight()--current size
 		local tw, th = winwidth, winheight--target size

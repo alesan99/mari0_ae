@@ -601,7 +601,7 @@ function loadcustomsounds()
 		customprincessmusic = false
 	end
 	
-	if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/sounds") or customsounds then
+	if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/sounds", "directory") or customsounds then
 		for i, j in pairs(soundliststring) do
 			if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/sounds/" .. j .. ".ogg") then
 				local method = "static"

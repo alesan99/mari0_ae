@@ -59,12 +59,22 @@ end
 --------------
 
 function hasvalue(tab, val)
-    for i, value in ipairs(tab) do
+    for i, value in pairs(tab) do
         if value == val then
             return true
         end
     end
     return false
+end
+
+function kpairs(t, keys)
+	local i = 0
+	return function()
+		i = i + 1
+		if keys[i] then
+			return keys[i], t[keys[i]]
+		end
+	end
 end
 
 function isPaused(source)
