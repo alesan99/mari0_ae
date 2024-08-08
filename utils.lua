@@ -67,28 +67,6 @@ function hasvalue(tab, val)
     return false
 end
 
-function spairs(t, compare)
-	local sorted = {}
-	for k in pairs(t) do
-		table.insert(sorted, k)
-	end
-
-	if compare then
-		table.sort(sorted, function(a,b) return compare(a,b,t) end)
-	else
-		table.sort(sorted)
-	end
-
-	-- iterator
-	local i = 0
-    return function()
-        i = i + 1
-        if sorted[i] then
-            return sorted[i], t[sorted[i]]
-        end
-    end
-end
-
 function kpairs(t, keys)
 	local i = 0
 	return function()
