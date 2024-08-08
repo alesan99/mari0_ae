@@ -60,7 +60,7 @@ jobs:
         bundle-id: love.to.androidmari0 # backwards compatibility
         product-name: ${{ steps.metadata.outputs.id }}
         resource-path: "main/.android-resources"
-        love-ref: ${{ steps.metadata.outputs.love-version }}
+        love-ref: 11.5a
         love-package: main/makelove-build/love/${{ env.ARTIFACT_NAME_LOVE }}
         remote-libs: "https://github.com/love2d/lua-https"
         version-string: ${{ steps.metadata.outputs.version }}
