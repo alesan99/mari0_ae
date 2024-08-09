@@ -1,4 +1,4 @@
-function loadmappacksettings()
+function loadmappacksettings(suspended)
 	if not love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/settings.txt") then
 		return false
 	end
@@ -7,7 +7,9 @@ function loadmappacksettings()
 	for j = 1, #s1 do
 		local s2 = s1[j]:split("=")
 		if s2[1] == "lives" then
-			mariolivecount = tonumber(s2[2])
+			if not suspended then
+				mariolivecount = tonumber(s2[2])
+			end
 		elseif s2[1] == "physics" then
 			currentphysics = tonumber(s2[2]) or 1
 			setphysics(currentphysics)
@@ -32,7 +34,7 @@ function loadmappacksettings()
 	end
 end
 
-function updatemappacksettings()
+function updatemappacksettings(suspended)
 	--after settings are loaded, changes may have to be made
 	if CenterCamera and not editormode then
 		camerasetting = 2
@@ -49,14 +51,16 @@ function updatemappacksettings()
 		infinitelives = true
 	end
 	
-	mariolives = {}
-	for i = 1, players do
-		mariolives[i] = mariolivecount
-	end
-	
-	mariosizes = {}
-	for i = 1, players do
-		mariosizes[i] = 1
+	if not suspended then
+		mariolives = {}
+		for i = 1, players do
+			mariolives[i] = mariolivecount
+		end
+		
+		mariosizes = {}
+		for i = 1, players do
+			mariosizes[i] = 1
+		end
 	end
 	
 	updateplayerproperties()

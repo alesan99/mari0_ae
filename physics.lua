@@ -227,7 +227,7 @@ function physicsupdate(dt)
 					--Check for emancipation grill
 					if v.emancipatecheck then
 						for h, u in pairs(emancipationgrills) do
-							if u.active and v.emancipate then
+							if u.active and v.emancipate and not passed then --ignore if passing through portal and not actually crossing grill
 								if u.dir == "hor" then
 									if inrange(v.x+6/16, u.startx-1, u.endx, true) and inrange(u.y-14/16, oldy, v.y+v.speedy*dt, true) then
 										v:emancipate(h)

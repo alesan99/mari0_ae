@@ -91,8 +91,8 @@ function game_load(suspended)
 	objects = nil
 	if suspended == true then
 		continuegame()
-		loadmappacksettings()
-		updatemappacksettings()
+		loadmappacksettings("suspended")
+		updatemappacksettings("suspended")
 	elseif suspended then
 		marioworld = suspended
 	end
