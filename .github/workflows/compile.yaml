@@ -56,7 +56,7 @@ jobs:
       id: build-android
       uses: qixils/love-actions-android@v1
       with:
-        app-name: ${{ steps.metadata.outputs.title }}
+        app-name: "Mari0: AE"
         bundle-id: love.to.androidmari0 # backwards compatibility
         product-name: ${{ steps.metadata.outputs.id }}
         resource-path: "main/.android-resources"
