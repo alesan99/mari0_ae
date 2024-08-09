@@ -265,22 +265,22 @@ function game_update(dt)
 	
 	--SCROLLING SCORES
 	local delete
-	for i, v in ipairs(scrollingscores) do
-		if v:update(dt) == true then
+	for i, v in pairs(scrollingscores) do
+		if scrollingscores[i]:update(dt) == true then
 			if not delete then delete = {} end
 			table.insert(delete, i)
 		end
 	end
 	if delete then
 		table.sort(delete, function(a,b) return a>b end)
-		for i, v in ipairs(delete) do
+		for i, v in pairs(delete) do
 			table.remove(scrollingscores, v) --remove
 		end
 	end
 	
 	--If everyone's dead, just update the players and coinblock timer.
 	if everyonedead then
-		for i, v in ipairs(objects["player"]) do
+		for i, v in pairs(objects["player"]) do
 			v:update(dt)
 		end
 		
@@ -289,10 +289,10 @@ function game_update(dt)
 	
 	--check if updates are blocked for whatever reason
 	if noupdate then
-		for i, v in ipairs(objects["checkpointflag"]) do
+		for i, v in pairs(objects["checkpointflag"]) do
 			v:update(dt)
 		end
-		for i, v in ipairs(objects["player"]) do
+		for i, v in pairs(objects["player"]) do
 			v:update(dt)
 		end
 		return
@@ -344,7 +344,7 @@ function game_update(dt)
 			
 			if mariotime <= 0 then
 				mariotime = 0
-				for i, v in ipairs(objects["player"]) do
+				for i, v in pairs(objects["player"]) do
 					v:die("time")
 				end
 			end
@@ -366,7 +366,7 @@ function game_update(dt)
 	
 	--coinblockanimation
 	local delete
-	for i, v in ipairs(coinblockanimations) do
+	for i, v in pairs(coinblockanimations) do
 		if coinblockanimations[i]:update(dt) == true then
 			if not delete then delete = {} end
 			table.insert(delete, i)
@@ -374,14 +374,14 @@ function game_update(dt)
 	end
 	if delete then
 		table.sort(delete, function(a,b) return a>b end)
-		for i, v in ipairs(delete) do
+		for i, v in pairs(delete) do
 			table.remove(coinblockanimations, v) --remove
 		end
 	end
 	
 	--nothing to see here
 	local delete
-	for i, v in ipairs(rainbooms) do
+	for i, v in pairs(rainbooms) do
 		if v:update(dt) == true then
 			if not delete then delete = {} end
 			table.insert(delete, i)
@@ -389,14 +389,14 @@ function game_update(dt)
 	end
 	if delete then
 		table.sort(delete, function(a,b) return a>b end)
-		for i, v in ipairs(delete) do
+		for i, v in pairs(delete) do
 			table.remove(rainbooms, v) --remove
 		end
 	end
 	
 	--userects
 	local delete
-	for i, v in ipairs(userects) do
+	for i, v in pairs(userects) do
 		if v.delete == true then
 			if not delete then delete = {} end
 			table.insert(delete, i)
@@ -404,7 +404,7 @@ function game_update(dt)
 	end
 	if delete then
 		table.sort(delete, function(a,b) return a>b end)
-		for i, v in ipairs(delete) do
+		for i, v in pairs(delete) do
 			table.remove(userects, v) --remove
 		end
 	end
@@ -439,8 +439,7 @@ function game_update(dt)
 		end
 	end
 	if delete then
-		table.sort(delete, function(a,b) return a>b end)
-		for i, v in ipairs(delete) do
+		for i, v in pairs(delete) do
 			blockbounce[v] = nil
 		end
 		if #delete >= 1 then
@@ -457,7 +456,7 @@ function game_update(dt)
 	
 	--blockdebris
 	local delete
-	for i, v in ipairs(blockdebristable) do
+	for i, v in pairs(blockdebristable) do
 		if v:update(dt) == true then
 			if not delete then delete = {} end
 			table.insert(delete, i)
@@ -465,7 +464,7 @@ function game_update(dt)
 	end
 	if delete then
 		table.sort(delete, function(a,b) return a>b end)
-		for i, v in ipairs(delete) do
+		for i, v in pairs(delete) do
 			table.remove(blockdebristable, v) --remove
 		end
 	end
@@ -502,23 +501,23 @@ function game_update(dt)
 	end
 	
 	--dialog boxes
-	for i, v in ipairs(dialogboxes) do
+	for i, v in pairs(dialogboxes) do
 		v:update(dt)
 	end
 	
 	--seesaws
-	for i, v in ipairs(seesaws) do
+	for i, v in pairs(seesaws) do
 		v:update(dt)
 	end
 	
 	--platformspawners
-	for i, v in ipairs(platformspawners) do
+	for i, v in pairs(platformspawners) do
 		v:update(dt)
 	end
 	
 	--Bubbles
 	local delete
-	for i, v in ipairs(bubbles) do
+	for i, v in pairs(bubbles) do
 		if v:update(dt) == true then
 			if not delete then delete = {} end
 			table.insert(delete, i)
@@ -526,14 +525,14 @@ function game_update(dt)
 	end
 	if delete then
 		table.sort(delete, function(a,b) return a>b end)
-		for i, v in ipairs(delete) do
+		for i, v in pairs(delete) do
 			table.remove(bubbles, v) --remove
 		end
 	end
 	
 	--Poofs
 	local delete
-	for i, v in ipairs(poofs) do
+	for i, v in pairs(poofs) do
 		if v:update(dt) == true then
 			if not delete then delete = {} end
 			table.insert(delete, i)
@@ -541,14 +540,14 @@ function game_update(dt)
 	end
 	if delete then
 		table.sort(delete, function(a,b) return a>b end)
-		for i, v in ipairs(delete) do
+		for i, v in pairs(delete) do
 			table.remove(poofs, v) --remove
 		end
 	end
 	
 	--Miniblocks
 	local delete
-	for i, v in ipairs(miniblocks) do
+	for i, v in pairs(miniblocks) do
 		if v:update(dt) == true then
 			if not delete then delete = {} end
 			table.insert(delete, i)
@@ -556,14 +555,14 @@ function game_update(dt)
 	end
 	if delete then
 		table.sort(delete, function(a,b) return a>b end)
-		for i, v in ipairs(delete) do
+		for i, v in pairs(delete) do
 			table.remove(miniblocks, v) --remove
 		end
 	end
 	
 	--Emancipation Fizzle
 	local delete
-	for i, v in ipairs(emancipationfizzles) do
+	for i, v in pairs(emancipationfizzles) do
 		if v:update(dt) == true then
 			if not delete then delete = {} end
 			table.insert(delete, i)
@@ -571,14 +570,14 @@ function game_update(dt)
 	end
 	if delete then
 		table.sort(delete, function(a,b) return a>b end)
-		for i, v in ipairs(delete) do
+		for i, v in pairs(delete) do
 			table.remove(emancipationfizzles, v) --remove
 		end
 	end
 	
 	--Emancipation Animations
 	local delete
-	for i, v in ipairs(emancipateanimations) do
+	for i, v in pairs(emancipateanimations) do
 		if v:update(dt) == true then
 			if not delete then delete = {} end
 			table.insert(delete, i)
@@ -586,7 +585,7 @@ function game_update(dt)
 	end
 	if delete then
 		table.sort(delete, function(a,b) return a>b end)
-		for i, v in ipairs(delete) do
+		for i, v in pairs(delete) do
 			table.remove(emancipateanimations, v) --remove
 		end
 	end
@@ -594,7 +593,7 @@ function game_update(dt)
 	--Fireworks
 	local delete = {}
 	
-	for i, v in ipairs(fireworks) do
+	for i, v in pairs(fireworks) do
 		if v:update(dt) == true then
 			table.insert(delete, i)
 		end
@@ -602,13 +601,13 @@ function game_update(dt)
 	
 	table.sort(delete, function(a,b) return a>b end)
 	
-	for i, v in ipairs(delete) do
+	for i, v in pairs(delete) do
 		table.remove(fireworks, v) --remove
 	end
 	
 	--EMANCIPATION GRILLS
 	local delete = {}
-	for i, v in ipairs(emancipationgrills) do
+	for i, v in pairs(emancipationgrills) do
 		if v:update(dt) then
 			table.insert(delete, i)
 		end
@@ -616,13 +615,13 @@ function game_update(dt)
 	
 	table.sort(delete, function(a,b) return a>b end)
 	
-	for i, v in ipairs(delete) do
+	for i, v in pairs(delete) do
 		table.remove(emancipationgrills, v)
 	end
 
 	--LASER FIELDS
 	local delete = {}
-	for i, v in ipairs(laserfields) do
+	for i, v in pairs(laserfields) do
 		if v:update(dt) then
 			table.insert(delete, i)
 		end
@@ -630,13 +629,13 @@ function game_update(dt)
 	
 	table.sort(delete, function(a,b) return a>b end)
 	
-	for i, v in ipairs(delete) do
+	for i, v in pairs(delete) do
 		table.remove(laserfields, v)
 	end
 	
 	--BULLET BILL LAUNCHERS
 	local delete = {}
-	for i, v in ipairs(rocketlaunchers) do
+	for i, v in pairs(rocketlaunchers) do
 		if v:update(dt) then
 			table.insert(delete, i)
 		end
@@ -644,13 +643,13 @@ function game_update(dt)
 	
 	table.sort(delete, function(a,b) return a>b end)
 	
-	for i, v in ipairs(delete) do
+	for i, v in pairs(delete) do
 		table.remove(rocketlaunchers, v)
 	end
 	
 	--BIG BILL LAUNCHERS
 	local delete = {}
-	for i, v in ipairs(bigbilllaunchers) do
+	for i, v in pairs(bigbilllaunchers) do
 		if v:update(dt) then
 			table.insert(delete, i)
 		end
@@ -658,13 +657,13 @@ function game_update(dt)
 	
 	table.sort(delete, function(a,b) return a>b end)
 	
-	for i, v in ipairs(delete) do
+	for i, v in pairs(delete) do
 		table.remove(bigbilllaunchers, v)
 	end
 	
 	--KING BILL LAUNCHERS
 	local delete = {}
-	for i, v in ipairs(kingbilllaunchers) do
+	for i, v in pairs(kingbilllaunchers) do
 		if v:update(dt) then
 			table.insert(delete, i)
 		end
@@ -672,43 +671,43 @@ function game_update(dt)
 	
 	table.sort(delete, function(a,b) return a>b end)
 	
-	for i, v in ipairs(delete) do
+	for i, v in pairs(delete) do
 		table.remove(kingbilllaunchers, v)
 	end
 	
 	--CANNON LAUNCHERS
 	local delete = {}
-	for i, v in ipairs(cannonballlaunchers) do
+	for i, v in pairs(cannonballlaunchers) do
 		if v:update(dt) then
 			table.insert(delete, i)
 		end
 	end
 	table.sort(delete, function(a,b) return a>b end)
-	for i, v in ipairs(delete) do
+	for i, v in pairs(delete) do
 		table.remove(cannonballlaunchers, v)
 	end
 	
 	--item animations
 	local delete = {}
-	for i, v in ipairs(itemanimations) do
+	for i, v in pairs(itemanimations) do
 		if v:update(dt) or v.instantdelete then
 			table.insert(delete, i)
 		end
 	end
 	table.sort(delete, function(a,b) return a>b end)
-	for i, v in ipairs(delete) do
+	for i, v in pairs(delete) do
 		table.remove(itemanimations, v)
 	end
 
 	--snake blocks
 	local delete = {}
-	for i, v in ipairs(snakeblocks) do
+	for i, v in pairs(snakeblocks) do
 		if v:update(dt) then
 			table.insert(delete, i)
 		end
 	end
 	table.sort(delete, function(a,b) return a>b end)
-	for i, v in ipairs(delete) do
+	for i, v in pairs(delete) do
 		table.remove(snakeblocks, v)
 	end
 	--UPDATE OBJECTS
@@ -716,7 +715,7 @@ function game_update(dt)
 	for i, v in kpairs(objects, objectskeys) do
 		if i ~= "tile" and i ~= "portalwall" and i ~= "screenboundary" and i ~= "coin" and i ~= "risingwater" and i ~= "clearpipesegment" and i ~= "tracksegment" and i ~= "funnel" and i ~= "clearpipe" then
 			delete = nil
-			for j, w in ipairs(v) do
+			for j, w in pairs(v) do
 				if dropshadow and w.shot and w.rotation then
 					if not w.dropshadowrotation then
 						w.dropshadowrotation = w.rotation
@@ -759,39 +758,39 @@ function game_update(dt)
 			if delete and #delete > 0 then
 				table.sort(delete, function(a,b) return a>b end)
 				
-				for j, w in ipairs(delete) do
+				for j, w in pairs(delete) do
 					table.remove(v, w)
 				end
 			end
 		end
 	end
 	--risingwater
-	for i, v in ipairs(objects["risingwater"]) do
+	for i, v in pairs(objects["risingwater"]) do
 		v:update(dt)
 	end
 	--funnel
-	for i, v in ipairs(objects["funnel"]) do
+	for i, v in pairs(objects["funnel"]) do
 		v:update(dt)
 	end
 	--tracks
-	for i, v in ipairs(tracks) do
+	for i, v in pairs(tracks) do
 		v:update(dt)
 	end
 
 	--clear pipes
 	local delete = {}
-	for i, v in ipairs(clearpipes) do
+	for i, v in pairs(clearpipes) do
 		if v:update(dt) then
 			table.insert(delete, i)
 		end
 	end
 	table.sort(delete, function(a,b) return a>b end)
-	for i, v in ipairs(delete) do
+	for i, v in pairs(delete) do
 		table.remove(clearpipes, v)
 	end
 
 	--player custom enemy riding
-	for i, v in ipairs(objects["player"]) do
+	for i, v in pairs(objects["player"]) do
 		if v.fireenemyride then
 			local obj = v.fireenemyride
 			if obj.delete then
@@ -832,14 +831,14 @@ function game_update(dt)
 
 	--spawn animations
 	local delete = {}
-	for i, v in ipairs(spawnanimations) do
+	for i, v in pairs(spawnanimations) do
 		if v:update(dt) then
 			v.delete = true
 			table.insert(delete, i)
 		end
 	end
 	table.sort(delete, function(a,b) return a>b end)
-	for i, v in ipairs(delete) do
+	for i, v in pairs(delete) do
 		table.remove(spawnanimations, v)
 	end
 	
@@ -1086,7 +1085,7 @@ function game_update(dt)
 		splityscroll[1] = yscroll
 	end
 
-	for j, w in ipairs(objects["camerastop"]) do
+	for j, w in pairs(objects["camerastop"]) do
 		w:collide(oldscroll, oldscrolly)
 	end
 	
@@ -1335,7 +1334,7 @@ function game_update(dt)
 	
 	delete = {}
 	
-	for i, v in ipairs(portalparticles) do
+	for i, v in pairs(portalparticles) do
 		if v:update(dt) == true then
 			table.insert(delete, i)
 		end
@@ -1343,14 +1342,14 @@ function game_update(dt)
 	
 	table.sort(delete, function(a,b) return a>b end)
 	
-	for i, v in ipairs(delete) do
+	for i, v in pairs(delete) do
 		table.remove(portalparticles, v) --remove
 	end
 	
 	--PORTAL PROJECTILES
 	delete = {}
 	
-	for i, v in ipairs(portalprojectiles) do
+	for i, v in pairs(portalprojectiles) do
 		if v:update(dt) == true then
 			table.insert(delete, i)
 		end
@@ -1358,7 +1357,7 @@ function game_update(dt)
 	
 	table.sort(delete, function(a,b) return a>b end)
 	
-	for i, v in ipairs(delete) do
+	for i, v in pairs(delete) do
 		table.remove(portalprojectiles, v) --remove
 	end
 	
@@ -1415,7 +1414,7 @@ function game_update(dt)
 	if not levelfinished and neurotoxin then
 		toxintime = toxintime - dt
 		if toxintime <= 0 then
-			for i, v in ipairs(objects["player"]) do
+			for i, v in pairs(objects["player"]) do
 				v:die("time")
 			end
 			toxintime = 0
@@ -1453,7 +1452,7 @@ function game_update(dt)
 			end
 		end
 	elseif #objects["windleaf"] > 0 then
-		for j, w in ipairs(objects["windleaf"]) do
+		for j, w in pairs(objects["windleaf"]) do
 			w.delete = true
 		end
 		windsound:stop()
@@ -1588,39 +1587,39 @@ function game_draw()
 			drawmaptiles("dropshadow", xscroll, yscroll)
 			
 			--OBJECTS
-			for j, w in ipairs(objects["tilemoving"]) do
+			for j, w in pairs(objects["tilemoving"]) do
 				w:draw()
 			end
-			for j, w in ipairs(objects["checkpointflag"]) do
+			for j, w in pairs(objects["checkpointflag"]) do
 				w:draw("drop")
 			end
-			for j, w in ipairs(objects["spring"]) do
+			for j, w in pairs(objects["spring"]) do
 				w:draw()
 			end
-			for j, w in ipairs(objects["smallspring"]) do
+			for j, w in pairs(objects["smallspring"]) do
 				w:draw()
 			end
-			for j, w in ipairs(objects["door"]) do
+			for j, w in pairs(objects["door"]) do
 				w:draw()
 			end
-			for j, w in ipairs(objects["platform"]) do
+			for j, w in pairs(objects["platform"]) do
 				w:draw("drop")
 			end
-			for j, w in ipairs(objects["belt"]) do
+			for j, w in pairs(objects["belt"]) do
 				w:draw()
 			end
-			for j, w in ipairs(objects["collectable"]) do
+			for j, w in pairs(objects["collectable"]) do
 				w:draw()
 			end
-			for j, w in ipairs(objects["yoshi"]) do
+			for j, w in pairs(objects["yoshi"]) do
 				w:draw()
 			end
-			--[[for j, w in ipairs(objects["redseesaw"]) do --has overlapping shadows
+			--[[for j, w in pairs(objects["redseesaw"]) do --has overlapping shadows
 				w:draw()
 			end]]
 			for j, w in kpairs(objects, objectskeys) do
 				if j ~= "tile" then
-					for i, v in ipairs(w) do
+					for i, v in pairs(w) do
 						if v.drawable and (not v.nodropshadow) then--and not v.drawback then
 							love.graphics.setColor(dropshadowcolor)
 							if j == "player" then
@@ -1637,57 +1636,57 @@ function game_draw()
 		end
 		
 		--Mushroom under tiles
-		for j, w in ipairs(objects["mushroom"]) do
+		for j, w in pairs(objects["mushroom"]) do
 			w:draw()
 		end
 		
 		--Flowers under tiles
-		for j, w in ipairs(objects["flower"]) do
+		for j, w in pairs(objects["flower"]) do
 			w:draw()
 		end
 		
 		--Oneup under tiles
-		for j, w in ipairs(objects["oneup"]) do
+		for j, w in pairs(objects["oneup"]) do
 			w:draw()
 		end
 		
 		--star tiles
-		for j, w in ipairs(objects["star"]) do
+		for j, w in pairs(objects["star"]) do
 			w:draw()
 		end
 
 		--Poisonmush under tiles
-		for j, w in ipairs(objects["poisonmush"]) do
+		for j, w in pairs(objects["poisonmush"]) do
 			w:draw()
 		end
 
 		--Threeupunder tiles
-		for j, w in ipairs(objects["threeup"]) do
+		for j, w in pairs(objects["threeup"]) do
 			w:draw()
 		end
 		
 		-- + Clock under tiles
-		for j, w in ipairs(objects["smbsitem"]) do
+		for j, w in pairs(objects["smbsitem"]) do
 			w:draw()
 		end
 		
 		--Hammersuit under tiles
-		for j, w in ipairs(objects["hammersuit"]) do
+		for j, w in pairs(objects["hammersuit"]) do
 			w:draw()
 		end
 		
 		--Frogsuit under tiles
-		for j, w in ipairs(objects["frogsuit"]) do
+		for j, w in pairs(objects["frogsuit"]) do
 			w:draw()
 		end
 		
 		--Yoshi egg under tiles
-		for j, w in ipairs(objects["yoshiegg"]) do
+		for j, w in pairs(objects["yoshiegg"]) do
 			w:draw()
 		end
 		
 		--pbutton thing under tiles
-		for j, w in ipairs(objects["pbutton"]) do
+		for j, w in pairs(objects["pbutton"]) do
 			if w.inblock then
 				w:draw()
 			end
@@ -1699,12 +1698,12 @@ function game_draw()
 		end
 		
 		--itemanimations (custom enemies coming out of blocks)
-		for j, w in ipairs(itemanimations) do
+		for j, w in pairs(itemanimations) do
 			w:draw()
 		end
 
 		--risingwater under
-		for j, w in ipairs(objects["risingwater"]) do
+		for j, w in pairs(objects["risingwater"]) do
 			if not w.drawover then
 				w:draw()
 			end
@@ -1725,12 +1724,12 @@ function game_draw()
 		end
 
 		--Moving Tiles (tilemoving)
-		for j, w in ipairs(objects["tilemoving"]) do
+		for j, w in pairs(objects["tilemoving"]) do
 			w:draw()
 		end
 
 		--OBJECTS
-		for i, v in ipairs(objects["enemy"]) do	
+		for i, v in pairs(objects["enemy"]) do	
 			if v.drawback and v.drawable then
 				love.graphics.setColor(1, 1, 1)
 				drawentity("enemy",nil,i,v,currentscissor)
@@ -1739,60 +1738,60 @@ function game_draw()
 		
 		--conveyor belt
 		love.graphics.setColor(1, 1, 1)
-		for j, w in ipairs(objects["belt"]) do
+		for j, w in pairs(objects["belt"]) do
 			w:draw()
 		end
 		
 		--collectable
 		love.graphics.setColor(1, 1, 1)
-		for j, w in ipairs(objects["collectable"]) do
+		for j, w in pairs(objects["collectable"]) do
 			w:draw()
 		end
 
 		--[[frozen coin
-		for j, w in ipairs(objects["frozencoin"]) do
+		for j, w in pairs(objects["frozencoin"]) do
 			w:draw()
 		end]]
 		
 		--door sprites
-		for j, w in ipairs(objects["doorsprite"]) do
+		for j, w in pairs(objects["doorsprite"]) do
 			w:draw()
 		end
 
 		--track switches
-		for j, w in ipairs(tracks) do
+		for j, w in pairs(tracks) do
 			w:draw()
 		end
 
 		--checkpoint flag
-		for j, w in ipairs(objects["checkpointflag"]) do
+		for j, w in pairs(objects["checkpointflag"]) do
 			w:draw()
 		end
 
 		--pow block
-		for j, w in ipairs(objects["powblock"]) do
+		for j, w in pairs(objects["powblock"]) do
 			w:draw()
 		end
 
 		--snakeblock
 		love.graphics.setColor(1, 1, 1)
-		for j, w in ipairs(objects["snakeblock"]) do
+		for j, w in pairs(objects["snakeblock"]) do
 			w:draw()
 		end
 
 		--switch blocks
-		--[[for j, w in ipairs(objects["buttonblock"]) do
+		--[[for j, w in pairs(objects["buttonblock"]) do
 			w:draw()
 		end]]
 
 		--plantcreeper
-		for j, w in ipairs(objects["plantcreeper"]) do
+		for j, w in pairs(objects["plantcreeper"]) do
 			w:draw()
 		end
 
 		love.graphics.setColor(1, 1, 1)
 		--Groundlights
-		for j, w in ipairs(objects["groundlight"]) do
+		for j, w in pairs(objects["groundlight"]) do
 			w:draw()
 		end
 		
@@ -1813,13 +1812,13 @@ function game_draw()
 		
 		love.graphics.setColor(1, 1, 1)
 		--text
-		for j, w in ipairs(objects["text"]) do
+		for j, w in pairs(objects["text"]) do
 			w:draw()
 		end
 		
 		love.graphics.setColor(1, 1, 1)
 		--vines
-		for j, w in ipairs(objects["vine"]) do
+		for j, w in pairs(objects["vine"]) do
 			w:draw()
 		end
 		
@@ -1827,49 +1826,49 @@ function game_draw()
 		--warpzonetext
 		if displaywarpzonetext then
 			properprint("welcome to warp zone!", (mapwidth-14-1/16-xscroll)*16*scale, (5.5-yscroll)*16*scale)
-			for i, v in ipairs(warpzonenumbers) do
+			for i, v in pairs(warpzonenumbers) do
 				properprint(v[3], math.floor((v[1]-xscroll-1-9/16)*16*scale), (v[2]-3-yscroll)*16*scale)
 			end
 		end
 		
 		love.graphics.setColor(1, 1, 1)
 		--platforms
-		for j, w in ipairs(objects["platform"]) do
+		for j, w in pairs(objects["platform"]) do
 			w:draw()
 		end
 		
 		love.graphics.setColor(1, 1, 1)
 		--platforms
-		for j, w in ipairs(objects["seesawplatform"]) do
+		for j, w in pairs(objects["seesawplatform"]) do
 			w:draw()
 		end
 		
 		love.graphics.setColor(1, 1, 1)
 		--seesaws
-		for j, w in ipairs(seesaws) do
+		for j, w in pairs(seesaws) do
 			w:draw()
 		end
 
 		--red seesaws (these are the actual seesaws)
-		for j, w in ipairs(objects["redseesaw"]) do
+		for j, w in pairs(objects["redseesaw"]) do
 			w:draw()
 		end
 		
 		love.graphics.setColor(1, 1, 1)
 		--springs
-		for j, w in ipairs(objects["spring"]) do
+		for j, w in pairs(objects["spring"]) do
 			w:draw()
 		end
 
 		--small spring
-		for j, w in ipairs(objects["smallspring"]) do
+		for j, w in pairs(objects["smallspring"]) do
 			w:draw()
 		end
 		
 		love.graphics.setColor(1, 1, 1)
 
 		--rocket turret laser
-		for j, w in ipairs(objects["rocketturret"]) do
+		for j, w in pairs(objects["rocketturret"]) do
 			w:draw()
 		end
 		
@@ -1935,115 +1934,115 @@ function game_draw()
 		
 		love.graphics.setColor(1, 1, 1)
 		--Fireworks
-		for j, w in ipairs(fireworks) do
+		for j, w in pairs(fireworks) do
 			w:draw()
 		end
 		
 		love.graphics.setColor(1, 1, 1)
 		--Buttons
-		for j, w in ipairs(objects["button"]) do
+		for j, w in pairs(objects["button"]) do
 			w:draw()
 		end
 		
 		love.graphics.setColor(1, 1, 1)
 		--Pushbuttons
-		for j, w in ipairs(objects["pushbutton"]) do
+		for j, w in pairs(objects["pushbutton"]) do
 			w:draw()
 		end
 		
 		love.graphics.setColor(1, 1, 1)
 		--portal gun pedestal
-		for j, w in ipairs(objects["pedestal"]) do
+		for j, w in pairs(objects["pedestal"]) do
 			w:draw()
 		end
 		
 		love.graphics.setColor(1, 1, 1)
 		--hardlight bridges
-		for j, w in ipairs(objects["lightbridgebody"]) do
+		for j, w in pairs(objects["lightbridgebody"]) do
 			w:draw()
 		end
 		
 		love.graphics.setColor(1, 1, 1)
 		--laser
-		for j, w in ipairs(objects["laser"]) do
+		for j, w in pairs(objects["laser"]) do
 			w:draw()
 		end
 		
 		love.graphics.setColor(1, 1, 1)
 		--laserdetector
-		for j, w in ipairs(objects["laserdetector"]) do
+		for j, w in pairs(objects["laserdetector"]) do
 			w:draw()
 		end
 		
 		love.graphics.setColor(1, 1, 1)
 
 		--lightbridge
-		for j, w in ipairs(objects["lightbridge"]) do
+		for j, w in pairs(objects["lightbridge"]) do
 			w:draw()
 		end
 		
 		love.graphics.setColor(1, 1, 1)
 		--Faithplates
-		for j, w in ipairs(objects["faithplate"]) do
+		for j, w in pairs(objects["faithplate"]) do
 			w:draw()
 		end
 		
 		love.graphics.setColor(1, 1, 1)
 		--turrets
-		for j, w in ipairs(objects["turret"]) do
+		for j, w in pairs(objects["turret"]) do
 			w:draw()
 		end
-		for j, w in ipairs(objects["turretshot"]) do
+		for j, w in pairs(objects["turretshot"]) do
 			w:draw()
 		end
 		
 		--yoshi
 		love.graphics.setColor(1, 1, 1)
-		for j, w in ipairs(objects["yoshi"]) do
+		for j, w in pairs(objects["yoshi"]) do
 			w:draw()
 		end
 		
 		love.graphics.setColor(1, 1, 1)
 		--Bubbles
-		for j, w in ipairs(bubbles) do
+		for j, w in pairs(bubbles) do
 			w:draw()
 		end
 		
 		love.graphics.setColor(1, 1, 1)
 		--miniblocks
-		for i, v in ipairs(miniblocks) do
+		for i, v in pairs(miniblocks) do
 			v:draw()
 		end
 		
 		--emancipateanimations
-		for i, v in ipairs(emancipateanimations) do
+		for i, v in pairs(emancipateanimations) do
 			v:draw()
 		end
 		
 		--emancipationfizzles
-		for i, v in ipairs(emancipationfizzles) do
+		for i, v in pairs(emancipationfizzles) do
 			v:draw()
 		end
 		
 		--chainchomp
-		for j, w in ipairs(objects["chainchomp"]) do
+		for j, w in pairs(objects["chainchomp"]) do
 			w:draw()
 		end
 
 		--spikeball
-		for j, w in ipairs(objects["spikeball"]) do
+		for j, w in pairs(objects["spikeball"]) do
 			w:draw()
 		end
 		
 		--skewer
-		for j, w in ipairs(objects["skewer"]) do
+		for j, w in pairs(objects["skewer"]) do
 			w:draw()
 		end
 		
 		--OBJECTS
 		for j, w in kpairs(objects, objectskeys) do	
 			if j ~= "tile" then
-				for i, v in ipairs(w) do
+				for i, v in pairs(w) do
 					if v.drawable and not v.drawback then
 						love.graphics.setColor(1, 1, 1)
 						drawentity(j,w,i,v,currentscissor)
@@ -2055,7 +2054,7 @@ function game_draw()
 		love.graphics.setColor(1, 1, 1)
 		
 		--mario dk hammer
-		for j, w in ipairs(objects["player"]) do
+		for j, w in pairs(objects["player"]) do
 			if w.drawable and w.dkhammer then
 				local dir = 1
 				if w.animationdirection == "left" then
@@ -2076,7 +2075,7 @@ function game_draw()
 		love.graphics.setColor(1, 1, 1)
 		
 		--[[regiontrigger
-		for j, w in ipairs(objects["regiontrigger"]) do
+		for j, w in pairs(objects["regiontrigger"]) do
 			w:draw()
 		end]]
 
@@ -2090,19 +2089,19 @@ function game_draw()
 		end]]
 
 		--Cannon ball cannon
-		for j, w in ipairs(objects["cannonballcannon"]) do
+		for j, w in pairs(objects["cannonballcannon"]) do
 			w:draw()
 		end
 		
 		--bowser
-		for j, w in ipairs(objects["bowser"]) do
+		for j, w in pairs(objects["bowser"]) do
 			w:draw()
 		end
 
 		--clearpipes
 		if #clearpipesegmentdrawqueue > 0 then
 			--these used to be drawn on the foreground layer, but they would draw ontop of stuff they shouldn't
-			for j, w in ipairs(clearpipesegmentdrawqueue) do
+			for j, w in pairs(clearpipesegmentdrawqueue) do
 				if objects["clearpipesegment"][w] then
 					objects["clearpipesegment"][w]:draw()
 				end
@@ -2111,7 +2110,7 @@ function game_draw()
 		end
 		
 		--Clear Pipe Debug
-		for j, w in ipairs(clearpipes) do
+		for j, w in pairs(clearpipes) do
 			w:draw()
 		end
 		love.graphics.setColor(1, 1, 1)
@@ -2139,12 +2138,12 @@ function game_draw()
 				
 				--OBJECTS
 				if i > 0 and i < 8 then
-					for j, w in ipairs(objects["tilemoving"]) do
+					for j, w in pairs(objects["tilemoving"]) do
 						w:draw()
 					end
 					for j, w in kpairs(objects, objectskeys) do	
 						if j ~= "tile" then
-							for i, v in ipairs(w) do
+							for i, v in pairs(w) do
 								if v.drawable and (not v.nodropshadow) then--and not v.drawback then
 									love.graphics.setColor(color)
 									if j == "player" then
@@ -2163,129 +2162,129 @@ function game_draw()
 		end
 		
 		--lakito
-		--[[for j, w in ipairs(objects["lakito"]) do
+		--[[for j, w in pairs(objects["lakito"]) do
 			w:draw()
 		end]]
 		
 		--angrysun
-		for j, w in ipairs(objects["angrysun"]) do
+		for j, w in pairs(objects["angrysun"]) do
 			w:draw()
 		end
 
 		--ice block
-		for j, w in ipairs(objects["ice"]) do
+		for j, w in pairs(objects["ice"]) do
 			w:draw()
 		end
 
 		
-		--[[for j, w in ipairs(objects["trackcontroller"]) do
+		--[[for j, w in pairs(objects["trackcontroller"]) do
 			w:draw()
 		end]]
 		
 		--torpedo ted launcher
-		for j, w in ipairs(objects["torpedolauncher"]) do
+		for j, w in pairs(objects["torpedolauncher"]) do
 			w:draw()
 		end
 		
 		--kingbill
-		for j, w in ipairs(objects["kingbill"]) do
+		for j, w in pairs(objects["kingbill"]) do
 			w:draw()
 		end
 		
 		--excursion funnel
-		for j, w in ipairs(objects["funnel"]) do
+		for j, w in pairs(objects["funnel"]) do
 			w:draw()
 		end
 		
 		--Geldispensers
-		for j, w in ipairs(objects["geldispenser"]) do
+		for j, w in pairs(objects["geldispenser"]) do
 			w:draw()
 		end
 		
 		--Cubedispensers
-		for j, w in ipairs(objects["cubedispenser"]) do
+		for j, w in pairs(objects["cubedispenser"]) do
 			w:draw()
 		end
 		
 		--Emancipationgrills
-		for j, w in ipairs(emancipationgrills) do
+		for j, w in pairs(emancipationgrills) do
 			w:draw()
 		end
 
 		--Laserfields
-		for j, w in ipairs(laserfields) do
+		for j, w in pairs(laserfields) do
 			w:draw()
 		end
 		
 		--Doors
-		for j, w in ipairs(objects["door"]) do
+		for j, w in pairs(objects["door"]) do
 			w:draw()
 		end
 
 		--risingwater over
-		for j, w in ipairs(objects["risingwater"]) do
+		for j, w in pairs(objects["risingwater"]) do
 			if w.drawover then
 				w:draw()
 			end
 		end
 		
 		--Wallindicators
-		for j, w in ipairs(objects["wallindicator"]) do
+		for j, w in pairs(objects["wallindicator"]) do
 			w:draw()
 		end
 		
 		--Walltimers
-		for j, w in ipairs(objects["walltimer"]) do
+		for j, w in pairs(objects["walltimer"]) do
 			w:draw()
 		end
 		
 		--Notgates
-		for j, w in ipairs(objects["notgate"]) do
+		for j, w in pairs(objects["notgate"]) do
 			w:draw()
 		end
 		
 		--Orgates
-		for j, w in ipairs(objects["orgate"]) do
+		for j, w in pairs(objects["orgate"]) do
 			w:draw()
 		end
 		
 		--Andgates
-		for j, w in ipairs(objects["andgate"]) do
+		for j, w in pairs(objects["andgate"]) do
 			w:draw()
 		end
 
 		--Animatedtiletrigger
-		for j, w in ipairs(objects["animatedtiletrigger"]) do
+		for j, w in pairs(objects["animatedtiletrigger"]) do
 			w:draw()
 		end
 
 		--Gucci Flipflop
-		for j, w in ipairs(objects["rsflipflop"]) do
+		for j, w in pairs(objects["rsflipflop"]) do
 			w:draw()
 		end
 		
 		--Squarewave
-		for j, w in ipairs(objects["squarewave"]) do
+		for j, w in pairs(objects["squarewave"]) do
 			w:draw()
 		end
 		
 		--Delayers
-		for j, w in ipairs(objects["delayer"]) do
+		for j, w in pairs(objects["delayer"]) do
 			w:draw()
 		end
 		
 		--Randomizer
-		for j, w in ipairs(objects["randomizer"]) do
+		for j, w in pairs(objects["randomizer"]) do
 			w:draw()
 		end
 		
 		--Musicchanger
-		for j, w in ipairs(objects["musicchanger"]) do
+		for j, w in pairs(objects["musicchanger"]) do
 			w:draw()
 		end
 		
 		--particles
-		for j, w in ipairs(portalparticles) do
+		for j, w in pairs(portalparticles) do
 			w:draw()
 		end
 
@@ -2298,7 +2297,7 @@ function game_draw()
 		
 		
 		--cappy
-		for j, w in ipairs(objects["cappy"]) do
+		for j, w in pairs(objects["cappy"]) do
 			w:draw()
 		end
 		
@@ -2307,7 +2306,7 @@ function game_draw()
 			local lw = love.graphics.getLineWidth()
 			love.graphics.setLineWidth(.5*scale)
 			for i, v in kpairs(objects, objectskeys) do
-				for j, k in ipairs(v) do
+				for j, k in pairs(v) do
 					if k.width then
 						if xscroll >= k.x-width and k.x+k.width > xscroll then
 							if k.active and not k.red then
@@ -2376,11 +2375,11 @@ function game_draw()
 			end
 			
 			love.graphics.setColor(234/255, 160/255, 45/255, 155/255)
-			for j, w in ipairs(objects["regiontrigger"]) do
+			for j, w in pairs(objects["regiontrigger"]) do
 				love.graphics.rectangle("fill", math.floor((w.rx-xscroll)*16*scale)+.5, math.floor((w.ry-yscroll-.5)*16*scale)+.5, w.rw*16*scale-1, w.rh*16*scale-1)
 			end
 
-			for j, w in ipairs(userects) do
+			for j, w in pairs(userects) do
 				love.graphics.setColor(0, 1, 1, 150/255)
 				love.graphics.rectangle("line", math.floor((w.x-xscroll)*16*scale)+.5, math.floor((w.y-yscroll-.5)*16*scale)+.5, w.width*16*scale-1, w.height*16*scale-1)
 			end
@@ -2420,7 +2419,7 @@ function game_draw()
 		love.graphics.setColor(1, 1, 1)
 		
 		--COINBLOCKANIMATION
-		for i, v in ipairs(coinblockanimations) do
+		for i, v in pairs(coinblockanimations) do
 			if v.t and v.t == "collectable" then
 				love.graphics.draw(collectableimg, collectablequad[spriteset][v.i][v.frame], math.floor((v.x - xscroll + 1/16)*16*scale), math.floor(((v.y + v.offsety - 8/16 - yscroll)*16-8)*scale), 0, scale, scale, 16, 16)
 			else
@@ -2429,18 +2428,18 @@ function game_draw()
 		end
 		
 		--SCROLLING SCORE
-		for i, v in ipairs(scrollingscores) do
-			if type(v.i) == "number" then
-				properprint2(v.i, math.floor((v.x-0.4)*16*scale), math.floor((v.y-1.5-scrollingscoreheight*(v.timer/scrollingscoretime))*16*scale))
-			elseif v.i == "1up" then
-				love.graphics.draw(oneuptextimage, math.floor((v.x)*16*scale), math.floor((v.y-1.5-scrollingscoreheight*(v.timer/scrollingscoretime))*16*scale), 0, scale, scale)
-			elseif v.i == "3up" then
-				love.graphics.draw(threeuptextimage, math.floor((v.x)*16*scale), math.floor((v.y-1.5-scrollingscoreheight*(v.timer/scrollingscoretime))*16*scale), 0, scale, scale)
+		for i, v in pairs(scrollingscores) do
+			if type(scrollingscores[i].i) == "number" then
+				properprint2(scrollingscores[i].i, math.floor((scrollingscores[i].x-0.4)*16*scale), math.floor((scrollingscores[i].y-1.5-scrollingscoreheight*(scrollingscores[i].timer/scrollingscoretime))*16*scale))
+			elseif scrollingscores[i].i == "1up" then
+				love.graphics.draw(oneuptextimage, math.floor((scrollingscores[i].x)*16*scale), math.floor((scrollingscores[i].y-1.5-scrollingscoreheight*(scrollingscores[i].timer/scrollingscoretime))*16*scale), 0, scale, scale)
+			elseif scrollingscores[i].i == "3up" then
+				love.graphics.draw(threeuptextimage, math.floor((scrollingscores[i].x)*16*scale), math.floor((scrollingscores[i].y-1.5-scrollingscoreheight*(scrollingscores[i].timer/scrollingscoretime))*16*scale), 0, scale, scale)
 			end
 		end
 		
 		--BLOCK DEBRIS
-		for i, v in ipairs(blockdebristable) do
+		for i, v in pairs(blockdebristable) do
 			v:draw()
 		end
 		
@@ -2518,19 +2517,19 @@ function game_draw()
 		
 		--Portal projectile
 		portalprojectilespritebatch:clear()
-		for i, v in ipairs(portalprojectiles) do
+		for i, v in pairs(portalprojectiles) do
 			v:particledraw()
 		end
 		love.graphics.setColor(1,1,1)
 		love.graphics.draw(portalprojectilespritebatch,0,0)
-		for i, v in ipairs(portalprojectiles) do
+		for i, v in pairs(portalprojectiles) do
 			v:draw()
 		end
 		
 		love.graphics.setColor(1, 1, 1)
 		
 		--nothing to see here
-		for i, v in ipairs(rainbooms) do
+		for i, v in pairs(rainbooms) do
 			v:draw()
 		end
 		
@@ -2539,7 +2538,7 @@ function game_draw()
 		
 		love.graphics.setColor(1, 1, 1)
 		--Poofs
-		for j, w in ipairs(poofs) do
+		for j, w in pairs(poofs) do
 			w:draw()
 		end
 		
@@ -2724,7 +2723,7 @@ function game_draw()
 	love.graphics.setScissor()
 	if lightsout and not editormode then
 		local pass = true
-		for j, w in ipairs(objects["player"]) do
+		for j, w in pairs(objects["player"]) do
 			if w.starred then
 				pass = false
 				break
@@ -2757,22 +2756,22 @@ function game_draw()
 		--dark mode has fancy layers
 		love.graphics.setColor(0, 0, 0)
 		local stencil = function()
-			for j, w in ipairs(objects["player"]) do
+			for j, w in pairs(objects["player"]) do
 				love.graphics.circle("fill", ((w.x+(w.width/2)-xscroll)*16)*scale, ((w.y+(w.height/2)-yscroll)*16-8)*scale, 70*scale, 18)
 			end
 		end
 		local stencil2 = function()
-			for j, w in ipairs(objects["player"]) do
+			for j, w in pairs(objects["player"]) do
 				love.graphics.circle("fill", ((w.x+(w.width/2)-xscroll)*16)*scale, ((w.y+(w.height/2)-yscroll)*16-8)*scale, 60*scale, 18)
 			end
 		end
 		local stencil3 = function()
-			for j, w in ipairs(objects["player"]) do
+			for j, w in pairs(objects["player"]) do
 				love.graphics.circle("fill", ((w.x+(w.width/2)-xscroll)*16)*scale, ((w.y+(w.height/2)-yscroll)*16-8)*scale, 50*scale, 18)
 			end
 		end
 		local stencil4 = function()
-			for j, w in ipairs(objects["player"]) do
+			for j, w in pairs(objects["player"]) do
 				love.graphics.circle("fill", ((w.x+(w.width/2)-xscroll)*16)*scale, ((w.y+(w.height/2)-yscroll)*16-8)*scale, 40*scale, 18)
 			end
 		end
@@ -2815,7 +2814,7 @@ function game_draw()
 		properprint(DCchalobjective, width*8*scale-string.len(DCchalobjective)*4*scale, 35*scale)
 	end
 	
-	for i, v in ipairs(dialogboxes) do
+	for i, v in pairs(dialogboxes) do
 		v:draw()
 	end
 	
@@ -4740,15 +4739,15 @@ function loadmap(filename)
 	end
 
 	--Add tracks
-	for j, w in ipairs(objects["platform"]) do
+	for j, w in pairs(objects["platform"]) do
 		if w.linked then
 			trackobject(w.cox, w.coy, w, "platform")
 		end
 	end
-	for j, w in ipairs(objects["redseesaw"]) do
+	for j, w in pairs(objects["redseesaw"]) do
 		trackobject(w.cox, w.coy, w, "redseesaw")
 	end
-	for j, w in ipairs(objects["grinder"]) do
+	for j, w in pairs(objects["grinder"]) do
 		trackobject(w.cox, w.coy, w, "grinder")
 	end
 
@@ -4758,31 +4757,31 @@ function loadmap(filename)
 	
 	--Add links
 	for key, value in kpairs(objects, objectskeys) do
-		for j, w in ipairs(value) do
+		for j, w in pairs(value) do
 			if w.link then
 				w:link()
 			end
 		end
 	end
 	--emancipation links
-	for i, v in ipairs(emancipationgrills) do
+	for i, v in pairs(emancipationgrills) do
 		v:link()
 	end
-	for i, v in ipairs(laserfields) do
+	for i, v in pairs(laserfields) do
 		v:link()
 	end
-	for i, v in ipairs(kingbilllaunchers) do
+	for i, v in pairs(kingbilllaunchers) do
 		v:link()
 	end
-	for i, v in ipairs(snakeblocks) do
+	for i, v in pairs(snakeblocks) do
 		v:link()
 	end
-	for i, v in ipairs(tracks) do
+	for i, v in pairs(tracks) do
 		v:link()
 	end
 
 	--create clear pipe intersections
-	for i, v in ipairs(clearpipes) do
+	for i, v in pairs(clearpipes) do
 		v:createintersection()
 	end
 
@@ -5634,7 +5633,7 @@ function getTile(x, y, portalable, portalcheck, facing, ignoregrates, dir) --ret
 	end
 	
 	--check for tubes
-	for i, v in ipairs(objects["geldispenser"]) do
+	for i, v in pairs(objects["geldispenser"]) do
 		if (x == v.cox or x == v.cox+1) and (y == v.coy or y == v.coy+1) then
 			if portalcheck then
 				return false
@@ -5644,7 +5643,7 @@ function getTile(x, y, portalable, portalcheck, facing, ignoregrates, dir) --ret
 		end
 	end
 	
-	for i, v in ipairs(objects["cubedispenser"]) do
+	for i, v in pairs(objects["cubedispenser"]) do
 		if (x == v.cox or x == v.cox+1) and (y == v.coy or y == v.coy+1) then
 			if portalcheck then
 				return false
@@ -5742,7 +5741,7 @@ function getTile(x, y, portalable, portalcheck, facing, ignoregrates, dir) --ret
 		end
 		
 		--To stop people from portalling under the vine, which caused problems, but was fixed elsewhere (and betterer)
-		--[[for i, v in ipairs(objects["vine"]) do
+		--[[for i, v in pairs(objects["vine"]) do
 			if x == v.cox and y == v.coy and side == "top" then
 				return false, 1
 			end
@@ -5917,7 +5916,7 @@ end
 function moveoutportal() --pushes objects out of the portal i in.
 	for i, v in kpairs(objects, objectskeys) do
 		if i ~= "tile" and i ~= "portalwall" then
-			for j, w in ipairs(v) do
+			for j, w in pairs(v) do
 				if w.active and w.static == false then
 					local p1, p2 = insideportal(w.x, w.y, w.width, w.height)
 					
@@ -5983,17 +5982,17 @@ function warpzone(i, l)
 end
 
 function changeswitchstate(color, perma, flipblocks)
-	for j, w in ipairs(objects["buttonblock"]) do
+	for j, w in pairs(objects["buttonblock"]) do
 		if w.color == color then
 			w:change()
 		end
 	end
-	for j, w in ipairs(objects["belt"]) do
+	for j, w in pairs(objects["belt"]) do
 		if w.t == "switch" and w.color == color then
 			w:change()
 		end
 	end
-	for j, w in ipairs(tracks) do
+	for j, w in pairs(tracks) do
 		if w.switch and w.color == color then
 			w:change()
 		end
@@ -6009,7 +6008,7 @@ function changeswitchstate(color, perma, flipblocks)
 		solidblockperma[color] = not solidblockperma[color]
 	end
 	if flipblocks then
-		for j, w in ipairs(objects["flipblock"]) do
+		for j, w in pairs(objects["flipblock"]) do
 			if w.t == "switchblock" and w.color == color then
 				w.on = not w.on
 				if w.on then
@@ -6187,14 +6186,14 @@ function traceline(sourcex, sourcey, radians, reportal)
 	currentblock[2] = math.floor(y+1)
 		
 	local emancecollide = false
-	for i, v in ipairs(emancipationgrills) do
+	for i, v in pairs(emancipationgrills) do
 		if v:getTileInvolved(currentblock[1]+1, currentblock[2]) then
 			emancecollide = true
 		end
 	end
 	
 	local doorcollide = false
-	for i, v in ipairs(objects["door"]) do
+	for i, v in pairs(objects["door"]) do
 		if v.dir == "hor" then
 			if v.open == false and (v.cox == currentblock[1] or v.cox == currentblock[1]+1) and v.coy == currentblock[2] then
 				doorcollide = true
@@ -6299,7 +6298,7 @@ function traceline(sourcex, sourcey, radians, reportal)
 		
 		local collide, tileno = getTile(currentblock[1]+1, currentblock[2])
 		local emancecollide = false
-		for i, v in ipairs(emancipationgrills) do
+		for i, v in pairs(emancipationgrills) do
 			if v:getTileInvolved(currentblock[1]+1, currentblock[2]) then
 				emancecollide = true
 			end
@@ -6324,7 +6323,7 @@ function traceline(sourcex, sourcey, radians, reportal)
 		end
 		
 		local doorcollide = false
-		for i, v in ipairs(objects["door"]) do
+		for i, v in pairs(objects["door"]) do
 			if v.dir == "hor" then
 				if v.open == false and (v.cox == currentblock[1] or v.cox == currentblock[1]+1) and v.coy == currentblock[2] then
 					doorcollide = true
@@ -8075,7 +8074,7 @@ end
 function userect(x, y, width, height)
 	local outtable = {}
 	
-	for i, v in ipairs(userects) do
+	for i, v in pairs(userects) do
 		if aabb(x, y, width, height, v.x, v.y, v.width, v.height) then
 			table.insert(outtable, v.callback)
 		end
@@ -8416,13 +8415,13 @@ function camerasnap(targetx, targety, anim)
 end
 
 function updateranges()
-	for i, v in ipairs(objects["laser"]) do
+	for i, v in pairs(objects["laser"]) do
 		v:updaterange()
 	end
-	for i, v in ipairs(objects["lightbridge"]) do
+	for i, v in pairs(objects["lightbridge"]) do
 		v:updaterange()
 	end
-	for i, v in ipairs(objects["funnel"]) do
+	for i, v in pairs(objects["funnel"]) do
 		v:updaterange()
 	end
 end
@@ -8639,7 +8638,7 @@ end
 function lightsoutstencil()
 	for i2, v2 in kpairs(objects, objectskeys) do
 		if i2 ~= "tile" and i2 ~="buttonblock" and i2 ~= "clearpipesegment" then
-			for i, v in ipairs(objects[i2]) do
+			for i, v in pairs(objects[i2]) do
 				if (v.active or (i2 == "player" or i2 == "enemy")) and v.light and onscreen(v.x+v.width/2-v.light, v.y+v.height/2-v.light, v.light*2, v.light*2) then
 					local r = v.light
 					if i2 ~= "player" then
