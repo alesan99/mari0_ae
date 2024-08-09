@@ -5916,6 +5916,7 @@ function openrightclickmenu(x, y, tileX, tileY)
 		--Move if out of screen
 		local scootx = ((x/scale)+rightclickobjects.width > width*16)
 		local scooty = ((y/scale)+rightclickobjects.height > height*16)
+		local shiftx = ((x/scale)-rightclickobjects.width < 0)
 		local shifty = ((y/scale)-rightclickobjects.height < 0)
 	
 		local truey = rightclickobjects[1].y
@@ -5924,7 +5925,12 @@ function openrightclickmenu(x, y, tileX, tileY)
 			for i = 1, #rightclickobjects do
 				local obj = rightclickobjects[i]
 				if scootx then
-					rightclickobjects[i].x = rightclickobjects[i].x - rightclickobjects.width
+					if shiftx then
+						--neither work, just shift
+						rightclickobjects[i].x = ((width*16)-(x/scale))-rightclickobjects.width+rightclickobjects[i].x
+					else
+						rightclickobjects[i].x = rightclickobjects[i].x - rightclickobjects.width
+					end
 				end
 				if scooty then
 					if shifty then

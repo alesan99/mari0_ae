@@ -62,8 +62,8 @@ if debugconsole then debuginputon = true; debuginput = "print()"; print("DEBUG O
 local debugGraph,fpsGraph,memGraph,drawGraph
 local debugGraphs = false
 
-VERSION = 13.1005
-VERSIONSTRING = "13.1 (4/18/23)"
+VERSION = 13.1006
+VERSIONSTRING = "13.1a (8/9/24)"
 ANDROIDVERSION = 17
 
 android = (love.system.getOS() == "Android" or love.system.getOS() == "iOS") --[DROID]
@@ -2708,25 +2708,32 @@ function love.errorhandler(msg)
     if not love.window or not love.graphics or not love.event then
         return
     end
-	if not love.window.isOpen() then
+	
+	if not love.graphics.isCreated() or not love.window.isOpen() then
 		local success, status = pcall(love.window.setMode, 800, 600)
 		if not success or not status then
 			return
 		end
 	end
+
+	-- Reset state.
 	if love.mouse then
 		love.mouse.setVisible(true)
 		love.mouse.setGrabbed(false)
 		love.mouse.setRelativeMode(false)
+		if love.mouse.isCursorSupported() then
+			love.mouse.setCursor()
+		end
 	end
-	if love.joystick then -- Stop all joystick vibrations.
+	if love.joystick then
+		-- Stop all joystick vibrations.
 		for i,v in ipairs(love.joystick.getJoysticks()) do
 			v:setVibration()
 		end
 	end
 	local screenshot = false
 	if love.graphics.captureScreenshot then
-		love.graphics.captureScreenshot(function(s) screenshot = s end)
+		love.graphics.captureScreenshot(function(s) screenshot = love.graphics.newImage(s) end)
 	end
 
     -- Load.
@@ -2746,11 +2753,21 @@ function love.errorhandler(msg)
 
     love.graphics.clear()
 
+	local sanitizedmsg = {}
+	for char in msg:gmatch(utf8.charpattern) do
+		table.insert(sanitizedmsg, char)
+	end
+	sanitizedmsg = table.concat(sanitizedmsg)
+
 	local err = {}
 	local traceback = {}
 
-    table.insert(err, "Error\n")
-    table.insert(err, msg.."\n\n")
+	table.insert(err, "Error\n")
+	table.insert(err, sanitizedmsg.."\n\n")
+
+	if #sanitizedmsg ~= #msg then
+		table.insert(err, "Invalid UTF-8 string in error message.")
+	end
 
     for l in string.gmatch(trace, "(.-)\n") do
         if not string.match(l, "boot.lua") then
@@ -2792,13 +2809,14 @@ function love.errorhandler(msg)
 	end
 	
     local function draw()
+		if not love.graphics.isActive() then return end
 		love.graphics.clear(love.graphics.getBackgroundColor())
 		if screenshot then
 			love.graphics.setColor(30/255, 30/255, 30/255)
 			love.graphics.draw(screenshot, 0, 0, 0, love.graphics.getWidth()/screenshot:getWidth(), love.graphics.getHeight()/screenshot:getHeight())
 			if gradientimg and width and height then
-				love.graphics.setColor(0, 0, 0)
-				love.graphics.draw(gradientimg, 0, 0, 0, love.graphics.getWidth()/(width*16), love.graphics.getHeight()/(height*16))
+			 	love.graphics.setColor(0, 0, 0)
+			 	love.graphics.draw(gradientimg, 0, 0, 0, love.graphics.getWidth()/(width*16), love.graphics.getHeight()/(height*16))
 			end
 		end
 		love.graphics.setColor(1, 1, 1)
@@ -2811,21 +2829,23 @@ function love.errorhandler(msg)
 	
 	local e, a, b, c
 	
-	while true do
+	return function()
 		love.event.pump()
  
 		for e, a, b, c in love.event.poll() do
 			if e == "quit" then
-				return
+				return 1
 			elseif e == "keypressed" and a == "escape" then
-				return
+				return 1
 			elseif e == "touchpressed" then
 				local name = love.window.getTitle()
 				if #name == 0 or name == "Untitled" then name = "Game" end
 				local buttons = {"OK", "Cancel"}
 				local pressed = love.window.showMessageBox("Quit "..name.."?", "", buttons)
 				if pressed == 1 then
-					return
+					return 1
+				elseif pressed == 3 then
+					copyToClipboard()
 				end
 			end
 		end
