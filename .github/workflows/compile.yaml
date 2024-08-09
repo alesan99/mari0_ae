@@ -24,7 +24,7 @@ jobs:
     - name: Install Dependencies
       run: sudo apt-get install --assume-yes wine-stable wine64 python3-pip libfuse2
     - name: Install makelove
-      run: pip3 install git+https://github.com/pfirsich/makelove/
+      run: pip3 install --user git+https://github.com/pfirsich/makelove/
     - name: Build
       run: cd main && python3 -m makelove && cd ..
     - name: Artifact (LÖVE)
