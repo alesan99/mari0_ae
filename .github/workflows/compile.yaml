@@ -2,7 +2,7 @@ name: Compile
 on: [push, pull_request]
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     env:
       KEYSTORE_ALIAS: ${{ secrets.ANDROID_KEYSTORE_ALIAS }}
       KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -24,7 +24,7 @@ jobs:
     - name: Install Dependencies
       run: sudo apt-get install --assume-yes wine-stable wine64 python3-pip libfuse2
     - name: Install makelove
-      run: pip3 install git+https://github.com/pfirsich/makelove/
+      run: pip3 install --break-system-packages git+https://github.com/pfirsich/makelove/
     - name: Build
       run: cd main && python3 -m makelove && cd ..
     - name: Artifact (LÖVE)
@@ -60,9 +60,9 @@ jobs:
         bundle-id: love.to.androidmari0 # backwards compatibility
         product-name: ${{ steps.metadata.outputs.id }}
         resource-path: "main/.android-resources"
-        love-ref: ${{ steps.metadata.outputs.love-version }}
+        love-ref: 11.5a
         love-package: main/makelove-build/love/${{ env.ARTIFACT_NAME_LOVE }}
-        remote-libs: "https://github.com/love2d/lua-https"
+        remote-libs: "https://github.com/qixils/lua-https"
         version-string: ${{ steps.metadata.outputs.version }}
         version-code: ${{ steps.metadata.outputs.android-version }}
         output-folder: "main/makelove-build/android"

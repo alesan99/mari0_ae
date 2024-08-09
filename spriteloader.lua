@@ -28,16 +28,16 @@ imagestable = {  	"1", "2", "3", "blockdebrisimage", "coinblockanimationimage", 
 						"cannonballcannonimg", "clearpipeimg", "plantcreeperimg", "trackimg", "pneumatictubeimg", "dustimg", "platformtrackimg", "checkpointflagimg", "iceimg",
 						"snowspikeimg", "grinderimg", "fuzzyimg", "muncherfrozenimg"}
 
+table.sort(imagestable, function(a, b) return a < b end)--sort alphabetically
+imagestable[1] = "smbtilesimg"
+imagestable[2] = "portaltilesimg"
+imagestable[3] = "entitiesimg"
+
 -- clone imagestable to imagedatatable
 imagedatatable = {}
 for i,v in pairs(imagestable) do
 	imagedatatable[i] = v .. "_data"
 end
-
-table.sort(imagestable, function(a, b) return a < b end)--sort alphabetically
-imagestable[1] = "smbtilesimg"
-imagestable[2] = "portaltilesimg"
-imagestable[3] = "entitiesimg"
 
 imagestabledisplay = {}
 for i, s in pairs(imagestable) do
@@ -256,7 +256,7 @@ function loaddebris()
 	end
 	--custom
 	for i = 2, math.floor(blockdebrisimage_data:getWidth()/17) do
-		local r, g, b, a = blockdebrisimage_data:getPixel((i-1)*17, 0)
+		local r, g, b, a = blockdebrisimage_data:getPixel(i*17-1, 0)
 		--id of block debris is r,g,b,a
 		local name = rgbaToInt(r,g,b,a)
 		blockdebrisquads[name] = {}

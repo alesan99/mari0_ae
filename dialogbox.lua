@@ -19,7 +19,7 @@ function dialogbox:init(text, speaker, color)
 	self.text = self.text:gsub("%%player%%",playername)
 	
 	--initialize colors
-	local curcolor = {1, 1, 1}
+	local curcolor = {255, 255, 255}
 	local newcolor = true
 	local i = 1
 	self.textcolors = {}

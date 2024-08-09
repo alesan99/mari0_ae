@@ -51,7 +51,7 @@ local rotatepoint, getslopey
 function physicsupdate(dt)
 	local lobjects = objects
 	
-	for j, w in pairs(lobjects) do
+	for j, w in kpairs(lobjects, objectskeys) do
 		if j ~= "tile" and j ~= "buttonblock" and j ~= "tracksegment" then
 			for i, v in pairs(w) do
 				local oldspeedx = v.speedx
@@ -128,7 +128,7 @@ function physicsupdate(dt)
 					local latetable = {"portalwall", "castlefirefire", "platform"}
 					
 					--VS OTHER OBJECTS --but not portalwall
-					for h, u in pairs(lobjects) do
+					for h, u in kpairs(lobjects, objectskeys) do
 						if h ~= "tile" and h ~= "buttonblock" and h ~= "tracksegment" then
 							local pass = true
 							for k, l in pairs(latetable) do
@@ -955,7 +955,7 @@ function checkrect(x, y, width, height, list, statics, condition)
 		end
 	end
 
-	for i, v in pairs(objects) do
+	for i, v in kpairs(objects, objectskeys) do
 		local contains = false
 		
 		if list and list ~= "all" then	
