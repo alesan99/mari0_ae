@@ -38,7 +38,7 @@ function snakeblocksline:init(x, y, r)
 			if #self.path > 1 then
 				local ox, oy = 1, 0
 				local tx, ty = self.path[2][1]-x, self.path[2][2]-y
-				if ty == 0 then
+				if math.abs(ty) <= 1 then
 					if tx > 0 then
 						--nothing
 					else

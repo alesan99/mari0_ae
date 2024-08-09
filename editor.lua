@@ -540,7 +540,7 @@ function editor_update(dt)
 		if love.keyboard.isDown("rshift") then
 			speed = 70
 		end
-		if (love.keyboard.isDown("left") or (android and leftkey(1) and not autoscroll)) and (rightclickmenuopen or (not brushsizetoggle)) then
+		if (love.keyboard.isDown("left") or (android and leftkey(1) and not autoscroll)) and ((rightclickmenuopen or (not brushsizetoggle)) and not typingintextinput) then
 			autoscroll = false
 			guielements["autoscrollcheckbox"].var = autoscroll
 			splitxscroll[1] = splitxscroll[1] - speed*gdt
@@ -548,7 +548,7 @@ function editor_update(dt)
 				splitxscroll[1] = 0
 			end
 			generatespritebatch()
-		elseif (love.keyboard.isDown("right") or (android and rightkey(1) and not autoscroll)) and (rightclickmenuopen or (not brushsizetoggle)) then
+		elseif (love.keyboard.isDown("right") or (android and rightkey(1) and not autoscroll)) and ((rightclickmenuopen or (not brushsizetoggle)) and not typingintextinput) then
 			autoscroll = false
 			guielements["autoscrollcheckbox"].var = autoscroll
 			splitxscroll[1] = splitxscroll[1] + speed*gdt
@@ -557,7 +557,7 @@ function editor_update(dt)
 			end
 			generatespritebatch()
 		end
-		if mapheight ~= 15 and (rightclickmenuopen or (not brushsizetoggle)) then
+		if mapheight ~= 15 and ((rightclickmenuopen or (not brushsizetoggle)) and not typingintextinput) then
 			if (love.keyboard.isDown("up") or (android and upkey(1) and not autoscroll)) then
 				autoscroll = false
 				guielements["autoscrollcheckbox"].var = autoscroll
@@ -5262,7 +5262,7 @@ function editor_mousepressed(x, y, button)
 		end
 		
 	elseif button == "wu" then
-		if editormenuopen then
+		if editormenuopen or rightclickmenuopen then
 		else
 			if EditorZoom and ctrlpressed then
 				local dy = 1
@@ -5305,7 +5305,7 @@ function editor_mousepressed(x, y, button)
 			end
 		end
 	elseif button == "wd" then
-		if editormenuopen then
+		if editormenuopen or rightclickmenuopen then
 		else
 			if EditorZoom and ctrlpressed then
 				local dy = -1
