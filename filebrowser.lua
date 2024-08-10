@@ -18,6 +18,14 @@ local files = {}
 local loaddirectory
 local newfile, newfolder, deletefile, parentdirectory, getfile, editfile, downloadfile, renamefile, openprompt, closeprompt
 
+function openfile(path)
+	if android then
+		filebrowser_load(path)
+	else
+		love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/" .. path)
+	end
+end
+
 function filebrowser_load(directory)
 	--Save the previous state to return to
 	previous_state = gamestate

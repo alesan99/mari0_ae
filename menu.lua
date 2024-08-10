@@ -2765,11 +2765,7 @@ function menu_keypressed(key, unicode)
 					if not love.filesystem.getInfo("alesans_entities/characters") then
 						love.filesystem.createDirectory("alesans_entities/characters")
 					end
-					if android then
-						filebrowser_load("alesans_entities/characters")
-					else
-						love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/alesans_entities/characters")
-					end
+					openfile("alesans_entities/characters")
 				end
 			end
 		elseif key == "escape" then
@@ -3201,7 +3197,7 @@ function opendlcfolder()
 	if not love.filesystem.getInfo("alesans_entities/" .. path) then
 		love.filesystem.createDirectory("alesans_entities/" .. path)
 	end
-	love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/alesans_entities/" .. path)
+	openfile("alesans_entities/" .. path)
 end
 
 --https://stackoverflow.com/questions/20459943/find-the-last-index-of-a-character-in-a-string/20461414

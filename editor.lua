@@ -7440,66 +7440,38 @@ function opencustomimagefolder(f)
 		if not love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/custom", "directory") then
 			love.filesystem.createDirectory( mappackfolder .. "/" .. mappack .. "/custom")
 		end
-		if android then
-			filebrowser_load(mappackfolder .. "/" .. mappack .. "/custom")
-		else
-			love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/" .. mappackfolder .. "/" .. mappack .. "/custom")
-		end
+		openfile(mappackfolder .. "/" .. mappack .. "/custom")
 	elseif customtabstate == "tiles" then
 		if f == "tiles" then
-			if android then
-				filebrowser_load(mappackfolder .. "/" .. mappack)
-			else
-				love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/" .. mappackfolder .. "/" .. mappack)
-			end
+			openfile(mappackfolder .. "/" .. mappack)
 		elseif f == "animated" then
 			if not love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/animated", "directory") then
 				love.filesystem.createDirectory( mappackfolder .. "/" .. mappack .. "/animated")
 			end
-			if android then
-				filebrowser_load(mappackfolder .. "/" .. mappack .. "/animated")
-			else
-				love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/" .. mappackfolder .. "/" .. mappack .. "/animated")
-			end
+			openfile(mappackfolder .. "/" .. mappack .. "/animated")
 		end
 	elseif customtabstate == "backgrounds" then
 		if not love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/backgrounds", "directory") then
 			love.filesystem.createDirectory( mappackfolder .. "/" .. mappack .. "/backgrounds")
 		end
-		if android then
-			filebrowser_load(mappackfolder .. "/" .. mappack .. "/backgrounds")
-		else
-			love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/" .. mappackfolder .. "/" .. mappack .. "/backgrounds")
-		end
+		openfile(mappackfolder .. "/" .. mappack .. "/backgrounds")
 	elseif customtabstate == "sounds" then
 		if f == "sounds" then
 			if not love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/sounds", "directory") then
 				love.filesystem.createDirectory( mappackfolder .. "/" .. mappack .. "/sounds")
 			end
-			if android then
-				filebrowser_load(mappackfolder .. "/" .. mappack .. "/sounds")
-			else
-				love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/" .. mappackfolder .. "/" .. mappack .. "/sounds")
-			end
+			openfile(mappackfolder .. "/" .. mappack .. "/sounds")
 		else
 			if not love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/music", "directory") then
 				love.filesystem.createDirectory( mappackfolder .. "/" .. mappack .. "/music")
 			end
-			if android then
-				filebrowser_load(mappackfolder .. "/" .. mappack .. "/music")
-			else
-				love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/" .. mappackfolder .. "/" .. mappack .. "/music")
-			end
+			openfile(mappackfolder .. "/" .. mappack .. "/music")
 		end
 	elseif customtabstate == "enemies" then
 		if not love.filesystem.getInfo( mappackfolder .. "/" .. mappack .. "/enemies", "directory") then
 			love.filesystem.createDirectory( mappackfolder .. "/" .. mappack .. "/enemies")
 		end
-		if android then
-			filebrowser_load(mappackfolder .. "/" .. mappack .. "/enemies")
-		else
-			love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/" .. mappackfolder .. "/" .. mappack .. "/enemies")
-		end
+		openfile(mappackfolder .. "/" .. mappack .. "/enemies")
 	end
 end
 function savecustomimage()
