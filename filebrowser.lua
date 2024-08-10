@@ -43,7 +43,7 @@ function filebrowser_load(directory)
 	browsergui["scroll"] = guielement:new("scrollbar", 380, 13, 184, 20, 80, 0, "ver")
 
 	--graphics
-	filebrowserimg = love.graphics.newImage("graphics/gui/filebrowser.png")
+	filebrowserimg = love.graphics.newImage("graphics/GUI/filebrowser.png")
 	filebrowserquad = {}
 	for i = 1, 4 do
 		filebrowserquad[i] = love.graphics.newQuad((i-1)*16, 0, 16, 16, 64, 16)
