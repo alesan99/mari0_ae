@@ -618,7 +618,11 @@ function guielement:draw(a, offx, offy)
 			end
 			local s = tostring(self.value)
 			love.graphics.setColor(self.textcolor)
-			properprint(string.sub(s,self.textoffset+1, self.textoffset+self.width), (self.x+1+self.spacing)*scale, (self.y+2+self.spacing)*scale)
+			if self.allowanycharacters then
+				properprintfast(string.sub(s,self.textoffset+1, self.textoffset+self.width), (self.x+1+self.spacing)*scale, (self.y+2+self.spacing)*scale)
+			else
+				properprint(string.sub(s,self.textoffset+1, self.textoffset+self.width), (self.x+1+self.spacing)*scale, (self.y+2+self.spacing)*scale)
+			end
 		else
 			--format string for tall text boxes
 			local oldstring = self.value--string.sub(self.value, self.textoffset+1, self.textoffset+self.width)  --old offsets
@@ -857,7 +861,7 @@ function guielement:keypress(key,textinput)
 					android_key_repeat = key
 				end]]
 
-				if key == ":" or key == ";" then
+				if (key == ":" or key == ";") and not self.allowanycharacters then
 					return
 				elseif key == "," and (not self.bypassspecialcharacters) then
 					key = "A"
@@ -1039,6 +1043,8 @@ function guielement:keypress(key,textinput)
 								targetkey = "+"
 							elseif key == "B" and not self.bypassspecialcharacters then
 								targetkey = "_"
+							elseif key == ";" then
+								targetkey = ":"
 							end
 						end
 						

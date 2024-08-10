@@ -2760,13 +2760,16 @@ function menu_keypressed(key, unicode)
 				if optionsselection == 3 then
 					--open characters folder
 					if android then
-						notice.new("On android use a file manager\nand go to:\nAndroid > data > Love.to.mario >\nfiles > save > mari0_android >\nalesans_entities > characters", notice.red, 15)
-						return false
+						notice.new("On android try a file manager\nand go to:\nAndroid > data > Love.to.mario >\nfiles > save > mari0_android", notice.red, 5)
 					end
 					if not love.filesystem.getInfo("alesans_entities/characters") then
 						love.filesystem.createDirectory("alesans_entities/characters")
 					end
-					love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/alesans_entities/characters")
+					if android then
+						filebrowser_load("alesans_entities/characters")
+					else
+						love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/alesans_entities/characters")
+					end
 				end
 			end
 		elseif key == "escape" then

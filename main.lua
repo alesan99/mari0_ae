@@ -66,8 +66,8 @@ VERSION = 13.2000
 VERSIONSTRING = "13.2 (8/9/24)"
 ANDROIDVERSION = 17
 
-android = (love.system.getOS() == "Android" or love.system.getOS() == "iOS") --[DROID]
-androidtest = false--testing android on pc
+android = true or (love.system.getOS() == "Android" or love.system.getOS() == "iOS") --[DROID]
+androidtest = true--testing android on pc
 
 local loadingbarv = 0 --0-1
 local loadingbardraw = function(add)
@@ -291,7 +291,7 @@ function love.load()
 				"emancipationfizzle", "emancipateanimation", "ceilblocker", "belt", "hatloader", "poof", "animationguiline", "animation",
 				"animationsystem", "animationtrigger", "dialogbox", "portal", "orgate", "andgate", "animatedtiletrigger", "rsflipflop", "animatedtimer",
 				"collectable", "powblock", "smallspring", "risingwater", "redseesaw", "snakeblock", "frozencoin", "entitytooltip", "spawnanimation",
-				"camerastop", "clearpipe", "track", "tilemoving", "laserfield", "checkpointflag", "ice", "pipe", "errorwindow"}
+				"camerastop", "clearpipe", "track", "tilemoving", "laserfield", "checkpointflag", "ice", "pipe", "errorwindow", "filebrowser"}
 	for i = 1, #luas do
 		require(luas[i])
 	end
@@ -1103,7 +1103,9 @@ function love.update(dt)
 	elseif gamestate == "game" then
 		game_update(dt)	
 	elseif gamestate == "intro" then
-		intro_update(dt)	
+		intro_update(dt)
+	elseif gamestate == "filebrowser" then
+		filebrowser_update(dt)
 	end
 	
 	for i, v in pairs(guielements) do
@@ -1189,6 +1191,8 @@ function lovedraw()
 		game_draw()
 	elseif gamestate == "intro" then
 		intro_draw()
+	elseif gamestate == "filebrowser" then
+		filebrowser_draw()
 	end
 	love.graphics.pop()
 	
@@ -1982,6 +1986,8 @@ function love.keypressed(key, scancode, isrepeat, textinput)
 		levelscreen_keypressed(key)
 	elseif gamestate == "intro" then
 		intro_keypressed()
+	elseif gamestate == "filebrowser" then
+		filebrowser_keypressed(key, textinput)
 	end
 end
 
@@ -1991,6 +1997,8 @@ function love.keyreleased(key, unicode)
 		menu_keyreleased(key, unicode)
 	elseif gamestate == "game" then
 		game_keyreleased(key, unicode)
+	elseif gamestate == "filebrowser" then
+		filebrowser_keyreleased(key, unicode)
 	end
 end
 
@@ -2030,6 +2038,8 @@ function love.mousepressed(x, y, button, istouch)
 		game_mousepressed(x, y, button)
 	elseif gamestate == "intro" then
 		intro_mousepressed()
+	elseif gamestate == "filebrowser" then
+		filebrowser_mousepressed(x, y, button)
 	end
 	
 	--animations priorities
@@ -2105,6 +2115,8 @@ function love.mousereleased(x, y, button, istouch)
 		menu_mousereleased(x, y, button)
 	elseif gamestate == "game" then
 		game_mousereleased(x, y, button)
+	elseif gamestate == "filebrowser" then
+		filebrowser_mousereleased(x, y, button)
 	end
 	
 	if ignoregui then
