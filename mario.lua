@@ -3827,7 +3827,6 @@ function mario:jump(force)
 					speedx = self.speedy
 				end
 				local force = self.characterdata.uwjumpforce + (math.abs(speedx) / self.characterdata.maxrunspeed)*self.characterdata.uwjumpforceadd
-				print(force)
 				if self.gravitydir == "up" then
 					self.speedy = force
 				elseif self.gravitydir == "down" then
