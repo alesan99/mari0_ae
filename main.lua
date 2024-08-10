@@ -1127,7 +1127,7 @@ function love.update(dt)
 end
 
 function love.draw()
-	if android then
+	if resizable or android then
 		if letterboxfullscreen and (shaders.passes[1].on or shaders.passes[2].on) then
 			love.graphics.setColor(0, 0, 0)
 			love.graphics.rectangle("fill", 0, 0, winwidth, winheight)
@@ -1155,9 +1155,6 @@ function love.draw()
 			androidDraw()
 		end
 	else
-		if resizable then
-			love.graphics.scale(winwidth/(width*16*scale), winheight/(224*scale))
-		end
 		lovedraw()
 	end
 	
@@ -2480,16 +2477,19 @@ function love.focus(f)
 end
 
 function openSaveFolder(subfolder) --By Slime
+	if android then
+		notice.new("On android try a file manager\nand go to:\nAndroid > data > Love.to.mario", notice.white, 5)
+		filebrowser_load(subfolder or "")
+		return true
+	end
+
 	local path = love.filesystem.getSaveDirectory()
 	path = subfolder and path.."/"..subfolder or path
 	
 	local cmdstr
 	local successval = 0
 	
-	if android then
-		notice.new("On android use a file manager\nand go to:\nAndroid > data > Love.to.mario >\nfiles > save > mari0_android >\nalesans_entities > mappacks", notice.red, 15)
-		return false
-	elseif os.getenv("WINDIR") then -- lolwindows
+	if os.getenv("WINDIR") then -- lolwindows
 		--cmdstr = "Explorer /root,%s"
 		if path:match("LOVE") then --hardcoded to fix ISO characters in usernames and made sure release mode doesn't mess anything up -saso
 			cmdstr = "Explorer %%appdata%%\\LOVE\\mari0"
