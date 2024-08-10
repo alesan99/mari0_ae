@@ -9078,6 +9078,16 @@ function mario:statued(statue) --tanooki statue
 end
 
 function mario:animationwalk(dir, speed)
+	if self.ducking then
+		self:duck(false)
+	end
+	if self.fence then
+		self:dropfence()
+	end
+	if self.vine then
+		self:dropvine(self.vineside)
+	end
+
 	self.animation = "animationwalk"
 	self.animationstate = "running"
 	self.animationmisc = {dir, math.max(0, math.min(40, (speed or maxwalkspeed)))}

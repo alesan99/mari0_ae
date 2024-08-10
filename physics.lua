@@ -58,8 +58,10 @@ function physicsupdate(dt)
 				local oldspeedy = v.speedy
 				if ((v.static == false) or (v.activestatic == true)) and v.active then
 					--GRAVITY
-					local oldx = v.x
-					local oldy = v.y
+					local oldx = v.oldxplatform or v.x
+					local oldy = v.oldyplatform or v.y
+					v.oldxplatform = nil --platforms can also move objects, this variable stores the objects position from the previous frame
+					v.oldyplatform = nil
 					local oldgravity
 					if (not v.activestatic) and (not v.ignoregravity) then
 						--low gravity

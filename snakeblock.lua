@@ -527,11 +527,13 @@ function snakeblock:update(dt)
 						if inrange(w.y+w.height/2, self.y, self.y+self.height) then
 							if self.speedx > 0 and w.x < self.x+self.width and w.x+w.width > self.x+self.width then --right
 								if #checkrect(self.x+self.width, w.y, w.width, w.height, {"exclude", w}, true, "ignoreplatforms") == 0 then
+									w.oldxplatform = w.x
 									w.x = self.x+self.width
 									--w.speedx = math.max(self.speedx, w.speedx)
 								end
 							elseif self.speedx < 0 and w.x+w.width > self.x and w.x < self.x then
 								if #checkrect(self.x-w.width, w.y, w.width, w.height, {"exclude", w}, true, "ignoreplatforms") == 0 then
+									w.oldxplatform = w.x
 									w.x = self.x-w.width
 									--w.speedx = math.min(self.speedx, w.speedx)
 								end

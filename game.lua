@@ -325,7 +325,7 @@ function game_update(dt)
 			if queuelowtime and queuelowtime < 0 and (not levelfinished) then
 				local star = false
 				for i = 1, players do
-					if objects["player"][i].starred then
+					if objects["player"][i].starred and not objects["player"][i].size == 8 then
 						star = true
 					end
 				end

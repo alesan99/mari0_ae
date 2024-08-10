@@ -571,6 +571,7 @@ function goomba:update(dt)
 								self.pickupreadyplayers[w.playernumber] = true
 								if not self.tracked then
 									if #checkrect(w.x+self.speedx*dt, w.y, w.width, w.height, {"exclude", w}, true) == 0 then
+										w.oldxplatform = w.x
 										w.x = w.x + self.speedx*dt
 									end
 								end
