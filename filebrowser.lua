@@ -29,6 +29,8 @@ function filebrowser_load(directory)
 
 	--buttons
 	browsergui["exit"] = guielement:new("button", 10, 203, "exit", filebrowser_exit, 2)
+	browsergui["exit"].bordercolor = {1, 0, 0}
+	browsergui["exit"].bordercolorhigh = {1, .5, .5}
 
 	browsergui["newfile"] = guielement:new("button", 51, 203, "new file", newfile, 2)
 	browsergui["newfolder"] = guielement:new("button", 124, 203, "new folder", newfolder, 2)
@@ -354,6 +356,8 @@ function openprompt(t, arg)
 		promptgui["textinput"].bypassspecialcharacters = true
 		promptgui["textinput"].allowanycharacters = true
 		promptgui["confirm"] = guielement:new("button", 282,137, "confirm", function() renamefile(arg, promptgui["textinput"].value); closeprompt() end, 2)
+		promptgui["confirm"].bordercolor = {1, 0, 0}
+		promptgui["confirm"].bordercolorhigh = {1, .5, .5}
 	elseif t == "download" then
 		promptgui["title"] = guielement:new("text", 53, 60, "download from url:", {1,1,1})
 		promptgui["textinput"] = guielement:new("input", 54,73, 35, nil, arg, 45)
@@ -362,6 +366,8 @@ function openprompt(t, arg)
 		
 		promptgui["paste"] = guielement:new("button", 54,88, "paste from clipboard", function() promptgui["textinput"].value = love.system.getClipboardText() end, 2)
 		promptgui["confirm"] = guielement:new("button", 282,137, "confirm", function() downloadfile(promptgui["textinput"].value); closeprompt() end, 2)
+		promptgui["confirm"].bordercolor = {1, 0, 0}
+		promptgui["confirm"].bordercolorhigh = {1, .5, .5}
 	elseif t == "edit" then
 		promptgui["title"] = guielement:new("text", 53, 60, "edit file " .. arg, {1,1,1})
 		
@@ -377,10 +383,16 @@ function openprompt(t, arg)
 
 		promptgui["savetext"] = guielement:new("button", 268,137, "save text", function() editfile(arg, promptgui["textinput"].value, "text"); closeprompt() end, 2)
 		promptgui["savebase64"] = guielement:new("button", 168,137, "save base64", function() editfile(arg, promptgui["textinput"].value, "base64"); closeprompt() end, 2)
+		promptgui["savetext"].bordercolor = {1, 0, 0}
+		promptgui["savetext"].bordercolorhigh = {1, .5, .5}
+		promptgui["savebase64"].bordercolor = {1, 0, 0}
+		promptgui["savebase64"].bordercolorhigh = {1, .5, .5}
 	elseif t == "delete" then
 		promptgui["title"] = guielement:new("text", 53, 60, "delete this file?", {1,1,1})
 		promptgui["titlefile"] = guielement:new("text", 53, 70, arg, {1,1,1})
 		promptgui["confirm"] = guielement:new("button", 282,137, "confirm", function() deletefile(dir .. "/" .. arg); closeprompt() end, 2)
+		promptgui["confirm"].bordercolor = {1, 0, 0}
+		promptgui["confirm"].bordercolorhigh = {1, .5, .5}
 	end
 
 	promptgui["close"] = guielement:new("button", 54, 137, "close", closeprompt, 2)

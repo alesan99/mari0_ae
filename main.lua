@@ -63,11 +63,11 @@ local debugGraph,fpsGraph,memGraph,drawGraph
 local debugGraphs = false
 
 VERSION = 13.2000
-VERSIONSTRING = "13.2 (8/9/24)"
+VERSIONSTRING = "13.2 (8/10/24)"
 ANDROIDVERSION = 17
 
-android = true or (love.system.getOS() == "Android" or love.system.getOS() == "iOS") --[DROID]
-androidtest = true--testing android on pc
+android = (love.system.getOS() == "Android" or love.system.getOS() == "iOS") --[DROID]
+androidtest = false--testing android on pc
 
 local loadingbarv = 0 --0-1
 local loadingbardraw = function(add)
