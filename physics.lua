@@ -478,7 +478,7 @@ function cancollideside(obj, side, colobj)
 		elseif not colobj.nointernalplatform then
 			return cancollideside(obj, side)
 		else
-			local oppositeside
+			local oppositeside = "passive"
 			if side == "up" then oppositeside = "down"
 			elseif side == "down" then oppositeside = "up"
 			elseif side == "left" then oppositeside = "right"
