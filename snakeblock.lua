@@ -111,15 +111,7 @@ function snakeblocksline:init(x, y, r)
 		firstx = self.x-self.length+1
 	end
 	local obj = snakeblock:new(firstx, self.y, self, false, self.quadi)
-	if self.firstdir == "up" then
-		obj.speedy = -self.speed
-	elseif self.firstdir == "down" then
-		obj.speedy = self.speed
-	elseif self.firstdir == "left" then
-		obj.speedx = -self.speed
-	else
-		obj.speedx = self.speed
-	end
+	self:setstartdir(obj)
 	self.movingchild[1] = obj
 	self.movingchild[1].push = true
 	table.insert(objects["snakeblock"], obj)
@@ -362,6 +354,7 @@ function snakeblocksline:dorespawn()
 	self.movingchild[1].dy = false
 	self.movingchild[1].speedx = self.speed
 	self.movingchild[1].speedy = 0
+	self:setstartdir(self.movingchild[1])
 	self.movingchild[1]:move(self.power)
 	self.movingchild[1].quadi = self.quadi
 	self.movingchild[1]:setquad()
@@ -376,6 +369,21 @@ function snakeblocksline:dorespawn()
 	self.movingchild[2]:move(self.power)
 	self.movingchild[2].quadi = self.quadi
 	self.movingchild[2]:setquad()
+end
+
+function snakeblocksline:setstartdir(obj)
+	--first snake block automatically goes right, adjust it to follow to set starting direction
+	obj.speedx = 0
+	obj.speedy = 0
+	if self.firstdir == "up" then
+		obj.speedy = -self.speed
+	elseif self.firstdir == "down" then
+		obj.speedy = self.speed
+	elseif self.firstdir == "left" then
+		obj.speedx = -self.speed
+	else
+		obj.speedx = self.speed
+	end
 end
 
 function snakeblocksline:link()
