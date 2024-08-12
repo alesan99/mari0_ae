@@ -41,7 +41,7 @@
 	-HansAgain for new portal sprites, new mario sprites, banzai bills, and pneumatic tubes
 	-Subpixel for bowser3, rotodiscs, ninji, and splunkin sprites
 	-Critfish for overgrown portal sprites
-	-Aidan for general bugtesting and misc. contributions on github
+	-Britdan for general bugtesting and misc. contributions on github
 	-MadNyle for propeller sound effect and mega mushroom
 	-fußmatte for helping create a TON of new characters for the font and Esperanto Translation
 	-HugoBDesigner for Portugese-Br translation
