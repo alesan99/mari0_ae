@@ -19,18 +19,22 @@ whennumber:i:>/</=:v				when a variable turns something
 --]]
 
 --[[ CONDITIONS:
-noprevsublevel						doesn't if the level was changed from another sublevel (Mario goes through pipe, lands in 1-1_1, prevsublevel was _0, no trigger.)
-worldequals:i						only triggers if current world is i
-levelequals:i						only triggers if current level is i
-sublevelequals:i					only triggers if current sublevel is i
-requirecoins:i						requires i coins to trigger (will not remove coins)
+noprevsublevel					doesn't if the level was changed from another sublevel (Mario goes through pipe, lands in 1-1_1, prevsublevel was _0, no trigger.)
+worldequals:i					only triggers if current world is i
+levelequals:i					only triggers if current level is i
+sublevelequals:i				only triggers if current sublevel is i
+requirecoins:i					requires i coins to trigger (will not remove coins)
 
 playersize[:player]:size			requires a player to be size
 requirecollectables:i				requires i collectables to trigger (will not remove coins)
-requirepoints:i						requires i points
+requirepoints:i					requires i points
 buttonhelddown:button				only if button is held down
 requirekeys[:player]:i				requires i keys
 ifnumber:i:>/</=:v				if a variable is equal/greater than something
+ifcoins:>/</=:v					if coin count is equal/greater than v
+ifcollectables:>/</=:v:i			if collectable count of a type is equal/greater than v
+ifpoints:>/</=:v				if points is equal/greater than v
+requireplayers:i				requires i players to trigger
 --]]
 
 --[[ ACTIONS:
@@ -52,13 +56,13 @@ disableanimation					disables this animation from triggering
 enableanimation						enables this animation to trigger
 playerjump[:player]					makes players jump (as high as possible)
 playerstopjump[:player]				makes players abort the jump (for small jumps)
-dialogbox:text[:speaker]			creates a dialogbox with <text> and <speaker>
+dialogbox:text[:speaker][:color]	creates a dialogbox with <text> and <speaker> and <color> (from textcolors in variables.lua)
 removedialogbox						removes the dialogbox
 playmusic:i							plays music <i>
 screenshake:power					makes the screen shake with <power>
 addcoins:coins						adds <coins> coins
 addpoints:points					adds <points> points
-changebackgroundcolor:r:g:b			changes background color ro rgb
+changebackgroundcolor:r:g:b			changes background color to rgb
 killplayer[:player]					hurts player(s)
 changetime:time						changes the time left to <time>
 loadlevel:world:level:sublevel:exit	starts level <world>-<level>_<sublevel> pipeexitid:<exit>
@@ -106,6 +110,8 @@ settime:time						sets time
 setplayerlight:blocks				sets player's light in lights out mode
 waitforinput                        waits until a spesific/any player presses a button
 waitfrotrigger                      waits until a spesific animation is triggered
+makeinvincible:i					makes player invincible/give star for i or default seconds
+changeswitchstate:i					trigger switchblocks
 --]]
 
 function animation:init(path, name)
@@ -592,7 +598,7 @@ function animation:update(dt)
 					playmusic()
 				end
 			elseif v[1] == "changebackgroundcolor" then
-				love.graphics.setBackgroundColor(tonumber(v[2]) or 255, tonumber(v[3]) or 255, tonumber(v[4]) or 255)
+				love.graphics.setBackgroundColor((tonumber(v[2]) or 255)/255, (tonumber(v[3]) or 255)/255, (tonumber(v[4]) or 255)/255)
 			elseif v[1] == "killplayer" then
 				if v[2] == "everyone" then
 					for i = 1, players do
@@ -782,7 +788,7 @@ function animation:update(dt)
 						local s = t[2]:split("-") --find coords
 						local x, y = tonumber(s[1]), tonumber(s[2])
 						local coinblock = (ismaptile(x, y) and tilequads[map[x][y][1]].collision and tilequads[map[x][y][1]].coinblock)
-						objects["collectable"][t[2]] = collectable:new(x, y, map[x][y], false, coinblock)
+						objects["collectable"][tilemap(x,y)] = collectable:new(x, y, map[x][y], false, coinblock)
 					end
 				end
 				collectableslist[i] = {}
@@ -865,15 +871,15 @@ function animation:update(dt)
 			elseif v[1] == "transformenemy" then
 				transformenemyanimation(v[2])
 			elseif v[1] == "killallenemies" then
-				for i2, v2 in pairs(objects) do
-					if i1 ~= "tile" and i2 ~= "pixeltile" and i2 ~= "buttonblock" then
-						for i, v in pairs(objects[i2]) do
-							if v.active and v.shotted and (not v.resistseverything) then
+				for i2, v2 in kpairs(objects, objectskeys) do
+					if i2 ~= "tile" and i2 ~= "buttonblock" then
+						for i3, v3 in pairs(objects[i2]) do
+							if v3.active and v3.shotted and (not v3.resistseverything) then
 								local dir = "right"
 								if math.random(1,2) == 1 then
 									dir = "left"
 								end
-								v:shotted(dir)
+								v3:shotted(dir)
 							end
 						end
 					end
@@ -915,13 +921,28 @@ function animation:update(dt)
 						p.disablejumping = false
 					end
 				end
+			elseif v[1] == "changeportal" then
+				local pstart, pend = 1, players
+				if v[2] ~= "everyone" then
+					pstart, pend = tonumber(string.sub(v[2], -1)), tonumber(string.sub(v[2], -1))
+				end
+				for i = pstart, pend do
+					if objects["player"][i] then
+						local p = objects["player"][i]
+						p.portalgun = (v[3] ~= "none")
+						if p.portalgun and (not p.characterdata.noportalgun) and playertype ~= "classic" and playertype ~= "cappy" then
+							p.portals = v[3]
+							p:updateportalsavailable()
+						end
+					end
+				end
 			elseif v[1] == "triggeranimation" then
 				if animationtriggerfuncs[v[2]] then
 					for i = 1, #animationtriggerfuncs[v[2]] do
 						animationtriggerfuncs[v[2]][i]:trigger()
 					end
+					animationtriggerfuncs[v[2]].triggered = true
 				end
-				animationtriggerfuncs[v[2]].triggered = true
 				
 			elseif v[1] == "addkeys" then
 				if v[3] == "everyone" then
@@ -962,6 +983,31 @@ function animation:update(dt)
 			elseif v[1] == "setplayerlight" then
 				for i = 1, players do
 					objects["player"][i].light = tonumber(v[2])
+				end
+			elseif v[1] == "makeinvincible" then
+				local time = mariostarduration
+				if v[2] ~= "" and tonumber(v[2]) and tonumber(v[2]) > 0 then
+					time = tonumber(v[2])
+				end
+				if v[3] == "everyone" then
+					for i = 1, players do
+						if objects["player"][i].animation ~= "grow1" and objects["player"][i].animation ~= "grow2" and objects["player"][i].animation ~= "shrink" then
+							objects["player"][i]:star()
+							objects["player"][i].startimer = (mariostarduration-time)
+						end
+					end
+				else
+					local i = tonumber(string.sub(v[3], -1))
+					if objects["player"][i] then
+						if objects["player"][i].animation ~= "grow1" and objects["player"][i].animation ~= "grow2" and objects["player"][i].animation ~= "shrink" then
+							objects["player"][i]:star()
+							objects["player"][i].startimer = (mariostarduration-time)
+						end
+					end
+				end
+			elseif v[1] == "changeswitchstate" then
+				if tonumber(v[2]) and tonumber(v[2]) <= 4 then
+					changeswitchstate(tonumber(v[2]), (v[3] == "on"), true)
 				end
 			elseif v[1] == "setnumber" then
 				local name = tostring(v[2])
@@ -1039,6 +1085,36 @@ function animation:trigger()
 				if marioscore < tonumber(v[2]) then
 					pass = false
 					break
+				end
+			elseif v[1] == "ifcoins" then
+				local value = tonumber(v[3])
+				if v[2] == "=" and mariocoincount ~= value then
+					pass = false
+				elseif v[2] == ">" and mariocoincount <= value then
+					pass = false
+				elseif v[2] == "<" and mariocoincount >= value then
+					pass = false
+				end
+			elseif v[1] == "ifcollectables" then
+				local value = tonumber(v[3])
+				local typ = tonumber(v[4])
+				if not collectablescount[typ] then
+					pass = false
+				elseif v[2] == "=" and collectablescount[typ] ~= value then
+					pass = false
+				elseif v[2] == ">" and collectablescount[typ] <= value then
+					pass = false
+				elseif v[2] == "<" and collectablescount[typ] >= value then
+					pass = false
+				end
+			elseif v[1] == "ifpoints" then
+				local value = tonumber(v[3])
+				if v[2] == "=" and marioscore ~= value then
+					pass = false
+				elseif v[2] == ">" and marioscore <= value then
+					pass = false
+				elseif v[2] == "<" and marioscore >= value then
+					pass = false
 				end
 			elseif v[1] == "requirekeys" then
 				if v[3] == "everyone" then
@@ -1131,6 +1207,11 @@ function animation:trigger()
 						end
 					end
 				end
+			elseif v[1] == "requireplayers" then
+				if players < tonumber(v[2]) then
+					pass = false
+					break
+				end	
 			end
 		end
 		

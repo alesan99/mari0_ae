@@ -1,7 +1,7 @@
 DCversion = "4"
 
 --future updates just incase I feel like adding more later
-if love.filesystem.exists("alesans_entities/daily_challenge_expansion.data") then
+if love.filesystem.getInfo("alesans_entities/daily_challenge_expansion.data") then
 	ok, chunk = pcall(love.filesystem.load, "alesans_entities/daily_challenge_expansion.data")
 	if ok then
 		local ok, result = pcall(chunk)
@@ -136,7 +136,7 @@ DCchaltable = {
 function createdailychallenge()
 	custommusics = {}
 	if not custommusics["dc"] then
-		if love.filesystem.exists("sounds/dailychallenge.ogg") then
+		if love.filesystem.getInfo("sounds/dailychallenge.ogg") then
 			custommusics["dc"] = "sounds/dailychallenge.ogg"
 		else
 			custommusics["dc"] = "sounds/overworld-fast.ogg"

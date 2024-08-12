@@ -201,7 +201,7 @@ function pipe:inside(dir, c, b) --direction of entrance, cox or coy, player
 					--all it needs is a collision
 					if ((ph <= self.height) or bigmario) and --should he fit at all?
 						py+ph > self.coy-1 and py < self.coy and --is the player touching the pipe entity
-						py+ph*.5 < self.coy then --is the middle of the player within the pipe? (just to make it resonable)
+						py+ph*.4 < self.coy then --is the middle of the player within the pipe? (just to make it resonable)
 						return true
 					end
 				end

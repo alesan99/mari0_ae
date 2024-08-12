@@ -210,11 +210,11 @@ function thwomp:update(dt)
 			elseif self.hitground then
 				--returning
 				if self.t == "left" then
-					self.speedx = thwompreturnspeed
+					self.speedx = math.min(thwompreturnspeed, self.speedx+5*dt)
 				elseif self.t == "right" then
-					self.speedx = -thwompreturnspeed
+					self.speedx = math.max(-thwompreturnspeed, self.speedx-5*dt)
 				else
-					self.speedy = -thwompreturnspeed
+					self.speedy = math.max(-thwompreturnspeed, self.speedy-5*dt)
 				end
 				--return to origin
 				if self.returntoorigin then
@@ -243,6 +243,14 @@ function thwomp:update(dt)
 				else
 					self.speedy = math.min(thwompattackspeed, self.speedy+26*dt)
 				end
+			end
+		end
+
+		--slow down if being flung in wrong direction
+		if (self.t == "left" or self.t == "right") and (not self.track) then
+			if self.speedy ~= 0 then
+				self.speedy = math.max(0,math.abs(self.speedy)-10*dt)*(self.speedy/math.abs(self.speedy))
+				print("hey")
 			end
 		end
 		
@@ -486,4 +494,8 @@ end
 function thwomp:dosupersize()
 	self.ox = self.x
 	self.oy = self.y
+end
+
+function thwomp:portaled(exitdir)
+
 end

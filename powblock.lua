@@ -88,8 +88,8 @@ function powblock:hit()
 	self.explode = true
 	self.active = false
 
-	for i2, v2 in pairs(objects) do
-		if i1 ~= "tile" and i2 ~= "pixeltile" and i2 ~= "buttonblock" then
+	for i2, v2 in kpairs(objects, objectskeys) do
+		if i1 ~= "tile" and i2 ~= "buttonblock" then
 			for i, v in pairs(objects[i2]) do
 				if v.active and v.shotted and onscreen(v.x,v.y) and (not v.resistspowblock) and v.speedy == 0 then
 					local dir = "right"

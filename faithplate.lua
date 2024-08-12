@@ -58,7 +58,18 @@ function faithplate:init(x, y, dir, vars, r)
 	
 	self.animationtimer = 1
 	
-	self.includetable = {"player", "box", "turret", "goomba", "koopa", "enemy"}
+	self.includetable = {
+		"player", "box", "gel", "turret", "enemy", "ice", "energyball", "tilemoving",
+		"mushroom", "flower", "oneup", "star", "fireball", "fire", "poisonmush", "brofireball",
+		"boomerang", "hammersuit", "mariohammer", "frogsuit", "levelball", "core", "iceball",
+		"powblock", "smallspring", "pbutton"
+	}
+	local ignorelist = {"icicle", "cheep", "squid", "flyingfish", "cheepwhite", "cheepred", "chainchomp", "pinksquid", "parabeetle", "parabeetleright", "boo", "rockywrench"}
+	for i, v in pairs(enemies) do
+		if not tablecontains(ignorelist, v) then
+			table.insert(self.includetable, v)
+		end
+	end
 end
 
 function faithplate:update(dt)
@@ -101,7 +112,7 @@ function faithplate:draw()
 	if not custombackground then
 		love.graphics.setColor(unpack(backgroundcolor[background]))
 		love.graphics.rectangle("fill", math.floor((self.cox-1-xscroll)*16*scale), (self.coy-1.5-yscroll)*16*scale, 32*scale, 2*scale)
-		love.graphics.setColor(255, 255, 255)
+		love.graphics.setColor(1, 1, 1)
 	end
 
 	if self.animationtimer < 1 then

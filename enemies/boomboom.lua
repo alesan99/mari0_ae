@@ -468,11 +468,6 @@ function boomboom:leftcollide(a, b)
 	if self:globalcollide(a, b) then
 		return false
 	end
-
-	if a == "pixeltile" and b.dir == "right" then
-		self.y = self.y - 1/16
-		return false
-	end
 	
 	if self.direction == "left" and not self.bigjumping and not self.smalljumping and not self.ducking and b.y > self.y and self.speedy == 0 then
 		self:smalljump()
@@ -489,11 +484,6 @@ end
 
 function boomboom:rightcollide(a, b)
 	if self:globalcollide(a, b) then
-		return false
-	end
-
-	if a == "pixeltile" and b.dir == "left" then
-		self.y = self.y - 1/16
 		return false
 	end
 	
@@ -531,10 +521,6 @@ function boomboom:globalcollide(a, b)
 	if a == "fireball" or a == "player" then
 		return true
 	end
-end
-
-function boomboom:startfall()
-
 end
 
 function boomboom:floorcollide(a, b)

@@ -184,7 +184,7 @@ end
 
 function blocktogglebutton:draw()
 	if not self.drawable then
-		love.graphics.setColor(255, 255, 255)
+		love.graphics.setColor(1, 1, 1)
 		love.graphics.draw(self.graphic, self.quad, math.floor(((self.x-xscroll)*16+self.offsetX)*scale), math.floor(((self.y-yscroll)*16-self.offsetY)*scale), self.rotation, scale, scale, self.quadcenterX, self.quadcenterY)
 	end
 end
@@ -283,25 +283,7 @@ function blocktogglebutton:changeblocks(b)
 			end
 		end
 	else
-		for j, w in pairs(objects["buttonblock"]) do
-			if w.color == self.color then
-				w:change()
-			end
-		end
-		for j, w in pairs(objects["belt"]) do
-			if w.t == "switch" and w.color == self.color then
-				w:change()
-			end
-		end
-		if self.t == "big" then
-			solidblockperma[self.color] = not solidblockperma[self.color]
-		end
-		for i = 1, #animationswitchtriggerfuncs do
-			local t = animationswitchtriggerfuncs[i]
-			if tonumber((t[2] or 0)) and tonumber((t[2] or 0)) == self.color then
-				t[1]:trigger()
-			end
-		end
+		changeswitchstate(self.color, (self.t == "big"), true)
 	end
 end
 
@@ -453,7 +435,7 @@ function buttonblock:init(x, y, color, solid)
 end
 
 function buttonblock:draw()
-	--love.graphics.setColor(255, 255, 255)
+	--love.graphics.setColor(1, 1, 1)
 	love.graphics.draw(self.graphic, self.quad, math.floor(((self.x-xscroll)*16+self.offsetX)*scale), math.floor(((self.y-yscroll)*16-self.offsetY)*scale), 0, scale, scale, self.quadcenterX, self.quadcenterY)
 end
 

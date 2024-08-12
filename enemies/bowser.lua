@@ -248,10 +248,6 @@ function bowser:ceilcollide(a, b)
 	end
 end
 
-function bowser:startfall()
-
-end
-
 function bowser:floorcollide(a, b)
 	if self.jump then
 		self.jump = false

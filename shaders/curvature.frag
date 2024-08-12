@@ -2,15 +2,15 @@ extern vec2 inputSize;
 extern vec2 textureSize;
 
 
-#define distortion 0.2
+const float distortion = 0.2;
 
 /*
-#define f 0.6
-#define ox 0.5
-#define oy 0.5
-#define scale 0.8
-#define k1 0.7
-#define k2 -0.5
+const float f 0.6;
+const float ox 0.5;
+const float oy 0.5;
+const float scale 0.8;
+const float k1 0.7;
+const float k2 -0.5;
 
 vec2 barrelDistort(vec2 coord)
 {	
@@ -43,9 +43,9 @@ vec2 radialDistortion(vec2 coord, const vec2 ratio)
 	return result;
 }
 /*
-vec4 checkTexelBounds(Image texture, vec2 coords, vec2 bounds)
+vec4 checkTexelBounds(Image tex, vec2 coords, vec2 bounds)
 {
-	vec4 color = Texel(texture, coords) * 
+	vec4 color = Texel(tex, coords) * 
 	
 	vec2 ss = step(coords, vec2(bounds.x, 1.0)) * step(vec2(0.0, bounds.y), coords);
 	
@@ -55,14 +55,14 @@ vec4 checkTexelBounds(Image texture, vec2 coords, vec2 bounds)
 	return color;
 }*/
 
-vec4 checkTexelBounds(Image texture, vec2 coords, vec2 bounds)
+vec4 checkTexelBounds(Image tex, vec2 coords, vec2 bounds)
 {
 	vec2 ss = step(coords, vec2(bounds.x, 1.0)) * step(vec2(0.0, bounds.y), coords);
-	return Texel(texture, coords) * ss.x * ss.y;
+	return Texel(tex, coords) * ss.x * ss.y;
 }
 
 /*
-vec4 checkTexelBounds(Image texture, vec2 coords)
+vec4 checkTexelBounds(Image tex, vec2 coords)
 {
 	vec2 bounds = vec2(inputSize.x / textureSize.x, 1.0 - inputSize.y / textureSize.y);
 	
@@ -70,17 +70,17 @@ vec4 checkTexelBounds(Image texture, vec2 coords)
 	if (coords.x > bounds.x || coords.x < 0.0 || coords.y > 1.0 || coords.y < bounds.y)
 		color = vec4(0.0, 0.0, 0.0, 1.0);
 	else
-		color = Texel(texture, coords);
+		color = Texel(tex, coords);
 		
 	return color;
 }
 */
 
-vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 pixel_coords)
+vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 pixel_coords)
 {
 	vec2 coords = radialDistortion(texture_coords, inputSize / textureSize);
 	
-	vec4 texcolor = checkTexelBounds(texture, coords, vec2(inputSize.x / textureSize.x, 1.0 - inputSize.y / textureSize.y));
+	vec4 texcolor = checkTexelBounds(tex, coords, vec2(inputSize.x / textureSize.x, 1.0 - inputSize.y / textureSize.y));
 	texcolor.a = 1.0;
 	
 	return texcolor;

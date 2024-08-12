@@ -15,7 +15,14 @@ function funnel:init(x, y, dir, r)
 	self.timer = 0
 	self.timer2 = 0
 	
-	self.objtable = {"player", "goomba", "box", "koopa", "spikeball", "gel", "turret", "enemy", "ice", "energyball"}
+	self.objtable = {
+		"player", "box", "gel", "turret", "enemy", "ice", "energyball", "tilemoving", "mushroom", "flower", "oneup", "star",
+		"fireball", "fire", "poisonmush", "brofireball", "boomerang", "hammersuit", "mariohammer", "frogsuit", "levelball",
+		"core", "iceball", "powblock", "smallspring", "pbutton"
+	}
+	for i, v in pairs(enemies) do
+		table.insert(self.objtable, v)
+	end
 	
 	table.remove(self.r, 1)
 	table.remove(self.r, 1)
@@ -241,7 +248,7 @@ function funnel:update(dt)
 end
 
 function funnel:draw()
-	love.graphics.setColor(255, 255, 255)
+	love.graphics.setColor(1, 1, 1)
 	
 	if self.power then
 		local img
@@ -327,7 +334,7 @@ function funnel:draw()
 		end
 	end
 	
-	love.graphics.setColor(255, 255, 255)
+	love.graphics.setColor(1, 1, 1)
 	if self.dir == "right" then
 		love.graphics.draw(funnelbaseimg, excursionquad[self.quad], math.floor((self.cox-xscroll-1)*16*scale), math.floor((self.coy-yscroll-1.5)*16*scale), 0, scale, scale)
 	elseif self.dir == "left" then

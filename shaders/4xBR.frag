@@ -32,7 +32,7 @@ float reduce(vec3 color)
    return dot(color, dtt);
 }
 
-vec4 effect(vec4 vcolor, Image texture, vec2 texture_coords, vec2 pixel_coords)
+vec4 effect(vec4 vcolor, Image tex, vec2 texture_coords, vec2 pixel_coords)
 {
 	vec2 ps = 1.0 / textureSize;
 	vec2 dx = vec2(ps.x, 0.0);
@@ -44,15 +44,15 @@ vec4 effect(vec4 vcolor, Image texture, vec2 texture_coords, vec2 pixel_coords)
 
 	// Reading the texels
 
-	vec3 A = Texel(texture, d11-dx-dy).xyz;
-	vec3 B = Texel(texture, d11   -dy).xyz;
-	vec3 C = Texel(texture, d11+dx-dy).xyz;
-	vec3 D = Texel(texture, d11-dx   ).xyz;
-	vec3 E = Texel(texture, d11      ).xyz;
-	vec3 F = Texel(texture, d11+dx   ).xyz;
-	vec3 G = Texel(texture, d11-dx+dy).xyz;
-	vec3 H = Texel(texture, d11+dy   ).xyz;
-	vec3 I = Texel(texture, d11+dx+dy).xyz;
+	vec3 A = Texel(tex, d11-dx-dy).xyz;
+	vec3 B = Texel(tex, d11   -dy).xyz;
+	vec3 C = Texel(tex, d11+dx-dy).xyz;
+	vec3 D = Texel(tex, d11-dx   ).xyz;
+	vec3 E = Texel(tex, d11      ).xyz;
+	vec3 F = Texel(tex, d11+dx   ).xyz;
+	vec3 G = Texel(tex, d11-dx+dy).xyz;
+	vec3 H = Texel(tex, d11+dy   ).xyz;
+	vec3 I = Texel(tex, d11+dx+dy).xyz;
 
 	vec3 E0 = E;
 	vec3 E1 = E;

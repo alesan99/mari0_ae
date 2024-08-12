@@ -168,7 +168,7 @@ function shaders:init(numpasses)
 		local filename, filetype = v:match("(.+)%.(.-)$")
 		if filetype == "frag" then
 			local name = "shaders".."/"..v
-			if love.filesystem.isFile(name) then
+			if love.filesystem.getInfo(name).type == "file" then
 				local str = love.filesystem.read(name)
 				local success, effect = pcall(love.graphics.newShader, str)
 				if success then
@@ -271,7 +271,7 @@ function shaders:postdraw()
 	
 	local blendmode = love.graphics.getBlendMode()
 	love.graphics.setBlendMode("alpha", "premultiplied")
-	love.graphics.setColor(255, 255, 255)
+	love.graphics.setColor(1, 1, 1)
 	
 	local activepasses = {}
 	

@@ -24,16 +24,16 @@ function loadMappackInfo(url)
 	t[3] = ""--t.mappackdescription = ""
 	t[4] = "1-1"--t.mappackbackground = "1-1"
 	t[5] = false--icon
-	t[6] = false
+	t[6] = false--dropshadow
 	
-	if love.filesystem.exists(url .. "/icon.png") then
+	if love.filesystem.getInfo(url .. "/icon.png") then
 		local ok, data = pcall(love.image.newImageData, url .. "/icon.png")
 		if ok then
 			t[5] = data
 		end
 	end
 	
-	if love.filesystem.exists(url .. "/settings.txt") then
+	if love.filesystem.getInfo(url .. "/settings.txt") then
 		local s = love.filesystem.read(url .. "/settings.txt")
 		local s1 = s:split("\n")
 		for j = 1, #s1 do

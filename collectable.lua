@@ -113,6 +113,8 @@ end
 function collectablelock:removecheck()
 	if self.on and collectablescount[self.t] < self.count then
 		self:out("off")
+		self.on = false
+		self.initial = true
 	end
 end
 

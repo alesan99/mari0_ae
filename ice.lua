@@ -73,7 +73,23 @@ function ice:update(dt)
 
 	if math.abs(self.speedx) < 1 then
 		self.timer = self.timer + dt
+	else
+		--collect collectables if moving
+		local x = math.floor(self.x+self.width/2)+1
+		local y = math.floor(self.y+self.height)+1
+		if ismaptile(x, y) then
+			if objects["collectable"][tilemap(x, y)] then
+				getcollectable(x, y)
+			end
+		end
+		local y = math.floor(self.y+self.height/2)+1
+		if ismaptile(x, y) then
+			if objects["collectable"][tilemap(x, y)] then
+				getcollectable(x, y)
+			end
+		end
 	end
+
 	if self.static and (not self.dontfallafterfreeze) then
 		--start falling if static
 		if self.timer > iceblockairtime then
@@ -275,7 +291,7 @@ function ice:meltice(destroy)
 
 	if destroy then
 		playsound(iciclesound)
-		local debris = rgbaToInt(80,210,250,255)
+		local debris = rgbaToInt(80/255, 210/255, 250/255, 1)
 		if blockdebrisquads[debris] then
 			table.insert(blockdebristable, blockdebris:new(self.x+self.width/2, self.y+self.height/2, 3.5, -23, blockdebrisimage, blockdebrisquads[debris][spriteset]))
 			table.insert(blockdebristable, blockdebris:new(self.x+self.width/2, self.y+self.height/2, -3.5, -23, blockdebrisimage, blockdebrisquads[debris][spriteset]))

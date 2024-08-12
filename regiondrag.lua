@@ -25,17 +25,17 @@ end
 function regiondrag:draw()
 	--center panel
 	if not self.grabbed["corner1"] and not self.grabbed["corner2"] and not self.grabbed["corner3"] and not self.grabbed["corner4"] and (self.over.center or self.grabbed.center) then
-		love.graphics.setColor(255, 180, 65, 111)
+		love.graphics.setColor(1, 180/255, 65/255, 111/255)
 	else
-		love.graphics.setColor(234, 160, 45, 111)
+		love.graphics.setColor(234/255, 160/255, 45/255, 111/255)
 	end
 	love.graphics.rectangle("fill", ((((self.x)*16)-xscroll*16))*scale, ((self.y-(8/16)-yscroll)*16)*scale, (self.width*16)*scale, (self.height*16)*scale)
 	--corners
 	for i = 1, 4 do
 		if self.over["corner" .. i] or self.grabbed["corner" .. i] then
-			love.graphics.setColor(255, 106, 0, 150)
+			love.graphics.setColor(1, 106/255, 0, 150/255)
 		else
-			love.graphics.setColor(255, 106, 0, 100)
+			love.graphics.setColor(1, 106/255, 0, 100/255)
 		end
 		if i == 1 then
 			love.graphics.rectangle("fill", ((((self.x)*16)-xscroll*16)-(self.nubsize*.5))*scale, (((self.y-(8/16)-yscroll)*16)-(self.nubsize*.5))*scale, self.nubsize*scale, self.nubsize*scale)
@@ -47,7 +47,7 @@ function regiondrag:draw()
 			love.graphics.rectangle("fill", ((((self.x+self.width)*16)-xscroll*16)-(self.nubsize*.5))*scale, ((((self.y+self.height)-(8/16)-yscroll)*16)-(self.nubsize*.5))*scale, self.nubsize*scale, self.nubsize*scale)
 		end
 	end
-	love.graphics.setColor(255, 255, 255, 255)
+	love.graphics.setColor(1, 1, 1, 1)
 end
 
 function regiondrag:update(dt)
@@ -101,8 +101,8 @@ function regiondrag:update(dt)
 		self.width = math.floor((x/scale)/16*self.step)/self.step-self.x+1/self.step
 		self.height = math.floor(((y/scale)+8)/16*self.step)/self.step-self.y+1/self.step
 	elseif self.grabbed.center then
-		self.x = math.floor(((x-self.movex)/scale)/16*self.step)/self.step+self.oldx
-		self.y = math.floor(((y-self.movey)/scale)/16*self.step)/self.step+self.oldy
+		self.x = round(((x-self.movex)/scale)/16*self.step,0)/self.step+self.oldx
+		self.y = round(((y-self.movey)/scale)/16*self.step,0)/self.step+self.oldy
 	end
 	if self.width < 0 then
 		local oldx = self.x

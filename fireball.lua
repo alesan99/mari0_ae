@@ -100,7 +100,7 @@ function fireball:update(dt)
 			if tilequads[map[x][y][1]].coin then
 				collectcoin(x, y)
 			elseif objects["coin"][tilemap(x, y)] and not objects["coin"][tilemap(x, y)].frozen then
-				collectcoin2(x, y)
+				collectcoinentity(x, y)
 			elseif objects["collectable"][tilemap(x, y)] then
 				getcollectable(x, y)
 			end
@@ -155,12 +155,6 @@ function fireball:update(dt)
 end
 
 function fireball:leftcollide(a, b)
-	if a == "pixeltile" and b.dir == "right" then
-		self.y = self.y - b.step
-		self:floorcollide("tile", b)
-		return false
-	end
-	
 	if a == "donut" or a == "plantfire" then
 		return false
 	end
@@ -168,12 +162,12 @@ function fireball:leftcollide(a, b)
 	--if self.t == "fireball" then
 		--self.x = self.x-.5 --? Remove maybe
 	--end
-	self:hitstuff(a, b)
+	self:hitstuff(a, b, "left")
 	
 	if self.t == "superball" then
 		self.speedx = math.abs(self.speedx)
 	elseif self.t == "iceball" then
-		self:hitstuff(a, b)
+		self:hitstuff(a, b, "left")
 	else
 		self.speedx = fireballspeed
 	end
@@ -182,22 +176,16 @@ function fireball:leftcollide(a, b)
 end
 
 function fireball:rightcollide(a, b)
-	if a == "pixeltile" and b.dir == "left" then
-		self.y = self.y - b.step
-		self:floorcollide("tile", b)
-		return false
-	end
-	
 	if a == "donut" or a == "plantfire" then
 		return false
 	end
 
-	self:hitstuff(a, b)
+	self:hitstuff(a, b, "right")
 	
 	if self.t == "superball" then
 		self.speedx = -math.abs(self.speedx)
 	elseif self.t == "iceball" then
-		self:hitstuff(a, b)
+		self:hitstuff(a, b, "right")
 	else
 		self.speedx = -fireballspeed
 	end
@@ -216,7 +204,7 @@ function fireball:floorcollide(a, b)
 	end
 
 	if a ~= "tile" and a ~= "portalwall" and a ~= "flipblock" and a ~= "buttonblock" and a ~= "snakeblock" or a == "frozencoin" then
-		self:hitstuff(a, b)
+		self:hitstuff(a, b, "floor")
 	end
 
 	if self.t == "superball" then
@@ -226,6 +214,9 @@ function fireball:floorcollide(a, b)
 	else
 		self.speedy = -fireballjumpforce
 	end
+	if b.SLOPE then
+		self.speedy = self.speedy -b.incline*10
+	end
 	return false
 end
 
@@ -234,7 +225,7 @@ function fireball:ceilcollide(a, b)
 		return false
 	end
 
-	self:hitstuff(a, b)
+	self:hitstuff(a, b, "ceil")
 
 	if self.t == "superball" then
 		self.speedy = math.abs(self.speedy)
@@ -261,7 +252,7 @@ function fireball:passivecollide(a, b)
 	return false
 end
 
-function fireball:hitstuff(a, b)
+function fireball:hitstuff(a, b, hitdir)
 	local dir = "right"
 	if self.x+self.width/2 > b.x+b.width/2 then
 		dir = "left"
@@ -285,10 +276,16 @@ function fireball:hitstuff(a, b)
 		playsound(blockhitsound)
 		
 	elseif a == "enemy" then
-		if b:shotted(dir, false, false, true) ~= false then
-			addpoints(b.firepoints or 200, self.x, self.y)
+		if b.reflectsfireballs then
+			if hitdir and (hitdir == "left" or hitdir == "right") then
+				self.speedx = -self.speedx
+			end
+		else
+			if b:shotted(dir, false, false, true) ~= false then
+				addpoints(b.firepoints or 200, self.x, self.y)
+			end
+			self:explode()
 		end
-		self:explode()
 	
 	elseif (a == "koopa" and (b.t == "beetle" or b.t == "beetleshell" or b.t == "bigbeetle" or b.t == "downbeetle")) or a == "spikeball" or a == "amp" then
 		self:explode()

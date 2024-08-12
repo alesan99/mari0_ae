@@ -5,7 +5,7 @@ function magic:init()
 	self.t = 0
 	self.x = math.floor(7+math.random()*188)*scale
 	self.y = math.floor(88+math.random()*12)*scale
-	self.color = {202+(math.random()-.7)*50, 170+(math.random()-.7)*50, 209+(math.random()-.7)*50}
+	self.color = {(202+(math.random()-.7)*50)/255, (170+(math.random()-.7)*50)/255, (209+(math.random()-.7)*50)/255}
 end
 
 function magic:update(dt)
