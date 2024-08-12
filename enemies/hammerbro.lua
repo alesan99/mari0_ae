@@ -568,18 +568,18 @@ function brofireball:init(x, y, dir,t)
 		self.speedy = -fireballjumpforce
 		self.gravity = 30
 		if dir == "right" then
-			self.speedx = iceballspeed
+			self.speedx = iceballbrospeed
 			self.x = x+6/16
 		else
-			self.speedx = -iceballspeed
+			self.speedx = -iceballbrospeed
 			self.x = x
 		end
 	else
 		if dir == "right" then
-			self.speedx = 10
+			self.speedx = fireballbrospeed
 			self.x = x+6/16
 		else
-			self.speedx = -10
+			self.speedx = -fireballbrospeed
 			self.x = x
 		end
 	end
@@ -793,12 +793,11 @@ function boomerang:init(x, y, dir, v)
 	self.boomerangbrocollide = false
 
 	self.kills = true
-	self.speed = 7
-	if v then
+	if v then -- essentially, if thrower is mario
 		self.fireballthrower = v
 		self.killstuff = true
 		self.kills = false
-		self.speed = 10
+		self.speed = boomerangspeed
 		self.category = 4
 		self.mask = {	true,
 						false, false, false, false, true,
@@ -808,6 +807,8 @@ function boomerang:init(x, y, dir, v)
 						false, true, false, false, true,
 						false, false, false, false, true,
 						false, true}
+	else
+		self.speed = boomerangbrospeed
 	end
 
 	self.speedx = -self.speed

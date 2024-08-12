@@ -1008,7 +1008,7 @@ function mario:update(dt)
 				self.animationstate = "jumping"
 				self.speedx = 0
 				self.speedy = -5
-				local debris = rgbaToInt(80,210,250,255)
+				local debris = rgbaToInt(80/255, 210/255, 250/255, 1)
 				if blockdebrisquads[debris] then
 					table.insert(blockdebristable, blockdebris:new(self.x+self.width/2, self.y+self.height/2, 3.5, -23, blockdebrisimage, blockdebrisquads[debris][spriteset]))
 					table.insert(blockdebristable, blockdebris:new(self.x+self.width/2, self.y+self.height/2, -3.5, -23, blockdebrisimage, blockdebrisquads[debris][spriteset]))
@@ -8932,7 +8932,6 @@ function mario:turretshot(tx, ty, sx, sy, knockback) --turret
 end
 
 function mario:groundshock()--for sledge bros
-	local groundfreezetime = 1
 	if self.speedy == 0 and not self.groundfreeze and (not self.vine) and (not self.fence) and (not self.clearpipe) then
 		self.groundfreeze = groundfreezetime
 		self.speedx = 0
@@ -8942,7 +8941,6 @@ function mario:groundshock()--for sledge bros
 end
 
 function mario:freeze() --ice ball
-	local icefreezetime = 1
 	if not self.frozen then
 		self.static = true
 		self.jumping = false
