@@ -158,6 +158,7 @@ function platform:update(dt)
 								(w.y+w.height >= self.y-0.4 and w.y+w.height < self.y+0.4))
 								and (not w.jumping) and not (self.speedy > 0 and w.speedy < 0) then --and w.speedy >= self.speedy
 								if #checkrect(w.x+xdiff, self.y-w.height, w.width, w.height, {"exclude", w}, true, condition) == 0 then
+									w.oldxplatform = w.x
 									w.x = w.x + xdiff
 									w.y = self.y-w.height
 									w.falling = false
@@ -186,6 +187,7 @@ function platform:update(dt)
 							if w.y == self.y - w.height then
 								if ((not w.playernumber) and not checkintile(w.x+self.speedx*dt, w.y, w.width, w.height, {}, w, "ignoreplatforms")) or
 									(w.playernumber and #checkrect(w.x+self.speedx*dt, w.y, w.width, w.height, {"exclude", w}, true) == 0) then
+									w.oldxplatform = w.x
 									w.x = w.x + self.speedx*dt
 									--make sure red koopas dont fall off
 									if v == "drybones" or (v == "koopa" and w.t == "red" and not w.small) or (v == "goomba" and (w.t == "goombrat" or w.t == "spiketop" or w.t == "wiggler")) or (w.turnaroundoncliff and not w.small) then
@@ -203,7 +205,7 @@ function platform:update(dt)
 						end
 					end
 					if self.speedy ~= 0 then
-						if not w.jumping and inrange(w.x, self.x-w.width, self.x+self.width) then
+						if not w.jumping and inrange(w.x, self.x-w.width, self.x+self.width) and w.speedy and w.height then
 							local clip_past_platform = (w.y+w.height-w.speedy*dt < self.y and w.y+w.height > self.y)
 							if inrange(w.y, self.y - w.height - 0.1, self.y - w.height + 0.1) or clip_past_platform then
 								local x1, y1 = math.ceil(w.x+0.01), math.ceil(self.y+self.height)

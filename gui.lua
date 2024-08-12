@@ -1,6 +1,7 @@
 guielement = class:new()
 
 local android_key_repeat = false --bugfix: keep track of last pressed key to prevent glitchy keyboards from inputing letter twice
+typingintextinput = false --dirty fix, not neccessarily accurate but good enough to prevent unintended scrolling in editor
 
 function guielement:init(...)
 	local arg = {...}
@@ -74,11 +75,11 @@ function guielement:init(...)
 			self.centertext = arg[10]
 		end
 		
-		self.bordercolorhigh = {255, 255, 255}
-		self.bordercolor = {127, 127, 127}
+		self.bordercolorhigh = {1, 1, 1}
+		self.bordercolor = {.5, .5, .5}
 		
 		self.fillcolor = {0, 0, 0}
-		self.textcolor = {255, 255, 255}
+		self.textcolor = {1, 1, 1}
 	elseif arg[1] == "scrollbar" then --scrollbar(x, y, yrange, width, height, start, dir)
 		self.type = arg[1]
 		self.x = arg[2]
@@ -95,9 +96,9 @@ function guielement:init(...)
 			self.xrange = self.range - self.width
 		end	
 		
-		self.backgroundcolor = {127, 127, 127}
-		self.bordercolorhigh = {255, 255, 255}
-		self.bordercolor = {127, 127, 127}
+		self.backgroundcolor = {.5, .5, .5}
+		self.bordercolorhigh = {1, 1, 1}
+		self.bordercolor = {.5, .5, .5}
 		
 		self.fillcolor = {0, 0, 0}
 
@@ -129,11 +130,11 @@ function guielement:init(...)
 		self.offset = 0
 		self.textoffset = 0
 		
-		self.bordercolorhigh = {255, 255, 255}
-		self.bordercolor = {127, 127, 127}
+		self.bordercolorhigh = {1, 1, 1}
+		self.bordercolor = {.5, .5, .5}
 		
 		self.fillcolor = {0, 0, 0}
-		self.textcolor = {255, 255, 255}
+		self.textcolor = {1, 1, 1}
 
 		if android then
 			self.didtypecheck = false
@@ -216,6 +217,7 @@ function guielement:update(dt)
 					self.numdragging = true
 					self.numdraggingstart = false
 					self.inputting = false
+					typingintextinput = false
 				end
 				--self.oldmousex, self.oldmousey = love.mouse.getPosition()
 			end
@@ -280,7 +282,7 @@ function guielement:update(dt)
 end
 
 function guielement:draw(a, offx, offy)
-	love.graphics.setColor(255, 255, 255)
+	love.graphics.setColor(1, 1, 1)
 	if self.type == "checkbox" then
 		local quad = 1
 		if self.var == true then
@@ -300,7 +302,7 @@ function guielement:draw(a, offx, offy)
 		local high = self:inhighlight(love.mouse.getPosition())
 		
 		if self.extended and not self.cutoff then
-			love.graphics.setColor(127, 127, 127)
+			love.graphics.setColor(.5, .5, .5)
 			local y = self.y
 			if self.dropup then
 				y = (self.y-(10*#self.entries))
@@ -308,9 +310,9 @@ function guielement:draw(a, offx, offy)
 			love.graphics.rectangle("fill", (self.x+2)*scale, (y+2)*scale, (13+self.width*8)*scale, (10*(#self.entries+1)+1)*scale)
 		end
 	
-		love.graphics.setColor(127, 127, 127)
+		love.graphics.setColor(.5, .5, .5)
 		if high then
-			love.graphics.setColor(255, 255, 255)
+			love.graphics.setColor(1, 1, 1)
 		end
 		
 		love.graphics.rectangle("fill", self.x*scale, self.y*scale, (3+self.width*8)*scale, 11*scale)
@@ -324,41 +326,41 @@ function guielement:draw(a, offx, offy)
 		love.graphics.rectangle("fill", (self.x+1)*scale, (self.y+1)*scale, (1+self.width*8)*scale, 9*scale)
 		
 		local s = self.entries[self.var]
-		love.graphics.setColor(255, 255, 255)
+		love.graphics.setColor(1, 1, 1)
 		if self.extended then
-			love.graphics.setColor(127, 127, 127)
+			love.graphics.setColor(.5, .5, .5)
 		elseif self.coloredtext then
 			if s == "black" then
-				love.graphics.setColor(80,80,80)
+				love.graphics.setColor(80/255,80/255,80/255)
 			else
 				love.graphics.setColor(textcolors[s])
 			end
 		end
-			
+
 		if self.displayentries then s = self.displayentries[self.var];
 			if s and s:sub(1, 6) == "_ENEMY" then s = " " .. s:sub(7, -1); love.graphics.draw(customenemyiconimg, (self.x+1)*scale, (self.y+2)*scale, 0, scale, scale) end end
 		if type(s) == "string" then s = s:sub(1, self.width) end
 		properprint(s, (self.x+1)*scale, (self.y+2)*scale)
 	
 		if self.extended then
-			love.graphics.setColor(127, 127, 127)
+			love.graphics.setColor(.5, .5, .5)
 			if high then
-				love.graphics.setColor(255, 255, 255)
+				love.graphics.setColor(1, 1, 1)
 			end
 			
 			if self.cutoff then --have a scrollbar
 				love.graphics.rectangle("fill", self.x*scale, -self.scroll*scale, (13+self.width*8)*scale, (10*(#self.entries+1)+1)*scale)
 				
-				love.graphics.setColor(127, 127, 127)
+				love.graphics.setColor(.5, .5, .5)
 				if high then
-					love.graphics.setColor(255, 255, 255)
+					love.graphics.setColor(1, 1, 1)
 				end
 				love.graphics.draw(dropdownarrowimg, (self.x+2+self.width*8)*scale,-self.scroll*scale, 0, scale, scale)
 				love.graphics.setColor(0, 0, 0)
 				love.graphics.rectangle("fill", (self.x+1)*scale, (-self.scroll+1)*scale, (1+self.width*8)*scale, 9*scale)
-				love.graphics.setColor(255, 255, 255)
+				love.graphics.setColor(1, 1, 1)
 				if self.extended then
-					love.graphics.setColor(127, 127, 127)
+					love.graphics.setColor(.5, .5, .5)
 				end
 				local s = self.entries[self.var]
 				if self.displayentries then s = self.displayentries[self.var];
@@ -366,9 +368,9 @@ function guielement:draw(a, offx, offy)
 				if type(s) == "string" then s = s:sub(1, self.width) end
 				properprint(s, (self.x+1)*scale, (-self.scroll+2)*scale)
 				
-				love.graphics.setColor(127, 127, 127)
+				love.graphics.setColor(.5, .5, .5)
 				if high then
-					love.graphics.setColor(255, 255, 255)
+					love.graphics.setColor(1, 1, 1)
 				end
 				
 				for i = 1, #self.entries do
@@ -377,7 +379,7 @@ function guielement:draw(a, offx, offy)
 						if high ~= i then
 							love.graphics.setColor(0, 0, 0)
 							love.graphics.rectangle("fill", (self.x+1)*scale, ((1+i*10)-self.scroll)*scale, (11+self.width*8)*scale, 9*scale)
-							love.graphics.setColor(255, 255, 255)
+							love.graphics.setColor(1, 1, 1)
 									
 							local s = self.entries[i]
 							if self.displayentries then s = self.displayentries[i];
@@ -403,7 +405,7 @@ function guielement:draw(a, offx, offy)
 					if high ~= i then
 						love.graphics.setColor(0, 0, 0)
 						love.graphics.rectangle("fill", (self.x+1)*scale, ((self.y+2+i*10)-(11+(10*#self.entries)))*scale, (11+self.width*8)*scale, 9*scale)
-						love.graphics.setColor(255, 255, 255)
+						love.graphics.setColor(1, 1, 1)
 						local s = self.entries[i]
 						if self.displayentries then s = self.displayentries[i] end
 						if type(s) == "string" then s = s:sub(1, self.width+1) end
@@ -423,11 +425,11 @@ function guielement:draw(a, offx, offy)
 					if high ~= i then
 						love.graphics.setColor(0, 0, 0)
 						love.graphics.rectangle("fill", (self.x+1)*scale, (self.y+1+i*10)*scale, (11+self.width*8)*scale, 9*scale)
-						love.graphics.setColor(255, 255, 255)
+						love.graphics.setColor(1, 1, 1)
 						local s = self.entries[i]
 						if self.coloredtext then
 							if s == "black" then
-								love.graphics.setColor(80,80,80)
+								love.graphics.setColor(80/255, 80/255, 80/255)
 							else
 								love.graphics.setColor(textcolors[s])
 							end
@@ -448,20 +450,20 @@ function guielement:draw(a, offx, offy)
 	elseif self.type == "rightclick" then
 		local high = self:inhighlight(love.mouse.getPosition())
 	
-		love.graphics.setColor(255, 255, 255)
+		love.graphics.setColor(1, 1, 1)
 		
 		love.graphics.rectangle("fill", self.x*scale, self.y*scale, (3+self.width*8)*scale, 11*scale)
 		
 		love.graphics.setColor(0, 0, 0)
 		love.graphics.rectangle("fill", (self.x+1)*scale, (self.y+1)*scale, (1+self.width*8)*scale, 9*scale)
 		
-		love.graphics.setColor(180, 180, 180)
+		love.graphics.setColor(180/255, 180/255, 180/255)
 			
 		properprint(self.entries[1], (self.x+1)*scale, (self.y+2)*scale)
 	
-		love.graphics.setColor(127, 127, 127)
+		love.graphics.setColor(.5, .5, .5)
 		if high then
-			love.graphics.setColor(255, 255, 255)
+			love.graphics.setColor(1, 1, 1)
 		end
 		
 		if self.direction == "down" then
@@ -473,22 +475,22 @@ function guielement:draw(a, offx, offy)
 		for i = 2, #self.entries do
 			if high ~= i then
 				if ((not self.trustWhatStartWasSetAs) and self.var == self.entries[i]) or (self.trustWhatStartWasSetAs and i == self.var) then
-					love.graphics.setColor(0, 127, 0)
+					love.graphics.setColor(0, .5, 0)
 				else
 					love.graphics.setColor(0, 0, 0)
 				end
 				if self.direction == "down" then
 					love.graphics.rectangle("fill", (self.x+1)*scale, (self.y+1+(i-1)*10)*scale, (1+self.width*8)*scale, 9*scale)
-					love.graphics.setColor(255, 255, 255)
+					love.graphics.setColor(1, 1, 1)
 					properprint(self.entries[i], (self.x+1)*scale, (self.y+2+10*(i-1))*scale)
 				else
 					love.graphics.rectangle("fill", (self.x+1)*scale, (self.y+1-(i-1)*10)*scale, (1+self.width*8)*scale, 9*scale)
-					love.graphics.setColor(255, 255, 255)
+					love.graphics.setColor(1, 1, 1)
 					properprint(self.entries[i], (self.x+1)*scale, (self.y+2-10*(i-1))*scale)
 				end
 			else
 				if self.var == self.entries[i] then
-					love.graphics.setColor(0, 127, 0)
+					love.graphics.setColor(0, .5, 0)
 				else
 					love.graphics.setColor(0, 0, 0)
 				end
@@ -517,7 +519,7 @@ function guielement:draw(a, offx, offy)
 			if self.imagecolor then
 				love.graphics.setColor(self.imagecolor)
 			else
-				love.graphics.setColor(255,255,255)
+				love.graphics.setColor(1, 1, 1)
 			end
 			love.graphics.draw(self.image, (self.x+self.imageoffsetx)*scale, (self.y+self.imageoffsety)*scale, 0, scale, scale)
 		end
@@ -598,9 +600,9 @@ function guielement:draw(a, offx, offy)
 			if self.inputting or high then
 				love.graphics.setColor(self.bordercolorhigh)
 			end
-			
+
 			love.graphics.rectangle("fill", self.x*scale, self.y*scale, (3+self.width*8+2*self.spacing)*scale, (1+self.height*10+2*self.spacing)*scale)
-			
+
 			love.graphics.setColor(self.fillcolor)
 			love.graphics.rectangle("fill", (self.x+1)*scale, (self.y+1)*scale, (1+self.width*8+2*self.spacing)*scale, (-1+self.height*10+2*self.spacing)*scale)
 		end
@@ -616,7 +618,11 @@ function guielement:draw(a, offx, offy)
 			end
 			local s = tostring(self.value)
 			love.graphics.setColor(self.textcolor)
-			properprint(string.sub(s,self.textoffset+1, self.textoffset+self.width), (self.x+1+self.spacing)*scale, (self.y+2+self.spacing)*scale)
+			if self.allowanycharacters then
+				properprintfast(string.sub(s,self.textoffset+1, self.textoffset+self.width), (self.x+1+self.spacing)*scale, (self.y+2+self.spacing)*scale)
+			else
+				properprint(string.sub(s,self.textoffset+1, self.textoffset+self.width), (self.x+1+self.spacing)*scale, (self.y+2+self.spacing)*scale)
+			end
 		else
 			--format string for tall text boxes
 			local oldstring = self.value--string.sub(self.value, self.textoffset+1, self.textoffset+self.width)  --old offsets
@@ -662,7 +668,7 @@ function guielement:draw(a, offx, offy)
 		love.graphics.setColor(self.color)
 		properprint(self.text, self.x*scale, self.y*scale)
 	end
-	love.graphics.setColor(255, 255, 255)
+	love.graphics.setColor(1, 1, 1)
 end
 
 function guielement:click(x, y, button)
@@ -735,6 +741,7 @@ function guielement:click(x, y, button)
 					if self:inhighlight(x, y) then
 						if button == "r" and (self.rightclickvalue or (self.displayfunction and self.min and self.max)) and not android then
 							self.inputting = true
+							typingintextinput = true
 							self.textvalue = self:displayfunction(self.value)
 							self.cursorblink = true
 							self.timer = 0
@@ -744,6 +751,7 @@ function guielement:click(x, y, button)
 						end
 					else
 						self.inputting = false
+						typingintextinput = false
 					end
 				end
 			end
@@ -769,6 +777,7 @@ function guielement:click(x, y, button)
 						self.cursorpos = string.len(self.value)+1
 					end
 					self.inputting = true
+					typingintextinput = true
 					self.timer = 0
 					self.cursorblink = true
 					if self.width >= self.maxlength or self.height > 1 then
@@ -796,6 +805,7 @@ function guielement:click(x, y, button)
 						self:uninputtingfunc()
 					end
 					self.inputting = false
+					typingintextinput = false
 					self.highlight = false
 				end
 			end
@@ -810,6 +820,7 @@ function guielement:keypress(key,textinput)
 			if self.inputting and not self.highlighting then
 				if key == "escape" then
 					self.inputting = false
+					typingintextinput = false
 					love.keyboard.setKeyRepeat(false)
 				elseif (key == "return" or key == "enter" or key == "kpenter") then
 					local newvalue = tonumber(self.textvalue)
@@ -824,6 +835,7 @@ function guielement:keypress(key,textinput)
 						end
 					end
 					self.inputting = false
+					typingintextinput = false
 					love.keyboard.setKeyRepeat(false)
 				elseif key == "backspace" then
 					self.textvalue = string.sub(self.textvalue, 1, -2)
@@ -849,7 +861,7 @@ function guielement:keypress(key,textinput)
 					android_key_repeat = key
 				end]]
 
-				if key == ":" or key == ";" then
+				if (key == ":" or key == ";") and not self.allowanycharacters then
 					return
 				elseif key == "," and (not self.bypassspecialcharacters) then
 					key = "A"
@@ -858,6 +870,7 @@ function guielement:keypress(key,textinput)
 				end
 				if key == "escape" and not android then
 					self.inputting = false
+					typingintextinput = false
 					self.highlight = false
 					love.keyboard.setKeyRepeat(false)
 				elseif (key == "return" or key == "enter" or key == "kpenter") or (android and key == "escape") then
@@ -865,6 +878,7 @@ function guielement:keypress(key,textinput)
 						if self.extra == "music" then
 							changemusic(musici)
 							self.inputting = false
+							typingintextinput = false
 							love.keyboard.setKeyRepeat(false)
 							if android then
 								love.keyboard.setTextInput(false)--[DROID]
@@ -872,6 +886,7 @@ function guielement:keypress(key,textinput)
 						elseif self.extra == "rightclick" then
 							self.func(self.value)
 							self.inputting = false
+							typingintextinput = false
 							love.keyboard.setKeyRepeat(false)
 							if android then
 								love.keyboard.setTextInput(false)--[DROID]
@@ -881,6 +896,7 @@ function guielement:keypress(key,textinput)
 						end
 					else
 						self.inputting = false
+						typingintextinput = false
 						love.keyboard.setKeyRepeat(false)
 						if android then
 							love.keyboard.setTextInput(false)--[DROID]
@@ -941,6 +957,7 @@ function guielement:keypress(key,textinput)
 					if self.highlight then
 						local highlight = {math.min(self.highlight,self.cursorpos),math.max(self.highlight,self.cursorpos)}
 						if key == "x" and self.ctrl then
+							-- cut text selection
 							textclipboard = string.sub(self.value,highlight[1],highlight[2]-1)
 						end
 						self.value = string.sub(self.value,1,highlight[1]-1)..string.sub(self.value,highlight[2])
@@ -963,8 +980,11 @@ function guielement:keypress(key,textinput)
 					self.highlight = 1
 					self.cursorpos = string.len(self.value) + 1
 				elseif key == "c" and self.ctrl then
-					local highlight1, highlight2 = math.min(self.highlight,self.cursorpos),math.max(self.highlight,self.cursorpos)
-					textclipboard = string.sub(self.value,highlight1,highlight2-1)
+					--copy text selection
+					if self.highlight then
+						local highlight1, highlight2 = math.min(self.highlight,self.cursorpos),math.max(self.highlight,self.cursorpos)
+						textclipboard = string.sub(self.value,highlight1,highlight2-1)
+					end
 				else
 					if android then
 						if not (textinput and textinput == "forcetextinput") then
@@ -1023,6 +1043,8 @@ function guielement:keypress(key,textinput)
 								targetkey = "+"
 							elseif key == "B" and not self.bypassspecialcharacters then
 								targetkey = "_"
+							elseif key == ";" then
+								targetkey = ":"
 							end
 						end
 						

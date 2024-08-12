@@ -1,5 +1,5 @@
-#define glarebasesize 0.896
-#define power 0.50
+const float glarebasesize = 0.896;
+const float power = 0.50;
 
 extern vec2 textureSize;
 extern vec2 outputSize;

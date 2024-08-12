@@ -127,6 +127,9 @@ function koopaling:init(x, y, t, r)
 			self.enemy = (r ~= "boss")
 			self.key = (r == "key")
 		end
+
+		self.jumppos = {1,1}
+		self.playerpos = {1,1}
 	end
 	
 	--self.returntilemaskontrackrelease = true
@@ -602,6 +605,7 @@ function koopaling:update(dt)
 					self.jumppos = {self.x, self.y}
 					if objects["player"][closestplayer].dead then
 						self.jumppos = {self.x, self.y-10}
+						self.playerpos = {self.x, self.y-10}
 					else
 						self.playerpos = {objects["player"][closestplayer].x+objects["player"][closestplayer].width/2-self.width/2, objects["player"][closestplayer].y}
 					end

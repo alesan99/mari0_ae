@@ -164,7 +164,6 @@ end
 function track:draw()
 	if self.switch then
 		--draw switch light
-		local color = self.color
 		love.graphics.draw(trackimg, trackquad["switch"][self.color][self.activepath], math.floor(((self.cox-xscroll-.5)*16)*scale), math.floor(((self.coy-yscroll-1.5)*16+8)*scale), 0, scale, scale, 8, 8)
 	end
 end
@@ -519,6 +518,7 @@ function trackcontroller:update(dt)
 							and (not w.jumping) and (not w.vine) then
 							if #checkrect(w.x+xdiff, b.y-w.height, w.width, w.height, {"exclude", w}, true, condition) == 0 then
 								if (not w.trackplatformcarriedx) or math.abs(xdiff) > math.abs(w.trackplatformcarriedx) then --don't move if already moved by another platform
+									w.oldxplatform = w.x
 									w.x = w.x + xdiff
 									w.trackplatformcarriedx = xdiff
 								end
@@ -724,7 +724,7 @@ function trackcontroller:getdirection(t, v)
 end
 
 function trackcontroller:draw()
-	love.graphics.setColor(255,0,0,100)
+	love.graphics.setColor(1,0,0,100/255)
 	love.graphics.rectangle("line", (self.x-1-xscroll)*16*scale, (self.y-1.5-yscroll)*16*scale, 16*scale, 16*scale)
 end
 

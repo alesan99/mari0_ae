@@ -56,13 +56,13 @@ disableanimation					disables this animation from triggering
 enableanimation						enables this animation to trigger
 playerjump[:player]					makes players jump (as high as possible)
 playerstopjump[:player]				makes players abort the jump (for small jumps)
-dialogbox:text[:speaker]			creates a dialogbox with <text> and <speaker>
+dialogbox:text[:speaker][:color]	creates a dialogbox with <text> and <speaker> and <color> (from textcolors in variables.lua)
 removedialogbox						removes the dialogbox
 playmusic:i							plays music <i>
 screenshake:power					makes the screen shake with <power>
 addcoins:coins						adds <coins> coins
 addpoints:points					adds <points> points
-changebackgroundcolor:r:g:b			changes background color ro rgb
+changebackgroundcolor:r:g:b			changes background color to rgb
 killplayer[:player]					hurts player(s)
 changetime:time						changes the time left to <time>
 loadlevel:world:level:sublevel:exit	starts level <world>-<level>_<sublevel> pipeexitid:<exit>
@@ -598,7 +598,7 @@ function animation:update(dt)
 					playmusic()
 				end
 			elseif v[1] == "changebackgroundcolor" then
-				love.graphics.setBackgroundColor(tonumber(v[2]) or 255, tonumber(v[3]) or 255, tonumber(v[4]) or 255)
+				love.graphics.setBackgroundColor((tonumber(v[2]) or 255)/255, (tonumber(v[3]) or 255)/255, (tonumber(v[4]) or 255)/255)
 			elseif v[1] == "killplayer" then
 				if v[2] == "everyone" then
 					for i = 1, players do
@@ -871,15 +871,15 @@ function animation:update(dt)
 			elseif v[1] == "transformenemy" then
 				transformenemyanimation(v[2])
 			elseif v[1] == "killallenemies" then
-				for i2, v2 in pairs(objects) do
-					if i1 ~= "tile" and i2 ~= "buttonblock" then
-						for i, v in pairs(objects[i2]) do
-							if v.active and v.shotted and (not v.resistseverything) then
+				for i2, v2 in kpairs(objects, objectskeys) do
+					if i2 ~= "tile" and i2 ~= "buttonblock" then
+						for i3, v3 in pairs(objects[i2]) do
+							if v3.active and v3.shotted and (not v3.resistseverything) then
 								local dir = "right"
 								if math.random(1,2) == 1 then
 									dir = "left"
 								end
-								v:shotted(dir)
+								v3:shotted(dir)
 							end
 						end
 					end

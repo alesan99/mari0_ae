@@ -412,7 +412,7 @@ function tilemoving:leftcollide(a, b)
 		return false
 	end
 	if a == "thwomp" or a == "skewer" or (a == "koopa" and b.small) then
-		self:hit()
+		self:hit(a, b)
 	end
 	return false
 end

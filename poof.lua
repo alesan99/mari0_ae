@@ -16,7 +16,7 @@ function poof:init(x, y, frames, lifetime, sx, sy, static, sscale, color)
 	self.framecount = #self.frames
 	self.frame = 1
 
-	self.color = color
+	self.color = color or {1, 1, 1}
 	
 	self.lifetimer = 0
 	self.lifetime = lifetime or 1
@@ -37,10 +37,7 @@ function poof:update(dt)
 end
 
 function poof:draw()
-	love.graphics.setColor(255, 255, 255)
-	if self.color then
-		love.graphics.setColor(self.color)
-	end
+	love.graphics.setColor(self.color)
 	local mirror = 1
 	if self.frames[self.frame] < 0 then
 		mirror = -1

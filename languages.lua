@@ -6,7 +6,7 @@ function set_language(lang)
 	s = nil
 
 	if lang ~= "english" then
-		if love.filesystem.exists("languages/" .. lang .. ".json") then
+		if love.filesystem.getInfo("languages/" .. lang .. ".json") then
 			local s = love.filesystem.read("languages/" .. lang .. ".json")
 			local t = JSON:decode(s)
 			for j, w in pairs(t) do
@@ -59,22 +59,22 @@ function languagemenu_open()
 end
 function languagemenu_draw()
 	--Darken Background
-	love.graphics.setColor(0, 0, 0, 100)
+	love.graphics.setColor(0, 0, 0, 100/255)
 	love.graphics.rectangle("fill", 0, 0, width*16*scale, 224*scale)
 	--Window
 	local w, h = 220, (LanguageCount+1)*10+10
 	local x, y = (width*16-w)/2, (height*16-h)/2
 	love.graphics.setColor(0, 0, 0)
 	love.graphics.rectangle("fill", x*scale, y*scale, w*scale, h*scale)
-	love.graphics.setColor(255, 255, 255)
+	love.graphics.setColor(1, 1, 1)
 	drawrectangle(x+1, y+1, w-2, h-2)
 	--Text
 	properprintF(TEXT["language"], (x+(w-utf8.len(TEXT["language"])*8)/2)*scale, (y+6)*scale)
 	local i = 1
 	for name, t in pairs(Languages) do
-		love.graphics.setColor(100, 100, 100, 255)
+		love.graphics.setColor(100/255, 100/255, 100/255, 1)
 		if sel == i then
-			love.graphics.setColor(255, 255, 255)
+			love.graphics.setColor(1, 1, 1)
 			properprintf(">", (x+6)*scale, (y+6+i*10)*scale)
 		end
 		properprintf(t.name, (x+16)*scale, (y+6+i*10)*scale)

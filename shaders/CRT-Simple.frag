@@ -24,17 +24,17 @@ extern vec2 textureSize;
 // Controls the intensity of the barrel distortion used to emulate the
 // curvature of a CRT. 0.0 is perfectly flat, 1.0 is annoyingly
 // distorted, higher values are increasingly ridiculous.
-#define distortion 0.2
+const float distortion = 0.2;
 
 // Simulate a CRT gamma of 2.4.
-#define inputGamma  2.4
+const float inputGamma = 2.4;
 
 // Compensate for the standard sRGB gamma of 2.2.
-#define outputGamma 2.2
+const float outputGamma = 2.2;
 
 // Macros.
-#define TEX2D(c) pow(checkTexelBounds(_tex0_, (c)), vec4(inputGamma))
-#define PI 3.141592653589
+#define TEX2D(tex, c) pow(checkTexelBounds(tex, (c)), vec4(inputGamma))
+const float PI = 3.141592653589;
 
 
 vec2 bounds = vec2(inputSize.x / textureSize.x, 1.0 - inputSize.y / textureSize.y);
@@ -56,21 +56,21 @@ vec2 radialDistortion(vec2 coord, const vec2 ratio)
 }
 
 #ifdef CURVATURE
-vec4 checkTexelBounds(Image texture, vec2 coords)
+vec4 checkTexelBounds(Image tex, vec2 coords)
 {
 	vec2 ss = step(coords, vec2(bounds.x, 1.0)) * step(vec2(0.0, bounds.y), coords);	
-	return Texel(texture, coords) * ss.x * ss.y;
+	return Texel(tex, coords) * ss.x * ss.y;
 }
 #else
-vec4 checkTexelBounds(Image texture, vec2 coords)
+vec4 checkTexelBounds(Image tex, vec2 coords)
 {
-	return Texel(texture, coords);
+	return Texel(tex, coords);
 }
 #endif
 
 
 /*
-vec4 checkTexelBounds(Image texture, vec2 coords)
+vec4 checkTexelBounds(Image tex, vec2 coords)
 {
 	vec2 bounds = vec2(inputSize.x / textureSize.x, 1.0 - inputSize.y / textureSize.y);
 	
@@ -78,7 +78,7 @@ vec4 checkTexelBounds(Image texture, vec2 coords)
 	if (coords.x > bounds.x || coords.x < 0.0 || coords.y > 1.0 || coords.y < bounds.y)
 		color = vec4(0.0, 0.0, 0.0, 1.0);
 	else
-		color = Texel(texture, coords);
+		color = Texel(tex, coords);
 		
 	return color;
 }
@@ -110,7 +110,7 @@ vec4 scanlineWeights(float distance, vec4 color)
 	return 1.4 * exp(-pow(weights * inversesqrt(0.5 * wid), wid)) / (0.6 + 0.2 * wid);
 }
 
-vec4 effect(vec4 vcolor, Image texture, vec2 texCoord, vec2 pixel_coords)
+vec4 effect(vec4 vcolor, Image tex, vec2 texCoord, vec2 pixel_coords)
 {
 	vec2 one = 1.0 / textureSize;
 	float mod_factor = texCoord.x * textureSize.x * outputSize.x / inputSize.x;
@@ -156,8 +156,8 @@ vec4 effect(vec4 vcolor, Image texture, vec2 texCoord, vec2 pixel_coords)
 
 	// Calculate the effective colour of the current and next
 	// scanlines at the horizontal location of the current pixel.
-	vec4 col  = TEX2D(xy);
-	vec4 col2 = TEX2D(xy + vec2(0.0, one.y));
+	vec4 col  = TEX2D(tex, xy);
+	vec4 col2 = TEX2D(tex, xy + vec2(0.0, one.y));
 
 	// Calculate the influence of the current and next scanlines on
 	// the current pixel.
@@ -168,7 +168,7 @@ vec4 effect(vec4 vcolor, Image texture, vec2 texCoord, vec2 pixel_coords)
 	vec3 mul_res  = mul_res_f.rgb;
 
 #else
-	vec3 mul_res_f = TEX2D(xy);
+	vec3 mul_res_f = TEX2D(tex, xy);
 	vec3 mul_res = mul_res_f.rgb;
 	
 #endif
