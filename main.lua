@@ -1314,7 +1314,7 @@ function loadconfig(nodefaultconfig)
 		defaultconfig()
 	end
 	
-	local s
+	local s, s1, s2, s3, s4
 	if love.filesystem.exists("alesans_entities/options.txt") then
 		s = love.filesystem.read("alesans_entities/options.txt")
 	elseif love.filesystem.exists("options.txt") then
@@ -1323,11 +1323,8 @@ function loadconfig(nodefaultconfig)
 		return
 	end
 
-	if s:find(";\n") then
-		s1 = s:split(";\n")
-	else
-		s1 = s:split(";")
-	end
+	s = s:gsub(";\n", ";")
+	s1 = s:split(";")
 
 	for i = 1, #s1-1 do
 		s2 = s1[i]:split(":")
