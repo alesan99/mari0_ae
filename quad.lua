@@ -156,14 +156,14 @@ function getquadprops(imgdata, x, y, self)
 	local r, g, b, a = imgdata:getPixel(x*17-2, (y-1)*17+16)
 	if a > minalpha then
 		self.leftslant = true
-		if g == 0 and b == 100/255 then
+		if g == 0 and round(b*255) == 100 then
 			self.halfleftslant1 = true
-		elseif g == 0 and b == 200/255 then
+		elseif g == 0 and round(b*255) == 200 then
 			self.halfleftslant2 = true
 		else
 			self.fullleftslant = true
 		end
-		if g == 0 and r == 100/255 then
+		if g == 0 and round(r*255) == 100 then
 			self.downslant = true
 		end
 	end
@@ -173,14 +173,14 @@ function getquadprops(imgdata, x, y, self)
 	local r, g, b, a = imgdata:getPixel(x*17-3, (y-1)*17+16)
 	if a > minalpha then
 		self.rightslant = true
-		if g == 0 and b == 100/255 then
+		if g == 0 and round(b*255) == 100 then
 			self.halfrightslant1 = true
-		elseif g == 0 and b == 200/255 then
+		elseif g == 0 and round(b*255) == 200 then
 			self.halfrightslant2 = true
 		else
 			self.fullrightslant = true
 		end
-		if g == 0 and r == 100/255 then
+		if g == 0 and round(r*255) == 100 then
 			self.downslant = true
 		end
 	end

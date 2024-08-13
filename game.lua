@@ -91,8 +91,8 @@ function game_load(suspended)
 	objects = nil
 	if suspended == true then
 		continuegame()
-		loadmappacksettings()
-		updatemappacksettings()
+		loadmappacksettings("suspended")
+		updatemappacksettings("suspended")
 	elseif suspended then
 		marioworld = suspended
 	end
@@ -325,7 +325,7 @@ function game_update(dt)
 			if queuelowtime and queuelowtime < 0 and (not levelfinished) then
 				local star = false
 				for i = 1, players do
-					if objects["player"][i].starred then
+					if objects["player"][i].starred and not objects["player"][i].size == 8 then
 						star = true
 					end
 				end
@@ -712,7 +712,7 @@ function game_update(dt)
 	end
 	--UPDATE OBJECTS
 	local delete
-	for i, v in pairs(objects) do
+	for i, v in kpairs(objects, objectskeys) do
 		if i ~= "tile" and i ~= "portalwall" and i ~= "screenboundary" and i ~= "coin" and i ~= "risingwater" and i ~= "clearpipesegment" and i ~= "tracksegment" and i ~= "funnel" and i ~= "clearpipe" then
 			delete = nil
 			for j, w in pairs(v) do
@@ -1617,7 +1617,7 @@ function game_draw()
 			--[[for j, w in pairs(objects["redseesaw"]) do --has overlapping shadows
 				w:draw()
 			end]]
-			for j, w in pairs(objects) do	
+			for j, w in kpairs(objects, objectskeys) do
 				if j ~= "tile" then
 					for i, v in pairs(w) do
 						if v.drawable and (not v.nodropshadow) then--and not v.drawback then
@@ -2040,7 +2040,7 @@ function game_draw()
 		end
 		
 		--OBJECTS
-		for j, w in pairs(objects) do	
+		for j, w in kpairs(objects, objectskeys) do	
 			if j ~= "tile" then
 				for i, v in pairs(w) do
 					if v.drawable and not v.drawback then
@@ -2141,7 +2141,7 @@ function game_draw()
 					for j, w in pairs(objects["tilemoving"]) do
 						w:draw()
 					end
-					for j, w in pairs(objects) do	
+					for j, w in kpairs(objects, objectskeys) do	
 						if j ~= "tile" then
 							for i, v in pairs(w) do
 								if v.drawable and (not v.nodropshadow) then--and not v.drawback then
@@ -2305,7 +2305,7 @@ function game_draw()
 		if HITBOXDEBUG and (editormode or testlevel) then
 			local lw = love.graphics.getLineWidth()
 			love.graphics.setLineWidth(.5*scale)
-			for i, v in pairs(objects) do
+			for i, v in kpairs(objects, objectskeys) do
 				for j, k in pairs(v) do
 					if k.width then
 						if xscroll >= k.x-width and k.x+k.width > xscroll then
@@ -4118,161 +4118,32 @@ function startlevel(level, reason)
 	portals = {}
 	blockedportaltiles = {}
 	
+	objectskeys = {
+		"mariohammer", "icicle", "thwomp", "threeup", "ceilblocker", "energyball", "belt", "brofireball", "bomb",
+		"musicchanger", "mole", "lightbridge", "splunkin", "bulletbill", "cannonballcannon", "randomizer",
+		"collectable", "plant", "lakito", "laser", "squid", "star", "bowser", "powblock", "animationoutput",
+		"chainchomp", "energylauncher", "skewer", "platformspawner", "collectablelock", "cubedispenser", "door",
+		"bigmole", "hammersuit", "flipblock", "notgate", "frozencoin", "portalent", "yoshi", "coin", "bigbill",
+		"torpedolauncher", "seesawplatform", "groundlight", "koopa", "flyingfish", "kingbill", "spike", "donut",
+		"player", "mushroom", "clearpipesegment", "angrysun", "turretshot", "edgewrap", "spikeball", "rocketturret",
+		"redseesaw", "koopaling", "levelball", "torpedoted", "upfire", "magikoopa", "fireball", "cheep", "pixeltile",
+		"tilemoving", "platform", "drybones", "hammerbro", "animationtrigger", "meteor", "pushbutton", "leaf",
+		"wrench", "hammer", "muncher", "fire", "faithplate", "castlefire", "ninji", "doorsprite", "boo",
+		"blocktogglebutton", "iceball", "longfire", "animatedtiletrigger", "cannonball", "tiletool", "text",
+		"turretrocket", "funnel", "trackcontroller", "rsflipflop", "portalwall", "smallspring", "core",
+		"screenboundary", "boomboom", "cappy", "grinder", "ice", "checkpointflag", "plantfire", "geldispenser",
+		"castlefirefire", "tracksegment", "plantcreepersegment", "rockywrench", "wallindicator", "oneup", "box",
+		"snakeblock", "risingwater", "plantcreeper", "orgate", "pbutton", "delayer", "camerastop", "vine", "glados",
+		"gel", "yoshiegg", "spring", "pokey", "sidestepper", "windleaf", "button", "turret", "flower", "tile",
+		"mariotail", "laserdetector", "regiontrigger", "boomerang", "smbsitem", "walltimer", "fuzzy", "frogsuit",
+		"checkpoint", "lightbridgebody", "andgate", "fishbone", "goomba", "squarewave", "parabeetle", "amp",
+		"energycatcher", "pedestal", "buttonblock", "enemy", "enemytool", "barrel", "poisonmush"
+	}
 	objects = {}
-	objects["player"] = {}
-	objects["portalwall"] = {}
-	objects["tile"] = {}
-	objects["tilemoving"] = {}
-	objects["enemy"] = {}
-	objects["goomba"] = {}
-	objects["koopa"] = {}
-	objects["mushroom"] = {}
-	objects["flower"] = {}
-	objects["oneup"] = {}
-	objects["star"] = {}
-	objects["vine"] = {}
-	objects["box"] = {}
-	objects["door"] = {}
-	objects["button"] = {}
-	objects["groundlight"] = {}
-	objects["wallindicator"] = {}
-	objects["walltimer"] = {}
-	objects["notgate"] = {}
-	objects["lightbridge"] = {}
-	objects["lightbridgebody"] = {}
-	objects["faithplate"] = {}
-	objects["laser"] = {}
-	objects["laserdetector"] = {}
-	objects["gel"] = {}
-	objects["geldispenser"] = {}
-	objects["cubedispenser"] = {}
-	objects["pushbutton"] = {}
-	objects["bulletbill"] = {}
-	objects["hammerbro"] = {}
-	objects["hammer"] = {}
-	objects["fireball"] = {}
-	objects["platform"] = {}
-	objects["platformspawner"] = {}
-	objects["plant"] = {}
-	objects["castlefire"] = {}
-	objects["castlefirefire"] = {}
-	objects["fire"] = {}
-	objects["bowser"] = {}
-	objects["spring"] = {}
-	objects["cheep"] = {}
-	objects["flyingfish"] = {}
-	objects["upfire"] = {}
-	objects["seesawplatform"] = {}
-	objects["ceilblocker"] = {}
-	objects["lakito"] = {}
-	objects["squid"] = {}
-	objects["poisonmush"] = {}
-	objects["bigbill"] = {}
-	objects["kingbill"] = {}
-	objects["sidestepper"] = {}
-	objects["barrel"] = {}
-	objects["icicle"] = {}
-	objects["angrysun"] = {}
-	objects["splunkin"] = {}
-	objects["threeup"] = {}
-	objects["brofireball"] = {}
-	objects["smbsitem"] = {}
-	objects["thwomp"] = {}
-	objects["fishbone"] = {}
-	objects["drybones"] = {}
-	objects["muncher"] = {}
-	objects["meteor"] = {}
-	objects["donut"] = {}
-	objects["boomerang"] = {}
-	objects["parabeetle"] = {}
-	objects["ninji"] = {}
-	objects["hammersuit"] = {}
-	objects["mariohammer"] = {}
-	objects["boo"] = {}
-	objects["mole"] = {}
-	objects["bigmole"] = {}
-	objects["bomb"] = {}
-	objects["plantfire"] = {}
-	objects["flipblock"] = {}
-	objects["torpedoted"] = {}
-	objects["torpedolauncher"] = {}
-	objects["frogsuit"] = {}
-	objects["boomboom"] = {}
-	objects["levelball"] = {}
-	objects["leaf"] = {}
-	objects["mariotail"] = {}
-	objects["windleaf"] = {}
-	objects["energylauncher"] = {}
-	objects["energyball"] = {}
-	objects["energycatcher"] = {}
-	objects["turret"] = {}
-	objects["turretshot"] = {}
-	objects["blocktogglebutton"] = {}
-	objects["buttonblock"] = {}
-	objects["squarewave"] = {}
-	objects["delayer"] = {}
-	objects["coin"] = {}
-	objects["frozencoin"] = {}
-	objects["amp"] = {}
-	objects["fuzzy"] = {}
-	objects["funnel"] = {}
-	objects["longfire"] = {}
-	objects["cannonball"] = {}
-	objects["cannonballcannon"] = {}
-	objects["rocketturret"] = {}
-	objects["turretrocket"] = {}
-	objects["glados"] = {}
-	objects["core"] = {}
-	objects["pedestal"] = {}
-	objects["portalent"] = {}
-	objects["text"] = {}
-	objects["regiontrigger"] = {}
-	objects["tiletool"] = {}
-	objects["iceball"] = {}
-	objects["enemytool"] = {}
-	objects["randomizer"] = {}
-	objects["yoshiegg"] = {}
-	objects["yoshi"] = {}
-	objects["musicchanger"] = {}
-	objects["pbutton"] = {}
-	objects["pokey"] = {}
-	objects["chainchomp"] = {}
-	objects["rockywrench"] = {}
-	objects["wrench"] = {}
-	objects["koopaling"] = {}
-	objects["checkpoint"] = {}
-	objects["doorsprite"] = {}
-	objects["magikoopa"] = {}
-	objects["skewer"] = {}
-	objects["belt"] = {}
-	objects["animationtrigger"] = {}
-	objects["animationoutput"] = {}
-	objects["animatedtiletrigger"] = {}
-	objects["rsflipflop"] = {}
-	objects["orgate"] = {}
-	objects["andgate"] = {}
-	objects["collectable"] = {}
-	objects["collectablelock"] = {}
-	objects["powblock"] = {}
-	objects["smallspring"] = {}
-	objects["risingwater"] = {}
-	objects["redseesaw"] = {}
-	objects["snakeblock"] = {}
-	objects["spike"] = {}
-	objects["spikeball"] = {}
-	objects["camerastop"] = {}
-	objects["clearpipesegment"] = {}
-	objects["plantcreeper"] = {}
-	objects["plantcreepersegment"] = {}
-	objects["tracksegment"] = {}
-	objects["trackcontroller"] = {}
-	objects["checkpointflag"] = {}
-	objects["ice"] = {}
-	objects["grinder"] = {}
-	
-	objects["cappy"] = {}
-	
-	objects["screenboundary"] = {}
+	for i = 1, #objectskeys do
+		local key = objectskeys[i]
+		objects[key] = {}
+	end
 	objects["screenboundary"]["left"] = screenboundary:new(0)
 	
 	splitxscroll = {0}
@@ -4894,8 +4765,8 @@ function loadmap(filename)
 	table.sort(checkpoints)
 	
 	--Add links
-	for i, v in pairs(objects) do
-		for j, w in pairs(v) do
+	for key, value in kpairs(objects, objectskeys) do
+		for j, w in pairs(value) do
 			if w.link then
 				w:link()
 			end
@@ -6052,7 +5923,7 @@ function insideportal(x, y, width, height) --returns whether an object is in, an
 end
 
 function moveoutportal() --pushes objects out of the portal i in.
-	for i, v in pairs(objects) do
+	for i, v in kpairs(objects, objectskeys) do
 		if i ~= "tile" and i ~= "portalwall" then
 			for j, w in pairs(v) do
 				if w.active and w.static == false then
@@ -8774,7 +8645,7 @@ function convertr(r, types, dontgivedefaultvalues) --convert right cick values
 end
 
 function lightsoutstencil()
-	for i2, v2 in pairs(objects) do
+	for i2, v2 in kpairs(objects, objectskeys) do
 		if i2 ~= "tile" and i2 ~="buttonblock" and i2 ~= "clearpipesegment" then
 			for i, v in pairs(objects[i2]) do
 				if (v.active or (i2 == "player" or i2 == "enemy")) and v.light and onscreen(v.x+v.width/2-v.light, v.y+v.height/2-v.light, v.light*2, v.light*2) then

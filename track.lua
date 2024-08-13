@@ -518,6 +518,7 @@ function trackcontroller:update(dt)
 							and (not w.jumping) and (not w.vine) then
 							if #checkrect(w.x+xdiff, b.y-w.height, w.width, w.height, {"exclude", w}, true, condition) == 0 then
 								if (not w.trackplatformcarriedx) or math.abs(xdiff) > math.abs(w.trackplatformcarriedx) then --don't move if already moved by another platform
+									w.oldxplatform = w.x
 									w.x = w.x + xdiff
 									w.trackplatformcarriedx = xdiff
 								end

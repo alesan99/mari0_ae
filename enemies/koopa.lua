@@ -685,7 +685,7 @@ function koopa:rightcollide(a, b)
 end
 
 function koopa:hitwall(a, b, dir)
-	if a == "tile" or a == "portalwall" or a == "spring" or a == "donut" or a == "springgreen" or a == "bigmole" or a == "muncher" or (a == "flipblock" and not b.flippable) or a == "frozencoin" or a == "buttonblock" or (a == "enemy" and (b.resistsenemykill or b.resistseverything)) or a == "clearpipesegment" then	
+	if a == "tile" or a == "portalwall" or a == "spring" or a == "donut" or a == "springgreen" or a == "bigmole" or a == "muncher" or (a == "flipblock" and not b.flippable) or a == "frozencoin" or a == "buttonblock" or (a == "enemy" and (b.resistsenemykill or b.resistseverything)) or a == "clearpipesegment" or a == "tilemoving" then	
 		if self.small then
 			if not self.staystillfall then
 				if self.t == "bigkoopa" or self.t == "bigbeetle" then
@@ -730,6 +730,8 @@ function koopa:hitwall(a, b, dir)
 					if big and pass then
 						return "pass"
 					end
+				elseif a == "tilemoving" then
+					b:hit("koopa", self)
 				else
 					playsound(blockhitsound)
 				end

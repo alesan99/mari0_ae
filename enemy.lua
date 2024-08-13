@@ -2031,6 +2031,7 @@ function enemy:update(dt)
 							((self.movement == "circle" or self.movement == "flyvertical" or self.movement == "path" or self.speedy ~= 0) and w.y+w.height >= self.y-0.1 and w.y+w.height < self.y+0.1))
 							and (not w.jumping) and not (self.speedy > 0 and w.speedy < 0) then --and w.speedy >= self.speedy
 							if #checkrect(w.x+xdiff, self.y-w.height, w.width, w.height, {"exclude", w}, true, condition) == 0 then
+								w.oldxplatform = w.x
 								w.x = w.x + xdiff
 								w.y = self.y-w.height
 								w.falling = false
@@ -2042,10 +2043,12 @@ function enemy:update(dt)
 						if inrange(w.y+w.height/2, self.y, self.y+self.height) then
 							if xdiff > 0 and w.x < self.x+self.width and w.x+w.width > self.x+self.width then --right
 								if #checkrect(self.x+self.width, w.y, w.width, w.height, {"exclude", w}, true, "ignoreplatforms") == 0 then
+									w.oldxplatform = w.x
 									w.x = self.x+self.width
 								end
 							elseif xdiff < 0 and w.x+w.width > self.x and w.x < self.x then
 								if #checkrect(self.x-w.width, w.y, w.width, w.height, {"exclude", w}, true, "ignoreplatforms") == 0 then
+									w.oldxplatform = w.x
 									w.x = self.x-w.width
 								end
 							end

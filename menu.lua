@@ -23,7 +23,7 @@ function menu_load()
 	colorsetedit = 1
 	mappackselection = 1
 	onlinemappackselection = 1
-	openmappacksbutton = guielement:new("button", 241, 190, "", openSaveFolder, nil, 0, 2.5, 147, true)
+	openmappacksbutton = guielement:new("button", 241, 190, "", function() openSaveFolder(mappackfolder) end, nil, 0, 2.5, 147, true)
 	openmappacksbutton.active = false
 	opendlcbutton = guielement:new("button", 241, 190, "open dlc folder", opendlcfolder, nil, 0, 2.5, 147, true)
 	opendlcbutton.active = false
@@ -2760,13 +2760,12 @@ function menu_keypressed(key, unicode)
 				if optionsselection == 3 then
 					--open characters folder
 					if android then
-						notice.new("On android use a file manager\nand go to:\nAndroid > data > Love.to.mario >\nfiles > save > mari0_android >\nalesans_entities > characters", notice.red, 15)
-						return false
+						notice.new("On android try a file manager\nand go to:\nAndroid > data > Love.to.mario >\nfiles > save > mari0_android", notice.red, 5)
 					end
 					if not love.filesystem.getInfo("alesans_entities/characters") then
 						love.filesystem.createDirectory("alesans_entities/characters")
 					end
-					love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/alesans_entities/characters")
+					openfile("alesans_entities/characters")
 				end
 			end
 		elseif key == "escape" then
@@ -3191,13 +3190,14 @@ function opendlcfolder()
 	end
 
 	if android then
-		notice.new("On android use a file manager\nand go to:\nAndroid > data > Love.to.mario >\nfiles > save > mari0_android >\nalesans_entities > " .. path, notice.red, 15)
+		notice.new("On android use a file manager\nand go to:\nAndroid > data > Love.to.mario", notice.white, 5)
+		filebrowser_load("alesans_entities/" .. path)
 		return false
 	end
 	if not love.filesystem.getInfo("alesans_entities/" .. path) then
 		love.filesystem.createDirectory("alesans_entities/" .. path)
 	end
-	love.system.openURL("file://" .. love.filesystem.getSaveDirectory() .. "/alesans_entities/" .. path)
+	openfile("alesans_entities/" .. path)
 end
 
 --https://stackoverflow.com/questions/20459943/find-the-last-index-of-a-character-in-a-string/20461414

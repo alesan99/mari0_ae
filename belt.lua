@@ -106,10 +106,12 @@ function belt:update(dt)
 				if w.width and (not w.ignoreplatform) and w.active and inrange(w.x, self.x-w.width, self.x+self.width) and (not w.vine) and (not w.fence) then
 					if w.y == self.y - w.height then
 						if #checkrect(w.x+speed*dt, w.y, w.width, w.height, {"exclude", w}, true) == 0 then
+							w.oldxplatform = w.x
 							w.x = w.x + speed*dt
 						end
 					elseif v == "player" and w.gravitydir == "up" and w.y == self.y+self.height then
 						if #checkrect(w.x-speed*dt, w.y, w.width, w.height, {"exclude", w}, true) == 0 then
+							w.oldxplatform = w.x
 							w.x = w.x - speed*dt
 						end
 					end

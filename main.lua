@@ -41,7 +41,7 @@
 	-HansAgain for new portal sprites, new mario sprites, banzai bills, and pneumatic tubes
 	-Subpixel for bowser3, rotodiscs, ninji, and splunkin sprites
 	-Critfish for overgrown portal sprites
-	-Aidan for general bugtesting and misc. contributions on github
+	-Britdan for general bugtesting and misc. contributions on github
 	-MadNyle for propeller sound effect and mega mushroom
 	-fußmatte for helping create a TON of new characters for the font and Esperanto Translation
 	-HugoBDesigner for Portugese-Br translation
@@ -62,8 +62,8 @@ if debugconsole then debuginputon = true; debuginput = "print()"; print("DEBUG O
 local debugGraph,fpsGraph,memGraph,drawGraph
 local debugGraphs = false
 
-VERSION = 13.1005
-VERSIONSTRING = "13.1 (4/18/23)"
+VERSION = 13.2000
+VERSIONSTRING = "13.2 (8/10/24)"
 ANDROIDVERSION = 17
 
 android = (love.system.getOS() == "Android" or love.system.getOS() == "iOS") --[DROID]
@@ -291,7 +291,7 @@ function love.load()
 				"emancipationfizzle", "emancipateanimation", "ceilblocker", "belt", "hatloader", "poof", "animationguiline", "animation",
 				"animationsystem", "animationtrigger", "dialogbox", "portal", "orgate", "andgate", "animatedtiletrigger", "rsflipflop", "animatedtimer",
 				"collectable", "powblock", "smallspring", "risingwater", "redseesaw", "snakeblock", "frozencoin", "entitytooltip", "spawnanimation",
-				"camerastop", "clearpipe", "track", "tilemoving", "laserfield", "checkpointflag", "ice", "pipe", "errorwindow"}
+				"camerastop", "clearpipe", "track", "tilemoving", "laserfield", "checkpointflag", "ice", "pipe", "errorwindow", "filebrowser"}
 	for i = 1, #luas do
 		require(luas[i])
 	end
@@ -1103,7 +1103,9 @@ function love.update(dt)
 	elseif gamestate == "game" then
 		game_update(dt)	
 	elseif gamestate == "intro" then
-		intro_update(dt)	
+		intro_update(dt)
+	elseif gamestate == "filebrowser" then
+		filebrowser_update(dt)
 	end
 	
 	for i, v in pairs(guielements) do
@@ -1126,36 +1128,31 @@ end
 
 function love.draw()
 	if resizable or android then
-		if canvassupported or android then
-			if letterboxfullscreen and (shaders.passes[1].on or shaders.passes[2].on) then
-				love.graphics.setColor(0, 0, 0)
-				love.graphics.rectangle("fill", 0, 0, winwidth, winheight)
-			end
-			love.graphics.setCanvas({canvas, stencil=true})
-			love.graphics.clear()
-			lovedraw()
-			love.graphics.setCanvas()
-			if letterboxfullscreen and not (shaders.passes[1].on or shaders.passes[2].on) then
-				love.graphics.setColor(0, 0, 0)
-				love.graphics.rectangle("fill", 0, 0, winwidth, winheight)
-				local cw, ch = canvas:getWidth(), canvas:getHeight()--current size
-				local tw, th = winwidth, winheight--target size
-				local s
-				if cw/tw > ch/th then s = tw/cw
-				else s = th/ch end
-				love.graphics.setColor(1, 1, 1)
-				love.graphics.draw(canvas, winwidth/2, winheight/2, 0, s, s, cw/2, ch/2)
-			else
-				love.graphics.setColor(1, 1, 1)
-				love.graphics.draw(canvas, 0, 0, 0, winwidth/(width*16*scale), winheight/(224*scale))
-			end
-
-			if android and not androidLowRes then
-				androidDraw()
-			end
+		if letterboxfullscreen and (shaders.passes[1].on or shaders.passes[2].on) then
+			love.graphics.setColor(0, 0, 0)
+			love.graphics.rectangle("fill", 0, 0, winwidth, winheight)
+		end
+		love.graphics.setCanvas({canvas, stencil=true})
+		love.graphics.clear()
+		lovedraw()
+		love.graphics.setCanvas()
+		if letterboxfullscreen and not (shaders.passes[1].on or shaders.passes[2].on) then
+			love.graphics.setColor(0, 0, 0)
+			love.graphics.rectangle("fill", 0, 0, winwidth, winheight)
+			local cw, ch = canvas:getWidth(), canvas:getHeight()--current size
+			local tw, th = winwidth, winheight--target size
+			local s
+			if cw/tw > ch/th then s = tw/cw
+			else s = th/ch end
+			love.graphics.setColor(1, 1, 1)
+			love.graphics.draw(canvas, winwidth/2, winheight/2, 0, s, s, cw/2, ch/2)
 		else
-			love.graphics.scale(winwidth/(width*16*scale), winheight/(224*scale))
-			lovedraw()
+			love.graphics.setColor(1, 1, 1)
+			love.graphics.draw(canvas, 0, 0, 0, winwidth/(width*16*scale), winheight/(224*scale))
+		end
+
+		if android and not androidLowRes then
+			androidDraw()
 		end
 	else
 		lovedraw()
@@ -1178,10 +1175,8 @@ function lovedraw()
 	shaders:predraw()
 	
 	if resizable then
-		if canvassupported then
-			love.graphics.setColor(love.graphics.getBackgroundColor())
-			love.graphics.rectangle("fill", 0, 0, width*16*scale, height*16*scale)
-		end
+		love.graphics.setColor(love.graphics.getBackgroundColor())
+		love.graphics.rectangle("fill", 0, 0, width*16*scale, height*16*scale)
 	end
 	love.graphics.setColor(1, 1, 1)
 	love.graphics.push()
@@ -1193,6 +1188,8 @@ function lovedraw()
 		game_draw()
 	elseif gamestate == "intro" then
 		intro_draw()
+	elseif gamestate == "filebrowser" then
+		filebrowser_draw()
 	end
 	love.graphics.pop()
 	
@@ -1302,9 +1299,7 @@ function saveconfig()
 		s = s .. "scale:" .. scale .. ";"
 	end
 
-	if letterboxfullscreen then
-		s = s .. "letterbox;"
-	end
+	s = s .. "letterbox:" .. tostring(letterboxfullscreen) .. ";"
 	
 	s = s .. "shader1:" .. shaderlist[currentshaderi1] .. ";"
 	s = s .. "shader2:" .. shaderlist[currentshaderi2] .. ";"
@@ -1438,15 +1433,15 @@ function loadconfig(nodefaultconfig)
 			end
 			
 		elseif s2[1] == "scale" then
-			if not nodefaultconfig then
-				if android then
-					scale = 1
-				else
-					scale = tonumber(s2[2])
-				end
+			if not nodefaultconfig and not android then
+				scale = tonumber(s2[2])
 			end
 		elseif s2[1] == "letterbox" then
-			letterboxfullscreen = true
+			if s2[2] then
+				letterboxfullscreen = (s2[2] == "true")
+			else
+				letterboxfullscreen = true
+			end
 		elseif s2[1] == "shader1" then
 			for i = 1, #shaderlist do
 				if shaderlist[i] == s2[2] then
@@ -1606,9 +1601,13 @@ function defaultconfig()
 	mariocharacter = {"mario", "mario", "mario", "mario"}
 	
 	--options
-	scale = 2
+	if android then
+		scale = 1
+	else
+		scale = 2
+	end
 	resizable = true
-	letterboxfullscreen = false
+	letterboxfullscreen = true
 	volume = 1
 	mappack = "smb"
 	vsync = false
@@ -1752,7 +1751,7 @@ function changescale(s, fullscreen)
 		resizable = true
 		
 		uispace = math.floor(width*16*scale/4)
-		love.window.setMode(width*16*scale, 224*scale, {fullscreen=fullscreen, vsync=vsync, msaa=fsaa, resizable=window_resizable, minwidth=width*16, minheight=224}) --27x14 blocks (15 blocks actual height)
+		love.window.setMode(width*16*scale, 224*scale, {fullscreen=fullscreen, vsync=vsync, msaa=fsaa, resizable=window_resizable, minwidth=width*16, minheight=224, highdpi=false, usedpiscale=false}) --27x14 blocks (15 blocks actual height)
 		
 		gamewidth, gameheight = love.graphics.getDimensions()
 		if android then
@@ -1761,12 +1760,9 @@ function changescale(s, fullscreen)
 			gamewidth, gameheight = width*16*scale, height*16*scale
 		end
 		winwidth, winheight = getWindowSize()
-		
-		canvassupported = true--love.graphics.isSupported("canvas")
-		if canvassupported then
-			canvas = love.graphics.newCanvas(width*16*scale, height*16*scale)
-			canvas:setFilter("nearest", "nearest")
-		end
+
+		canvas = love.graphics.newCanvas(width*16*scale, height*16*scale)
+		canvas:setFilter("nearest", "nearest")
 		
 		if shaders then
 			shaders:refresh()
@@ -1778,11 +1774,11 @@ function changescale(s, fullscreen)
 		if fullscreen then
 			fullscreen = true
 			scale = 2
-			love.window.setMode(800, 600, {fullscreen=fullscreen, vsync=vsync, msaa=fsaa})
+			love.window.setMode(800, 600, {fullscreen=fullscreen, vsync=vsync, msaa=fsaa, highdpi=false, usedpiscale=false})
 		end
 		
 		uispace = math.floor(width*16*scale/4)
-		love.window.setMode(width*16*scale, height*16*scale, {fullscreen=fullscreen,vsync=vsync, msaa=fsaa}) --27x14 blocks (15 blocks actual height)
+		love.window.setMode(width*16*scale, height*16*scale, {fullscreen=fullscreen,vsync=vsync, msaa=fsaa, highdpi=false, usedpiscale=false}) --27x14 blocks (15 blocks actual height)
 		
 		gamewidth, gameheight = love.graphics.getDimensions()
 		winwidth, winheight = getWindowSize()
@@ -1796,7 +1792,7 @@ end
 --resizing stuff
 function love.resize(w, h)
 	winwidth, winheight = w, h
-	if resizable and canvassupported then
+	if resizable then
 		if winwidth < (width*16*scale)*1.5 or winheight < (224*scale)*1.5 then
 			canvas:setFilter("linear", "linear")
 		else
@@ -1837,9 +1833,6 @@ end
 lgs = love.graphics.setScissor
 function love.graphics.setScissor(x, y, w, h)
 	if x and y and w and h then
-		if resizable and not canvassupported then
-			x, y, w, h = x*(winwidth/gamewidth), y*(winheight/gameheight), w*(winwidth/gamewidth), h*(winheight/gameheight)
-		end
 		lgs(x, y, w, h)
 	else
 		lgs()
@@ -1853,7 +1846,7 @@ function love.mouse.getX()
 		return x
 	end
 	local x = lmx()
-	if resizable and letterboxfullscreen and canvassupported and canvas then
+	if resizable and letterboxfullscreen and canvas then
 		local cw, ch = canvas:getWidth(), canvas:getHeight()--current size
 		local tw, th = winwidth, winheight--target size
 		local s
@@ -1872,7 +1865,7 @@ function love.mouse.getY()
 		return y
 	end
 	local y = lmy()
-	if resizable and letterboxfullscreen and canvassupported and canvas then
+	if resizable and letterboxfullscreen and canvas then
 		local cw, ch = canvas:getWidth(), canvas:getHeight()--current size
 		local tw, th = winwidth, winheight--target size
 		local s
@@ -1990,6 +1983,8 @@ function love.keypressed(key, scancode, isrepeat, textinput)
 		levelscreen_keypressed(key)
 	elseif gamestate == "intro" then
 		intro_keypressed()
+	elseif gamestate == "filebrowser" then
+		filebrowser_keypressed(key, textinput)
 	end
 end
 
@@ -1999,6 +1994,8 @@ function love.keyreleased(key, unicode)
 		menu_keyreleased(key, unicode)
 	elseif gamestate == "game" then
 		game_keyreleased(key, unicode)
+	elseif gamestate == "filebrowser" then
+		filebrowser_keyreleased(key, unicode)
 	end
 end
 
@@ -2021,7 +2018,7 @@ function love.mousepressed(x, y, button, istouch)
 			love.touchpressed(1,x,y)
 			return false
 		end
-	elseif resizable and letterboxfullscreen and canvassupported and canvas then
+	elseif resizable and letterboxfullscreen and canvas then
 		x, y = love.mouse.getPosition()
 	elseif resizable then
 		x, y = x/(winwidth/gamewidth), y/(winheight/gameheight)
@@ -2038,6 +2035,8 @@ function love.mousepressed(x, y, button, istouch)
 		game_mousepressed(x, y, button)
 	elseif gamestate == "intro" then
 		intro_mousepressed()
+	elseif gamestate == "filebrowser" then
+		filebrowser_mousepressed(x, y, button)
 	end
 	
 	--animations priorities
@@ -2098,7 +2097,7 @@ function love.mousereleased(x, y, button, istouch)
 			love.touchreleased(1,x,y)
 			return false
 		end
-	elseif resizable and letterboxfullscreen and canvassupported and canvas then
+	elseif resizable and letterboxfullscreen and canvas then
 		x, y = love.mouse.getPosition()
 	elseif resizable then
 		x, y = x/(winwidth/gamewidth), y/(winheight/gameheight)
@@ -2113,6 +2112,8 @@ function love.mousereleased(x, y, button, istouch)
 		menu_mousereleased(x, y, button)
 	elseif gamestate == "game" then
 		game_mousereleased(x, y, button)
+	elseif gamestate == "filebrowser" then
+		filebrowser_mousereleased(x, y, button)
 	end
 	
 	if ignoregui then
@@ -2135,7 +2136,7 @@ function love.mousemoved(x, y, dx, dy, istouch)
 			end
 			return false
 		end
-	elseif resizable and letterboxfullscreen and canvassupported and canvas then
+	elseif resizable and letterboxfullscreen and canvas then
 		x, y = love.mouse.getPosition()
 		local cw, ch = canvas:getWidth(), canvas:getHeight()--current size
 		local tw, th = winwidth, winheight--target size
@@ -2476,16 +2477,19 @@ function love.focus(f)
 end
 
 function openSaveFolder(subfolder) --By Slime
+	if android then
+		notice.new("On android try a file manager\nand go to:\nAndroid > data > Love.to.mario", notice.white, 5)
+		filebrowser_load(subfolder or "")
+		return true
+	end
+
 	local path = love.filesystem.getSaveDirectory()
 	path = subfolder and path.."/"..subfolder or path
 	
 	local cmdstr
 	local successval = 0
 	
-	if android then
-		notice.new("On android use a file manager\nand go to:\nAndroid > data > Love.to.mario >\nfiles > save > mari0_android >\nalesans_entities > mappacks", notice.red, 15)
-		return false
-	elseif os.getenv("WINDIR") then -- lolwindows
+	if os.getenv("WINDIR") then -- lolwindows
 		--cmdstr = "Explorer /root,%s"
 		if path:match("LOVE") then --hardcoded to fix ISO characters in usernames and made sure release mode doesn't mess anything up -saso
 			cmdstr = "Explorer %%appdata%%\\LOVE\\mari0"
@@ -2716,25 +2720,32 @@ function love.errorhandler(msg)
     if not love.window or not love.graphics or not love.event then
         return
     end
-	if not love.window.isOpen() then
+	
+	if not love.graphics.isCreated() or not love.window.isOpen() then
 		local success, status = pcall(love.window.setMode, 800, 600)
 		if not success or not status then
 			return
 		end
 	end
+
+	-- Reset state.
 	if love.mouse then
 		love.mouse.setVisible(true)
 		love.mouse.setGrabbed(false)
 		love.mouse.setRelativeMode(false)
+		if love.mouse.isCursorSupported() then
+			love.mouse.setCursor()
+		end
 	end
-	if love.joystick then -- Stop all joystick vibrations.
+	if love.joystick then
+		-- Stop all joystick vibrations.
 		for i,v in ipairs(love.joystick.getJoysticks()) do
 			v:setVibration()
 		end
 	end
 	local screenshot = false
 	if love.graphics.captureScreenshot then
-		love.graphics.captureScreenshot(function(s) screenshot = s end)
+		love.graphics.captureScreenshot(function(s) screenshot = love.graphics.newImage(s) end)
 	end
 
     -- Load.
@@ -2754,11 +2765,21 @@ function love.errorhandler(msg)
 
     love.graphics.clear()
 
+	local sanitizedmsg = {}
+	for char in msg:gmatch(utf8.charpattern) do
+		table.insert(sanitizedmsg, char)
+	end
+	sanitizedmsg = table.concat(sanitizedmsg)
+
 	local err = {}
 	local traceback = {}
 
-    table.insert(err, "Error\n")
-    table.insert(err, msg.."\n\n")
+	table.insert(err, "Error\n")
+	table.insert(err, sanitizedmsg.."\n\n")
+
+	if #sanitizedmsg ~= #msg then
+		table.insert(err, "Invalid UTF-8 string in error message.")
+	end
 
     for l in string.gmatch(trace, "(.-)\n") do
         if not string.match(l, "boot.lua") then
@@ -2800,13 +2821,14 @@ function love.errorhandler(msg)
 	end
 	
     local function draw()
+		if not love.graphics.isActive() then return end
 		love.graphics.clear(love.graphics.getBackgroundColor())
 		if screenshot then
 			love.graphics.setColor(30/255, 30/255, 30/255)
 			love.graphics.draw(screenshot, 0, 0, 0, love.graphics.getWidth()/screenshot:getWidth(), love.graphics.getHeight()/screenshot:getHeight())
 			if gradientimg and width and height then
-				love.graphics.setColor(0, 0, 0)
-				love.graphics.draw(gradientimg, 0, 0, 0, love.graphics.getWidth()/(width*16), love.graphics.getHeight()/(height*16))
+			 	love.graphics.setColor(0, 0, 0)
+			 	love.graphics.draw(gradientimg, 0, 0, 0, love.graphics.getWidth()/(width*16), love.graphics.getHeight()/(height*16))
 			end
 		end
 		love.graphics.setColor(1, 1, 1)
@@ -2819,21 +2841,23 @@ function love.errorhandler(msg)
 	
 	local e, a, b, c
 	
-	while true do
+	return function()
 		love.event.pump()
  
 		for e, a, b, c in love.event.poll() do
 			if e == "quit" then
-				return
+				return 1
 			elseif e == "keypressed" and a == "escape" then
-				return
+				return 1
 			elseif e == "touchpressed" then
 				local name = love.window.getTitle()
 				if #name == 0 or name == "Untitled" then name = "Game" end
 				local buttons = {"OK", "Cancel"}
 				local pressed = love.window.showMessageBox("Quit "..name.."?", "", buttons)
 				if pressed == 1 then
-					return
+					return 1
+				elseif pressed == 3 then
+					copyToClipboard()
 				end
 			end
 		end

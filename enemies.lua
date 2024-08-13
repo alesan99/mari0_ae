@@ -156,12 +156,10 @@ function loadenemy(filename)
 				end
 			else
 				--Put enemy for later loading because base hasn't been loaded yet
-				if not success then
-					if not loaddelayed[base] then
-						loaddelayed[base] = {}
-					end
-					table.insert(loaddelayed[base], filename)
+				if not loaddelayed[base] then
+					loaddelayed[base] = {}
 				end
+				table.insert(loaddelayed[base], filename)
 				--print("DON'T HAVE BASE " .. base .. " FOR " .. s)
 				if editormode then
 					--notice.new("don't have base " .. base .. " for " .. s)
@@ -302,10 +300,10 @@ function loadenemy(filename)
 		
 		
 		if loaddelayed[s] and #loaddelayed[s] > 0 then
-			for j = #loaddelayed[s], 1, -1 do
-				loadenemy(loaddelayed[s][j]) --RECURSIVE PROGRAMMING AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH
-				table.remove(loaddelayed, j)
+			for ji, jv in ipairs(loaddelayed[s]) do
+				loadenemy(jv)
 			end
+			loaddelayed[s] = nil
 		end
 	else
 		--Bad.

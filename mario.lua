@@ -3827,7 +3827,6 @@ function mario:jump(force)
 					speedx = self.speedy
 				end
 				local force = self.characterdata.uwjumpforce + (math.abs(speedx) / self.characterdata.maxrunspeed)*self.characterdata.uwjumpforceadd
-				print(force)
 				if self.gravitydir == "up" then
 					self.speedy = force
 				elseif self.gravitydir == "down" then
@@ -6366,6 +6365,11 @@ function mario:globalcollide(a, b)
 					if b.makesmariocolor then
 						convertcolors(b.makesmariocolor)
 						self.customcolors = b.makesmariocolor
+						for i, v in pairs(self.customcolors) do
+							for j, w in pairs(v) do
+								w = w/255
+							end
+						end
 						self.basecolors = self.customcolors
 						self.colors = self.basecolors
 					else
@@ -9074,6 +9078,16 @@ function mario:statued(statue) --tanooki statue
 end
 
 function mario:animationwalk(dir, speed)
+	if self.ducking then
+		self:duck(false)
+	end
+	if self.fence then
+		self:dropfence()
+	end
+	if self.vine then
+		self:dropvine(self.vineside)
+	end
+
 	self.animation = "animationwalk"
 	self.animationstate = "running"
 	self.animationmisc = {dir, math.max(0, math.min(40, (speed or maxwalkspeed)))}
