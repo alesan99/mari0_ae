@@ -13,7 +13,7 @@ local function iscolorvariable(key)
 	return false
 end
 
-local function convertcolors(table)
+function convertcolors(table)
 	if table == nil or #table == 0 then
 		return
 	end
