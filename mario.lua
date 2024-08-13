@@ -994,11 +994,28 @@ function mario:update(dt)
 	--sledge bros
 	if self.groundfreeze then
 		self.controlsenabled = false
-		self.groundfreeze = self.groundfreeze - dt
+		if self.animation ~= "shrink" then
+			self.groundfreeze = self.groundfreeze - dt
+		end
 		if self.groundfreeze < 0 then
 			self.controlsenabled = true
 			self.groundfreeze = false
-			self.frozen = false
+
+			if self.frozen then
+				self.frozen = false
+				self.static = false
+				playsound(iciclesound)
+				self.animationstate = "jumping"
+				self.speedx = 0
+				self.speedy = -5
+				local debris = rgbaToInt(80/255, 210/255, 250/255, 1)
+				if blockdebrisquads[debris] then
+					table.insert(blockdebristable, blockdebris:new(self.x+self.width/2, self.y+self.height/2, 3.5, -23, blockdebrisimage, blockdebrisquads[debris][spriteset]))
+					table.insert(blockdebristable, blockdebris:new(self.x+self.width/2, self.y+self.height/2, -3.5, -23, blockdebrisimage, blockdebrisquads[debris][spriteset]))
+					table.insert(blockdebristable, blockdebris:new(self.x+self.width/2, self.y+self.height/2, 3.5, -14, blockdebrisimage, blockdebrisquads[debris][spriteset]))
+					table.insert(blockdebristable, blockdebris:new(self.x+self.width/2, self.y+self.height/2, -3.5, -14, blockdebrisimage, blockdebrisquads[debris][spriteset]))
+				end
+			end
 		end
 	end
 	
@@ -6363,6 +6380,7 @@ function mario:globalcollide(a, b)
 					self.fireenemy = b.makesmarioshoot
 					self.dofireenemy = self.fireenemy
 					if b.makesmariocolor then
+						convertcolors(b.makesmariocolor)
 						self.customcolors = b.makesmariocolor
 						for i, v in pairs(self.customcolors) do
 							for j, w in pairs(v) do
@@ -8925,7 +8943,9 @@ end
 
 function mario:freeze() --ice ball
 	if not self.frozen then
-		self.groundfreeze = 4
+		self.static = true
+		self.jumping = false
+		self.groundfreeze = icefreezetime
 		self.frozen = true
 		self.speedx = 0
 		self.animationstate = "idle"

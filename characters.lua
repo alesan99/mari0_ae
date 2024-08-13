@@ -1,10 +1,10 @@
 --I have no idea what i'm even doing
-local colorvariables = {"colors", "defaultcolors", "starcolors", "flowercolor", "hammersuitcolor", "frogsuitcolor", "leafcolor", "iceflowercolor", "tanookisuitcolor", "statuecolor", "superballcolor", "blueshellcolor", "boomerangcolor"}
+local colorvariables = {"colors", "defaultcolors", "starcolors", "flowercolor", "hammersuitcolor", "frogsuitcolor", "leafcolor", "iceflowercolor", "tanookisuitcolor", "statuecolor", "superballcolor", "blueshellcolor", "boomerangcolor", "graphiccolor"}
 local animfiles = {"", "big", "fire", "ice", "superball", "hammer", "frog", "raccoon", "tiny", "tanooki", "skinny", "cape", "shell", "boomerang"}
 local blankimg = love.graphics.newImage(love.image.newImageData(1, 1))
 local splitimage
 
-local function iscolorvariable(key)
+function iscolorvariable(key)
 	for i, v in ipairs(colorvariables) do
 		if v == key then
 			return true
@@ -13,7 +13,7 @@ local function iscolorvariable(key)
 	return false
 end
 
-local function convertcolors(table)
+function convertcolors(table)
 	if table == nil or #table == 0 then
 		return
 	end
@@ -23,6 +23,12 @@ local function convertcolors(table)
 		else
 			table[i] = tonumber(v)/255
 		end
+	end
+end
+
+function convertcolorsif(key, table)
+	if iscolorvariable(key) then
+		convertcolors(table)
 	end
 end
 
@@ -367,9 +373,7 @@ function loadcustomplayers()
 				--works! so set properties
 				for i, v in pairs(temp) do
 					-- convert numbers to 0..1
-					if iscolorvariable(i) then
-						convertcolors(v)
-					end
+					convertcolorsif(i, v)
 					-- set properties
 					playerstuff[i] = v
 					if i == "health" or i == "fireenemy" then

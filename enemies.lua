@@ -330,6 +330,11 @@ function loadenemy(filename, s)
 		end
 	end
 
+	--Bulk migration
+	for i, v in pairs(enemiesdata[s]) do
+		convertcolorsif(i, v)
+	end
+
 
 	--fix offsetY
 	if enemiesdata[s].offsetyadjust then
