@@ -28,7 +28,8 @@ airslidefactor = 0.8 --multiply of acceleration in air when changing direction
 icefriction = 3 --friction when on ice entity
 icewalkacceleration = 4 --acceleration of walking on ground on ice entitiy
 icerunacceleration = 8 --^^^
-groundfreezetime = 3 --seconds stunned when sledge bro ground pounded
+icefreezetime = 1 --seconds stunned when hit by ice bro balls
+groundfreezetime = 1 --seconds stunned when sledge bro ground pounded
 goombashoehop = 8 --height of hops when mario has goomba shoe
 fencespeed = 4 --speed when climbing fence
 fencejumptime = 0.05 --how long mario jumps when holding up and jumping while climbing
@@ -403,12 +404,16 @@ angrysunpassivespeed = 5
 angrysunfalltime = 0.1
 
 fireballspeed = 15
+fireballbrospeed = 10 -- 2/3
 fireballjumpforce = 10
 maxfireballs = 2
 fireanimationtime = 0.11
 iceballspeed = 7
+iceballbrospeed = 5 -- 2/3 ish
 iceballjumpforce = 10
 superballspeed = 12
+boomerangspeed = 10
+boomerangbrospeed = 7 -- 2/3 ish
 
 shotspeedx = 4 --X speed (constant) of fire/shell killed enemies
 shotjumpforce = 8 --initial speedy (negative) when shot

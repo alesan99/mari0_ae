@@ -1,4 +1,5 @@
 hammerbro = class:new()
+local throwgroups = {1, 3}
 
 function hammerbro:init(x, y, t)
 	--PHYSICS STUFF
@@ -59,8 +60,9 @@ function hammerbro:init(x, y, t)
 	self.falling = false
 	
 	self.quadi = 1
-	self.timer = hammerbrotime[math.random(2)]
+	self.timer = 0.5
 	self.timer2 = 0
+	self.queue = 1
 	
 	self.jumping = false
 	self.jump = false --is it jumping?
@@ -134,7 +136,13 @@ function hammerbro:update(dt)
 				if self.t == "boomerang" then
 					self.timer = math.random(3, 4)
 				else
-					self.timer = hammerbrotime[math.random(2)]
+					self.queue = self.queue - 1
+					if self.queue == 0 then
+						self.queue = throwgroups[math.random(2)]
+						self.timer = 2
+					else
+						self.timer = 0.6
+					end
 				end
 			end
 				
@@ -411,6 +419,8 @@ function hammerbro:globalcollide(a, b)
 		else
 			self:shotted()
 		end
+	elseif a == "player" then
+		return true
 	end
 end
 
@@ -476,7 +486,7 @@ function hammer:init(x, y, dir)
 	self.mask = {	true,
 					true, false, false, false, true,
 					true, true, true, true, true,
-					true, false, true, true, true,
+					true, true, true, true, true,
 					true, true, true, false, true,
 					true, true, true, true, true,
 					true, true, true, true, true,
@@ -557,20 +567,19 @@ function brofireball:init(x, y, dir,t)
 	if self.t == "ice" then
 		self.speedy = -fireballjumpforce
 		self.gravity = 30
-		self.hp = 2
 		if dir == "right" then
-			self.speedx = iceballspeed
+			self.speedx = iceballbrospeed
 			self.x = x+6/16
 		else
-			self.speedx = -iceballspeed
+			self.speedx = -iceballbrospeed
 			self.x = x
 		end
 	else
 		if dir == "right" then
-			self.speedx = fireballspeed
+			self.speedx = fireballbrospeed
 			self.x = x+6/16
 		else
-			self.speedx = -fireballspeed
+			self.speedx = -fireballbrospeed
 			self.x = x
 		end
 	end
@@ -649,8 +658,8 @@ function brofireball:leftcollide(a, b)
 	end
 	self.x = self.x-.5
 	self:hitstuff(a, b)
+	self:explode()
 	
-	self.speedx = fireballspeed
 	return false
 end
 
@@ -659,7 +668,8 @@ function brofireball:rightcollide(a, b)
 		return false
 	end
 	self:hitstuff(a, b)
-	self.speedx = -fireballspeed
+	self:explode()
+	
 	return false
 end
 
@@ -668,12 +678,9 @@ function brofireball:floorcollide(a, b)
 		return false
 	end
 	if self.t == "ice" and a == "tile" then
-		self.hp = self.hp - 1
-		if self.hp <= 0 then
-			self:explode()
-			playsound(iciclesound)
-			return false
-		end
+		self:explode()
+		playsound(iciclesound)
+		return false
 	end
 	
 	if a ~= "tile" and a ~= "portalwall" then
@@ -706,7 +713,9 @@ function brofireball:hitstuff(a, b)
 		if a == "tile" or a == "portalwall" or a == "spring" or a == "kingbill" or a == "angrysun" or a == "springgreen" or a == "thwomp" or a == "fishbone" or a == "muncher" or (a == "bigkoopa" and b.t == "bigbeetle") or a == "meteor" or a == "dryplant" or a == "drydownplant" or a == "parabeetle" or a == "boo" or a == "torpedoted" then
 			playsound(iciclesound)
 		elseif a == "player" then
-			b:freeze()
+			if (b.animationtimer == 0 or not (b.frozen or b.invincible)) and not (b.startimer < mariostarduration) then
+				b:freeze()
+			end
 			self:explode()
 		elseif iceballfreeze[a] then
 			if b.freezable and (not b.frozen) then
@@ -738,6 +747,8 @@ function brofireball:explode()
 	if self.active then
 		self.destroysoon = true
 		self.quadi = 5
+		self.quadcenterX = 8
+		self.quadcenterY = 8
 		self.quad = fireballquad[self.quadi]
 		self.active = false
 	end
@@ -761,10 +772,6 @@ function boomerang:init(x, y, dir, v)
 	self.y = y-16/16
 	self.starty = self.y
 	self.speedy = -3
-	self.speedx = -10
-	if dir == "right" then
-		self.speedx = -self.speedx
-	end
 	self.dir = dir
 	self.width = 12/16
 	self.height = 12/16
@@ -774,7 +781,7 @@ function boomerang:init(x, y, dir, v)
 	self.mask = {	true,
 					true, false, false, false, true,
 					true, true, true, true, true,
-					true, false, true, true, true,
+					true, true, true, true, true,
 					true, true, true, false, true,
 					true, true, true, true, true,
 					true, true, true, true, true,
@@ -786,10 +793,11 @@ function boomerang:init(x, y, dir, v)
 	self.boomerangbrocollide = false
 
 	self.kills = true
-	if v then
+	if v then -- essentially, if thrower is mario
 		self.fireballthrower = v
 		self.killstuff = true
 		self.kills = false
+		self.speed = boomerangspeed
 		self.category = 4
 		self.mask = {	true,
 						false, false, false, false, true,
@@ -799,6 +807,13 @@ function boomerang:init(x, y, dir, v)
 						false, true, false, false, true,
 						false, false, false, false, true,
 						false, true}
+	else
+		self.speed = boomerangbrospeed
+	end
+
+	self.speedx = -self.speed
+	if dir == "right" then
+		self.speedx = self.speed
 	end
 	
 	--IMAGE STUFF
@@ -879,9 +894,9 @@ function boomerang:update(dt)
 			self.timer2 = self.timer2 + dt
 			if self.timer2 > 0.5 then
 				if self.dir == "left" then
-					self.speedx = 10
+					self.speedx = self.speed
 				else
-					self.speedx = -10
+					self.speedx = -self.speed
 				end
 				self.boomerangbrocollide = "hammerbro"
 				if self.fireballthrower then
