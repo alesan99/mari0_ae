@@ -50,14 +50,15 @@ function enemies_load()
 	local mpenemiespath = mappackfolder .. "/" .. mappack .. "/enemies/"
 	local fl2 = love.filesystem.getDirectoryItems(mpenemiespath)
 	for i = 1, #fl2 do
-		if love.filesystem.getInfo(mpenemiespath .. fl2[i],"directory") then
+		local mpepath = mpenemiespath .. fl2[i]
+		if love.filesystem.getInfo(mpepath, "directory") then
 			--load enemies from folder
-			local fl3 = love.filesystem.getDirectoryItems(mpenemiespath .. fl2[i])
+			local fl3 = love.filesystem.getDirectoryItems(mpepath)
 			for i2 = 1, #fl3 do
-				table.insert(realfl, mpenemiespath .. fl2[i] .. "/" .. fl3[i2])
+				table.insert(realfl, mpepath .. "/" .. fl3[i2])
 			end
 		else
-			table.insert(realfl, mpenemiespath .. fl2[i]) --MAPPACK ENEMIES
+			table.insert(realfl, mpepath) --MAPPACK ENEMIES
 		end
 	end
 
@@ -68,14 +69,15 @@ function enemies_load()
 		if mariocharacter[i] and (not characterenemiesloaded[mariocharacter[i]]) and love.filesystem.getInfo(charenemiespath) then
 			local fl3 = love.filesystem.getDirectoryItems(charenemiespath)
 			for i2 = 1, #fl3 do
-				if love.filesystem.getInfo(charenemiespath .. fl3[i2],"directory") then
+				local cepath = charenemiespath .. fl3[i2]
+				if love.filesystem.getInfo(cepath, "directory") then
 					--load enemies from folder
-					local fl4 = love.filesystem.getDirectoryItems(charenemiespath .. fl3[i2])
+					local fl4 = love.filesystem.getDirectoryItems(cepath)
 					for i3 = 1, #fl4 do
-						table.insert(realfl, charenemiespath .. fl3[i2] .. "/" .. fl4[i3])
+						table.insert(realfl, cepath .. "/" .. fl4[i3])
 					end
 				else
-					table.insert(realfl, charenemiespath .. fl3[i2]) --CHARACTER ENEMIES
+					table.insert(realfl, cepath) --CHARACTER ENEMIES
 				end
 			end
 			characterenemiesloaded[mariocharacter[i]] = true
