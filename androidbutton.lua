@@ -123,6 +123,7 @@ function touchButton:update(dt)
 		self.active = ((not editormode) or ((not editormenuopen) and (not (self.autoscrollGone and (not autoscroll))) and (not HIDEANDROIDBUTTONS)) or self.i == "start")
 			and (not (self.gameOnly and gamestate ~= "game"))
 			and (not (self.multiplayerOnly and (players <= 1 or (SERVER or CLIENT) or players < self.playeri)))
+			and (gamestate ~= "filebrowser")
 	end
 end
 

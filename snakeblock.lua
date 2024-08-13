@@ -38,7 +38,7 @@ function snakeblocksline:init(x, y, r)
 			if #self.path > 1 then
 				local ox, oy = 1, 0
 				local tx, ty = self.path[2][1]-x, self.path[2][2]-y
-				if ty == 0 then
+				if math.abs(ty) <= 1 then
 					if tx > 0 then
 						--nothing
 					else
@@ -111,15 +111,7 @@ function snakeblocksline:init(x, y, r)
 		firstx = self.x-self.length+1
 	end
 	local obj = snakeblock:new(firstx, self.y, self, false, self.quadi)
-	if self.firstdir == "up" then
-		obj.speedy = -self.speed
-	elseif self.firstdir == "down" then
-		obj.speedy = self.speed
-	elseif self.firstdir == "left" then
-		obj.speedx = -self.speed
-	else
-		obj.speedx = self.speed
-	end
+	self:setstartdir(obj)
 	self.movingchild[1] = obj
 	self.movingchild[1].push = true
 	table.insert(objects["snakeblock"], obj)
@@ -362,6 +354,7 @@ function snakeblocksline:dorespawn()
 	self.movingchild[1].dy = false
 	self.movingchild[1].speedx = self.speed
 	self.movingchild[1].speedy = 0
+	self:setstartdir(self.movingchild[1])
 	self.movingchild[1]:move(self.power)
 	self.movingchild[1].quadi = self.quadi
 	self.movingchild[1]:setquad()
@@ -376,6 +369,21 @@ function snakeblocksline:dorespawn()
 	self.movingchild[2]:move(self.power)
 	self.movingchild[2].quadi = self.quadi
 	self.movingchild[2]:setquad()
+end
+
+function snakeblocksline:setstartdir(obj)
+	--first snake block automatically goes right, adjust it to follow to set starting direction
+	obj.speedx = 0
+	obj.speedy = 0
+	if self.firstdir == "up" then
+		obj.speedy = -self.speed
+	elseif self.firstdir == "down" then
+		obj.speedy = self.speed
+	elseif self.firstdir == "left" then
+		obj.speedx = -self.speed
+	else
+		obj.speedx = self.speed
+	end
 end
 
 function snakeblocksline:link()
@@ -527,11 +535,13 @@ function snakeblock:update(dt)
 						if inrange(w.y+w.height/2, self.y, self.y+self.height) then
 							if self.speedx > 0 and w.x < self.x+self.width and w.x+w.width > self.x+self.width then --right
 								if #checkrect(self.x+self.width, w.y, w.width, w.height, {"exclude", w}, true, "ignoreplatforms") == 0 then
+									w.oldxplatform = w.x
 									w.x = self.x+self.width
 									--w.speedx = math.max(self.speedx, w.speedx)
 								end
 							elseif self.speedx < 0 and w.x+w.width > self.x and w.x < self.x then
 								if #checkrect(self.x-w.width, w.y, w.width, w.height, {"exclude", w}, true, "ignoreplatforms") == 0 then
+									w.oldxplatform = w.x
 									w.x = self.x-w.width
 									--w.speedx = math.min(self.speedx, w.speedx)
 								end

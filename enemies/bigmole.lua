@@ -58,6 +58,7 @@ function bigmole:update(dt)
 					if inrange(w.x, self.x-w.width, self.x+self.width) then
 						if w.y+w.height >= self.y-(1/16) and w.y+w.height <= self.y+(4/16) and (not w.jumping) then
 							if not checkintile(w.x+self.speedx*dt, w.y, w.width, w.height, tileentities, w, "ignoreplatforms") then
+								w.oldxplatform = w.x
 								w.x = w.x + (self.x-self.oldx)
 								w.y = math.min(self.y-w.height, w.y)
 								w.falling = false

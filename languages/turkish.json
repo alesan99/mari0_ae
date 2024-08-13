@@ -77,7 +77,7 @@
 	"mappack folder fail": "sağ bas\ndlc yetkisi al\n\nbulunamadı\nharita dosysası\n(mappack)",
 	"{new mappack}": "{yeni harita}",
 	"new mappack description": "harita açıklaması!",
-	"by": " by",
+	"by": " by ",
 "^_DLC":"",
 	"dlc instructions": "harita indir!\n\npick a mappack to\nopen the link\n\nafter you download\nthe mappack, put\nthe .zip inside\nyour dlc folder\n\n\n\n*there's enemies/ \n characters too!",
 	"dlc enemy instructions": "level yapmayı aç\n varlık ekleye bas\nkendi haritanı yap",
