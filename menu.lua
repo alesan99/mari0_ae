@@ -3141,6 +3141,9 @@ function createmappack()
 	s = s .. "description=the newest best  mappack?" .. "\n"
 	
 	love.filesystem.write(mappackfolder .. "/" .. mappack .. "/settings.txt", s)
+
+	-- Clean old suspend file for renamed or deleted mappacks
+	love.filesystem.remove(mappackfolder:gsub("mappacks", "saves") .. "/" .. mappack .. ".suspend")
 end
 
 function resetconfig()
