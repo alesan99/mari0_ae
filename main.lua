@@ -1624,7 +1624,7 @@ function defaultconfig()
 	reachedworlds = {}
 end
 
-function savegame()
+function writesuspendfile()
 	local st = {}
 	if marioworld == "M" then
 		marioworld = 8
@@ -1678,7 +1678,7 @@ function savegame()
 end
 
 function suspendgame()
-	savegame()
+	writesuspendfile()
 	love.audio.stop()
 	menu_load()
 end

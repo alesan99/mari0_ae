@@ -757,9 +757,9 @@ function animation:update(dt)
 					end
 				end
 			elseif v[1] == "autosave" then
-				savegame()
+				writesuspendfile()
 				if v[2] == true then
-					notice.new("game saved!", notice.white, 3)
+					notice.new(TEXT["game saved!"], notice.white, 3)
 				end
 			elseif v[1] == "changebackground" then
 				if v[2] then
