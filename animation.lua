@@ -79,6 +79,7 @@ instantkillplayer[:player]			kills player(s)
 disablejumping						disable jumping
 enablejumping						enables jumping
 
+autosave							saves mappack progress
 changebackground:background			changes background
 changeforeground:background	 	    changes foreground
 removecoins:amount					removes coins
@@ -754,6 +755,11 @@ function animation:update(dt)
 						objects["player"][i].speedx = tonumber(sx) or 0
 						objects["player"][i].speedy = tonumber(sy) or 0
 					end
+				end
+			elseif v[1] == "autosave" then
+				savegame()
+				if v[2] == true then
+					notice.new("game saved!", notice.white, 3)
 				end
 			elseif v[1] == "changebackground" then
 				if v[2] then

@@ -325,9 +325,11 @@ function love.load()
 		soundenabled = true
 	end
 	love.filesystem.createDirectory("mappacks")
+	love.filesystem.createDirectory("saves")
 	
 	love.filesystem.createDirectory("alesans_entities")
 	love.filesystem.createDirectory("alesans_entities/mappacks")
+	love.filesystem.createDirectory("alesans_entities/saves")
 	love.filesystem.createDirectory("alesans_entities/onlinemappacks")
 	love.filesystem.createDirectory("alesans_entities/characters")
 	love.filesystem.createDirectory("alesans_entities/hats")
@@ -1618,7 +1620,7 @@ function defaultconfig()
 	reachedworlds = {}
 end
 
-function suspendgame()
+function savegame()
 	local st = {}
 	if marioworld == "M" then
 		marioworld = 8
@@ -1668,18 +1670,22 @@ function suspendgame()
 	st.mappackfolder = mappackfolder
 
 	local s = JSON:encode_pretty(st)
-	love.filesystem.write("suspend", s)
-	
+	love.filesystem.write(mappackfolder:gsub("mappacks", "saves") .. "/" .. mappack .. ".suspend", s)
+end
+
+function suspendgame()
+	savegame()
 	love.audio.stop()
 	menu_load()
 end
 
 function continuegame()
-	if not love.filesystem.getInfo("suspend") then
+	savefile = mappackfolder:gsub("mappacks", "saves") .. "/" .. mappack .. ".suspend"
+	if not love.filesystem.getInfo(savefile) then
 		return
 	end
 	
-	local s = love.filesystem.read("suspend")
+	local s = love.filesystem.read(savefile)
 	local st = JSON:decode(s)
 	
 	mariosizes = {}
@@ -1718,7 +1724,7 @@ function continuegame()
 	mappackfolder = st.mappackfolder
 	
 	if (not st.collectables) then	--save the game if collectables are involved
-		love.filesystem.remove("suspend")
+		love.filesystem.remove(savefile)
 	end
 
 	loadbackground("1-1.txt")

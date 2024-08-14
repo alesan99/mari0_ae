@@ -66,7 +66,7 @@ function menu_load()
 	end
 	
 	continueavailable = false
-	if love.filesystem.getInfo("suspend") then
+	if love.filesystem.getInfo(mappackfolder:gsub("mappacks", "saves") .. "/" .. mappack .. ".suspend") then
 		continueavailable = true
 	end
 	
@@ -2329,6 +2329,12 @@ function menu_keypressed(key, unicode)
 			end
 			gamestate = "menu"
 			saveconfig()
+
+			continueavailable = false
+			if love.filesystem.getInfo(mappackfolder:gsub("mappacks", "saves") .. "/" .. mappack .. ".suspend") then
+				continueavailable = true
+			end
+
 			if mappack == "custom_mappack" then
 				createmappack()
 			end
