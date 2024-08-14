@@ -2610,11 +2610,7 @@ function mario:update(dt)
 			end
 		end
 		
-		if self.gravitydir == "up" and self.y < 0 then
-			self:die("pit")
-		elseif (self.gravitydir == "left" or self.gravitydir == "right") and (self.y < 0 or self.y >= mapheight) then
-			self:die("pit")
-		elseif self.y >= mapheight then
+		if self.y >= mapheight or (self.gravitydir ~= "down" and self.y < -self.height) then
 			self:die("pit")
 		elseif flagx and self.x+self.width >= flagx+6/16 and (flagborder or (self.x <= flagx+10/16 and self.y < flagy+1)) and self.y > flagy-10.8 then
 			self:flag()
@@ -3909,17 +3905,18 @@ function mario:stopjump()
 	end
 end
 
-function mario:wag() --raccoon
+function mario:wag() --raccoon / carrot
 	if self.controlsenabled then
 		if (self.size == 6 or self.size == 9 or self.size == 11) then
-			if not self.water and (not self.noteblock) and (not self.noteblock2) and
-				not self.statue and not self.fence and not self.vine and not self.spring and not self.groundpounding then
-				if self.falling and self.speedy >= 0 then
-					self.float = true
-					self.floattimer = 0
-					if not self.raccoonfly then
-						playsound(raccoonswingsound)
-					end
+			if self.water or self.noteblock or self.noteblock2 or self.statue or self.fence
+				or self.vine or self.spring or self.groundpounding then
+				return
+			end
+			if self.falling and ((self.gravitydir == "down" and self.speedy >= 0) or (self.gravitydir == "up" and self.speedy <= 0)) then
+				self.float = true
+				self.floattimer = 0
+				if not self.raccoonfly then
+					playsound(raccoonswingsound)
 				end
 			end
 		end
