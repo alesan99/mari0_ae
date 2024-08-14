@@ -359,6 +359,10 @@ function love.load()
 		saveconfig()
 	end
 
+	if love.filesystem.getInfo("suspend") then
+		convertoldsuspendfile()
+	end
+
 	loadingbardraw(1)
 	
 	--check date for daily challenges
@@ -2993,6 +2997,17 @@ function disablecheats()
 	infinitetime = false
 	infinitelives = false
 	darkmode = false
+end
+
+function convertoldsuspendfile()
+	local s = love.filesystem.read("suspend")
+	local st = JSON:decode(s)
+
+	-- *ahem* sus. [crowd cheering]
+	local suspendedmappackfolder = st.mappackfolder
+	local suspendedmappack = st.mappack
+	love.filesystem.write(suspendedmappackfolder:gsub("mappacks", "saves") .. "/" .. suspendedmappack .. ".suspend", s)
+	love.filesystem.remove("suspend")
 end
 
 --sausage (don't ask)
