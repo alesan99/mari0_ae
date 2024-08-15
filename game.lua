@@ -3870,6 +3870,11 @@ function drawmultiHUD()
 		end
 	end
 
+	local textscale = 1
+	if players > 6 then
+		textscale = 6/players
+	end
+
 	if livesdisplay then
 		for i = 1, players do
 			--lives
@@ -3881,20 +3886,20 @@ function drawmultiHUD()
 			end
 
 			local x = (width*16)/players/2 + (width*16)/players*(i-1)
-			local cx = x-string.len(s)*4-4
+			local cx = x-string.len(s)*4*textscale-4*textscale
 			local cy = 25 --offset y
 
 			--display lives
 			love.graphics.setColor(1, 1, 1, 1)
-			properprintfunc(s, (cx+8)*scale, cy*scale)
+			properprintfunc(s, (cx+8*textscale)*scale, cy*scale, textscale)
 			if hudoutline then
 				love.graphics.setColor(0, 0, 0)
-				love.graphics.rectangle("fill", (cx-1)*scale, (cy-1)*scale, 9*scale, 9*scale)
+				love.graphics.rectangle("fill", (cx-1*textscale)*scale, (cy-1)*scale, 9*scale*textscale, 9*scale*textscale)
 			end
 			love.graphics.setColor(mariocolors[i][1])
-			love.graphics.rectangle("fill", (cx)*scale, cy*scale, 7*scale, 7*scale)
+			love.graphics.rectangle("fill", (cx)*scale, cy*scale, 7*scale*textscale, 7*scale*textscale)
 			love.graphics.setColor(1, 1, 1, 1)
-			cy = cy + 10
+			cy = cy + 10*textscale
 
 			if objects and objects["player"] and objects["player"][i] then
 				local p = objects["player"][i]
@@ -3902,16 +3907,16 @@ function drawmultiHUD()
 				if p.health and p.characterdata.healthimg then
 					love.graphics.setColor(1, 1, 1)
 					local s = "hp: " .. p.health
-					properprintfunc(s, cx*scale, cy*scale)
-					cy = cy + 10
+					properprintfunc(s, cx*scale, cy*scale, textscale)
+					cy = cy + 10*textscale
 				end
 				--keys
 				if p.key and p.key > 0 then
 					love.graphics.setColor(1, 1, 1)
 					local s = "*" .. p.key
-					love.graphics.draw(keyuiimg, keyuiquad[spriteset or 1][coinframe or 1], cx*scale, cy*scale, 0, scale, scale)
-					properprintfunc(s, (cx+9)*scale, cy*scale)
-					cy = cy + 10
+					love.graphics.draw(keyuiimg, keyuiquad[spriteset or 1][coinframe or 1], cx*scale, cy*scale, 0, scale*textscale, scale*textscale)
+					properprintfunc(s, (cx+9*textscale)*scale, cy*scale, textscale)
+					cy = cy + 10*textscale
 				end
 			end
 		end

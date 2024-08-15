@@ -1765,7 +1765,7 @@ function editor_draw()
 					
 					love.graphics.draw(linktoolpointerimg, x2-math.ceil(scale/2), y2, 0, scale, scale, 3, 3)
 					
-					properprintFbackground(linktoolt, math.floor(x2+4*scale), y2-4*scale, true)
+					properprintFbackground(linktoolt, math.floor(x2+4*scale), y2-4*scale, 1, true)
 				else
 					--draw links
 					local tx, ty = rightclickmenucox, rightclickmenucoy
@@ -1797,7 +1797,7 @@ function editor_draw()
 							drawlinkline(x1, y1, x2, y2)
 						end
 						
-						properprintFbackground(t, math.floor(x2-string.len(t)*4*scale), y2+10*scale, true)--, {0, 0, 0, 1}) --why would the text be black? wtf
+						properprintFbackground(t, math.floor(x2-string.len(t)*4*scale), y2+10*scale, 1, true)--, {0, 0, 0, 1}) --why would the text be black? wtf
 					end
 					
 					--draw actual menu
@@ -2163,11 +2163,11 @@ function editor_draw()
 		--resizing stuff
 		if changemapwidthmenu then
 			love.graphics.setColor(1, 1, 1)
-			properprintFbackground(TEXT["old width: "] .. mapwidth, 26*scale, (mapy-21)*scale, true)
-			properprintFbackground(TEXT["old height: "] .. mapheight, 26*scale, (mapy-11)*scale, true)
+			properprintFbackground(TEXT["old width: "] .. mapwidth, 26*scale, (mapy-21)*scale, 1, true)
+			properprintFbackground(TEXT["old height: "] .. mapheight, 26*scale, (mapy-11)*scale, 1, true)
 			
-			properprintFbackground(TEXT["new width: "] .. newmapwidth, 26*scale, (mapy+h+4)*scale, true)
-			properprintFbackground(TEXT["new height: "] .. newmapheight, 26*scale, (mapy+h+14)*scale, true)
+			properprintFbackground(TEXT["new width: "] .. newmapwidth, 26*scale, (mapy+h+4)*scale, 1, true)
+			properprintFbackground(TEXT["new height: "] .. newmapheight, 26*scale, (mapy+h+14)*scale, 1, true)
 			
 			--button positioning
 			guielements["maptopup"].x, guielements["maptopup"].y = width*8-5, mapy-24
