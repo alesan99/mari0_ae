@@ -11,13 +11,13 @@ function poof:init(x, y, frames, lifetime, sx, sy, static, sscale, color)
 		self.yscroll = yscroll or 0
 	end
 	self.scale = sscale or 1
-	
+
 	self.frames = frames or {1, 2, 3, 4} --negatives indicate mirroring
 	self.framecount = #self.frames
 	self.frame = 1
 
-	self.color = color or {1, 1, 1}
-	
+	self.color = color or {255, 255, 255}
+
 	self.lifetimer = 0
 	self.lifetime = lifetime or 1
 end
@@ -25,14 +25,14 @@ end
 function poof:update(dt)
 	self.x = self.x + self.speedx*dt
 	self.y = self.y + self.speedy*dt
-	
+
 	self.lifetimer = self.lifetimer + dt
 	if self.lifetimer > self.lifetime then
 		return true
 	end
-	
+
 	self.frame = math.max(1, math.ceil((self.lifetimer/self.lifetime)*self.framecount))
-	
+
 	return false
 end
 

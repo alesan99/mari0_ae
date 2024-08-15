@@ -1,36 +1,7 @@
 --I have no idea what i'm even doing
-local colorvariables = {"colors", "defaultcolors", "starcolors", "flowercolor", "hammersuitcolor", "frogsuitcolor", "leafcolor", "iceflowercolor", "tanookisuitcolor", "statuecolor", "superballcolor", "blueshellcolor", "boomerangcolor", "graphiccolor"}
 local animfiles = {"", "big", "fire", "ice", "superball", "hammer", "frog", "raccoon", "tiny", "tanooki", "skinny", "cape", "shell", "boomerang"}
 local blankimg = love.graphics.newImage(love.image.newImageData(1, 1))
 local splitimage
-
-function iscolorvariable(key)
-	for i, v in ipairs(colorvariables) do
-		if v == key then
-			return true
-		end
-	end
-	return false
-end
-
-function convertcolors(table)
-	if table == nil or #table == 0 then
-		return
-	end
-	for i, v in ipairs(table) do
-		if type(v) == "table" then
-			convertcolors(v)
-		else
-			table[i] = tonumber(v)/255
-		end
-	end
-end
-
-function convertcolorsif(key, table)
-	if iscolorvariable(key) then
-		convertcolors(table)
-	end
-end
 
 function loadcustomplayers()
 	characters = {list = {}, data = {}}
@@ -372,8 +343,6 @@ function loadcustomplayers()
 				temp = err
 				--works! so set properties
 				for i, v in pairs(temp) do
-					-- convert numbers to 0..1
-					convertcolorsif(i, v)
 					-- set properties
 					playerstuff[i] = v
 					if i == "health" or i == "fireenemy" then
@@ -518,7 +487,7 @@ function splitimage(img, color, exclude, imagedata) --split singe image into col
 					if exclude then
 						output:setPixel(x, y, r, g, b, a)
 					else
-						output:setPixel(x, y, 1, 1, 1, a)
+						output:setPixel(x, y, 255, 255, 255, a)
 					end
 				end
 			end

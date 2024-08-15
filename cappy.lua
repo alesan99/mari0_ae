@@ -200,7 +200,7 @@ function cappy:draw()
 		if self.hat == 1 then
 			love.graphics.setColor(self.player.colors[1])
 		else
-			love.graphics.setColor(1, 1, 1)
+			love.graphics.setColor(255, 255, 255)
 		end
 		local graphic = hat[self.hat].graphic
 		local quad = hat[self.hat].quad[1]

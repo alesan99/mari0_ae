@@ -482,7 +482,7 @@ local function grok_array(self, text, start, etc)
          return VALUE, i + 1
       end
       if text:sub(i, i) ~= ',' then
-         self:onDecodeError("expected comma or '['", text, i, etc)
+         self:onDecodeError("expected comma or ']'", text, i, etc)
       end
       i = skip_whitespace(text, i + 1)
    end

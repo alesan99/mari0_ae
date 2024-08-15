@@ -56,7 +56,7 @@ function emancipateanimation:draw()
 	local black = 1-self.timer/emancipateanimationtime
 	local a = math.min(1, 1-(self.timer-(emancipateanimationtime-emancipatefadeouttime))/emancipatefadeouttime)
 
-	love.graphics.setColor(black, black, black, a)
+	love.graphics.setColor(255*black, 255*black, 255*black, 255*a)
 	if self.quad then
 		love.graphics.draw(self.img, self.quad, math.floor(((self.x-xscroll)*16+self.offsetX)*scale), math.floor(((self.y-yscroll)*16-self.offsetY)*scale), self.rotation, scale, scale, self.quadcenterX, self.quadcenterY)
 	else

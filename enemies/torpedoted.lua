@@ -119,7 +119,7 @@ function torpedolauncher:draw()
 	end
 	
 	love.graphics.setScissor(math.floor((self.customscissor[1]-xscroll)*16*scale), math.floor((self.customscissor[2]-.5-yscroll)*16*scale), self.customscissor[3]*16*scale, self.customscissor[4]*16*scale)
-	love.graphics.setColor(1, 1, 1)
+	love.graphics.setColor(255, 255, 255)
 	love.graphics.draw(self.graphic, self.quad, math.floor(((self.x-xscroll)*16+self.offsetX)*scale), math.floor(((self.y-yscroll)*16-self.offsetY)*scale), self.rotation, dirscale, horscale, self.quadcenterX, self.quadcenterY)
 	love.graphics.setScissor()
 end

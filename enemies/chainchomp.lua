@@ -335,7 +335,7 @@ end
 function chainchomp:draw()
 	if not self.shot and not self.free then
 		--draw the chain
-		love.graphics.setColor(1, 1, 1)
+		love.graphics.setColor(255, 255, 255)
 		for i = 1, 4 do
 			i = i - .5
 			local drop = (2/16)*(2-math.abs(i-2))

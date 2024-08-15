@@ -12,7 +12,7 @@ function portalwall:init(x, y, width, height)
 end
 
 function portalwall:draw()--debug
-	love.graphics.setColor(1, 0, 0)
+	love.graphics.setColor(255, 0, 0)
 	if self.width ~= 0 or self.height ~= 0 then
 		love.graphics.line((self.x-xscroll)*16*scale, (self.y-.5-yscroll)*16*scale, (self.x-xscroll)*16*scale+self.width*16*scale, (self.y-.5-yscroll)*16*scale+self.height*16*scale)
 	else

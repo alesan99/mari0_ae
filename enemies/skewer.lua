@@ -196,7 +196,7 @@ function skewer:update(dt)
 end
 
 function skewer:draw()
-	love.graphics.setColor(1, 1, 1)
+	love.graphics.setColor(255, 255, 255)
 	if self.dir == "down" then
 		love.graphics.draw(skewerimg, skewerquad[spriteset][3], (self.x+self.width/2-xscroll)*16*scale, (self.y+self.length-1-yscroll)*16*scale, 0, scale, scale, 32, 8)
 		love.graphics.setScissor((self.x+self.width/2-32/16-xscroll)*16*scale, (self.y-.5-yscroll)*16*scale, 64*scale, self.length*16*scale)

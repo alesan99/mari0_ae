@@ -252,7 +252,7 @@ function flipblock:destroy()
 		return false
 	end
 	playsound(blockbreaksound)
-	local debris = rgbaToInt(252/255, 152/255, 56/255, 1)
+	local debris = rgbaToInt(252, 152, 56, 255)
 	if blockdebrisquads[debris] then
 		table.insert(blockdebristable, blockdebris:new(self.cox-.5, self.coy-.5, 3.5, -23, blockdebrisimage, blockdebrisquads[debris][spriteset]))
 		table.insert(blockdebristable, blockdebris:new(self.cox-.5, self.coy-.5, -3.5, -23, blockdebrisimage, blockdebrisquads[debris][spriteset]))

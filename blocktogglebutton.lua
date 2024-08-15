@@ -184,7 +184,7 @@ end
 
 function blocktogglebutton:draw()
 	if not self.drawable then
-		love.graphics.setColor(1, 1, 1)
+		love.graphics.setColor(255, 255, 255)
 		love.graphics.draw(self.graphic, self.quad, math.floor(((self.x-xscroll)*16+self.offsetX)*scale), math.floor(((self.y-yscroll)*16-self.offsetY)*scale), self.rotation, scale, scale, self.quadcenterX, self.quadcenterY)
 	end
 end
@@ -435,7 +435,7 @@ function buttonblock:init(x, y, color, solid)
 end
 
 function buttonblock:draw()
-	--love.graphics.setColor(1, 1, 1)
+	--love.graphics.setColor(255, 255, 255)
 	love.graphics.draw(self.graphic, self.quad, math.floor(((self.x-xscroll)*16+self.offsetX)*scale), math.floor(((self.y-yscroll)*16-self.offsetY)*scale), 0, scale, scale, self.quadcenterX, self.quadcenterY)
 end
 

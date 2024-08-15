@@ -64,27 +64,27 @@ function touchButton:draw(spriteBatch, quad)
 				love.graphics.setLineWidth(1)
 			end
 			if self.held then
-				love.graphics.setColor(100/255, 100/255, 100/255, 140/255)
+				love.graphics.setColor(100, 100, 100, 140)
 			elseif highlight then
-				love.graphics.setColor(90/255, 90/255, 90/255, 140/255)
+				love.graphics.setColor(90, 90, 90, 140)
 			elseif self.color then
-				love.graphics.setColor(self.color[1], self.color[2], self.color[3], 80/255)
+				love.graphics.setColor(self.color[1], self.color[2], self.color[3], 80)
 			else
-				love.graphics.setColor(30/255, 30/255, 30/255, 80/255)
+				love.graphics.setColor(30, 30, 30, 80)
 			end
 			if self.round then
 				local x, y, r = self.x+self.w/2, self.y+self.h/2,self.r
 				love.graphics.circle("fill", x, y, r, 8)
-				love.graphics.setColor(1, 1, 1, 140/255)
+				love.graphics.setColor(255, 255, 255, 140)
 				love.graphics.circle("line", x, y, r, 8)
 			else
 				local x, y, w, h = self.x, self.y, self.w, self.h
 				love.graphics.rectangle("fill", x, y, w, h)
-				love.graphics.setColor(1, 1, 1, 140/255)
+				love.graphics.setColor(255, 255, 255, 140)
 				love.graphics.rectangle("line", x+.5, y+.5, w, h)
 			end
 
-			love.graphics.setColor(1, 1, 1)
+			love.graphics.setColor(255, 255, 255)
 			if self.text then
 				properprintfast(self.text, math.floor(self.x+self.w/2-string.len(self.text)*4), math.floor(self.y+self.h/2-4))
 			elseif self.img then

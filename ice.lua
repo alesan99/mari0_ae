@@ -291,7 +291,7 @@ function ice:meltice(destroy)
 
 	if destroy then
 		playsound(iciclesound)
-		local debris = rgbaToInt(80/255, 210/255, 250/255, 1)
+		local debris = rgbaToInt(80, 210, 250, 255)
 		if blockdebrisquads[debris] then
 			table.insert(blockdebristable, blockdebris:new(self.x+self.width/2, self.y+self.height/2, 3.5, -23, blockdebrisimage, blockdebrisquads[debris][spriteset]))
 			table.insert(blockdebristable, blockdebris:new(self.x+self.width/2, self.y+self.height/2, -3.5, -23, blockdebrisimage, blockdebrisquads[debris][spriteset]))

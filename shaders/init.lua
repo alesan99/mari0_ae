@@ -271,7 +271,7 @@ function shaders:postdraw()
 	
 	local blendmode = love.graphics.getBlendMode()
 	love.graphics.setBlendMode("alpha", "premultiplied")
-	love.graphics.setColor(1, 1, 1)
+	love.graphics.setColor(255, 255, 255)
 	
 	local activepasses = {}
 	

@@ -56,7 +56,7 @@ end
 
 function musicchanger:draw()
 	if self.visible then
-		love.graphics.setColor(1, 1, 1)
+		love.graphics.setColor(255, 255, 255)
 		love.graphics.draw(gateimg, gatequad[5], math.floor((self.x-1-xscroll)*16*scale), ((self.y-1-yscroll)*16-8)*scale, 0, scale, scale)
 	end
 end

@@ -241,7 +241,7 @@ function loadcustomsprites(initial) --Sprite loader
 end
 
 function rgbaToInt(r,g,b,a)
-	return round(r*255)*1000000000 + round(g*255)*1000000 + round(b*255)*1000 + round(a*255)
+	return r*1000000000 + g*1000000 + b*1000 + a
 end
 
 function loaddebris()

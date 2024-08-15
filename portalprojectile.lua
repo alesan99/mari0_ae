@@ -105,7 +105,7 @@ end
 
 function portalprojectile:draw()
 	if self.timer < self.time then
-		love.graphics.setColor(unpack(self.color))
+		love.graphics.setColor(self.color)
 		
 		love.graphics.draw(portalprojectileimg, math.floor((self.x-xscroll)*16*scale), math.floor((self.y-yscroll-0.5)*16*scale), 0, scale, scale, 3, 3)
 	end
@@ -121,7 +121,7 @@ function portalprojectileparticle:init(x, y, color)
 	self.speedx = math.random(-10, 10)/70
 	self.speedy = math.random(-10, 10)/70
 	
-	self.alpha = 150/255
+	self.alpha = 150
 	
 	self.timer = 0
 end
@@ -135,7 +135,7 @@ function portalprojectileparticle:update(dt)
 	self.x = self.x + self.speedx*dt
 	self.y = self.y + self.speedy*dt
 	
-	self.alpha = self.alpha - dt*(300/255)
+	self.alpha = self.alpha - dt*300
 	if self.alpha < 0 then
 		self.alpha = 0
 		return true

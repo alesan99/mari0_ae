@@ -10,7 +10,7 @@ function text:init(x, y, r, text)
 	self.centered = false
 	if text == nil then
 		self.text = "text"
-		self.color = {1, 1, 1}
+		self.color = {255, 255, 255}
 	else
 		local r = convertr(self.r[3], {"string", "string", "bool", "bool", "bool", "bool"}, true)
 		--text
@@ -54,10 +54,10 @@ function text:draw()
 			x = x - ((#self.text*sizesep)/2)+.5
 		end
 		if self.outline then
-			love.graphics.setColor(0,0,0,1)
+			love.graphics.setColor(0,0,0,255)
 			properprintbackground(self.text, x*16*scale, y*16*scale, false, nil, size)
 		end
-		love.graphics.setColor(unpack(self.color))
+		love.graphics.setColor(self.color)
 		properprint(self.text, x*16*scale, y*16*scale, size)
 	end
 end

@@ -26,12 +26,12 @@ function onlinemenu_load()
 	guielements.magiccheckbox = guielement:new("checkbox", 220, 147, togglemagic, false, TEXT["use magicdns words"])
 	
 	guielements.hostbutton = guielement:new("button", 247, 199, TEXT["create game"], creategame, 2)
-	guielements.hostbutton.bordercolor = {1, 0, 0}
-	guielements.hostbutton.bordercolorhigh = {1, .5, .5}
+	guielements.hostbutton.bordercolor = {255, 0, 0}
+	guielements.hostbutton.bordercolorhigh = {255, 127, 127}
 	
 	guielements.joinbutton = guielement:new("button", 61, 199, TEXT["join game"], joingame, 2)
-	guielements.joinbutton.bordercolor = {0, 1, 0}
-	guielements.joinbutton.bordercolorhigh = {.5, 1, .5}
+	guielements.joinbutton.bordercolor = {0, 255, 0}
+	guielements.joinbutton.bordercolorhigh = {127, 255, 127}
 	
 	runanimationtimer = 0
 	runanimationframe = 1
@@ -83,9 +83,9 @@ end
 
 function onlinemenu_draw()
 	--TOP PART
-	love.graphics.setColor(0, 0, 0, 200/255)
+	love.graphics.setColor(0, 0, 0, 200)
 	love.graphics.rectangle("fill", 3*scale, 3*scale, 394*scale, 52*scale)
-	love.graphics.setColor(1, 1, 1)
+	love.graphics.setColor(255, 255, 255)
 	
 	properprintF(TEXT["online play"], 4*scale, 5*scale)
 	
@@ -103,18 +103,18 @@ function onlinemenu_draw()
 	--BOTTOM PART
 	
 	--LEFT (JOIN)
-	love.graphics.setColor(0, 0, 0, 200/255)
+	love.graphics.setColor(0, 0, 0, 200)
 	love.graphics.rectangle("fill", 3*scale, 58*scale, 196*scale, 163*scale)
 	
-	love.graphics.setColor(1, 1, 1)
+	love.graphics.setColor(255, 255, 255)
 	properprintF(TEXT["join game"], 64*scale, 60*scale)
 	
 	properprintF(TEXT["address/magicdns"], 36*scale, 77*scale)
 	guielements.ipentry:draw()
-	love.graphics.setColor(150/255, 150/255, 150/255)
+	love.graphics.setColor(150, 150, 150)
 	properprintF(TEXT["join game instructons"], 24*scale, 107*scale)
 	
-	love.graphics.setColor(1, 1, 1)
+	love.graphics.setColor(255, 255, 255)
 	properprintF(TEXT["optional port:"], 21*scale, 148*scale)
 	if guielements.portentry2.inputting then
 		guielements.portentry2:draw()
@@ -122,16 +122,16 @@ function onlinemenu_draw()
 		properprintF(guielements.portentry2.value, 133*scale, 148*scale)
 	end
 	
-	love.graphics.setColor(150/255, 150/255, 150/255)
+	love.graphics.setColor(150, 150, 150)
 	properprintF(TEXT["optional port instructions"], 24*scale, 162*scale)
 	
 	guielements.joinbutton:draw()
 	
 	--RIGHT (HOST)
-	love.graphics.setColor(0, 0, 0, 200/255)
+	love.graphics.setColor(0, 0, 0, 200)
 	love.graphics.rectangle("fill", 202*scale, 58*scale, 195*scale, 163*scale)
 	
-	love.graphics.setColor(1, 1, 1)
+	love.graphics.setColor(255, 255, 255)
 	properprintF(TEXT["host game"], 260*scale, 60*scale)
 	properprintF(TEXT["port:"], 278*scale, 77*scale)
 	
@@ -141,11 +141,11 @@ function onlinemenu_draw()
 		properprintF(guielements.portentry.value, 276*scale, 90*scale)
 	end
 	
-	love.graphics.setColor(150/255, 150/255, 150/255)
+	love.graphics.setColor(150, 150, 150)
 	properprintF(TEXT["host game instructions"], 218*scale, 107*scale)
 	
 	guielements.magiccheckbox:draw()
-	love.graphics.setColor(150/255, 150/255, 150/255)
+	love.graphics.setColor(150, 150, 150)
 	properprintF(TEXT["magicdns instructions"], 238*scale, 162*scale)
 	
 	guielements.hostbutton:draw()
@@ -158,12 +158,12 @@ end
 
 function drawplayercard(x, y, colortable, hattable, nick, ping, focus, character)
 	if focus then
-		love.graphics.setColor(.5, .5, .5, 150/255)
+		love.graphics.setColor(127, 127, 127, 150)
 	else
-		love.graphics.setColor(0, 0, 0, 1)
+		love.graphics.setColor(0, 0, 0, 255)
 	end
 	love.graphics.rectangle("fill", x*scale, y*scale, 150*scale, 38*scale)
-	love.graphics.setColor(1, 1, 1, 1)
+	love.graphics.setColor(255, 255, 255, 255)
 	drawrectangle(x+1, y+1, 148, 36)
 
 	local v = characters.data[character or "mario"]
@@ -171,12 +171,12 @@ function drawplayercard(x, y, colortable, hattable, nick, ping, focus, character
 		v = characters.data["mario"]
 	end
 	if v then
-		love.graphics.setColor(1, 1, 1, 1)
+		love.graphics.setColor(255, 255, 255, 255)
 		for i = 0, #v.colorables do
 			if i > 0 then
-				love.graphics.setColor(unpack(colortable[i]))
+				love.graphics.setColor(colortable[i])
 			else
-				love.graphics.setColor(1, 1, 1)
+				love.graphics.setColor(255, 255, 255)
 			end
 			if mariocharacter[skinningplayer] then
 				love.graphics.draw(v["animations"][i], v["small"]["run"][3][math.min(#v["small"]["run"],runanimationframe)], (x+4+v.smalloffsetX*2)*scale, (y+26-v.smalloffsetY*2)*scale, 0, scale*2, scale*2, v.smallquadcenterX, v.smallquadcenterY)
@@ -193,7 +193,7 @@ function drawplayercard(x, y, colortable, hattable, nick, ping, focus, character
 		for i = 1, #hattable do
 			if hat[hattable[i] ] then
 				if addcolortohat then
-					love.graphics.setColor(unpack(colortable[1]))
+					love.graphics.setColor(colortable[1])
 				end
 				local offsets = customplayerhatoffsets(character, "hatoffsets", "running") or hatoffsets["running"]
 				love.graphics.draw(hat[hattable[i] ].graphic, hat[hattable[i] ].quad[1], (x+4+v.smalloffsetX*2)*scale, (y+26-v.smalloffsetY*2)*scale, 0, scale*2, scale*2, v.smallquadcenterX - hat[hattable[i] ].x + offsets[runanimationframe][1], v.smallquadcenterY - hat[hattable[i] ].y + offsets[runanimationframe][2] + yadd)
@@ -202,11 +202,11 @@ function drawplayercard(x, y, colortable, hattable, nick, ping, focus, character
 		end
 	end
 
-	love.graphics.setColor(1, 1, 1)
+	love.graphics.setColor(255, 255, 255)
 	properprintF(nick, x*scale+35*scale, y*scale+10*scale)
 
 	if not ping then
-		love.graphics.setColor(.5, .5, .5)
+		love.graphics.setColor(127, 127, 127)
 	end
 	if not ping then
 		properprintF("ping:", x*scale+35*scale, y*scale+22*scale)
@@ -214,14 +214,14 @@ function drawplayercard(x, y, colortable, hattable, nick, ping, focus, character
 	else
 		if tonumber(ping) then
 			if tonumber(ping) < 40 then
-				love.graphics.setColor((100+125*(tonumber(ping)/40))/255, 1, 100/255)
+				love.graphics.setColor(100+125*(tonumber(ping)/40), 255, 100)
 			elseif tonumber(ping) >= 40 and tonumber(ping) < 80 then
-				love.graphics.setColor(1, (225-125*((tonumber(ping)-40)/40))/255, 100/255)
+				love.graphics.setColor(255, 225-125*((tonumber(ping)-40)/40), 100)
 			elseif tonumber(ping) >= 80 then
-				love.graphics.setColor(1, 100/255, 100/255)
+				love.graphics.setColor(255, 100, 100)
 			end
 		else
-			love.graphics.setColor(.5, .5, .5, 1)
+			love.graphics.setColor(127, 127, 127, 255)
 		end
 		properprintF("ping:", x*scale+35*scale, y*scale+22*scale)
 		properprintF(ping .. "ms", (x+123-#(ping .. "ms")*8)*scale, y*scale+22*scale)

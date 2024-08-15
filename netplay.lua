@@ -304,7 +304,7 @@ function server_update(dt)
 		elseif cmd == 'mappackerror' and safe then
 			--player is missing mappack
 			if guielements.mappack then
-				guielements.mappack.textcolor = {.5, 0, 0}
+				guielements.mappack.textcolor = {127, 0, 0}
 				notice.new(playerlist[clients[entity].i].nick .. " is missing the mappack!", notice.red, 5)
 			end
 		elseif cmd == 'quit' then
@@ -506,7 +506,7 @@ function client_update(dt)
 							mappackselection = i
 							if guielements.mappack then
 								guielements.mappack.text = target:lower()
-								guielements.mappack.textcolor = {.5, .5, .5}
+								guielements.mappack.textcolor = {127, 127, 127}
 							end
 							break
 						end
@@ -514,7 +514,7 @@ function client_update(dt)
 						if i == #mappacklist then
 							if guielements.mappack then
 								guielements.mappack.text = target:lower()
-								guielements.mappack.textcolor = {.5, 0, 0}
+								guielements.mappack.textcolor = {127, 0, 0}
 							end
 							notice.new("missing mappack!", notice.red, 5)
 							udp:send(string.format("%s~%s", entity, 'mappackerror'))

@@ -66,9 +66,9 @@ end
 
 function regiontrigger:draw()
 	--draw orange rectangle
-	--[[love.graphics.setColor(234/255, 160/255, 45/255, 111/255)
+	--[[love.graphics.setColor(234, 160, 45, 111)
 	love.graphics.rectangle("fill", (((self.x)*16)-xscroll*16)*scale, ((self.y-(8/16))*16)*scale, (self.w*16)*scale, (self.h*16)*scale)
-	love.graphics.setColor(1, 1, 1, 1)]]
+	love.graphics.setColor(255, 255, 255, 255)]]
 end
 
 function regiontrigger:update(dt)
