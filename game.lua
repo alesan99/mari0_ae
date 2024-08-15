@@ -3049,12 +3049,7 @@ function drawentity(j, w, i, v, currentscissor, drop)
 	else
 		if v.graphic and v.quad then
 			if v.graphiccolor and (not drop) then
-				local graphiccolor = {}
-				for gci = 1, #v.graphiccolor do
-					local color = tonumber(v.graphiccolor[gci])
-					graphiccolor[gci] = color
-				end
-				love.graphics.setColor(graphiccolor)
+				love.graphics.setColor(v.graphiccolor)
 			end
 			love.graphics.draw(v.graphic, v.quad, math.floor(((v.x-xscroll)*16+v.offsetX)*scale), math.floor(((v.y-yscroll)*16-v.offsetY)*scale), v.rotation, dirscale, horscale, v.quadcenterX, v.quadcenterY)
 			if v.overlaygraphic then
@@ -3102,11 +3097,7 @@ function drawentity(j, w, i, v, currentscissor, drop)
 			else
 				if v.graphic and v.quad then
 					if v.graphiccolor and (not drop) then
-						local graphiccolor = {}
-						for gci = 1, #v.graphiccolor do
-							graphiccolor[gci] = tonumber(v.graphiccolor[i])
-						end
-						love.graphics.setColor(graphiccolor)
+						love.graphics.setColor(v.graphiccolor)
 					end
 					love.graphics.draw(v.graphic, v.quad, math.floor(((px-xscroll)*16+v.offsetX)*scale), math.floor(((py-yscroll)*16-v.offsetY)*scale), pr, dirscale, horscale, v.quadcenterX, v.quadcenterY)
 					if v.overlaygraphic then
