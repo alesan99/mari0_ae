@@ -1,6 +1,6 @@
 local queuespritebatchupdate = false
 
-function game_load(suspended)
+function game_load(suspended, deletesuspend)
 	scrollfactor = 0
 	scrollfactory = 0
 	scrollfactor2 = 0
@@ -97,6 +97,11 @@ function game_load(suspended)
 		marioworld = suspended
 	end
 	
+	if deletesuspend then
+		-- On starting a new game, remove the old save
+		love.filesystem.remove(savesfolder .. "/" .. mappack .. ".suspend")
+	end
+
 	--remove custom sprites
 	for i = smbtilecount+portaltilecount+1, #tilequads do
 		tilequads[i] = nil

@@ -1728,10 +1728,6 @@ function continuegame()
 	end
 	mappack = st.mappack
 	mappackfolder = st.mappackfolder
-	
-	if (not st.collectables) then	--save the game if collectables are involved
-		love.filesystem.remove(savefile)
-	end
 
 	loadbackground("1-1.txt")
 

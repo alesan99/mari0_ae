@@ -5,6 +5,10 @@
 	"level editor": "level editor",
 	"select mappack": "select mappack",
 	"options": "options",
+	"starting a new game will": "starting a new game will",
+	"delete your existing save!": "delete your existing save!",
+	"new game": "new game",
+	"go back": "go back",
 	"select world": "select world",
 
 "^_Settings":"",
@@ -126,7 +130,6 @@
 	"link": "link",
 	"neurotoxin time: ": "neurotoxin time: ",
 	"game over": "game over",
-	"game saved!": "game saved!",
 
 "^_Pause":"",
 	"": "",
@@ -343,4 +346,5 @@
 
 "^_Notices":"",
 	"Map saved!": "Map saved!",
+	"game saved!": "game saved!",
 }
