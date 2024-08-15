@@ -767,7 +767,7 @@ gelcannonspeed = 30
 infinitetime = false
 infinitelives = false
 
-pausemenuoptions = {"resume", "suspend", "volume", "quit to", "quit to"}
+pausemenuoptions = {"resume", "save game", "volume", "quit to", "quit to"}
 pausemenuoptions2 = {"", "", "", "menu", "desktop"}
 
 guirepeatdelay = 0.07

@@ -2867,13 +2867,8 @@ function game_draw()
 				love.graphics.setColor(1, 1, 1, 1)
 				properprint(">", (width*8*scale)-45*scale, (112*scale)-60*scale+(i-1)*25*scale)
 			end
-			if dcplaying and pausemenuoptions[i] == "suspend" then --restart instead of suspend
+			if dcplaying and pausemenuoptions[i] == "save game" then --restart instead of suspend
 				properprintF(TEXT["restart"], (width*8*scale)-35*scale, (112*scale)-60*scale+(i-1)*25*scale)
-			elseif (collectablescount[1] > 0 or collectablescount[2] > 0 or collectablescount[3] > 0 or collectablescount[4] > 0 or
-			collectablescount[5] > 0 or collectablescount[6] > 0 or collectablescount[7] > 0 or collectablescount[8] > 0 or
-			collectablescount[9] > 0 or collectablescount[10] > 0)
-				and pausemenuoptions[i] == "suspend" then --make it more obvious that you can save your progress
-				properprintF(TEXT["save game"], (width*8*scale)-35*scale, (112*scale)-60*scale+(i-1)*25*scale)
 			else
 				properprintF(TEXT[pausemenuoptions[i]], (width*8*scale)-35*scale, (112*scale)-60*scale+(i-1)*25*scale)
 			end
@@ -2934,15 +2929,8 @@ function game_draw()
 			love.graphics.rectangle("fill", (width*8*scale)-100*scale, (112*scale)-25*scale, 200*scale, 50*scale)
 			love.graphics.setColor(1, 1, 1, 1)
 			drawrectangle((width*8)-99, 112-24, 198, 48)
-			if (collectablescount[1] > 0 or collectablescount[2] > 0 or collectablescount[3] > 0 or collectablescount[4] > 0 or
-			collectablescount[5] > 0 or collectablescount[6] > 0 or collectablescount[7] > 0 or collectablescount[8] > 0 or
-			collectablescount[9] > 0 or collectablescount[10] > 0) then --make it more obvious that you can save your progress
-				properprintF(TEXT["save game? this will"], (width*8*scale)-utf8.len(TEXT["save game? this will"])*4*scale, (112*scale)-20*scale)
-				properprintF(TEXT["overwrite last save."], (width*8*scale)-utf8.len(TEXT["overwrite last save."])*4*scale, (112*scale)-10*scale)
-			else
-				properprintF(TEXT["suspend game? this can"], (width*8*scale)-utf8.len(TEXT["suspend game? this can"])*4*scale, (112*scale)-20*scale)
-				properprintF(TEXT["only be loaded once!"], (width*8*scale)-utf8.len(TEXT["only be loaded once!"])*4*scale, (112*scale)-10*scale)
-			end
+			properprintF(TEXT["save game? this will"], (width*8*scale)-utf8.len(TEXT["save game? this will"])*4*scale, (112*scale)-20*scale)
+			properprintF(TEXT["overwrite last save."], (width*8*scale)-utf8.len(TEXT["overwrite last save."])*4*scale, (112*scale)-10*scale)
 			if pausemenuselected2 == 1 then
 				properprintF(">", (width*8*scale)-51*scale, (112*scale)+4*scale)
 				love.graphics.setColor(1, 1, 1, 1)
@@ -5074,7 +5062,7 @@ function game_keypressed(key, textinput)
 				else
 					playmusic()
 				end
-			elseif pausemenuoptions[pausemenuselected] == "suspend" then
+			elseif pausemenuoptions[pausemenuselected] == "save game" then
 				if dcplaying then
 					pausemenuopen = false
 					updatesizes("reset")
