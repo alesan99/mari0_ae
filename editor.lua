@@ -4361,8 +4361,10 @@ function placetile(x, y, tilei)
 	elseif editentities == false then
 		if tilequads[currenttile].collision == true and (tilequads[map[cox][coy][1]].collision == false or (objects["tile"][tilemap(cox, coy)] and objects["tile"][tilemap(cox, coy)].slant)) then
 			local oldtile
-			if tilequads[currenttile].leftslant or tilequads[currenttile].halfleftslant1 or tilequads[currenttile].halfleftslant2 or
-				tilequads[currenttile].rightslant or tilequads[currenttile].halfrightslant1 or tilequads[currenttile].halfrightslant2 then
+			local tilequad = tilequads[currenttile]
+			if tilequad.platform or tilequad.leftslant or tilequad.halfleftslant1 or tilequad.halfleftslant2 or
+				tilequad.rightslant or tilequad.halfrightslant1 or tilequads.halfrightslant2 then
+				--fix platforms and slants acting like solid blocks when first placed in editor
 				--so many people complained about this minor oddity
 				--guess i have to do a wack workaround
 				oldtile = map[cox][coy][1]
