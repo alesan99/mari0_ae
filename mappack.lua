@@ -192,13 +192,13 @@ end
 function savecustomtext()
 	local s = ""
 	local color = textcolors[textcolorl]
-	s = s .. string.format("endingtextcolor=%s, %s, %s", color[1], color[2], color[3])
+	s = s .. string.format("endingtextcolor=%s, %s, %s", unpack(color))
 	s = s .. "\r\nendingcolorname=" .. textcolorl
 	s = s .. "\r\nendingtext=" .. guielements["editendingtext1"].value .. "," .. guielements["editendingtext2"].value
 	s = s .. "\r\nplayername=" .. guielements["editplayername"].value
 	s = s .. "\r\n"
 	color = textcolors[textcolorp]
-	s = s .. string.format("hudtextcolor=%s, %s, %s", color[1], color[2], color[3])
+	s = s .. string.format("hudtextcolor=%s, %s, %s", unpack(color))
 	s = s .. "\r\nhudcolorname=" .. textcolorp
 	s = s .. "\r\nhudvisible=" .. tostring(hudvisible)
 	s = s .. "\r\nhudworldletter=" .. tostring(hudworldletter)
