@@ -1487,6 +1487,7 @@ function loadconfig(nodefaultconfig)
 			end
 		elseif s2[1] == "modmappacks" then
 			mappackfolder = "alesans_entities/mappacks"
+			savesfolder = "alesans_entities/saves"
 		elseif s2[1] == "resizable" then
 			if s2[2] then
 				resizable = (s2[2] == "true")
@@ -1618,6 +1619,7 @@ function defaultconfig()
 	mappack = "smb"
 	vsync = false
 	mappackfolder = "mappacks"
+	savesfolder = "saves"
 	fourbythree = false
 	localnick = false
 	
@@ -1674,7 +1676,7 @@ function writesuspendfile()
 	st.mappackfolder = mappackfolder
 
 	local s = JSON:encode_pretty(st)
-	love.filesystem.write(mappackfolder:gsub("mappacks", "saves") .. "/" .. mappack .. ".suspend", s)
+	love.filesystem.write(savesfolder .. "/" .. mappack .. ".suspend", s)
 end
 
 function suspendgame()
@@ -1684,7 +1686,7 @@ function suspendgame()
 end
 
 function continuegame()
-	savefile = mappackfolder:gsub("mappacks", "saves") .. "/" .. mappack .. ".suspend"
+	savefile = savesfolder .. "/" .. mappack .. ".suspend"
 	if not love.filesystem.getInfo(savefile) then
 		return
 	end

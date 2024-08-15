@@ -66,7 +66,7 @@ function menu_load()
 	end
 	
 	continueavailable = false
-	if love.filesystem.getInfo(mappackfolder:gsub("mappacks", "saves") .. "/" .. mappack .. ".suspend") then
+	if love.filesystem.getInfo(savesfolder .. "/" .. mappack .. ".suspend") then
 		continueavailable = true
 	end
 	
@@ -2331,7 +2331,7 @@ function menu_keypressed(key, unicode)
 			saveconfig()
 
 			continueavailable = false
-			if love.filesystem.getInfo(mappackfolder:gsub("mappacks", "saves") .. "/" .. mappack .. ".suspend") then
+			if love.filesystem.getInfo(savesfolder .. "/" .. mappack .. ".suspend") then
 				continueavailable = true
 			end
 
@@ -2567,6 +2567,7 @@ function menu_keypressed(key, unicode)
 				elseif optionsselection == 11 then
 					if mappackfolder == "mappacks" then
 						mappackfolder = "alesans_entities/mappacks"
+						savesfolder = "alesans_entities/saves"
 						mappack = "smb"
 						loadbackground("1-1.txt")
 					end
@@ -2702,6 +2703,7 @@ function menu_keypressed(key, unicode)
 				elseif optionsselection == 11 then
 					if mappackfolder == "alesans_entities/mappacks" then
 						mappackfolder = "mappacks"
+						savesfolder = "saves"
 						mappack = "smb"
 						loadbackground("1-1.txt")
 					end
@@ -3143,7 +3145,7 @@ function createmappack()
 	love.filesystem.write(mappackfolder .. "/" .. mappack .. "/settings.txt", s)
 
 	-- Clean old suspend file for renamed or deleted mappacks
-	love.filesystem.remove(mappackfolder:gsub("mappacks", "saves") .. "/" .. mappack .. ".suspend")
+	love.filesystem.remove(savesfolder .. "/" .. mappack .. ".suspend")
 end
 
 function resetconfig()
