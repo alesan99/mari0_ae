@@ -6,8 +6,10 @@
 Bug fixes and quality of life improvements are welcome!
 This includes stuff like custom enemy properties and new animations.
 
-Avoid major additions that will potentially cause bugs or complicate the game/code (Stuff like powerups).
-I appreciate the help, but the goal is to continue the mod while I am busy. Major changes will only increase my workload and make the mod even buggier.
+Please avoid major additions or refactors that will potentially cause bugs or complicate the game/code (Stuff like powerups).  
+While I appreciate the help, the game is no longer under active development so patches won't be released as glitches are found as a result of a new feature, so please keep this in mind.
+
+Suggest downloadable game content here: https://github.com/qixils/mari0pository
 
 ## 📥 Downloads
 

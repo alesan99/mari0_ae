@@ -2584,67 +2584,58 @@ function enemy:customtimeraction(action, arg, arg2)
 end
 
 function enemy:ifstatement(t, action, arg)
-	--EXAMPLE: ["if","speedx","==","speedy"],["set","speedy"],10
-	--EXAMPLE: ["if","speedx","==","speedy","and","jumping","~=",false],["set","speedy"],10
+	--EXAMPLE: ["if","speedx","==","speedy"],["set","speedy"],10],
+	--EXAMPLE: ["if","speedx","==","speedy","and","jumping","~=",false],["set","speedy"],10],
 	local statementPass = false
 	for step = 1, math.floor(#t/4) do
 		local i = 1+(step-1)*4
-		local check = t[i]
+		local check = t[i]:lower()
 
-		--get properties needed for comparison
-		local prop1,prop2 = t[i+1], t[i+3]
-		if (type(prop1) == "table" and prop1[1] and prop1[2] and prop1[1] == "property") then
-			prop1 = self[prop1[2]]
-		else
-			prop1 = self[prop1]	
+		--logic
+		if check == "or" and statementPass then
+			break
 		end
-		if (type(prop2) == "string" and self[prop2] ~= nil) then
-			prop2 = self[prop2]
-		elseif (type(prop2) == "table" and prop2[1] and prop2[2] and prop2[1] == "property") then
-			prop2 = self[prop2[2]]
-		end
-
-		--comparison
-		local comparison = t[i+2]
-		if (not comparison) or (type(comparison) ~= "string") then
-			return false
-		end
-		comparison = comparison:lower()
-
-		local pass 
-		if (comparison == "equal" or comparison == "==") and (prop1 == prop2) then
-			pass = true
-		elseif (comparison == "notequal" or comparison == "~=" or comparison == "!=") and (prop1 ~= prop2) then
-			pass = true
-
-		elseif (comparison == "greater" or comparison == ">") and (prop1 > prop2) then
-			pass = true
-		elseif (comparison == "less" or comparison == "<") and (prop1 < prop2) then
-			pass = true
-		elseif (comparison == "greaterequal" or comparison == ">=") and (prop1 >= prop2) then
-			pass = true
-		elseif (comparison == "lessequal" or comparison == "<=") and (prop1 <= prop2) then
-			pass = true
-
-		elseif (comparison == "exists") and prop1 ~= nil then
-			pass = true
-		elseif (comparison == "notexists") and prop1 == nil then
-			pass = true
-		end
-
-		--logical operators
-		if check == "if" or check == "and" then
-			if pass then
-				statementPass = true
+		if statementPass == true or check == "or" or step == 1 then
+			--get properties needed for comparison
+			local prop1,prop2 = t[i+1], t[i+3]
+			if (type(prop1) == "table" and prop1[1] and prop1[2] and prop1[1] == "property") then
+				prop1 = self[prop1[2]]
 			else
-				statementPass = false
-				break
+				prop1 = self[prop1]	
 			end
-		elseif check == "or" then
-			if pass then
-				statementPass = true
-				break
+			if (type(prop2) == "string" and self[prop2] ~= nil) then
+				prop2 = self[prop2]
+			elseif (type(prop2) == "table" and prop2[1] and prop2[2] and prop2[1] == "property") then
+				prop2 = self[prop2[2]]
 			end
+
+			--comparison
+			local comparison = t[i+2]
+			if (not comparison) or (type(comparison) ~= "string") then
+				return false
+			end
+			comparison = comparison:lower()
+
+			local pass = false
+			if (comparison == "equal" or comparison == "==") and (prop1 == prop2) then
+				pass = true
+			elseif (comparison == "notequal" or comparison == "~=" or comparison == "!=") and (prop1 ~= prop2) then
+				pass = true
+			elseif (comparison == "greater" or comparison == ">") and (prop1 > prop2) then
+				pass = true
+			elseif (comparison == "less" or comparison == "<") and (prop1 < prop2) then
+				pass = true
+			elseif (comparison == "greaterequal" or comparison == ">=") and (prop1 >= prop2) then
+				pass = true
+			elseif (comparison == "lessequal" or comparison == "<=") and (prop1 <= prop2) then
+				pass = true
+			elseif (comparison == "exists") and prop1 ~= nil then
+				pass = true
+			elseif (comparison == "notexists") and prop1 == nil then
+				pass = true
+			end
+
+			statementPass = pass
 		end
 	end
 

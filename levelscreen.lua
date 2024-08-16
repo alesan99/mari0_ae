@@ -335,9 +335,6 @@ function levelscreen_draw()
 					end
 				end
 				properprintfunc(s, (width/2*16)*scale-string.len(s)*4*scale, 200*scale)
-			elseif mappack == "only_for_alesans_entities" and marioworld == 1 and mariolevel == 1 then
-				local s = "mappack by alesan99"
-				properprintfunc(s, (width/2*16)*scale-string.len(s)*4*scale, 200*scale)
 			elseif levelscreentext[marioworld .. "-" .. mariolevel] then
 				local s = levelscreentext[marioworld .. "-" .. mariolevel]
 				properprintbasicfunc(s, (width/2*16)*scale-string.len(s)*4*scale, 200*scale)

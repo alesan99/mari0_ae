@@ -3082,7 +3082,6 @@ end
 function reset_mappacks()
 	delete_mappack("smb")
 	delete_mappack("portal")
-	delete_mappack("only_for_alesans_entities")
 	delete_mappack("alesans_entities_mappack")
 
 	--[[local dlclist = love.filesystem.getDirectoryItems("alesans_entities/onlinemappacks/")
