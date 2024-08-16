@@ -48,6 +48,7 @@ function game_load(suspended, deletesuspend)
 	continuesublevelmusic = false
 	nolowtime = false
 	nocoinlimit = false
+	alwaysdeletesuspend = false
 	setphysics(1)
 	if not dcplaying then
 		loadmappacksettings()
@@ -97,7 +98,7 @@ function game_load(suspended, deletesuspend)
 		marioworld = suspended
 	end
 	
-	if deletesuspend then
+	if deletesuspend or alwaysdeletesuspend then
 		-- On starting a new game, remove the old save
 		love.filesystem.remove(savesfolder .. "/" .. mappack .. ".suspend")
 	end
@@ -2869,6 +2870,8 @@ function game_draw()
 			end
 			if dcplaying and pausemenuoptions[i] == "save game" then --restart instead of suspend
 				properprintF(TEXT["restart"], (width*8*scale)-35*scale, (112*scale)-60*scale+(i-1)*25*scale)
+			elseif alwaysdeletesuspend and pausemenuoptions[i] == "save game" then
+				properprintF(TEXT["suspend"], (width*8*scale)-35*scale, (112*scale)-60*scale+(i-1)*25*scale)
 			else
 				properprintF(TEXT[pausemenuoptions[i]], (width*8*scale)-35*scale, (112*scale)-60*scale+(i-1)*25*scale)
 			end
@@ -2929,8 +2932,13 @@ function game_draw()
 			love.graphics.rectangle("fill", (width*8*scale)-100*scale, (112*scale)-25*scale, 200*scale, 50*scale)
 			love.graphics.setColor(1, 1, 1, 1)
 			drawrectangle((width*8)-99, 112-24, 198, 48)
-			properprintF(TEXT["save game? this will"], (width*8*scale)-utf8.len(TEXT["save game? this will"])*4*scale, (112*scale)-20*scale)
-			properprintF(TEXT["overwrite last save."], (width*8*scale)-utf8.len(TEXT["overwrite last save."])*4*scale, (112*scale)-10*scale)
+			if alwaysdeletesuspend then
+				properprintF(TEXT["suspend game? this can"], (width*8*scale)-utf8.len(TEXT["suspend game? this can"])*4*scale, (112*scale)-20*scale)
+				properprintF(TEXT["only be loaded once!"], (width*8*scale)-utf8.len(TEXT["only be loaded once!"])*4*scale, (112*scale)-10*scale)
+			else
+				properprintF(TEXT["save game? this will"], (width*8*scale)-utf8.len(TEXT["save game? this will"])*4*scale, (112*scale)-20*scale)
+				properprintF(TEXT["overwrite last save."], (width*8*scale)-utf8.len(TEXT["overwrite last save."])*4*scale, (112*scale)-10*scale)
+			end
 			if pausemenuselected2 == 1 then
 				properprintF(">", (width*8*scale)-51*scale, (112*scale)+4*scale)
 				love.graphics.setColor(1, 1, 1, 1)
