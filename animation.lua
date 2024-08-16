@@ -757,9 +757,16 @@ function animation:update(dt)
 					end
 				end
 			elseif v[1] == "autosave" then
-				writesuspendfile()
-				if v[2] == true then
-					notice.new(TEXT["game saved!"], notice.white, 3)
+				-- only save if the game is being played offline
+				if not (CLIENT or SERVER) then
+					-- don't save if the game is being played in the editor
+					if not testlevel then
+						writesuspendfile()
+					end
+					-- show notice regardless of whether player is in editor or not, to prove the function works while testing
+					if v[2] == true then
+						notice.new(TEXT["game saved!"], notice.white, 3)
+					end
 				end
 			elseif v[1] == "changebackground" then
 				if v[2] then
