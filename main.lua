@@ -2471,11 +2471,12 @@ function newRecoloredImage(path, tablein, tableout)
 		local r, g, b, a = pointer[i], pointer[i+1], pointer[i+2], pointer[i+3]
 
 		if a > minalpha then
-			for _, v in ipairs(tablein) do
+			for j, v in ipairs(tablein) do
 				if r == v[1] and g == v[2] and b == v[3] then
-					pointer[i]   = v[1]
-					pointer[i+1] = v[2]
-					pointer[i+2] = v[3]
+					local nr, ng, nb = unpack(tableout[j])
+					pointer[i]   = nr
+					pointer[i+1] = ng
+					pointer[i+2] = nb
 				end
 			end
 		end
