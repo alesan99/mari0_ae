@@ -79,6 +79,7 @@ instantkillplayer[:player]			kills player(s)
 disablejumping						disable jumping
 enablejumping						enables jumping
 
+autosave							saves mappack progress
 changebackground:background			changes background
 changeforeground:background	 	    changes foreground
 removecoins:amount					removes coins
@@ -753,6 +754,18 @@ function animation:update(dt)
 					if objects["player"][i] then
 						objects["player"][i].speedx = tonumber(sx) or 0
 						objects["player"][i].speedy = tonumber(sy) or 0
+					end
+				end
+			elseif v[1] == "autosave" then
+				-- only save if the game is being played offline
+				if not (CLIENT or SERVER or dcplaying) then
+					-- don't save if the game is being played in the editor
+					if not testlevel then
+						writesuspendfile()
+					end
+					-- show notice regardless of whether player is in editor or not, to prove the function works while testing
+					if v[2] == true then
+						notice.new(TEXT["game saved!"], notice.white, 3)
 					end
 				end
 			elseif v[1] == "changebackground" then

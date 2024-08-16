@@ -26,6 +26,8 @@ function loadmappacksettings(suspended)
 			continuesublevelmusic = true
 		elseif s2[1] == "nolowtime" then
 			nolowtime = true
+		elseif s2[1] == "usesuspends" then
+			alwaysdeletesuspend = true
 		elseif s2[1] == "character" then
 			for i = 1, players do
 				setcustomplayer(s2[2], i)
