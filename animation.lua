@@ -758,7 +758,7 @@ function animation:update(dt)
 				end
 			elseif v[1] == "autosave" then
 				-- only save if the game is being played offline
-				if not (CLIENT or SERVER) then
+				if not (CLIENT or SERVER or dcplaying) then
 					-- don't save if the game is being played in the editor
 					if not testlevel then
 						writesuspendfile()
