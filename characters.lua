@@ -445,7 +445,7 @@ function splitimage(img, color, exclude, imagedata) --split singe image into col
 			]]
 		end
 		local input = love.graphics.newImage(img)
-		local output = love.graphics.newCanvas(input:getWidth(), input:getHeight(),"rgba8")
+		local output = love.graphics.newCanvas(input:getWidth(), input:getHeight())
 		if exclude then
 			local outputdata = output:newImageData()
 			return love.graphics.newImage(outputdata)
@@ -462,33 +462,31 @@ function splitimage(img, color, exclude, imagedata) --split singe image into col
 		return love.graphics.newImage(outputdata)
 	else
 		local input = love.image.newImageData(img)
-		local output = love.image.newImageData(input:getWidth(), input:getHeight())
-		for x = 0, input:getWidth()-1 do
-			for y = 0, input:getHeight()-1 do
-				local r, g, b, a = input:getPixel(x, y)
-				local place = false
-				if exclude then
-					place = true
-					for i, c in pairs(color) do
-						if r == c[1] and g == c[2] and b == c[3] then
-							place = false
-							break
-						end
-					end
-				else
-					if r == color[1] and g == color[2] and b == color[3] then
-						place = true
+		local output = input:clone()
+		output:mapPixel(function(_, _, r, g, b, a)
+			local place = false
+			if exclude then
+				place = true
+				for _, c in pairs(color) do
+					if r == c[1] and g == c[2] and b == c[3] then
+						place = false
+						break
 					end
 				end
-				if place then
-					if exclude then
-						output:setPixel(x, y, r, g, b, a)
-					else
-						output:setPixel(x, y, 255, 255, 255, a)
-					end
+			else
+				if r == color[1] and g == color[2] and b == color[3] then
+					place = true
 				end
 			end
-		end
+			if place then
+				if exclude then
+					return r, g, b, a
+				else
+					return 255, 255, 255, a
+				end
+			end
+			return 0, 0, 0, 0
+		end)
 		if imagedata then
 			return output
 		else
