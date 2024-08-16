@@ -469,6 +469,55 @@ end
 ---@param color table
 ---@param exclude boolean?
 ---@param imagedata boolean?
+local function _splitimageffi(img, color, exclude, imagedata)
+	local output = img:clone()
+	local pointer= require("ffi").cast("uint8_t*", output:getFFIPointer()) -- imageData has one byte per channel per pixel.
+	local bytecount = output:getWidth() * output:getHeight() -- pixel count * 4
+	
+	for i = 0, 4*bytecount-1, 4 do
+		local r, g, b, a = pointer[i], pointer[i+1], pointer[i+2], pointer[i+3]
+
+		local place = false
+		if exclude then
+			place = true
+			for _, c in pairs(color) do
+				if r == c[1] and g == c[2] and b == c[3] then
+					place = false
+					break
+				end
+			end
+		else
+			if r == color[1] and g == color[2] and b == color[3] then
+				place = true
+			end
+		end
+		if place then
+			-- if exclude, values remain the same, so no need to do anything
+			if not exclude then
+				pointer[i]   = 255
+				pointer[i+1] = 255
+				pointer[i+2] = 255
+				pointer[i+3] = a
+			end
+		else
+			pointer[i]   = 0
+			pointer[i+1] = 0
+			pointer[i+2] = 0
+			pointer[i+3] = 0
+		end
+	end
+
+	if imagedata then
+		return output
+	else
+		return love.graphics.newImage(output)
+	end
+end
+
+---@param img love.ImageData
+---@param color table
+---@param exclude boolean?
+---@param imagedata boolean?
 local function _splitimagenative(img, color, exclude, imagedata)
 	local output = img:clone()
 	output:mapPixel(function(_, _, r, g, b, a)
@@ -509,6 +558,8 @@ end
 function splitimage(img, color, exclude, imagedata) --split singe image into colorable images
 	if false then --useShader then
 		return _splitimageshaders(img, color, exclude, imagedata)
+	elseif true then
+		return _splitimageffi(img, color, exclude, imagedata)
 	else
 		return _splitimagenative(img, color, exclude, imagedata)
 	end
