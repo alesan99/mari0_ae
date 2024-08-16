@@ -63,22 +63,6 @@ local function convertFromByte(x)
     return clamp(math.floor(x + 0.5) / 255, 0, 1)
 end
 
-local function convertToByte(x)
-	return math.floor(clamp(x, 0, 1) * 255 + 0.5)
-end
-
-local function convertTableToByte(...)
-	-- TODO: has issues
-
-	local args = {...}
-	if type(args[1]) == "table" then args = args[1] end
-	-- like love.math.colorToBytes but more robust (accepts var # of inputs)
-	for i, v in ipairs(args) do
-		args[i] = v ~= nil and convertToByte(v) or nil
-	end
-	return args
-end
-
 local colorCache = {}
 for i = 0, 255 do colorCache[i] = convertFromByte(i) end
 
@@ -99,7 +83,7 @@ local function convertText(text)
 	if type(text) == "table" then
 		for i, v in ipairs(text) do
 			if type(v) == "table" then
-				text[i] = love.math.colorToBytes(unpack(v))
+				text[i] = unpack(convertFromCachedTable(v))
 			end
 		end
 	end
@@ -133,20 +117,9 @@ end
 local defaultClear = love.graphics.clear
 function love.graphics.clear(r, g, b, a, ...)
 	if r ~= nil and g ~= nil and b ~= nil then
-		r, g, b, a = love.math.colorToBytes(r, g, b, a)
+		r, g, b, a = unpack(convertFromCachedTable({r, g, b, a}))
 	end
 	return defaultClear(r, g, b, a, ...)
-end
-
-local function convertText(text)
-	if type(text) == "table" then
-		for i, v in ipairs(text) do
-			if type(v) == "table" then
-				text[i] = love.math.colorToBytes(unpack(v))
-			end
-		end
-	end
-	return text
 end
 
 local defaultPrint = love.graphics.print
@@ -212,7 +185,7 @@ end
 
 local defaultImageDataMapPixel = ImageData.mapPixel
 function ImageData:mapPixel(pixelFunction, ...)
-	return defaultImageDataMapPixel(self, function(x, y, r, g, b, a) return pixelFunction(x, y, love.math.colorToBytes(r, g, b, a)) end, ...)
+	return defaultImageDataMapPixel(self, function(x, y, r, g, b, a) return unpack(convertFromCachedTable({pixelFunction(x, y, love.math.colorToBytes(r, g, b, a))})) end, ...)
 end
 
 -- TODO: ParticleSystem, linear/gamma functions, points, sendColor, newMesh, [gs]etVertex
