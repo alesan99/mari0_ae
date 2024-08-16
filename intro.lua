@@ -97,7 +97,7 @@ function intro_draw()
 		love.graphics.setColor(50, 50, 50, a2)
 		properprint(loadingtext, love.graphics.getWidth()/2-string.len(loadingtext)*4*scale, love.graphics.getHeight()/2+165*logoscale)
 
-		love.graphics.setColor(255, 255, 255, a2)
+		love.graphics.setColor(255,255,255, a2)
 		love.graphics.rectangle("fill", 0, (height*16-3)*scale, (width*16)*scale, 3*scale)
 	end
 end

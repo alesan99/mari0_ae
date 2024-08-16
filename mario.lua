@@ -8918,7 +8918,7 @@ function mario:turretshot(tx, ty, sx, sy, knockback) --turret
 		self:die("turret shots")
 		self.hitpoints = maxhitpoints / 2
 	end
-	local v = math.max(0, self.hitpoints/maxhitpoints)
+	local v = math.max(0, self.hitpoints/maxhitpoints)*255
 	makepoof(self.x+self.width/2+(8*(math.random()-.5))/16, self.y+self.height/2+(8*(math.random()-.5))/16, "turretshot", {v,v,v})
 
 	

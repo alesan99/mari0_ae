@@ -937,7 +937,7 @@ __defaultPortalColor = {{60, 188, 252}, {232, 130, 30}}
 
 function getDefaultPortalColor(index)
 	color = __defaultPortalColor[index]
-	return {color[1], color[2], color[3]}
+	return {unpack(color)}
 end
 
 function getDefaultPortalColors()

@@ -260,7 +260,7 @@ local loadingbardraw = function(add)
 	end
 
 	loadingbarv = loadingbarv + (add)/(8)
-	love.graphics.setColor(255, 255, 255)
+	love.graphics.setColor(255,255,255)
 	love.graphics.rectangle("fill", 0, (height*16-3)*scale, (width*16*loadingbarv)*scale, 3*scale)
 	love.graphics.pop()
 	love.graphics.present()
@@ -1325,7 +1325,7 @@ function love.draw()
 	
 	if debugGraphs then
 		--Draw graphs
-		love.graphics.setColor(255, 255, 255)
+		love.graphics.setColor(255,255,255)
 		local stats = love.graphics.getStats()
 		love.graphics.setLineWidth(2)
 		drawGraph.label = "Drawcalls: " .. stats.drawcalls
@@ -1382,7 +1382,7 @@ function lovedraw()
 		love.graphics.print(debuginput, 2, 2)
 	end
 	--testing sublevels (i KNOW you'll need this)
-	--love.graphics.setColor(255, 255, 255)
+	--love.graphics.setColor(255,255,255)
 	--properprint("mariosublevel: " .. tostring(mariosublevel) .. "\nprevsublevel: " .. tostring(prevsublevel) .. "\nactualsublevel: " .. tostring(actualsublevel), 2, 2)
 
 	love.graphics.setColor(255, 255, 255)
@@ -2456,6 +2456,7 @@ function round(num, idp) --Not by me
 end
 
 function getrainbowcolor(i)
+	local whiteness = 255
 	local r, g, b
 	if i < 1/6 then
 		r = 1
@@ -2483,7 +2484,7 @@ function getrainbowcolor(i)
 		b = (1/6-(i-5/6))*6
 	end
 	
-	return {r, g, b, 1}
+	return {round(r*whiteness), round(g*whiteness), round(b*whiteness), 255}
 end
 
 function newRecoloredImage(path, tablein, tableout)

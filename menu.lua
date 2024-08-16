@@ -230,13 +230,13 @@ function menu_update(dt)
 		if characters.data[mariocharacter[skinningplayer]].colorables and optionsselection > 5 and optionsselection < 9 then
 			local colorRGB = optionsselection-5
 			
-			if (love.keyboard.isDown("right") or rightkey(1)) and mariocolors[skinningplayer][colorsetedit][colorRGB] < 1 then
-				mariocolors[skinningplayer][colorsetedit][colorRGB] = mariocolors[skinningplayer][colorsetedit][colorRGB] + (RGBchangespeed*dt)
+			if (love.keyboard.isDown("right") or rightkey(1)) and mariocolors[skinningplayer][colorsetedit][colorRGB] < 255 then
+				mariocolors[skinningplayer][colorsetedit][colorRGB] = mariocolors[skinningplayer][colorsetedit][colorRGB] + RGBchangespeed*dt
 				if mariocolors[skinningplayer][colorsetedit][colorRGB] > 255 then
 					mariocolors[skinningplayer][colorsetedit][colorRGB] = 255
 				end
 			elseif (love.keyboard.isDown("left") or leftkey(1)) and mariocolors[skinningplayer][colorsetedit][colorRGB] > 0 then
-				mariocolors[skinningplayer][colorsetedit][colorRGB] = mariocolors[skinningplayer][colorsetedit][colorRGB] - (RGBchangespeed*dt)
+				mariocolors[skinningplayer][colorsetedit][colorRGB] = mariocolors[skinningplayer][colorsetedit][colorRGB] - RGBchangespeed*dt
 				if mariocolors[skinningplayer][colorsetedit][colorRGB] < 0 then
 					mariocolors[skinningplayer][colorsetedit][colorRGB] = 0
 				end
@@ -399,9 +399,9 @@ function menu_draw()
 	--BACKGROUND TILES
 	if bmap_on then
 		if editormode then
-			love.graphics.setColor(255, 255, 255, 100)
+			love.graphics.setColor(255,255,255,100)
 		else
-			love.graphics.setColor(255, 255, 255, 255)
+			love.graphics.setColor(255,255,255,255)
 		end
 		for y = 1, ytodraw do
 			for x = 1, xtodraw do
@@ -415,7 +415,7 @@ function menu_draw()
 				end
 			end
 		end
-		love.graphics.setColor(255, 255, 255, 255)
+		love.graphics.setColor(255,255,255,255)
 	end
 
 	--Drop Shadow
@@ -511,7 +511,7 @@ function menu_draw()
 		love.graphics.draw(titleimage, titlequad[titleframe], x*scale, 24*scale, 0, scale, scale)
 		
 		love.graphics.setColor(255, 255, 255)
-		properprintF("©2012-2023 maurice", (x+titlewidth-144)*scale, 112*scale)
+		properprintF("©2012-2024 maurice", (x+titlewidth-144)*scale, 112*scale)
 		love.graphics.setColor(255, 255, 255, 255)
 		
 		if selection == 0 then
@@ -1273,30 +1273,30 @@ function menu_draw()
 				properprint("b", 39*scale, (135)*scale)
 				
 				love.graphics.setColor(100, 0, 0)
-				love.graphics.rectangle("fill", 51*scale, (116)*scale, math.floor(129*scale * mariocolors[skinningplayer][colorsetedit][1]), 7*scale)
+				love.graphics.rectangle("fill", 51*scale, (116)*scale, math.floor(129*scale * (mariocolors[skinningplayer][colorsetedit][1]/255)), 7*scale)
 				love.graphics.setColor(255, 0, 0)
-				love.graphics.rectangle("fill", 50*scale, (115)*scale, math.floor(129*scale * mariocolors[skinningplayer][colorsetedit][1]), 7*scale)
+				love.graphics.rectangle("fill", 50*scale, (115)*scale, math.floor(129*scale * (mariocolors[skinningplayer][colorsetedit][1]/255)), 7*scale)
 				
 				love.graphics.setColor(100, 100, 100)
-				local s = mariocolors[skinningplayer][colorsetedit][1]
+				local s = math.floor(mariocolors[skinningplayer][colorsetedit][1])
 				properprint(s, 200*scale-string.len(s)*4*scale, 116*scale)
 				
 				love.graphics.setColor(0, 100, 0)
-				love.graphics.rectangle("fill", 51*scale, (126)*scale, math.floor(129*scale * mariocolors[skinningplayer][colorsetedit][2]), 7*scale)
+				love.graphics.rectangle("fill", 51*scale, (126)*scale, math.floor(129*scale * (mariocolors[skinningplayer][colorsetedit][2]/255)), 7*scale)
 				love.graphics.setColor(0, 255, 0)
-				love.graphics.rectangle("fill", 50*scale, (125)*scale, math.floor(129*scale * mariocolors[skinningplayer][colorsetedit][2]), 7*scale)
+				love.graphics.rectangle("fill", 50*scale, (125)*scale, math.floor(129*scale * (mariocolors[skinningplayer][colorsetedit][2]/255)), 7*scale)
 				
 				love.graphics.setColor(100, 100, 100)
-				s = mariocolors[skinningplayer][colorsetedit][2]
+				s = math.floor(mariocolors[skinningplayer][colorsetedit][2])
 				properprintF(s, 200*scale-string.len(s)*4*scale, 126*scale)
 				
 				love.graphics.setColor(0, 0, 100)
-				love.graphics.rectangle("fill", 51*scale, (136)*scale, math.floor(129*scale * mariocolors[skinningplayer][colorsetedit][3]), 7*scale)
+				love.graphics.rectangle("fill", 51*scale, (136)*scale, math.floor(129*scale * (mariocolors[skinningplayer][colorsetedit][3]/255)), 7*scale)
 				love.graphics.setColor(0, 0, 255)
-				love.graphics.rectangle("fill", 50*scale, (135)*scale, math.floor(129*scale * mariocolors[skinningplayer][colorsetedit][3]), 7*scale)
+				love.graphics.rectangle("fill", 50*scale, (135)*scale, math.floor(129*scale * (mariocolors[skinningplayer][colorsetedit][3]/255)), 7*scale)
 				
 				love.graphics.setColor(100, 100, 100)
-				s = mariocolors[skinningplayer][colorsetedit][3]
+				s = math.floor(mariocolors[skinningplayer][colorsetedit][3])
 				properprintF(s, 200*scale-string.len(s)*4*scale, 136*scale)
 			end
 			

@@ -216,7 +216,7 @@ function androidDraw()
 			local x, y, w, h = skin["center"][1]:getViewport()
 			skinSpriteBatch:add(skin["center"][1], skinData["center"][1], skinData["center"][2], 0, skinData["center"][3]/w, skinData["center"][4]/h)
 		end
-		love.graphics.setColor(255, 255, 255)
+		love.graphics.setColor(255,255,255)
 		love.graphics.draw(skinSpriteBatch,0,0)
 		for name, b in pairs(buttons) do
 			if skinData.highlightonpress or not b.held then

@@ -774,7 +774,7 @@ function clearpipe:draw()
 					ox, oy = t[2]*dx+self.sucklen*math.max(0,-dx), t[1]
 				end
 				local v = (t[2]/self.sucklen)
-				love.graphics.setColor(255, 255, 255, 255*v)
+				love.graphics.setColor(255,255,255,255*v)
 				love.graphics.draw(dustimg, dustquad[t[5]], (x+ox-xscroll)*16*scale, (y+oy-.5-yscroll)*16*scale, t[3], scale, scale, 8, 8)
 				if self.suckentranceportalx then
 					local dir = self.suckentranceportalfacing
@@ -785,7 +785,7 @@ function clearpipe:draw()
 						ox, oy = t[2]*dx+self.sucklen*math.max(0,-dx), t[1]
 					end
 					local v = (t[2]/self.sucklen)
-					love.graphics.setColor(255, 255, 255, 255*v)
+					love.graphics.setColor(255,255,255,255*v)
 					love.graphics.draw(dustimg, dustquad[t[5]], (x+ox-xscroll)*16*scale, (y+oy-.5-yscroll)*16*scale, t[3], scale, scale, 8, 8)
 				end
 			end
@@ -798,7 +798,7 @@ function clearpipe:draw()
 					ox, oy = t[2]*dx+self.sucklen*math.max(0,-dx), t[1]
 				end
 				local v = 1-(t[2]/self.sucklen)
-				love.graphics.setColor(255, 255, 255, 255*v)
+				love.graphics.setColor(255,255,255,255*v)
 				love.graphics.draw(dustimg, dustquad[t[5]], (x+ox-xscroll)*16*scale, (y+oy-.5-yscroll)*16*scale, t[3], scale, scale, 8, 8)
 				if self.suckexitportalx then
 					local dir = self.suckexitportalfacing
@@ -809,7 +809,7 @@ function clearpipe:draw()
 						ox, oy = t[2]*dx+self.sucklen*math.max(0,-dx), t[1]
 					end
 					local v = 1-(t[2]/self.sucklen)
-					love.graphics.setColor(255, 255, 255, 255*v)
+					love.graphics.setColor(255,255,255,255*v)
 					love.graphics.draw(dustimg, dustquad[t[5]], (x+ox-xscroll)*16*scale, (y+oy-.5-yscroll)*16*scale, t[3], scale, scale, 8, 8)
 				end
 			end

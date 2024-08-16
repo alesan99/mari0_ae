@@ -27,8 +27,6 @@ function loadcustomplayers()
 				i = #characters["list"]+1,
 
 				--colors
-				-- !! MAKE SURE to add any new RGB variables to `colorvariables` at the top !!
-				-- !! to ensure they get automatically converted from 0..255 to 0..1        !!
 				colorables = {"hat", "hair", "skin"},
 				colors = {},
 				defaultcolors = false,
@@ -468,18 +466,17 @@ function splitimage(img, color, exclude, imagedata) --split singe image into col
 		for x = 0, input:getWidth()-1 do
 			for y = 0, input:getHeight()-1 do
 				local r, g, b, a = input:getPixel(x, y)
-				local rr, rg, rb = r, g, b
 				local place = false
 				if exclude then
 					place = true
 					for i, c in pairs(color) do
-						if rr == c[1] and rg == c[2] and rb == c[3] then
+						if r == c[1] and g == c[2] and b == c[3] then
 							place = false
 							break
 						end
 					end
 				else
-					if rr == color[1] and rg == color[2] and rb == color[3] then
+					if r == color[1] and g == color[2] and b == color[3] then
 						place = true
 					end
 				end

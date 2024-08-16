@@ -326,7 +326,6 @@ function guielement:draw(a, offx, offy)
 		love.graphics.rectangle("fill", (self.x+1)*scale, (self.y+1)*scale, (1+self.width*8)*scale, 9*scale)
 		
 		local s = self.entries[self.var]
-		love.graphics.setColor(255, 255, 255)
 		if self.extended then
 			love.graphics.setColor(127, 127, 127)
 		elseif self.coloredtext then
@@ -335,6 +334,8 @@ function guielement:draw(a, offx, offy)
 			else
 				love.graphics.setColor(textcolors[s])
 			end
+		else
+			love.graphics.setColor(255, 255, 255)
 		end
 
 		if self.displayentries then s = self.displayentries[self.var];
@@ -351,7 +352,7 @@ function guielement:draw(a, offx, offy)
 			if self.cutoff then --have a scrollbar
 				love.graphics.rectangle("fill", self.x*scale, -self.scroll*scale, (13+self.width*8)*scale, (10*(#self.entries+1)+1)*scale)
 				
-				love.graphics.setColor(255, 255, 255)
+				love.graphics.setColor(127, 127, 127)
 				if high then
 					love.graphics.setColor(255, 255, 255)
 				end
@@ -368,7 +369,7 @@ function guielement:draw(a, offx, offy)
 				if type(s) == "string" then s = s:sub(1, self.width) end
 				properprint(s, (self.x+1)*scale, (-self.scroll+2)*scale)
 				
-				love.graphics.setColor(255, 255, 255)
+				love.graphics.setColor(127, 127, 127)
 				if high then
 					love.graphics.setColor(255, 255, 255)
 				end
@@ -429,7 +430,7 @@ function guielement:draw(a, offx, offy)
 						local s = self.entries[i]
 						if self.coloredtext then
 							if s == "black" then
-								love.graphics.setColor(80, 80, 80)
+								love.graphics.setColor(80,80,80)
 							else
 								love.graphics.setColor(textcolors[s])
 							end
@@ -519,7 +520,7 @@ function guielement:draw(a, offx, offy)
 			if self.imagecolor then
 				love.graphics.setColor(self.imagecolor)
 			else
-				love.graphics.setColor(255, 255, 255)
+				love.graphics.setColor(255,255,255)
 			end
 			love.graphics.draw(self.image, (self.x+self.imageoffsetx)*scale, (self.y+self.imageoffsety)*scale, 0, scale, scale)
 		end

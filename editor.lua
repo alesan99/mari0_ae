@@ -101,7 +101,7 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	mtsavehighlighttime = 5
 	mtsavetimer = 0
 	mtjustsaved = false
-	mtsavecolors = {255, 112, 112, 127}
+	mtsavecolors = {255, 112, 112, 128}
 	pastingtiles = false
 	pastemode = 1
 	pastecenter = {0, 0}
@@ -272,11 +272,11 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	guielements["portalbutton"].bordercolor = {0, 0, 255}
 	guielements["portalbutton"].bordercolorhigh = {127, 127, 255}
 	guielements["selectionbutton"] = guielement:new("button", 5, 58, TEXT["selection tool"], selectionbutton, 2, false, 1, 120)
-	guielements["selectionbutton"].bordercolor = {1, 106, 0}
-	guielements["selectionbutton"].bordercolorhigh = {1, 206, .5}
+	guielements["selectionbutton"].bordercolor = {255, 106, 0}
+	guielements["selectionbutton"].bordercolorhigh = {255, 206, 127}
 	guielements["powerlinebutton"] = guielement:new("button", 5, 76, TEXT["power line draw"], powerlinebutton, 2, false, 1, 120)
-	guielements["powerlinebutton"].bordercolor = {1, 216, 0}
-	guielements["powerlinebutton"].bordercolorhigh = {1, 1, 220}
+	guielements["powerlinebutton"].bordercolor = {255, 216, 0}
+	guielements["powerlinebutton"].bordercolorhigh = {255, 255, 220}
 	currenttooldesc = 1 --what description should be displayed for the buttons
 	
 	guielements["livesdecrease"] = guielement:new("button", 294, 104, "{", livesdecrease, 0)
@@ -1430,7 +1430,7 @@ function editor_draw()
 
 						local transparent = false
 						while (t[4] == "down" and y+offy < mapheight+0.5) or (t[4] == "up" and y+offy > 0) do
-							love.graphics.setColor(255, 255, 255, 255)
+							love.graphics.setColor(255,255,255,255)
 							if transparent then
 								love.graphics.setColor(255, 255, 255, 100)
 							end
@@ -1515,7 +1515,7 @@ function editor_draw()
 							y = tonumber(s[3])
 							tile = tonumber(command:sub(s2+4, -1))
 						end
-						love.graphics.setColor(255, 255, 255, 150)
+						love.graphics.setColor(255,255,255,150)
 						local tx, ty = getMouseTile(mousex, mousey+8*screenzoom*scale)
 						properprint(tx .. "-" .. ty, mousex, mousey)
 					end
@@ -1647,7 +1647,7 @@ function editor_draw()
 						end
 					end
 				elseif customrcopen == "trackpath" then
-					love.graphics.setColor(255, 255, 255)
+					love.graphics.setColor(255,255,255)
 					local rcp = rightclicktrack
 					local lx, ly = rcp.last[1], rcp.last[2]--last pos
 					for i = 1, #rcp.path do
@@ -1693,15 +1693,15 @@ function editor_draw()
 								end
 								local cox, coy = getMouseTile(mousex, mousey+8*screenzoom*scale)
 								if (cox == tx and coy == ty and not trackrightclickmenu.active) or (trackrightclickmenu.active and trackrightclickmenustage == i) then
-									love.graphics.setColor(255, 216, 0, 255)
+									love.graphics.setColor(255,216,0,255)
 								end
 								love.graphics.draw(trackmarkerimg, trackmarkerquad[quadi], math.floor(((tx-xscroll-.5)*16)*scale), math.floor(((ty-yscroll-1)*16)*scale), r, scale, scale, 8, 8)
-								love.graphics.setColor(255, 255, 255)
+								love.graphics.setColor(255,255,255)
 							end
 						end
 					end
 					--next track
-					love.graphics.setColor(255, 216, 0, 150)
+					love.graphics.setColor(255,216,0,150)
 					local left, right, up, down, leftup, leftdown, rightup, rightdown = true,true,true,true,true,true,true,true
 					for i = #rcp.path, 1, -1 do
 						--check overlap
@@ -1874,7 +1874,7 @@ function editor_draw()
 					local sx, sy, sw, sh = x1-1, y1-1, x2-x1+1, y2-y1+1
 					love.graphics.setColor(0, 131, 255, 45)
 					love.graphics.rectangle("fill", ((sx-xscroll)*16)*scale,((sy-yscroll)*16-8)*scale, sw*16*scale, sh*16*scale)
-					love.graphics.setColor(255, 255, 255)
+					love.graphics.setColor(255,255,255)
 					love.graphics.stencil(function() 
 						love.graphics.setLineWidth(scale)
 						love.graphics.rectangle("line", (math.floor((sx-xscroll)*16)+.5)*scale, (math.floor((sy-yscroll)*16)-8+.5)*scale, (sw*16-1)*scale, (sh*16-1)*scale) end, "increment")
@@ -2199,7 +2199,7 @@ function editor_draw()
 		else --just moving camera
 			love.graphics.setColor(255,0,0)
 			love.graphics.rectangle("line", (mapx+(xscroll+nmox)*s)*scale, (mapy+(yscroll+nmoy+.5)*s)*scale, width*s*scale, height*s*scale)
-			love.graphics.setColor(255, 255, 255)
+			love.graphics.setColor(255,255,255)
 			properprintFbackground(TEXT["toggle minimap with m"], 8*scale, (height*16-16)*scale)
 		end
 	else
@@ -2222,7 +2222,7 @@ function editor_draw()
 		guielements["tabcustom"]:draw()
 		guielements["tabanimations"]:draw()
 		
-		if editorstate == "tiles" then
+		if editorstate == "tiles" then			
 			--TILES
 			love.graphics.setColor(255, 255, 255)
 			
@@ -2680,9 +2680,9 @@ function editor_draw()
 					love.graphics.setColor(0,0,0)
 					love.graphics.rectangle("fill", (lpd.x+1)*scale, (lpd.y+12)*scale, (lpd.width+5-2)*scale, (8*len+1-1)*scale)
 					if high then
-						love.graphics.setColor(255, 255, 255)
+						love.graphics.setColor(255,255,255)
 					else
-						love.graphics.setColor(127, 127, 127)
+						love.graphics.setColor(127,127,127)
 					end
 					drawrectangle(lpd.x, lpd.y+12, lpd.width+5, 8*len+1)
 					guielements["intermissioncheckbox"]:draw()
@@ -4694,7 +4694,7 @@ function createlevelbuttons(i)
 					local d = meta_data[i .. "~" .. j .. "~" .. k]
 					if d.img then
 						guielements[name].image = d.img
-						guielements[name].imagecolor = {127, 127, 127}
+						guielements[name].imagecolor = {128, 128, 128}
 						guielements[name].imageoffsetx = 2
 						guielements[name].imageoffsety = 2
 					end
@@ -5811,11 +5811,11 @@ function openrightclickmenu(x, y, tileX, tileY)
 							rightclickvalues2[variablenum] = dir
 							for i = objstart, objstart+objs-1 do
 								if i == obj then
-									rightclickobjects[i].bordercolorhigh = {255, 127, 127}
-									rightclickobjects[i].bordercolor = {255, 0, 0}
+									rightclickobjects[i].bordercolorhigh = {255,127,127}
+									rightclickobjects[i].bordercolor = {255,0,0}
 								else
-									rightclickobjects[i].bordercolorhigh = {255, 255, 255}
-									rightclickobjects[i].bordercolor = {127, 127, 127}
+									rightclickobjects[i].bordercolorhigh = {255,255,255}
+									rightclickobjects[i].bordercolor = {127,127,127}
 								end
 							end
 						end
@@ -5851,7 +5851,7 @@ function openrightclickmenu(x, y, tileX, tileY)
 					addv = 13
 				elseif obj == "slider" then
 					local d = guielement:new("scrollbar", rx, ry, 100, 33, 9, vt[t[2]], "hor")
-					d.backgroundcolor = {0, 0, 0}
+					d.backgroundcolor = {0,0,0}
 					d.scrollstep = 0
 					d.displayfunction = t[3]
 					d.rightclickvalue = t[2]

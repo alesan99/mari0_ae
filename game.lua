@@ -1548,9 +1548,9 @@ function game_draw()
 		--BACKGROUND TILES
 		if bmap_on then
 			if editormode then
-				love.graphics.setColor(255, 255, 255, 100)
+				love.graphics.setColor(255,255,255,100)
 			else
-				love.graphics.setColor(255, 255, 255, 255)
+				love.graphics.setColor(255,255,255,255)
 			end
 			love.graphics.draw(smbspritebatch[2], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
 			love.graphics.draw(portalspritebatch[2], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
@@ -1569,7 +1569,7 @@ function game_draw()
 					end
 				end
 			end
-			love.graphics.setColor(255, 255, 255, 255)
+			love.graphics.setColor(255,255,255,255)
 		end
 
 		--DROP SHADOW
@@ -1632,7 +1632,7 @@ function game_draw()
 				end
 			end
 			love.graphics.pop()
-			love.graphics.setColor(255, 255, 255, 255)
+			love.graphics.setColor(255,255,255,255)
 		end
 		
 		--Mushroom under tiles
@@ -1774,7 +1774,7 @@ function game_draw()
 		end
 
 		--snakeblock
-		love.graphics.setColor(255, 255, 255)
+		love.graphics.setColor(255,255,255)
 		for j, w in pairs(objects["snakeblock"]) do
 			w:draw()
 		end
@@ -2113,7 +2113,7 @@ function game_draw()
 		for j, w in pairs(clearpipes) do
 			w:draw()
 		end
-		love.graphics.setColor(255, 255, 255)
+		love.graphics.setColor(255,255,255)
 
 		--3D Mode
 		if _3DMODE then
@@ -2158,7 +2158,7 @@ function game_draw()
 				end
 				love.graphics.pop()
 			end
-			love.graphics.setColor(255, 255, 255, 255)
+			love.graphics.setColor(255,255,255,255)
 		end
 		
 		--lakito
@@ -2520,7 +2520,7 @@ function game_draw()
 		for i, v in pairs(portalprojectiles) do
 			v:particledraw()
 		end
-		love.graphics.setColor(255, 255, 255)
+		love.graphics.setColor(255,255,255)
 		love.graphics.draw(portalprojectilespritebatch,0,0)
 		for i, v in pairs(portalprojectiles) do
 			v:draw()
@@ -2777,17 +2777,17 @@ function game_draw()
 		end
 		love.graphics.stencil(stencil4)
 		love.graphics.setStencilTest("less", 1)
-		love.graphics.setColor(0, 0, 0, .25*255)
+		love.graphics.setColor(0, 0, 0, 255/4)
 		love.graphics.rectangle("fill", 0, 0, width*16*scale, 224*scale)
 		love.graphics.setStencilTest()
 		love.graphics.stencil(stencil3)
 		love.graphics.setStencilTest("less", 1)
-		love.graphics.setColor(0, 0, 0, .33*255)
+		love.graphics.setColor(0, 0, 0, 255/3)
 		love.graphics.rectangle("fill", 0, 0, width*16*scale, 224*scale)
 		love.graphics.setStencilTest()
 		love.graphics.stencil(stencil2)
 		love.graphics.setStencilTest("less", 1)
-		love.graphics.setColor(0, 0, 0, .5*255)
+		love.graphics.setColor(0, 0, 0, 255/2)
 		love.graphics.rectangle("fill", 0, 0, width*16*scale, 224*scale)
 		love.graphics.setStencilTest()
 		love.graphics.stencil(stencil)
@@ -2842,7 +2842,7 @@ function game_draw()
 	love.graphics.translate(0, yoffset*scale)
 	
 	if testlevel then
-		love.graphics.setColor(255, 0, 0, .5*255)
+		love.graphics.setColor(255, 0, 0, 127)
 		properprintfast("TESTING LEVEL - PRESS ESC TO RETURN TO EDITOR", 16*scale, 0)
 	end
 	
@@ -3678,7 +3678,7 @@ function drawplayer(i, x, y, r, pad, drop)
 
 	--ice block
 	if v.frozen then
-		love.graphics.setColor(255, 255, 255, a)
+		love.graphics.setColor(255,255,255, a)
 		local w, h = math.ceil(v.width)*2+1, math.ceil(v.height)*2+1
 		for x = 1, w do
 			for y = 1, h do
@@ -3728,7 +3728,7 @@ function drawplayer(i, x, y, r, pad, drop)
 			background = {0, 0, 0}
 		end]]
 
-		love.graphics.setColor(playerlist[v.playernumber].colors[1][1], playerlist[v.playernumber].colors[1][2], playerlist[v.playernumber].colors[1][3], .5*255)
+		love.graphics.setColor(playerlist[v.playernumber].colors[1][1], playerlist[v.playernumber].colors[1][2], playerlist[v.playernumber].colors[1][3], 127)
 		properprintbackground(nick, math.floor(((px-xscroll+v.width/2)*16-((#nick*8)/2))*scale), math.floor(((py-yscroll)*16-28)*scale), true)--, background)
 	end
 end

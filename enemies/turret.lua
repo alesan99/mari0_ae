@@ -500,7 +500,7 @@ function turret:draw()
 	else
 		love.graphics.draw(self.graphic, turretquad[1], math.floor(((self.x-xscroll)*16+self.offsetX+1)*scale), ((self.y-.5-yscroll)*16+self.offsetY)*scale,  self.rotation, dirscale, scale, self.quadcenterX, self.quadcenterY)
 	end
-	
+
 	local shade = 255*(1-turretdarkenfactor*self.timer)
 	love.graphics.setColor(shade, shade, shade)
 
