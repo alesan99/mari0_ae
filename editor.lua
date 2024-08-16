@@ -2222,7 +2222,7 @@ function editor_draw()
 		guielements["tabcustom"]:draw()
 		guielements["tabanimations"]:draw()
 		
-		if editorstate == "tiles" then			
+		if editorstate == "tiles" then
 			--TILES
 			love.graphics.setColor(255, 255, 255)
 			
