@@ -470,8 +470,8 @@ end
 ---@param exclude boolean?
 ---@param imagedata boolean?
 local function _splitimageffi(img, color, exclude, imagedata)
-	local output = img:clone()
-	local pointer= require("ffi").cast("uint8_t*", output:getFFIPointer()) -- imageData has one byte per channel per pixel.
+	local output    = img:clone()
+	local pointer   = require("ffi").cast("uint8_t*", output:getFFIPointer()) -- imageData has one byte per channel per pixel.
 	local bytecount = output:getWidth() * output:getHeight() -- pixel count * 4
 	
 	for i = 0, 4*bytecount-1, 4 do
