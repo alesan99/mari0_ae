@@ -55,35 +55,13 @@
 if love._version_major ~= 11 then error("You have an outdated version of Love2d! Get 11.5 and retry.") end
 
 ----- COLOR MIGRATION helpers -----
-function clamp(x, lower, upper)
-    return math.min(math.max(x, lower), upper)
-end
-
-local function convertFromByte(x)
-    return clamp(math.floor(x + 0.5) / 255, 0, 1)
-end
-
-local colorCache = {}
-for i = 0, 255 do colorCache[i] = convertFromByte(i) end
-
-local function convertFromCachedByte(x)
-	x = clamp(x, 0, 255)
-	local cached = colorCache[x]
-	return (cached ~= nil and cached) or convertFromByte(x) -- fallback for decimals
-end
-
-local function convertFromCachedTable(table)
-	for i, v in ipairs(table) do
-		table[i] = v ~= nil and convertFromCachedByte(v) or nil
-	end
-	return table
-end
+FFIAVAILABLE = pcall(function () require("ffi") end)
 
 local function convertText(text)
 	if type(text) == "table" then
 		for i, v in ipairs(text) do
 			if type(v) == "table" then
-				text[i] = unpack(convertFromCachedTable(v))
+				text[i] = {love.math.colorFromBytes(unpack(v))}
 			end
 		end
 	end
@@ -93,31 +71,31 @@ end
 ----- COLOR MIGRATION for real -----
 
 local defaultSetColor = love.graphics.setColor
-function love.graphics.setColor(r, g, b, a, ...)
-	if type(r) == "table" then r, g, b, a = r[1], r[2], r[3], r[4] end
-    return defaultSetColor(convertFromCachedTable({r, g, b, a}), ...)
+function love.graphics.setColor(r, g, b, a)
+	if type(r) == "table" then r, g, b, a = unpack(r) end
+    return defaultSetColor(love.math.colorFromBytes(r, g, b, a))
 end
 
 local defaultGetColor = love.graphics.getColor
-function love.graphics.getColor(...)
-	return love.math.colorToBytes(defaultGetColor(...))
+function love.graphics.getColor()
+	return love.math.colorToBytes(defaultGetColor())
 end
 
 local defaultSetBackgroundColor = love.graphics.setBackgroundColor
-function love.graphics.setBackgroundColor(r, g, b, a, ...)
-	if type(r) == "table" then r, g, b, a = r[1], r[2], r[3], r[4] end
-    return defaultSetBackgroundColor(convertFromCachedTable({r, g, b, a}), ...)
+function love.graphics.setBackgroundColor(r, g, b, a)
+	if type(r) == "table" then r, g, b, a = unpack(r) end
+    return defaultSetBackgroundColor(love.math.colorFromBytes(r, g, b, a))
 end
 
 local defaultGetBackgroundColor = love.graphics.getBackgroundColor
-function love.graphics.getBackgroundColor(...)
-	return love.math.colorToBytes(defaultGetBackgroundColor(...))
+function love.graphics.getBackgroundColor()
+	return love.math.colorToBytes(defaultGetBackgroundColor())
 end
 
 local defaultClear = love.graphics.clear
 function love.graphics.clear(r, g, b, a, ...)
 	if r ~= nil and g ~= nil and b ~= nil then
-		r, g, b, a = unpack(convertFromCachedTable({r, g, b, a}))
+		r, g, b, a = love.math.colorFromBytes(r, g, b, a)
 	end
 	return defaultClear(r, g, b, a, ...)
 end
@@ -163,7 +141,7 @@ local SpriteBatch = debug.getregistry().SpriteBatch
 
 local defaultSpriteBatchSetColor = SpriteBatch.setColor
 function SpriteBatch:setColor(...)
-	return defaultSpriteBatchSetColor(self, unpack(convertFromCachedTable({...})))
+	return defaultSpriteBatchSetColor(self, love.math.colorFromBytes(...))
 end
 
 local defaultSpriteBatchGetColor = SpriteBatch.getColor
@@ -171,11 +149,11 @@ function SpriteBatch:getColor(...)
 	return love.math.colorToBytes(defaultSpriteBatchGetColor(self, ...))
 end
 
-local ImageData = debug.getregistry().ImageData
+local ImageData = debug.getregistry().ImageData -- TODO: use FFI by default? not sure if fetching the pointer constantly will actually be efficient
 
 local defaultImageDataSetPixel = ImageData.setPixel
 function ImageData:setPixel(x, y, ...)
-	return defaultImageDataSetPixel(self, x, y, unpack(convertFromCachedTable({...})))
+	return defaultImageDataSetPixel(self, x, y, love.math.colorFromBytes(...))
 end
 
 local defaultImageDataGetPixel = ImageData.getPixel
@@ -185,7 +163,11 @@ end
 
 local defaultImageDataMapPixel = ImageData.mapPixel
 function ImageData:mapPixel(pixelFunction, ...)
-	return defaultImageDataMapPixel(self, function(x, y, r, g, b, a) return unpack(convertFromCachedTable({pixelFunction(x, y, love.math.colorToBytes(r, g, b, a))})) end, ...)
+	return defaultImageDataMapPixel(self, function(x, y, r, g, b, a)
+		local nr, ng, nb, na = pixelFunction(x, y, love.math.colorToBytes(r, g, b, a))
+		if nr == nil then return r, g, b, a end
+		return love.math.colorFromBytes(nr, ng, nb, na)
+	end, ...)
 end
 
 -- TODO: ParticleSystem, linear/gamma functions, points, sendColor, newMesh, [gs]etVertex

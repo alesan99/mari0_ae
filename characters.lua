@@ -520,6 +520,7 @@ end
 ---@param imagedata boolean?
 local function _splitimagenative(img, color, exclude, imagedata)
 	local output = img:clone()
+
 	output:mapPixel(function(_, _, r, g, b, a)
 		local place = false
 		if exclude then
@@ -537,13 +538,14 @@ local function _splitimagenative(img, color, exclude, imagedata)
 		end
 		if place then
 			if exclude then
-				return r, g, b, a
+				return nil -- leaves value (r,g,b,a) unchanged
 			else
 				return 255, 255, 255, a
 			end
 		end
 		return 0, 0, 0, 0
 	end)
+
 	if imagedata then
 		return output
 	else
@@ -558,7 +560,7 @@ end
 function splitimage(img, color, exclude, imagedata) --split singe image into colorable images
 	if false then --useShader then
 		return _splitimageshaders(img, color, exclude, imagedata)
-	elseif true then
+	elseif FFIAVAILABLE then
 		return _splitimageffi(img, color, exclude, imagedata)
 	else
 		return _splitimagenative(img, color, exclude, imagedata)
