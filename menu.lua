@@ -803,15 +803,25 @@ function menu_draw()
 					love.graphics.setColor(0, 0, 0, 200)
 					love.graphics.rectangle("fill", 241*scale, 16*scale, 150*scale, 180*scale)
 					love.graphics.setColor(255, 255, 255, 255)
+					local asset = onlineassetlist[onlinemappackselection]
+
 					local message
-					if onlineassetlist[onlinemappackselection] and onlineassetlist[onlinemappackselection].downloadable then
+					if asset and asset.downloadable then
 						message = TEXT["dlc dl instructions"]
 					else
 						message = TEXT["dlc instructions"]
+
+						local y = (19 + 10 * (1 + #(message:split("\n"))))*scale
+						if asset and asset.type == "enemy" then
+							properprintF(TEXT["dlc enemy instructions"], 244*scale, y)
+						elseif asset and (asset.type == "mappack" or asset.type == "character") then
+							properprintF(TEXT["dlc asset instructions"], 244*scale, y)
+						end
 					end
 					properprintF(message, 244*scale, 19*scale)
-					--properprintF("bonus content\nlike enemies\nand characters\nare here too!", 244*scale, 140*scale)
+
 					love.graphics.setColor(255, 255, 255, 255)
+					-- TODO: these aren't initialized
 					if outdated then
 						love.graphics.setColor(255, 0, 0, 255)
 						properprintF("version outdated!\nyou have an old\nversion of mari0!\nmappacks could not\nbe downloaded.\ngo to\nstabyourself.net\nto download latest", 244*scale, 130*scale)
@@ -821,19 +831,14 @@ function menu_draw()
 						properprintF("download error!\nsomething went\nwrong while\ndownloading\nyour mappack.\ntry again.\nsorry.", 244*scale, 130*scale)
 						love.graphics.setColor(255, 255, 255, 255)
 					end
-					if onlineassetlist[onlinemappackselection] and onlineassetlist[onlinemappackselection].type == "enemy" then
-						love.graphics.setColor(255, 150, 150, 255)
-						properprintF(TEXT["dlc enemy instructions"], 244*scale, 160*scale)
-						love.graphics.setColor(255, 255, 255, 255)
-					end
-					if onlineassetlist[onlinemappackselection] and onlineassetlist[onlinemappackselection].type == "character" then
-						--love.graphics.setColor(255, 150, 150, 255)
-						--properprintF(TEXT["dlc character instructions"], 244*scale, 170*scale)
+
+					if asset and asset.type == "character" then
 						love.graphics.setColor(255, 255, 255, 255)
 						opendlcbutton.text = TEXT["characters folder"]
 					else
 						opendlcbutton.text = TEXT["open dlc folder"]
 					end
+
 					opendlcbutton:draw()
 				end
 					
@@ -871,11 +876,11 @@ function menu_draw()
 					local qi = 2
 					if (not onlinedlc) then
 						qi = 3
-					elseif asset.type[i] == "enemy" then
+					elseif asset.type == "enemy" then
 						qi = 5
-					elseif asset.type[i] == "character" then
+					elseif asset.type == "character" then
 						qi = 6
-					elseif asset.type[i] == "video" then
+					elseif asset.type == "video" then
 						qi = 7
 					end
 					love.graphics.setColor(0, 0, 0, 150)

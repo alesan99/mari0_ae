@@ -919,7 +919,7 @@ defaultworlds = 8
 defaultlevels = 4
 defaultsublevels = 5
 
-onlinedlc = true --dlc went down :(. local dlc only now
+onlinedlc = true
 
 maxsublevelstable = {}
 for k = 0, maxsublevels do
