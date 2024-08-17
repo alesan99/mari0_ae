@@ -8250,27 +8250,18 @@ function saveeditormetadata()
 	end
 	w, h = math.min(mapwidth, w), math.min(mapheight, h)
 	local imgdata = love.image.newImageData(w, h)
-	local pointer   = require("ffi").cast("uint8_t*", imgdata:getFFIPointer()) -- imageData has one byte per channel per pixel.
-	local bytecount = imgdata:getWidth() * imgdata:getHeight() -- pixel count * 4
-
-	local i = 0
-	for y = 1, h do
-		for x = 1, w do
+	for x = 1, w do
+		for y = 1, h do
 			local id = map[x][mapheight-h+y][1]
-			local r, g, b
-			if rgblist[id] and id ~= 0 and not tilequads[id].invisible then
-				r, g, b = unpack(rgblist[id])
+			if rgblist[id] and id ~= 0 and not tilequads[id].invisible  then
+				local r, g, b, a = unpack(rgblist[id])
+				imgdata:setPixel(x-1, y-1, r, g, b, 255)
 			else
-				r, g, b = love.graphics.getBackgroundColor()
+				local r, g, b, a = love.graphics.getBackgroundColor()
+				imgdata:setPixel(x-1, y-1, r, g, b, 255)
 			end
-			pointer[i]   = r
-			pointer[i+1] = g
-			pointer[i+2] = b
-			pointer[i+3] = 255
-			i = i + 4
 		end
 	end
-
 	local levelstring = marioworld .. "~" .. mariolevel .. "~" .. mariosublevel
 	imgdata:encode("png", mappackfolder .. "/" .. mappack .. "/editor/" .. levelstring .. ".png")
 	if not meta_data[levelstring] then

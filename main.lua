@@ -2463,20 +2463,18 @@ end
 function newRecoloredImage(path, tablein, tableout)
 	local minalpha = 128
 	local imagedata = love.image.newImageData( path )
-
-	local pointer   = require("ffi").cast("uint8_t*", imagedata:getFFIPointer()) -- imageData has one byte per channel per pixel.
-	local bytecount = imagedata:getWidth() * imagedata:getHeight() -- pixel count * 4
-
-	for i = 0, 4*bytecount-1, 4 do
-		local r, g, b, a = pointer[i], pointer[i+1], pointer[i+2], pointer[i+3]
-
-		if a > minalpha then
-			for j, v in ipairs(tablein) do
-				if r == v[1] and g == v[2] and b == v[3] then
-					local nr, ng, nb = unpack(tableout[j])
-					pointer[i]   = nr
-					pointer[i+1] = ng
-					pointer[i+2] = nb
+	local width, height = imagedata:getWidth(), imagedata:getHeight()
+	
+	for y = 0, height-1 do
+		for x = 0, width-1 do
+			local oldr, oldg, oldb, olda = imagedata:getPixel(x, y)
+			
+			if olda > minalpha then
+				for i = 1, #tablein do
+					if oldr == tablein[i][1] and oldg == tablein[i][2] and oldb == tablein[i][3] then
+						local r, g, b = unpack(tableout[i])
+						imagedata:setPixel(x, y, r, g, b, olda)
+					end
 				end
 			end
 		end
