@@ -8250,16 +8250,16 @@ function saveeditormetadata()
 	end
 	w, h = math.min(mapwidth, w), math.min(mapheight, h)
 	local imgdata = love.image.newImageData(w, h)
-	for x = 1, w do
-		for y = 1, h do
+	for y = 1, h do
+		for x = 1, w do
 			local id = map[x][mapheight-h+y][1]
+			local r, g, b
 			if rgblist[id] and id ~= 0 and not tilequads[id].invisible  then
-				local r, g, b, a = unpack(rgblist[id])
-				imgdata:setPixel(x-1, y-1, r, g, b, 255)
+				r, g, b = unpack(rgblist[id])
 			else
-				local r, g, b, a = love.graphics.getBackgroundColor()
-				imgdata:setPixel(x-1, y-1, r, g, b, 255)
+				r, g, b = love.graphics.getBackgroundColor()
 			end
+			imgdata:setPixel(x-1, y-1, r, g, b, 255)
 		end
 	end
 	local levelstring = marioworld .. "~" .. mariolevel .. "~" .. mariosublevel
