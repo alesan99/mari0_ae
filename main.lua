@@ -184,7 +184,7 @@ local debugGraphs = false
 
 VERSION = 13.2000
 VERSIONSTRING = "13.2 (8/10/24)"
-ANDROIDVERSION = 17
+ANDROIDVERSION = 18
 
 android = (love.system.getOS() == "Android" or love.system.getOS() == "iOS") --[DROID]
 androidtest = false--testing android on pc
