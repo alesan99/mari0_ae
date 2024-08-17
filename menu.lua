@@ -66,7 +66,7 @@ function menu_load()
 	end
 	
 	continueavailable = false
-	if love.filesystem.getInfo("suspend") then
+	if love.filesystem.getInfo(savesfolder .. "/" .. mappack .. ".suspend") then
 		continueavailable = true
 	end
 	
@@ -595,11 +595,34 @@ function menu_draw()
 			love.graphics.draw(playerselectarrowimg, (158-(math.ceil((utf8.len(TEXT["player game"])+2)/2)*8))*scale, 138*scale, 0, -scale, scale)
 		end
 		
+		if newgamewarning then
+			love.graphics.setColor(0, 0, 0)
+			love.graphics.rectangle("fill", 20*scale, 92*scale, 220*scale, 60*scale)
+			love.graphics.setColor(255, 255, 255)
+			drawrectangle(21, 93, 218, 58)
+			properprintF(TEXT["starting a new game will"], (130-(utf8.len(TEXT["starting a new game will"])*4))*scale, 100*scale)
+			properprintF(TEXT["delete your existing save!"], (130-(utf8.len(TEXT["delete your existing save!"])*4))*scale, 110*scale)
+			
+			if newgamewarningcursor == 1 then
+				properprintF(">", (120-((utf8.len(TEXT["new game"])+utf8.len(TEXT["go back"]))*4)-16)*scale, 130*scale)
+				love.graphics.setColor(255, 255, 255, 255)
+				properprintF(TEXT["new game"], (130-((utf8.len(TEXT["new game"])+utf8.len(TEXT["go back"]))*4)-16)*scale, 130*scale)
+				love.graphics.setColor(100, 100, 100, 255)
+				properprintF(TEXT["go back"], (130-((utf8.len(TEXT["new game"])-utf8.len(TEXT["go back"]))*4)+16)*scale, 130*scale)
+			else
+				properprintF(">", (120-((utf8.len(TEXT["new game"])-utf8.len(TEXT["go back"]))*4)+16)*scale, 130*scale)
+				love.graphics.setColor(100, 100, 100, 255)
+				properprintF(TEXT["new game"], (130-((utf8.len(TEXT["new game"])+utf8.len(TEXT["go back"]))*4)-16)*scale, 130*scale)
+				love.graphics.setColor(255, 255, 255, 255)
+				properprintF(TEXT["go back"], (130-((utf8.len(TEXT["new game"])-utf8.len(TEXT["go back"]))*4)+16)*scale, 130*scale)
+			end
+		end
+		
 		if selectworldopen then
 			love.graphics.setColor(0, 0, 0)
-			love.graphics.rectangle("fill", 30*scale, 92*scale, 200*scale, 60*scale)
+			love.graphics.rectangle("fill", 20*scale, 92*scale, 220*scale, 60*scale)
 			love.graphics.setColor(255, 255, 255)
-			drawrectangle(31, 93, 198, 58)
+			drawrectangle(21, 93, 218, 58)
 			properprintF(TEXT["select world"], (130-(utf8.len(TEXT["select world"])*4))*scale, 105*scale)
 			
 			local sc = selectworldcursor
@@ -2125,7 +2148,23 @@ function menu_keypressed(key, unicode)
 		return
 	end
 	if gamestate == "menu" then
-		if selectworldopen then
+		if newgamewarning then
+			if (key == "left" or key == "a") then
+				newgamewarningcursor = 1
+			elseif (key == "right" or key == "d") then
+				newgamewarningcursor = 2
+			elseif (key == "return" or key == "enter" or key == "kpenter" or key == " ") then
+				if (newgamewarningcursor == 1) then
+					newgamewarning = false
+					selectworld()
+				else
+					newgamewarning = false
+				end
+			elseif key == "escape" then
+				newgamewarning = false
+			end
+			return
+		elseif selectworldopen then
 			if (key == "right" or key == "d") then
 				local target = selectworldcursor+1
 				while target <= #mappacklevels and not reachedworlds[mappack][target] do
@@ -2144,7 +2183,7 @@ function menu_keypressed(key, unicode)
 				end
 			elseif (key == "return" or key == "enter" or key == "kpenter" or key == " ") then
 				selectworldopen = false
-				game_load(selectworldcursor)
+				game_load(selectworldcursor, true)
 			elseif key == "escape" then
 				selectworldopen = false
 			end
@@ -2168,7 +2207,7 @@ function menu_keypressed(key, unicode)
 			if selection == 0 then
 				game_load(true)
 			elseif selection == 1 then
-				selectworld()
+				newgame()
 			elseif selection == 2 then
 				if nofunallowed then
 					notice.new("Creator disabled the editor.", notice.white, 2)
@@ -2329,6 +2368,12 @@ function menu_keypressed(key, unicode)
 			end
 			gamestate = "menu"
 			saveconfig()
+
+			continueavailable = false
+			if love.filesystem.getInfo(savesfolder .. "/" .. mappack .. ".suspend") then
+				continueavailable = true
+			end
+
 			if mappack == "custom_mappack" then
 				createmappack()
 			end
@@ -2561,6 +2606,7 @@ function menu_keypressed(key, unicode)
 				elseif optionsselection == 11 then
 					if mappackfolder == "mappacks" then
 						mappackfolder = "alesans_entities/mappacks"
+						savesfolder = "alesans_entities/saves"
 						mappack = "smb"
 						loadbackground("1-1.txt")
 					end
@@ -2696,6 +2742,7 @@ function menu_keypressed(key, unicode)
 				elseif optionsselection == 11 then
 					if mappackfolder == "alesans_entities/mappacks" then
 						mappackfolder = "mappacks"
+						savesfolder = "saves"
 						mappack = "smb"
 						loadbackground("1-1.txt")
 					end
@@ -2793,7 +2840,15 @@ function menu_mousepressed(x, y, button)
 	if gamestate == "menu" then
 		menu_updatemouseselection(x,y)
 		if mouseonselect then
-			if selectworldopen then
+			if newgamewarning then
+				if newgamewarningcursor == 1 then
+					selectworld()
+					newgamewarning = false
+				elseif newgamewarningcursor == 2 then
+					newgamewarning = false
+				end
+				return
+			elseif selectworldopen then
 				local x, y = x/scale, y/scale
 				local sc = selectworldcursor
 				local v = math.ceil(sc/8)*8-7
@@ -2825,7 +2880,7 @@ function menu_mousepressed(x, y, button)
 					end
 					if reachedworlds[mappack][i] and x > (54+(i2-1)*20) and x < (54+(i2-1)*20)+12 and y > 128 and y < 140 then
 						selectworldopen = false
-						game_load(i)
+						game_load(i, true)
 						break
 					end
 					i2 = i2 + 1
@@ -2903,7 +2958,7 @@ function menu_mousereleased(x, y, button)
 			if mouseonselect == 0 then
 				game_load(true)
 			elseif mouseonselect == 1 then
-				selectworld()
+				newgame()
 			elseif mouseonselect == 2 then
 				if nofunallowed then
 					notice.new("Creator disabled the editor.", notice.white, 2)
@@ -3135,6 +3190,9 @@ function createmappack()
 	s = s .. "description=the newest best  mappack?" .. "\n"
 	
 	love.filesystem.write(mappackfolder .. "/" .. mappack .. "/settings.txt", s)
+
+	-- Clean old suspend file for renamed or deleted mappacks
+	love.filesystem.remove(savesfolder .. "/" .. mappack .. ".suspend")
 end
 
 function resetconfig()
@@ -3151,9 +3209,19 @@ function resetconfig()
 	loadbackground("1-1.txt")
 end
 
+function newgame()
+	if love.filesystem.getInfo(savesfolder .. "/" .. mappack .. ".suspend") then
+		newgamewarning = true
+		newgamewarningcursor = 1
+		return
+	end
+
+	selectworld()
+end
+
 function selectworld()
 	if not reachedworlds[mappack] then
-		game_load()
+		game_load(nil, true)
 	end
 	
 	local noworlds = true
@@ -3165,7 +3233,7 @@ function selectworld()
 	end
 	
 	if noworlds then
-		game_load()
+		game_load(nil, true)
 		return
 	end
 	
@@ -3243,7 +3311,18 @@ function menu_filedropped(file)
 end
 
 function menu_updatemouseselection(x,y)
-	if selectworldopen then
+	if newgamewarning then
+		local x, y = x/scale, y/scale
+		local option1start = (130-((utf8.len(TEXT["new game"])+utf8.len(TEXT["go back"]))*4)-16) - 2
+		local option1end = option1start + (utf8.len(TEXT["new game"])*8) + 2
+		local option2start = (130-((utf8.len(TEXT["new game"])-utf8.len(TEXT["go back"]))*4)+16) - 2
+		local option2end = option2start + (utf8.len(TEXT["go back"])*8) + 2
+		if x > option1start and x < option1end and y > 128 and y < 140 then
+			newgamewarningcursor = 1
+		elseif x > option2start and x < option2end and y > 128 and y < 140 then
+			newgamewarningcursor = 2
+		end
+	elseif selectworldopen then
 		local x, y = x/scale, y/scale
 		local sc = selectworldcursor
 		local v = math.ceil(sc/8)*8-7

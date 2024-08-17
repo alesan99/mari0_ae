@@ -1390,6 +1390,22 @@ table.insert(toenter, {name = "changebackground",
 	}
 })
 
+table.insert(toenter, {name = "autosave", 
+	t = {
+		t="action",
+		nicename="save game progress",
+		entries={
+			{
+				t="text",
+				value=" and "
+			},
+			{
+				t="notifyplayer"
+			}
+		}
+	}
+})
+
 table.insert(toenter, {name = "changeforeground", 
 	t = {
 		t="action",
@@ -2144,6 +2160,12 @@ function animationguiline:init(tabl, t2)
 					dropwidth = 6
 					args = {"both","none","1 only","2 only","gel"}
 					displayargs = {"both","none","1 only","2 only","gel"}
+				
+				elseif v.t == "notifyplayer" then
+					dropdown = true
+					dropwidth = 24
+					args = {true, false}
+					displayargs = {"notify the player", "don't notify the player"}
 				end
 				
 				if dropdown then

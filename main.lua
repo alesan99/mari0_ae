@@ -445,9 +445,11 @@ function love.load()
 		soundenabled = true
 	end
 	love.filesystem.createDirectory("mappacks")
+	love.filesystem.createDirectory("saves")
 	
 	love.filesystem.createDirectory("alesans_entities")
 	love.filesystem.createDirectory("alesans_entities/mappacks")
+	love.filesystem.createDirectory("alesans_entities/saves")
 	love.filesystem.createDirectory("alesans_entities/onlinemappacks")
 	love.filesystem.createDirectory("alesans_entities/characters")
 	love.filesystem.createDirectory("alesans_entities/hats")
@@ -475,6 +477,10 @@ function love.load()
 		mappack = checkmappack
 		checkmappack = nil
 		saveconfig()
+	end
+
+	if love.filesystem.getInfo("suspend") then
+		convertoldsuspendfile()
 	end
 
 	loadingbardraw(1)
@@ -1601,6 +1607,7 @@ function loadconfig(nodefaultconfig)
 			end
 		elseif s2[1] == "modmappacks" then
 			mappackfolder = "alesans_entities/mappacks"
+			savesfolder = "alesans_entities/saves"
 		elseif s2[1] == "resizable" then
 			if s2[2] then
 				resizable = (s2[2] == "true")
@@ -1732,13 +1739,14 @@ function defaultconfig()
 	mappack = "smb"
 	vsync = false
 	mappackfolder = "mappacks"
+	savesfolder = "saves"
 	fourbythree = false
 	localnick = false
 	
 	reachedworlds = {}
 end
 
-function suspendgame()
+function writesuspendfile()
 	local st = {}
 	if marioworld == "M" then
 		marioworld = 8
@@ -1788,18 +1796,22 @@ function suspendgame()
 	st.mappackfolder = mappackfolder
 
 	local s = JSON:encode_pretty(st)
-	love.filesystem.write("suspend", s)
-	
+	love.filesystem.write(savesfolder .. "/" .. mappack .. ".suspend", s)
+end
+
+function suspendgame()
+	writesuspendfile()
 	love.audio.stop()
 	menu_load()
 end
 
 function continuegame()
-	if not love.filesystem.getInfo("suspend") then
+	savefile = savesfolder .. "/" .. mappack .. ".suspend"
+	if not love.filesystem.getInfo(savefile) then
 		return
 	end
 	
-	local s = love.filesystem.read("suspend")
+	local s = love.filesystem.read(savefile)
 	local st = JSON:decode(s)
 	
 	mariosizes = {}
@@ -1836,10 +1848,6 @@ function continuegame()
 	end
 	mappack = st.mappack
 	mappackfolder = st.mappackfolder
-	
-	if (not st.collectables) then	--save the game if collectables are involved
-		love.filesystem.remove("suspend")
-	end
 
 	loadbackground("1-1.txt")
 
@@ -3108,6 +3116,17 @@ function disablecheats()
 	infinitetime = false
 	infinitelives = false
 	darkmode = false
+end
+
+function convertoldsuspendfile()
+	local s = love.filesystem.read("suspend")
+	local st = JSON:decode(s)
+
+	-- *ahem* sus. [crowd cheering]
+	local suspendedmappackfolder = st.mappackfolder
+	local suspendedmappack = st.mappack
+	love.filesystem.write(suspendedmappackfolder:gsub("mappacks", "saves") .. "/" .. suspendedmappack .. ".suspend", s)
+	love.filesystem.remove("suspend")
 end
 
 --sausage (don't ask)

@@ -991,7 +991,7 @@ function guielement:keypress(key,textinput)
 						if not (textinput and textinput == "forcetextinput") then
 							local justchanged = false
 							if not doubleinput then
-								if doubleinputcheck and doubleinputcheck == key then
+								if doubleinputcheck and key and doubleinputcheck:lower() == key:lower() then
 									doubleinput = true
 									justchanged = true
 								end
