@@ -170,7 +170,7 @@ function ImageData:mapPixel(pixelFunction, ...)
 	end, ...)
 end
 
--- TODO: ParticleSystem, linear/gamma functions, points, sendColor, newMesh, [gs]etVertex
+-- TODO: ParticleSystem, linear/gamma functions, points, newMesh, [gs]etVertex
 
 ----- MAIN -----
 
