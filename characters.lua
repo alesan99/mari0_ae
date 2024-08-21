@@ -1,36 +1,7 @@
 --I have no idea what i'm even doing
-local colorvariables = {"colors", "defaultcolors", "starcolors", "flowercolor", "hammersuitcolor", "frogsuitcolor", "leafcolor", "iceflowercolor", "tanookisuitcolor", "statuecolor", "superballcolor", "blueshellcolor", "boomerangcolor", "graphiccolor"}
 local animfiles = {"", "big", "fire", "ice", "superball", "hammer", "frog", "raccoon", "tiny", "tanooki", "skinny", "cape", "shell", "boomerang"}
 local blankimg = love.graphics.newImage(love.image.newImageData(1, 1))
 local splitimage
-
-function iscolorvariable(key)
-	for i, v in ipairs(colorvariables) do
-		if v == key then
-			return true
-		end
-	end
-	return false
-end
-
-function convertcolors(table)
-	if table == nil or #table == 0 then
-		return
-	end
-	for i, v in ipairs(table) do
-		if type(v) == "table" then
-			convertcolors(v)
-		else
-			table[i] = tonumber(v)/255
-		end
-	end
-end
-
-function convertcolorsif(key, table)
-	if iscolorvariable(key) then
-		convertcolors(table)
-	end
-end
 
 function loadcustomplayers()
 	characters = {list = {}, data = {}}
@@ -56,8 +27,6 @@ function loadcustomplayers()
 				i = #characters["list"]+1,
 
 				--colors
-				-- !! MAKE SURE to add any new RGB variables to `colorvariables` at the top !!
-				-- !! to ensure they get automatically converted from 0..255 to 0..1        !!
 				colorables = {"hat", "hair", "skin"},
 				colors = {},
 				defaultcolors = false,
@@ -372,8 +341,6 @@ function loadcustomplayers()
 				temp = err
 				--works! so set properties
 				for i, v in pairs(temp) do
-					-- convert numbers to 0..1
-					convertcolorsif(i, v)
 					-- set properties
 					playerstuff[i] = v
 					if i == "health" or i == "fireenemy" then
@@ -430,10 +397,11 @@ function loadcustomplayers()
 						local n = v .. "animations"
 						if imgs[n] and not love.filesystem.getInfo(folder .. "/" .. n .. "1.png") then
 							characters.data[i][n] = {}
-							local imgdata = splitimage("alesans_entities/characters/" .. i .. "/" .. n .. ".png", characters.data[i].splitcolors, true, "imagedata")
+							local img = love.image.newImageData("alesans_entities/characters/" .. i .. "/" .. n .. ".png")
+							local imgdata = splitimage(img, characters.data[i].splitcolors, true, "imagedata")
 							imgdata:encode("png", "alesans_entities/characters/" .. i .. "/" .. n .. "0.png")
 							for j = 1, #characters.data[i].colorables do
-								local imgdata = splitimage("alesans_entities/characters/" .. i .. "/" .. n .. ".png", characters.data[i].splitcolors[j], nil, "imagedata")
+								imgdata = splitimage(img, characters.data[i].splitcolors[j], nil, "imagedata")
 								imgdata:encode("png", "alesans_entities/characters/" .. i .. "/" .. n .. j .. ".png")
 							end
 						end
@@ -452,82 +420,150 @@ function resetcustomplayers()
 	end
 end
 
---local splitShader
-function splitimage(img, color, exclude, imagedata) --split singe image into colorable images
-	if false then --useShader then
-		if not splitShader then
-			splitShader = love.graphics.newShader[[
-				uniform Image inputImage;
-				uniform vec3 splitColor;
+---@param img love.ImageData
+---@param color table
+---@param exclude boolean?
+---@param imagedata boolean?
+local function _splitimageshaders(img, color, exclude, imagedata)
+	if not splitShader then
+		splitShader = love.graphics.newShader[[
+			uniform Image inputImage;
+			uniform vec3 splitColor;
 
-				#ifdef VERTEX
-				vec4 position( mat4 transform_projection, vec4 vertex_position )
-				{
-					return transform_projection * vertex_position;
-				}
-				#endif
-				#ifdef PIXEL
-				vec4 effect( vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords )
-				{
-					vec4 texcolor = Texel(inputImage, texture_coords);
-					if (abs(texcolor.r-splitColor.r) > 0.01 || abs(texcolor.g-splitColor.g) > 0.01 || abs(texcolor.b-splitColor.b) > 0.01)
-					{ discard; }
-					return vec4(1.0,1.0,1.0,1.0);
-				}
-				#endif
-			]]
-		end
-		local input = love.graphics.newImage(img)
-		local output = love.graphics.newCanvas(input:getWidth(), input:getHeight(),"rgba8")
-		if exclude then
-			local outputdata = output:newImageData()
-			return love.graphics.newImage(outputdata)
-		end
-		local c = love.graphics.getCanvas()
-		love.graphics.setCanvas(output)
-		love.graphics.setShader(splitShader)
-		splitShader:send("inputImage", input)
-		splitShader:send("splitColor", {color[1],color[2],color[3]})
-		love.graphics.draw(input,0,0)
-		love.graphics.setShader()
-		love.graphics.setCanvas(c)
+			#ifdef VERTEX
+			vec4 position( mat4 transform_projection, vec4 vertex_position )
+			{
+				return transform_projection * vertex_position;
+			}
+			#endif
+			#ifdef PIXEL
+			vec4 effect( vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords )
+			{
+				vec4 texcolor = Texel(inputImage, texture_coords);
+				if (abs(texcolor.r-splitColor.r) > 0.01 || abs(texcolor.g-splitColor.g) > 0.01 || abs(texcolor.b-splitColor.b) > 0.01)
+				{ discard; }
+				return vec4(1.0,1.0,1.0,1.0);
+			}
+			#endif
+		]]
+	end
+	local drawable = love.graphics.newImage(img)
+	local output = love.graphics.newCanvas(drawable:getWidth(), drawable:getHeight())
+	if exclude then
 		local outputdata = output:newImageData()
 		return love.graphics.newImage(outputdata)
-	else
-		local input = love.image.newImageData(img)
-		local output = love.image.newImageData(input:getWidth(), input:getHeight())
-		for x = 0, input:getWidth()-1 do
-			for y = 0, input:getHeight()-1 do
-				local r, g, b, a = input:getPixel(x, y)
-				local rr, rg, rb = r, g, b
-				local place = false
-				if exclude then
-					place = true
-					for i, c in pairs(color) do
-						if rr == c[1] and rg == c[2] and rb == c[3] then
-							place = false
-							break
-						end
-					end
-				else
-					if rr == color[1] and rg == color[2] and rb == color[3] then
-						place = true
-					end
-				end
-				if place then
-					if exclude then
-						output:setPixel(x, y, r, g, b, a)
-					else
-						output:setPixel(x, y, 1, 1, 1, a)
-					end
+	end
+	local c = love.graphics.getCanvas()
+	love.graphics.setCanvas(output)
+	love.graphics.setShader(splitShader)
+	splitShader:send("inputImage", drawable)
+	splitShader:send("splitColor", {color[1]/255,color[2]/255,color[3]/255})
+	love.graphics.draw(drawable,0,0)
+	love.graphics.setShader()
+	love.graphics.setCanvas(c)
+	local outputdata = output:newImageData()
+	return love.graphics.newImage(outputdata)
+end
+
+---@param img love.ImageData
+---@param color table
+---@param exclude boolean?
+---@param imagedata boolean?
+local function _splitimageffi(img, color, exclude, imagedata)
+	local output    = img:clone()
+	local pointer   = require("ffi").cast("uint8_t*", output:getFFIPointer()) -- imageData has one byte per channel per pixel.
+	local bytecount = output:getWidth() * output:getHeight() -- pixel count * 4
+
+	for i = 0, 4*bytecount-1, 4 do
+		local r, g, b, a = pointer[i], pointer[i+1], pointer[i+2], pointer[i+3]
+
+		local place = false
+		if exclude then
+			place = true
+			for _, c in pairs(color) do
+				if r == c[1] and g == c[2] and b == c[3] then
+					place = false
+					break
 				end
 			end
-		end
-		if imagedata then
-			return output
 		else
-			return love.graphics.newImage(output)
+			if r == color[1] and g == color[2] and b == color[3] then
+				place = true
+			end
 		end
+		if place then
+			-- if exclude, values remain the same, so no need to do anything
+			if not exclude then
+				pointer[i]   = 255
+				pointer[i+1] = 255
+				pointer[i+2] = 255
+				pointer[i+3] = a
+			end
+		else
+			pointer[i]   = 0
+			pointer[i+1] = 0
+			pointer[i+2] = 0
+			pointer[i+3] = 0
+		end
+	end
+
+	if imagedata then
+		return output
+	else
+		return love.graphics.newImage(output)
+	end
+end
+
+---@param img love.ImageData
+---@param color table
+---@param exclude boolean?
+---@param imagedata boolean?
+local function _splitimagenative(img, color, exclude, imagedata)
+	local output = img:clone()
+
+	output:mapPixel(function(_, _, r, g, b, a)
+		local place = false
+		if exclude then
+			place = true
+			for _, c in pairs(color) do
+				if r == c[1] and g == c[2] and b == c[3] then
+					place = false
+					break
+				end
+			end
+		else
+			if r == color[1] and g == color[2] and b == color[3] then
+				place = true
+			end
+		end
+		if place then
+			if exclude then
+				return nil -- leaves value (r,g,b,a) unchanged
+			else
+				return 255, 255, 255, a
+			end
+		end
+		return 0, 0, 0, 0
+	end)
+
+	if imagedata then
+		return output
+	else
+		return love.graphics.newImage(output)
+	end
+end
+
+---@param img love.ImageData
+---@param color table
+---@param exclude boolean?
+---@param imagedata boolean?
+function splitimage(img, color, exclude, imagedata) --split singe image into colorable images
+	if false then --useShader then
+		return _splitimageshaders(img, color, exclude, imagedata)
+	elseif FFIAVAILABLE then
+		return _splitimageffi(img, color, exclude, imagedata)
+	else
+		return _splitimagenative(img, color, exclude, imagedata)
 	end
 end
 
@@ -549,9 +585,10 @@ function setcustomplayer(i, pn, initial) --name, player number, initial (don't c
 				if imgs[n] then
 					characters.data[i][n] = {}
 					if #characters.data[i].colors == #characters.data[i].colorables and not characters.data[i].dontsplitcolors then
-						characters.data[i][n][0] = splitimage("alesans_entities/characters/" .. i .. "/" .. n .. ".png", characters.data[i].colors, true)
+						local img = love.image.newImageData("alesans_entities/characters/" .. i .. "/" .. n .. ".png")
+						characters.data[i][n][0] = splitimage(img, characters.data[i].colors, true)
 						for j = 1, #characters.data[i].colorables do
-							characters.data[i][n][j] = splitimage("alesans_entities/characters/" .. i .. "/" .. n .. ".png", characters.data[i].colors[j])
+							characters.data[i][n][j] = splitimage(img, characters.data[i].colors[j])
 						end
 					elseif love.filesystem.getInfo("alesans_entities/characters/" .. i .. "/" .. n .. "1.png") then
 						for j = 0, #characters.data[i].colorables do

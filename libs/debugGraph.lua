@@ -115,12 +115,12 @@ function debugGraph:new(type, x, y, width, height, delay, label, font)
     end
 
 	-- Draw the line
-	love.graphics.setColor(1,1,1,.5)
+	love.graphics.setColor(255,255,255,128)
     love.graphics.line(lineData)
 
     -- Print the label
     if self.label ~= '' then
-		love.graphics.setColor(1,1,1)
+		love.graphics.setColor(255,255,255)
       love.graphics.print(self.label, self.x, self.y + self.height - self.font:getHeight())
     end
 

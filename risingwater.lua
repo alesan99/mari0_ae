@@ -310,16 +310,16 @@ end
 
 function risingwater:draw()
 	--[[draw orange rectangle
-	love.graphics.setColor(234/255, 160/255, 45/255, 111/255)
+	love.graphics.setColor(234, 160, 45, 111)
 	love.graphics.rectangle("fill", (((self.rx)*16)-xscroll*16)*scale, ((self.ry-(8/16)-yscroll)*16)*scale, (self.rw*16)*scale, (self.rh*16)*scale)
-	love.graphics.setColor(0, 0, 1, 150/255)
+	love.graphics.setColor(0, 0, 255, 150)
 	love.graphics.rectangle("fill", (((self.x)*16)-xscroll*16)*scale, ((self.y-(8/16)-yscroll)*16)*scale, (self.width*16)*scale, (self.height*16)*scale)
-	love.graphics.setColor(1, 1, 1, 1)]]
+	love.graphics.setColor(255, 255, 255, 255)]]
 	if not onscreen(self.x, self.y, self.width, self.height) then
 		return false
 	end
 
-	love.graphics.setColor(1, 1, 1, 1)
+	love.graphics.setColor(255, 255, 255, 255)
 	love.graphics.setScissor(math.floor((((self.x)*16)-xscroll*16)*scale), math.floor(((self.y-(8/16)-yscroll)*16)*scale), math.ceil((self.width*16)*scale), math.ceil((self.height*16)*scale))
 	if self.spritebatch and self.spritebatchupdated then
 		love.graphics.draw(self.spritebatch)

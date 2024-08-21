@@ -25,7 +25,7 @@ function emancipationfizzle:update(dt)
 end
 
 function emancipationfizzle:draw()
-	local delta = 1-self.timer/emancipationfizzletime
+	local delta = 255*(1-self.timer/emancipationfizzletime)
 	love.graphics.setColor(delta, delta, delta, delta)
 	love.graphics.draw(fizzleimg, (self.x-xscroll)*16*scale, (self.y-yscroll-.5)*16*scale, self.r, scale, scale, 2, 1)
 end

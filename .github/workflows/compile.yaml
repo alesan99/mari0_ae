@@ -56,11 +56,11 @@ jobs:
       id: build-android
       uses: qixils/love-actions-android@v1
       with:
-        app-name: "Mari0: AE"
+        app-name: ${{ steps.metadata.outputs.title }}
         bundle-id: love.to.androidmari0 # backwards compatibility
         product-name: ${{ steps.metadata.outputs.id }}
         resource-path: "main/.android-resources"
-        love-ref: 11.5a
+        love-ref: 11.x
         love-package: main/makelove-build/love/${{ env.ARTIFACT_NAME_LOVE }}
         remote-libs: "https://github.com/qixils/lua-https"
         version-string: ${{ steps.metadata.outputs.version }}

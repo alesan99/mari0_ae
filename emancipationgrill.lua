@@ -149,9 +149,9 @@ function emancipationgrill:draw()
 			if self.active then
 				love.graphics.setScissor(parstartleft, ((self.y-1-yscroll)*16-2)*scale, self.range - emanceimgwidth*scale, scale*4)
 				
-				love.graphics.setColor(unpack(emancelinecolor))
+				love.graphics.setColor(emancelinecolor)
 				love.graphics.rectangle("fill", math.floor((self.startx-1-xscroll)*16*scale), ((self.y-1-yscroll)*16-2)*scale, self.range, scale*4)
-				love.graphics.setColor(1, 1, 1)
+				love.graphics.setColor(255, 255, 255)
 				
 				for i, v in pairs(self.particles.i) do
 					local y = ((self.y-yscroll-1)*16-self.particles.mod[i])*scale
@@ -176,9 +176,9 @@ function emancipationgrill:draw()
 			if self.active then
 				love.graphics.setScissor(math.floor(((self.x-1-xscroll)*16+6)*scale), parstartup-8*scale, scale*4, self.range - emanceimgwidth*scale)
 				
-				love.graphics.setColor(unpack(emancelinecolor))
+				love.graphics.setColor(emancelinecolor)
 				love.graphics.rectangle("fill", math.floor(((self.x-1-xscroll)*16+6)*scale), parstartup-8*scale, scale*4, self.range - emanceimgwidth*scale)
-				love.graphics.setColor(1, 1, 1)
+				love.graphics.setColor(255, 255, 255)
 				
 				for i, v in pairs(self.particles.i) do
 					local x = ((self.x-1-xscroll)*16-self.particles.mod[i]+9)*scale

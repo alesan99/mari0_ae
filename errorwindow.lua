@@ -20,12 +20,12 @@ function errorwindow:init(title, text)
 	self.button["retry"] = guielement:new("button", self.x+self.width-8-padding, self.y+self.height-15-padding, "retry", function() end, 2)
 	self.button["retry"].x = self.button["retry"].x - self.button["retry"].width
 
-	self.a = 1
+	self.a = 255
 	self.opened = false
 end
 
 function errorwindow:update(dt)
-	self.a = math.min(1, self.a + (3000/255)*dt)
+	self.a = math.min(255, self.a + 3000*dt)
 	self.button["ignore"]:update(dt)
 	self.button["retry"]:update(dt)
 end
@@ -33,17 +33,17 @@ end
 function errorwindow:draw(a)
 	a = a or self.a
 	--window
-	love.graphics.setColor(0, 0, 0, a*230/255)
+	love.graphics.setColor(0,0,0,230*(a/255))
 	love.graphics.rectangle("fill", self.x*scale, self.y*scale, self.width*scale, self.height*scale)
-	love.graphics.setColor(1, 1, 1, a)
+	love.graphics.setColor(255,255,255,a)
 	drawrectangle(self.x, self.y, self.width, 19)
 	drawrectangle(self.x, self.y+18, self.width, self.height-18)
 	--text
 	love.graphics.setScissor(self.x*scale, self.y*scale, self.width*scale, (self.height-padding-15)*scale)
-	love.graphics.setColor(1, 1, 1, a)
+	love.graphics.setColor(255,255,255,a)
 	properprintfast(self.title, (self.x+padding)*scale, (self.y+padding)*scale)
 	
-	love.graphics.setColor(1, 1, 1, a)
+	love.graphics.setColor(255,255,255,a)
 	properprintfastf(self.text, (self.x+padding)*scale, (self.y+padding+20)*scale, self.width-padding*2)
 	love.graphics.setScissor()
 

@@ -39,7 +39,7 @@ end
 
 function doorsprite:draw()
 	if self.visible then
-		love.graphics.setColor(1, 1, 1)
+		love.graphics.setColor(255, 255, 255)
 		love.graphics.draw(doorspriteimg, self.quad[self.frame], math.floor((self.cox-1-xscroll)*16*scale), math.floor((self.coy-2-(8/16)-yscroll)*16*scale), 0, scale, scale)
 	end
 end

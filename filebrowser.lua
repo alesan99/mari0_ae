@@ -37,8 +37,8 @@ function filebrowser_load(directory)
 
 	--buttons
 	browsergui["exit"] = guielement:new("button", 10, 203, "exit", filebrowser_exit, 2)
-	browsergui["exit"].bordercolor = {1, 0, 0}
-	browsergui["exit"].bordercolorhigh = {1, .5, .5}
+	browsergui["exit"].bordercolor = {255, 0, 0}
+	browsergui["exit"].bordercolorhigh = {255, 127, 127}
 
 	browsergui["newfile"] = guielement:new("button", 51, 203, "new file", newfile, 2)
 	browsergui["newfolder"] = guielement:new("button", 124, 203, "new folder", newfolder, 2)
@@ -136,21 +136,21 @@ end
 
 function filebrowser_draw()
 	-- background
-	love.graphics.setColor(0,0,0, 0.8)
+	love.graphics.setColor(0, 0, 0, 200)
 	love.graphics.rectangle("fill", 0, 0, width*16*scale, height*16*scale)
 
 	-- files
 	for i = 0, #files-1 do
 		local file = files[i+1]
 		if (i*listsize+listsize+listy)-listscroll >= listy and i*listsize-listscroll < height*16-27 then --check if on screen
-			love.graphics.setColor(1,1,1)
+			love.graphics.setColor(255, 255, 255)
 			love.graphics.rectangle("fill", 0, (i*listsize+listy - listscroll + listsize)*scale, width*16*scale, 1*scale)
 			properprintfast(file, 1*scale, (i*listsize+listy - listscroll + listsize - math.floor(listsize/2+4))*scale)
 		
 			--buttons
 			for j, w in pairs(filegui[file]) do
 				w:draw()
-				love.graphics.setColor(1,1,1)
+				love.graphics.setColor(255, 255, 255)
 				love.graphics.draw(filebrowserimg, filebrowserquad[w.filebrowserimage], (w.x+5)*scale, (w.y+2)*scale, 0, scale, scale)
 			end
 		end
@@ -160,14 +160,14 @@ function filebrowser_draw()
 	-- directory
 	love.graphics.setColor(0,0,0)
 	love.graphics.rectangle("fill", 0, 0, width*16*scale, (listy-1)*scale)
-	love.graphics.setColor(1,1,1)
+	love.graphics.setColor(255, 255, 255)
 	love.graphics.rectangle("fill", 0, (listy-1)*scale, width*16*scale, 1*scale)
 	properprintfast(dir, 1*scale, 2*scale)
 
 	-- tool bar
 	love.graphics.setColor(0,0,0)
 	love.graphics.rectangle("fill", 0*scale, 197*scale, width*16*scale, 27*scale)
-	love.graphics.setColor(1,1,1)
+	love.graphics.setColor(255, 255, 255)
 	love.graphics.rectangle("fill", 0*scale, 197*scale, width*16*scale, 1*scale)
 	for i, v in pairs(browsergui) do
 		v:draw()
@@ -175,7 +175,7 @@ function filebrowser_draw()
 
 	-- prompt
 	if prompt then
-		love.graphics.setColor(0,0,0, 0.5)
+		love.graphics.setColor(0,0,0, 127)
 		love.graphics.rectangle("fill", 0, 0, width*16*scale, height*16*scale)
 		love.graphics.setColor(0,0,0)
 		love.graphics.rectangle("fill", 50*scale, 56*scale, 300*scale, 100*scale)
@@ -359,27 +359,27 @@ function openprompt(t, arg)
 	promptgui = {}
 
 	if t == "rename" then
-		promptgui["title"] = guielement:new("text", 53, 60, "rename file", {1,1,1})
+		promptgui["title"] = guielement:new("text", 53, 60, "rename file", {255, 255, 255})
 		promptgui["textinput"] = guielement:new("input", 54,73, 35, nil, arg, 45)
 		promptgui["textinput"].bypassspecialcharacters = true
 		promptgui["textinput"].allowanycharacters = true
 		promptgui["confirm"] = guielement:new("button", 282,137, "confirm", function() renamefile(arg, promptgui["textinput"].value); closeprompt() end, 2)
-		promptgui["confirm"].bordercolor = {1, 0, 0}
-		promptgui["confirm"].bordercolorhigh = {1, .5, .5}
+		promptgui["confirm"].bordercolor = {255, 0, 0}
+		promptgui["confirm"].bordercolorhigh = {255, 127, 127}
 	elseif t == "download" then
-		promptgui["title"] = guielement:new("text", 53, 60, "download from url:", {1,1,1})
+		promptgui["title"] = guielement:new("text", 53, 60, "download from url:", {255, 255, 255})
 		promptgui["textinput"] = guielement:new("input", 54,73, 35, nil, arg, 45)
 		promptgui["textinput"].bypassspecialcharacters = true
 		promptgui["textinput"].allowanycharacters = true
 		
 		promptgui["paste"] = guielement:new("button", 54,88, "paste from clipboard", function() promptgui["textinput"].value = love.system.getClipboardText() end, 2)
 		promptgui["confirm"] = guielement:new("button", 282,137, "confirm", function() downloadfile(promptgui["textinput"].value); closeprompt() end, 2)
-		promptgui["confirm"].bordercolor = {1, 0, 0}
-		promptgui["confirm"].bordercolorhigh = {1, .5, .5}
+		promptgui["confirm"].bordercolor = {255, 0, 0}
+		promptgui["confirm"].bordercolorhigh = {255, 127, 127}
 	elseif t == "edit" then
-		promptgui["title"] = guielement:new("text", 53, 60, "edit file " .. arg, {1,1,1})
+		promptgui["title"] = guielement:new("text", 53, 60, "edit file " .. arg, {255, 255, 255})
 		
-		promptgui["contents"] = guielement:new("text", 53, 70, "replace with new contents:", {1,1,1})
+		promptgui["contents"] = guielement:new("text", 53, 70, "replace with new contents:", {255, 255, 255})
 		promptgui["textinput"] = guielement:new("input", 54,80, 35, nil, "", 9999999)
 		promptgui["textinput"].bypassspecialcharacters = true
 		promptgui["textinput"].allowanycharacters = true
@@ -391,16 +391,16 @@ function openprompt(t, arg)
 
 		promptgui["savetext"] = guielement:new("button", 268,137, "save text", function() editfile(arg, promptgui["textinput"].value, "text"); closeprompt() end, 2)
 		promptgui["savebase64"] = guielement:new("button", 168,137, "save base64", function() editfile(arg, promptgui["textinput"].value, "base64"); closeprompt() end, 2)
-		promptgui["savetext"].bordercolor = {1, 0, 0}
-		promptgui["savetext"].bordercolorhigh = {1, .5, .5}
-		promptgui["savebase64"].bordercolor = {1, 0, 0}
-		promptgui["savebase64"].bordercolorhigh = {1, .5, .5}
+		promptgui["savetext"].bordercolor = {255, 0, 0}
+		promptgui["savetext"].bordercolorhigh = {255, 127, 127}
+		promptgui["savebase64"].bordercolor = {255, 0, 0}
+		promptgui["savebase64"].bordercolorhigh = {255, 127, 127}
 	elseif t == "delete" then
-		promptgui["title"] = guielement:new("text", 53, 60, "delete this file?", {1,1,1})
-		promptgui["titlefile"] = guielement:new("text", 53, 70, arg, {1,1,1})
+		promptgui["title"] = guielement:new("text", 53, 60, "delete this file?", {255, 255, 255})
+		promptgui["titlefile"] = guielement:new("text", 53, 70, arg, {255, 255, 255})
 		promptgui["confirm"] = guielement:new("button", 282,137, "confirm", function() deletefile(dir .. "/" .. arg); closeprompt() end, 2)
-		promptgui["confirm"].bordercolor = {1, 0, 0}
-		promptgui["confirm"].bordercolorhigh = {1, .5, .5}
+		promptgui["confirm"].bordercolor = {255, 0, 0}
+		promptgui["confirm"].bordercolorhigh = {255, 127, 127}
 	end
 
 	promptgui["close"] = guielement:new("button", 54, 137, "close", closeprompt, 2)

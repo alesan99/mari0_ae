@@ -225,11 +225,6 @@ function loadenemy(filename)
 				enemiesdata[s][i] = v
 			end
 		end
-
-		--Bulk migration
-		for i, v in pairs(enemiesdata[s]) do
-			convertcolorsif(i, v)
-		end
 		
 		--Load graphics if it exists
 		if love.filesystem.getInfo(folder .. s .. ".png") then

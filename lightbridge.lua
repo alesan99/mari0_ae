@@ -300,21 +300,21 @@ function lightbridgebody:update(dt)
 end
 
 function lightbridgebody:draw()
-	love.graphics.setColor(1, 1, 1)
+	love.graphics.setColor(255, 255, 255)
 	
 	local glowa = self.parent:getglowa(self.i)
 	
 	if self.dir == "hor" then
 		love.graphics.draw(lightbridgeimg, math.floor((self.cox-xscroll-1)*16*scale), (self.coy-yscroll-1.5)*16*scale, 0, scale, scale)
-		love.graphics.setColor(1, 1, 1, glowa)
+		love.graphics.setColor(255, 255, 255, glowa*255)
 		love.graphics.draw(lightbridgeglowimg, math.floor((self.cox-xscroll-1)*16*scale), (self.coy-yscroll-1.5)*16*scale, 0, scale, scale)
 	else
 		love.graphics.draw(lightbridgeimg, math.floor((self.cox-xscroll-1/16)*16*scale), (self.coy-yscroll-1)*16*scale, math.pi/2, scale, scale, 8, 1)
-		love.graphics.setColor(1, 1, 1, glowa)
+		love.graphics.setColor(255, 255, 255, glowa*255)
 		love.graphics.draw(lightbridgeglowimg, math.floor((self.cox-xscroll-1/16)*16*scale), (self.coy-yscroll-1)*16*scale, math.pi/2, scale, scale, 8, 1)
 	end
 	
-	love.graphics.setColor(1, 1, 1)
+	love.graphics.setColor(255, 255, 255)
 	
 	--gel
 	for i = 1, 4 do

@@ -1,6 +1,6 @@
 notice = {}
-notice.red = {1, .5, .5}
-notice.white = {1, 1, 1}
+notice.red = {255, 127, 127}
+notice.white = {255, 255, 255}
 notice.notices = {}
 notice.duration = 5 --seconds
 notice.fadetime = 0.5
@@ -47,10 +47,10 @@ function notice.draw()
 		
 		love.graphics.setScissor(unpack(scissor))
 		
-		love.graphics.setColor(0, 0, 0, 200/255)
+		love.graphics.setColor(0, 0, 0, 200)
 		love.graphics.rectangle("fill", targetrect[1]*scale, targetrect[2]*scale, targetrect[3]*scale, targetrect[4]*scale)
 		
-		love.graphics.setColor(1, 1, 1, 1)
+		love.graphics.setColor(255, 255, 255, 255)
 		drawrectangle(targetrect[1]+1, targetrect[2]+1, targetrect[3]-2, targetrect[4]-2)
 		
 		love.graphics.setColor(v.color)
@@ -59,7 +59,7 @@ function notice.draw()
 		love.graphics.setScissor()
 	end
 	
-	love.graphics.setColor(1, 1, 1)
+	love.graphics.setColor(255, 255, 255)
 end
 
 function notice.gety(y, life, height, duration)

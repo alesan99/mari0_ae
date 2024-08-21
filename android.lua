@@ -93,8 +93,8 @@ function androidLoad()
 	buttons["portal1"].portal = true
 	buttons["portal2"] = touchButton:new("r", "2", t["portal2"][1],t["portal2"][2],t["portal2"][3],t["portal2"][4], "round")
 	buttons["portal2"].portal = true
-	buttons["portal1"].color = {60/255, 188/255, 252/255}
-	buttons["portal2"].color = {232/255, 130/255, 30/255}
+	buttons["portal1"].color = {60, 188, 252}
+	buttons["portal2"].color = {232, 130, 30}
 	
 	-- shift keys to left
 	if fourbythree then
@@ -216,7 +216,7 @@ function androidDraw()
 			local x, y, w, h = skin["center"][1]:getViewport()
 			skinSpriteBatch:add(skin["center"][1], skinData["center"][1], skinData["center"][2], 0, skinData["center"][3]/w, skinData["center"][4]/h)
 		end
-		love.graphics.setColor(1,1,1)
+		love.graphics.setColor(255,255,255)
 		love.graphics.draw(skinSpriteBatch,0,0)
 		for name, b in pairs(buttons) do
 			if skinData.highlightonpress or not b.held then
@@ -231,12 +231,12 @@ function androidDraw()
 	end
 	
 	--[[touch debug
-	love.graphics.setColor(1,0,0)
+	love.graphics.setColor(255,0,0)
 	local mx,my= androidGetCoords(mouseTouchX,mouseTouchY)
 	love.graphics.circle("fill",mx,my,2)
-	love.graphics.setColor(1,1,0)
+	love.graphics.setColor(255,255,0)
 	love.graphics.circle("fill",lastTouchX,lastTouchY,1)
-	love.graphics.setColor(0,1,1)
+	love.graphics.setColor(0,255,255)
 	love.graphics.circle("fill",lastReleaseX,lastReleaseY,1)]]
 
 	if not androidLowRes then

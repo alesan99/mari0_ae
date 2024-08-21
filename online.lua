@@ -1,4 +1,4 @@
-local url = "https://raw.githubusercontent.com/qixils/mari0pository/v1/data.json"
+local asseturl = "https://raw.githubusercontent.com/qixils/mari0pository/v1/data.json"
 local mounted = {}
 
 --- Mounts a file to a folder.
@@ -72,7 +72,7 @@ function downloadassetdata()
         onlinemappacklisterror = true
         return {}
     end
-    local code, body = https.request(url)
+    local code, body = https.request(asseturl)
     if code ~= 200 then
         notice.new(body, notice.red, 4)
         onlinemappacklisterror = true

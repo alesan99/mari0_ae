@@ -172,6 +172,6 @@ function longfire:ceilcollide(a, b)
 end
 
 function longfire:draw()
-	love.graphics.setColor(1, 0, 0)
+	love.graphics.setColor(255, 0, 0)
 	love.graphics.rectangle("line", ((self.x*16)-xscroll)*scale, ((self.y+.5*16)-yscroll)*scale, ((self.x+self.width)*16-xscroll)*scale, ((self.y+self.height+.5)*16-yscroll)*scale)
 end

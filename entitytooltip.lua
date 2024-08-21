@@ -41,7 +41,7 @@ end
 
 function entitytooltip:draw(a)
 	if (tooltipimages[self.ent] and tooltipimages[self.ent].image) or self.customenemy then
-		love.graphics.setColor(1, 1, 1, a)
+		love.graphics.setColor(255, 255, 255, a)
 		local s = self.ent
 		if not self.customenemy then
 			s = entitylist[self.ent].name or entitylist[self.ent].t
@@ -49,21 +49,21 @@ function entitytooltip:draw(a)
 		properprintFbackground(s, self.x, self.y, true)
 		love.graphics.setColor(0, 0, 0, a)
 		drawrectangle(self.x/scale, self.y/scale+8, (twidth+4), (theight+4))
-		love.graphics.setColor(1, 1, 1, a)
+		love.graphics.setColor(255, 255, 255, a)
 		drawrectangle(self.x/scale+1, self.y/scale+9, 66, theight+2)
 		
 		local r, g, b = love.graphics.getBackgroundColor()
 		love.graphics.setColor(r, g, b, a)
 		love.graphics.rectangle("fill", self.x+2*scale, self.y+10*scale, 64*scale, 64*scale)
-		love.graphics.setColor(1, 1, 1, a)
+		love.graphics.setColor(255, 255, 255, a)
 		if self.customenemy and (not self.v.tooltipgraphic) then
 			love.graphics.setScissor(self.x+2*scale, self.y+10*scale, 64*scale, 64*scale)
 			local v = self.v
 			if v.width and v.height then
 				local xoff, yoff = ((0.5-v.width/2+(v.spawnoffsetx or 0))*16 + v.offsetX - v.quadcenterX)*scale, (((v.spawnoffsety or 0)-v.height+1)*16-v.offsetY - v.quadcenterY)*scale
-				love.graphics.setColor(1, 0, 0, a*(150/255))
+				love.graphics.setColor(255, 0, 0, 150*(a/255))
 				love.graphics.rectangle("fill", self.x+(2+32-8)*scale, self.y+(10+32-8)*scale, 16*scale, 16*scale)
-				love.graphics.setColor(1, 1, 1, a)
+				love.graphics.setColor(255, 255, 255, a)
 				if self.graphic and self.quad then
 					love.graphics.draw(self.graphic, self.quad, self.x+(2+32-8)*scale+xoff, self.y+(10+32)*scale+yoff, 0, scale, scale)
 				else
@@ -73,7 +73,7 @@ function entitytooltip:draw(a)
 					elseif (not self.graphic) and self.quad then
 						s = "no\ngraphic"
 					end
-					love.graphics.setColor(216/255, 40/255, 0, a)
+					love.graphics.setColor(216, 40, 0, a)
 					properprintFbackground(s, self.x+(2+32-#("broken")*4)*scale+xoff, self.y+(10+32)*scale+yoff, true)
 				end
 			end
@@ -85,7 +85,7 @@ function entitytooltip:draw(a)
 					local alpha = (((self.timer%1)-0.9)/0.1)
 					love.graphics.setColor(r, g, b, (1-math.sqrt(1-(alpha*alpha)))*a)
 					love.graphics.rectangle("fill", self.x+2*scale, self.y+10*scale, 64*scale, 64*scale)
-					love.graphics.setColor(1, 1, 1, alpha*a)
+					love.graphics.setColor(255, 255, 255, alpha*a)
 					love.graphics.draw(self.graphic, tooltipquad[math.floor((self.timer+1)%2)+1], self.x+2*scale, self.y+10*scale, 0, scale, scale)
 				end
 			else

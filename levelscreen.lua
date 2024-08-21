@@ -249,7 +249,7 @@ function levelscreen_draw()
 		properprintbasicfunc = properprintbackground
 	end
 	if levelscreentimer < blacktime - blacktimesub and levelscreentimer > blacktimesub then
-		love.graphics.setColor(1, 1, 1, 1)
+		love.graphics.setColor(255, 255, 255, 255)
 		
 		if gamestate == "levelscreen" and not dcplaying then
 			if levelscreenimagecheck then
@@ -270,7 +270,7 @@ function levelscreen_draw()
 				local v = characters.data[mariocharacter[i]]
 				
 				for j = 1, #characters.data[mariocharacter[i]]["animations"] do
-					love.graphics.setColor(unpack(mariocolors[i][j]))
+					love.graphics.setColor(mariocolors[i][j])
 					if playertype == "classic" or playertype == "cappy" or not portalgun then--no portal gun
 					 	love.graphics.draw(v["animations"][j], v["small"]["idle"][5], x+(v.smalloffsetX)*scale, y+(11-v.smalloffsetY)*scale, 0, scale, scale, v.smallquadcenterX, v.smallquadcenterY)
 					else
@@ -284,7 +284,7 @@ function levelscreen_draw()
 				if #mariohats[i] > 1 or mariohats[i][1] ~= 1 then
 					local yadd = 0
 					for j = 1, #mariohats[i] do
-						love.graphics.setColor(1, 1, 1)
+						love.graphics.setColor(255, 255, 255)
 						love.graphics.draw(hat[mariohats[i][j]].graphic, hat[mariohats[i][j]].quad[1], x+(v.smalloffsetX)*scale, y+(11-v.smalloffsetY)*scale, 0, scale, scale, v.smallquadcenterX - hat[mariohats[i][j]].x + offsets[1], v.smallquadcenterY - hat[mariohats[i][j]].y + offsets[2] + yadd)
 						yadd = yadd + hat[mariohats[i][j]].height
 					end
@@ -293,7 +293,7 @@ function levelscreen_draw()
 					love.graphics.draw(hat[mariohats[i][1]].graphic, hat[mariohats[i][1]].quad[1], x+(v.smalloffsetX)*scale, y+(11-v.smalloffsetY)*scale, 0, scale, scale, v.smallquadcenterX - hat[mariohats[i][1]].x + offsets[1], v.smallquadcenterY - hat[mariohats[i][1]].y + offsets[2])
 				end
 			
-				love.graphics.setColor(1, 1, 1, 1)
+				love.graphics.setColor(255, 255, 255, 255)
 				
 				if playertype == "classic" or playertype == "cappy" or not portalgun then--no portal gun
 					love.graphics.draw(v["animations"][0], v["small"]["idle"][5], x+(v.smalloffsetX)*scale, y+(11-v.smalloffsetY)*scale, 0, scale, scale, v.smallquadcenterX, v.smallquadcenterY)
@@ -348,7 +348,7 @@ function levelscreen_draw()
 			
 			properprintfunc(endingtext[1], width*8*scale-string.len(endingtext[1])*4*scale, 120*scale)
 			properprintfunc(endingtext[2], width*8*scale-string.len(endingtext[2])*4*scale, 140*scale)
-			love.graphics.setColor(1, 1, 1, 1)
+			love.graphics.setColor(255, 255, 255, 255)
 		elseif gamestate == "dclevelscreen" or dcplaying then
 			if dcfinish then
 				properprintfunc("daily challenge completed!", width*8*scale-string.len("daily challenge completed!")*4*scale, 120*scale)

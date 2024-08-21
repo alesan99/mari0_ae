@@ -209,7 +209,7 @@ function drawbelt(x, y, length, i, color) --for editor
 	end
 	x, y = x-1, y-1
 	length = math.min(99, math.max(2, math.floor(tonumber(length or 3))))
-	love.graphics.setColor(1, 1, 1)
+	love.graphics.setColor(255, 255, 255)
 	love.graphics.draw(img, beltquad[row][1], math.floor((x-xscroll)*16*scale), math.floor((y-yscroll-.5)*16*scale), 0, scale, scale)
 	for i = 1, length-2 do
 		love.graphics.draw(img, beltquad[row][2], math.floor((x+i-xscroll)*16*scale), math.floor((y-yscroll-.5)*16*scale), 0, scale, scale)

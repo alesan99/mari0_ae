@@ -774,7 +774,7 @@ function clearpipe:draw()
 					ox, oy = t[2]*dx+self.sucklen*math.max(0,-dx), t[1]
 				end
 				local v = (t[2]/self.sucklen)
-				love.graphics.setColor(1, 1, 1, v)
+				love.graphics.setColor(255,255,255,255*v)
 				love.graphics.draw(dustimg, dustquad[t[5]], (x+ox-xscroll)*16*scale, (y+oy-.5-yscroll)*16*scale, t[3], scale, scale, 8, 8)
 				if self.suckentranceportalx then
 					local dir = self.suckentranceportalfacing
@@ -785,7 +785,7 @@ function clearpipe:draw()
 						ox, oy = t[2]*dx+self.sucklen*math.max(0,-dx), t[1]
 					end
 					local v = (t[2]/self.sucklen)
-					love.graphics.setColor(1, 1, 1, v)
+					love.graphics.setColor(255,255,255,255*v)
 					love.graphics.draw(dustimg, dustquad[t[5]], (x+ox-xscroll)*16*scale, (y+oy-.5-yscroll)*16*scale, t[3], scale, scale, 8, 8)
 				end
 			end
@@ -798,7 +798,7 @@ function clearpipe:draw()
 					ox, oy = t[2]*dx+self.sucklen*math.max(0,-dx), t[1]
 				end
 				local v = 1-(t[2]/self.sucklen)
-				love.graphics.setColor(1, 1, 1, v)
+				love.graphics.setColor(255,255,255,255*v)
 				love.graphics.draw(dustimg, dustquad[t[5]], (x+ox-xscroll)*16*scale, (y+oy-.5-yscroll)*16*scale, t[3], scale, scale, 8, 8)
 				if self.suckexitportalx then
 					local dir = self.suckexitportalfacing
@@ -809,7 +809,7 @@ function clearpipe:draw()
 						ox, oy = t[2]*dx+self.sucklen*math.max(0,-dx), t[1]
 					end
 					local v = 1-(t[2]/self.sucklen)
-					love.graphics.setColor(1, 1, 1, v)
+					love.graphics.setColor(255,255,255,255*v)
 					love.graphics.draw(dustimg, dustquad[t[5]], (x+ox-xscroll)*16*scale, (y+oy-.5-yscroll)*16*scale, t[3], scale, scale, 8, 8)
 				end
 			end
@@ -819,7 +819,7 @@ function clearpipe:draw()
 		local dir = self.entrance
 		local cx, cy = self.path[1][1]-1, self.path[1][2]-1
 		local cx, cy, cw, ch, dx, dy = self:getsuck(dir,"entrance",cx,cy)
-		love.graphics.setColor(1,1,1,180/255) if self.suckentranceportalx then love.graphics.setColor(1,0,0,180/255) end
+		love.graphics.setColor(255,255,255,180) if self.suckentranceportalx then love.graphics.setColor(255,0,0,180) end
 		love.graphics.rectangle("line",(cx-xscroll)*16*scale, (cy-0.5-yscroll)*16*scale, cw*16*scale, ch*16*scale)
 		if self.suckentranceportalx then
 			local cx, cy = self.suckentranceportalx-1, self.suckentranceportaly-1
@@ -829,7 +829,7 @@ function clearpipe:draw()
 		local dir = self.exit
 		local cx, cy = self.path[#self.path][1]-1, self.path[#self.path][2]-1
 		local cx, cy, cw, ch, dx, dy = self:getsuck(dir,"exit",cx,cy)
-		love.graphics.setColor(1,1,1,180/255) if self.suckexitportalx then love.graphics.setColor(1,0,0,180/255) end
+		love.graphics.setColor(255,255,255,180) if self.suckexitportalx then love.graphics.setColor(255,0,0,180) end
 		love.graphics.rectangle("line",(cx-xscroll)*16*scale, (cy-0.5-yscroll)*16*scale, cw*16*scale, ch*16*scale)
 		if self.suckexitportalx then
 			local cx, cy = self.suckexitportalx-1, self.suckexitportaly-1
@@ -840,9 +840,9 @@ function clearpipe:draw()
 
 	--[[DEBUG
 	for i = 1, #self.path do
-		love.graphics.setColor(1, 0, 0, 100/255)
+		love.graphics.setColor(255, 0, 0, 100)
 		love.graphics.rectangle("fill", (self.path[i][1]-1-xscroll)*16*scale, (self.path[i][2]-1.5-yscroll)*16*scale, 16*scale, 16*scale)
-		love.graphics.setColor(0, 0, 0, 210/255)
+		love.graphics.setColor(0, 0, 0, 210)
 		love.graphics.circle("fill", (self.path[i][1]-1-xscroll)*16*scale, (self.path[i][2]-1.5-yscroll)*16*scale, 2*scale)
 	end]]
 end
@@ -858,7 +858,7 @@ addsegment = function(x, y, parent, quad, stage, dir, entrance, exit, graphic)
 end
 function clearpipe:getstage(v,dir)
 	if dir == "forward" then
-		return math.max(1, math.min(#self.path, math.floor(v))) 
+		return math.max(1, math.min(#self.path, math.floor(v)))
 	else
 		return math.max(1, math.min(#self.path, math.ceil(v)))
 	end
@@ -1053,12 +1053,12 @@ function clearpipesegment:init(x, y, parent, quad, stage, dir, entrance, exit, g
 	self.static = true
 	self.category = 2
 	self.mask = {true}
-	
+
 	self.emancipatecheck = false
 	self.autodelete = false
 	self.drawable = false
 	self.portalable = false
-	
+
 	self.rotation = 0 --for portals
 	self.graphic = {graphic or clearpipeimg}
 	self.quadi = {quad[1], quad[2]}
@@ -1072,7 +1072,7 @@ function clearpipesegment:init(x, y, parent, quad, stage, dir, entrance, exit, g
 	self.entrance = entrance or false
 	self.exit = exit or false
 	self.stage = stage
-	
+
 	if self.entrance or self.exit then
 		self.hollow = true
 	end
@@ -1090,7 +1090,7 @@ end
 
 function clearpipesegment:draw(drop)
 	if onscreen(self.x, self.y, 1, 1) then
-		--love.graphics.setColor(1, 1, 1)
+		--love.graphics.setColor(255, 255, 255)
 		for i = 1, #self.quad do
 			love.graphics.draw(self.graphic[i], self.quad[i], math.floor(((self.x-xscroll)*16+self.offsetX)*scale), math.floor(((self.y-yscroll)*16-self.offsetY)*scale), 0, scale, scale, self.quadcenterX, self.quadcenterY)
 		end

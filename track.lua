@@ -724,7 +724,7 @@ function trackcontroller:getdirection(t, v)
 end
 
 function trackcontroller:draw()
-	love.graphics.setColor(1,0,0,100/255)
+	love.graphics.setColor(255,0,0,100)
 	love.graphics.rectangle("line", (self.x-1-xscroll)*16*scale, (self.y-1.5-yscroll)*16*scale, 16*scale, 16*scale)
 end
 

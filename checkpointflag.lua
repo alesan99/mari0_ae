@@ -9,7 +9,7 @@ function checkpointflag:init(x, y, r, i)
 	self.r = r
 	self.i = i
 	self.color = {0,0,0}
-	self.symbolcolor = {1,1,1}
+	self.symbolcolor = {255,255,255}
 	self.activatetimer = false
 
 	local v = convertr(r[3], {"string", "num"}, true)
@@ -99,7 +99,7 @@ function checkpointflag:draw(drop)
 		end
 	end
 	if not drop then
-		love.graphics.setColor(1, 1, 1)
+		love.graphics.setColor(255, 255, 255)
 	end
 	love.graphics.draw(checkpointflagimg, checkpointflagquad[spriteset][quadi], math.floor(((self.x+self.width/2-xscroll)*16+offx)*scale), math.floor(((self.y+self.height/2-yscroll-.5)*16+offy)*scale), self.rotation, scale, scale, 16, 16)
 end

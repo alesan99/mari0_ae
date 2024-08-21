@@ -599,7 +599,7 @@ function animation:update(dt)
 					playmusic()
 				end
 			elseif v[1] == "changebackgroundcolor" then
-				love.graphics.setBackgroundColor((tonumber(v[2]) or 255)/255, (tonumber(v[3]) or 255)/255, (tonumber(v[4]) or 255)/255)
+				love.graphics.setBackgroundColor(tonumber(v[2]) or 255, tonumber(v[3]) or 255, tonumber(v[4]) or 255)
 			elseif v[1] == "killplayer" then
 				if v[2] == "everyone" then
 					for i = 1, players do
