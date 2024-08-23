@@ -7401,9 +7401,9 @@ function exportcustomimage(arg)
 			end
 		else
 			if love.filesystem.getInfo(mappackfolder .. "/" .. mappack .. "/tiles.png") then
-				love.filesystem.write(mappackfolder .. "/" .. mappack .. "/tilestemplate.png", love.filesystem.read("graphics/" .. graphicspack .. "/smbtiles.png"))
+				love.filesystem.write(mappackfolder .. "/" .. mappack .. "/tilestemplate.png", love.filesystem.read("graphics/" .. graphicspack .. "/tilestemplate.png"))
 			else
-				love.filesystem.write(mappackfolder .. "/" .. mappack .. "/tiles.png", love.filesystem.read("graphics/" .. graphicspack .. "/smbtiles.png"))
+				love.filesystem.write(mappackfolder .. "/" .. mappack .. "/tiles.png", love.filesystem.read("graphics/" .. graphicspack .. "/tilestemplate.png"))
 			end
 		end
 	elseif customtabstate == "sounds" then
