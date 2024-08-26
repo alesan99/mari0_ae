@@ -227,7 +227,7 @@ function risingwater:update(dt)
 								b.jumping = false
 								b.animationstate = "idle"
 							end
-							b.speedy = math.min(self.sandspeedy - gravity*dt, b.speedy + self.sandsink*dt)
+							b.speedy = math.min(self.sandspeedy - (not b.ignoregravity and b.gravity or 0)*dt, b.speedy + self.sandsink*dt)
 							b.quicksand = true
 							b.speedx = math.min(self.sandspeedx, math.max(-self.sandspeedx, b.speedx))
 							if b.speedx == 0 and not b.jumping then
