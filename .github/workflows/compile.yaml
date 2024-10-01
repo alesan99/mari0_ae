@@ -1,5 +1,5 @@
 name: Compile
-on: [push, pull_request]
+on: [push]
 jobs:
   build:
     runs-on: ubuntu-24.04
@@ -76,7 +76,7 @@ jobs:
         name: ${{ steps.metadata.outputs.id }}-android-debug
         path: main/makelove-build/android/${{ steps.metadata.outputs.id }}-debug.apk
     - name: Artifact (Android Release)
-      if: env.KEYSTORE_ALIAS != '' && env.KEYSTORE_BASE64 != '' && env.KEYSTORE_KEYPASSWORD != '' && env.KEYSTORE_STOREPASSWORD != ''
+      if: env.KEYSTORE_ALIAS != '' && env.KEYSTORE_BASE64
       uses: actions/upload-artifact@v4
       with:
         name: ${{ steps.metadata.outputs.id }}-android-release
