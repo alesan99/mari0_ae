@@ -1,5 +1,5 @@
 name: Compile
-on: [push]
+on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-24.04
@@ -70,10 +70,6 @@ jobs:
         keystore-base64: ${{ env.KEYSTORE_BASE64 }}
         keystore-key-password: ${{ env.KEYSTORE_KEYPASSWORD }}
         keystore-store-password: ${{ env.KEYSTORE_STOREPASSWORD }}
-
-    - name: List Output Directory
-      run: ls -R main/makelove-build/android
-
     - name: Artifact (Android Release)
       uses: actions/upload-artifact@v4
       with:
