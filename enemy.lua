@@ -2779,9 +2779,7 @@ function enemy:globalcollide(a, b, c, d, dir)
 		and a == "enemy" and (not (b.resistsenemykill or b.resistseverything)) and (not b.killsenemies) then
 
 		if self.transforms and self:gettransformtrigger("enemykill") and (not self.justspawned) then
-			if self:handlecollisiontransform("enemykill",a,b) then
-				return
-			end
+			self:transform(self:gettransformsinto("enemykill"))
 		end
 		
 		return true
@@ -2810,9 +2808,7 @@ function enemy:globalcollide(a, b, c, d, dir)
 					addpoints((firepoints[b.t] or 200), self.x, self.y)
 
 					if self.transforms and self:gettransformtrigger("enemykill") and (not self.justspawned) then
-						if self:handlecollisiontransform("enemykill",a,b) then
-							return
-						end
+						self:transform(self:gettransformsinto("enemykill"))
 					end
 					
 					return true
