@@ -12,7 +12,7 @@ function risingwater:init(x, y, r)
 	if #self.r > 0 and self.r[1] ~= "link" then
 		--rightclick things
 		if self.r[1]:find("|") then
-			local v = convertr(self.r[1], {"num", "num", "num", "num", "string", "num", "num", "bool", "num"})
+			local v = convertr(self.r[1], {"num", "num", "num", "num", "string", "num", "num", "bool", "num", "bool"})
 			self.rx = (self.cox-1)+v[3]
 			self.ry = (self.coy-1)+v[4]
 			self.rw = v[1]
@@ -22,10 +22,12 @@ function risingwater:init(x, y, r)
 			self.fillspeed = v[7]/self.rh
 			self.oscillate = v[8]
 			self.waittime = v[9]
+			self.ontop = v[10]
 		end
 		table.remove(self.r, 1)
 	end
 
+	self.drawover = self.ontop
 	self.x = self.rx
 	self.y = self.ry
 	self.width = self.rw
@@ -38,31 +40,21 @@ function risingwater:init(x, y, r)
 
 	if self.t == "clear water" then
 		self.quadi = 1
-		self.drawover = true
 		self.animdelay = 0.2
 	elseif self.t == "water" then
 		self.quadi = 2
-		self.drawover = false
 		self.animdelay = 0.2
 	elseif self.t == "poison" then
 		self.quadi = 3
-		self.drawover = true
 		self.animdelay = 0.2
 	elseif self.t == "poison water" then
 		self.quadi = 3
-		self.drawover = false
 		self.animdelay = 0.2
 	elseif self.t == "lava" then
 		self.quadi = 4
-		self.drawover = true
 		self.animdelay = 0.2
 	elseif self.t == "quicksand" then
 		self.quadi = 5
-		self.drawover = false
-		self.animdelay = 0.2
-	elseif self.t == "quicksandtop" then
-		self.quadi = 5
-		self.drawover = true
 		self.animdelay = 0.2
 	end
 
@@ -73,7 +65,7 @@ function risingwater:init(x, y, r)
 		self.water = true
 		self.hurt = true
 		self.checktable = {"player", "enemy"}
-	elseif self.t == "quicksand" or self.t == "quicksandtop" then
+	elseif self.t == "quicksand" then
 		self.sand = true
 		self.sandsink = 80
 		self.sandspeedy = 0.9
