@@ -182,8 +182,8 @@ if debugconsole then debuginputon = true; debuginput = "print()"; print("DEBUG O
 local debugGraph,fpsGraph,memGraph,drawGraph
 local debugGraphs = false
 
-VERSION = 13.2001
-VERSIONSTRING = "13.2 (10/13/24)"
+VERSION = 13.2002
+VERSIONSTRING = "13.2 (10/26/2024)"
 ANDROIDVERSION = 18
 
 android = (love.system.getOS() == "Android" or love.system.getOS() == "iOS") --[DROID]
