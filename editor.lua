@@ -1654,7 +1654,7 @@ function editor_draw()
 						local tx, ty = rcp.x+rcp.path[i][1], rcp.y+rcp.path[i][2]
 						drawtrack(tx, ty, rcp.path[i][3], rcp.path[i][4])
 						--is object selected to be tracked? (d=default(entity),r=reverse,t=tile,tr=tile reverse)
-						if i ~= 1 and i ~= ismaptile(tx, ty) and (map[tx][ty][2] or rcp.path[i][5] == "t" or rcp.path[i][5] == "tr" or rcp.path[i][5] == "tf" or rcp.path[i][5] == "tfr") then
+						if i ~= 1 and ismaptile(tx, ty) and (map[tx][ty][2] or rcp.path[i][5] == "t" or rcp.path[i][5] == "tr" or rcp.path[i][5] == "tf" or rcp.path[i][5] == "tfr") then
 							local trackable = rcp.path[i][5] or "d"
 							if trackable ~= "" then
 								local dir = rcp.path[i][4]

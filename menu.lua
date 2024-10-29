@@ -1996,8 +1996,8 @@ function loadonlinemappacks()
 			local asset = {
 				type = "error",
 				name = "error",
-				author = "error",
-				description = "error",
+				author = "-",
+				description = "couldn't connect!",
 				download = {
 					url = "error",
 					filename = "error",
