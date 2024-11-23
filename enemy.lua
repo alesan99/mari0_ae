@@ -109,9 +109,6 @@ function enemy:init(x, y, t, a, properties)
 		end
 	end
 
-	-- update qaud if quadno is changed, better than running the same check 10 times
-	local oldqaudno = (self.quadno or 1)
-
 	--right click menu
 	if self.rightclickmenu and self.a[3] then
 		local s = tostring(self.a[3])
@@ -221,9 +218,8 @@ function enemy:init(x, y, t, a, properties)
 		table.remove(self.a, 1)
 	end
 	
-	-- if quadno is changed in either rightclick
-	if oldqaudno ~= self.quadno then
-		self.quad = self.quadgroup[self.quadno]
+	if type(self.quadgroup) == "table" then
+		self.quad = self.quadgroup[self.quadno or 1]
 	end
 	
 	if self.customtimer then
