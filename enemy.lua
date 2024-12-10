@@ -205,7 +205,7 @@ function enemy:init(x, y, t, a, properties)
 						local name = v[1]
 						local value = v[2]
 						if (not self.casesensitive) and (name ~= "offsetX" and name ~= "offsetY" and name ~= "quadcenterX" and name ~= "quadcenterY") then
-							value = value:lower()
+							name = name:lower()
 						end
 						if type(value) == "table" then
 							self[name] = deepcopy(value)
