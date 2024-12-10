@@ -2773,6 +2773,11 @@ function enemy:globalcollide(a, b, c, d, dir)
 	if self.killsenemies and ((self.killsenemiesonsides and (dir == "left" or dir == "right")) or (self.killsenemiesonbottom and dir == "floor") or (self.killsenemiesontop and dir == "ceil") or
 		(self.killsenemiesonleft and dir == "left") or (self.killsenemiesonright and dir == "right") or (self.killsenemiesonpassive and dir == "passive"))
 		and a == "enemy" and (not (b.resistsenemykill or b.resistseverything)) and (not b.killsenemies) then
+
+		if self.transforms and self:gettransformtrigger("enemykill") and (not self.justspawned) then
+			self:transform(self:gettransformsinto("enemykill"))
+		end
+		
 		return true
 	end
 	
@@ -2797,6 +2802,11 @@ function enemy:globalcollide(a, b, c, d, dir)
 						self.speedy = -(self.bounceforce or 10)
 					end
 					addpoints((firepoints[b.t] or 200), self.x, self.y)
+
+					if self.transforms and self:gettransformtrigger("enemykill") and (not self.justspawned) then
+						self:transform(self:gettransformsinto("enemykill"))
+					end
+					
 					return true
 				end
 			end
