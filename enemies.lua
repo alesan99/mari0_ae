@@ -137,12 +137,13 @@ function enemies_load()
 end
 
 function getname(filename)
+	filename = filename:lower()
 	if string.sub(filename, -4) == "json" then
-		return filename:match("^.+/(.*)%.json$"):lower()
-	elseif string.sub(filename, -3):lower() == "png" then
-		return filename:match("^.+/([^%-%.]*)"):lower()
+		return filename:match("^.+/(.*)%.json$")
+	elseif string.sub(filename, -3) == "png" then
+		return filename:match("^.+/([^%-]*).*%.png$")
 	elseif string.sub(filename, -3) == "ogg" then
-		return filename:match("^.+/(.*)%.ogg$"):lower()
+		return filename:match("^.+/(.*)%.ogg$")
 	end
 end
 
