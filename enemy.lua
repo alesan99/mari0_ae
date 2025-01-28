@@ -3711,7 +3711,7 @@ function enemy:transform(t, returntransform, death)
 		temp.iceblock = self.iceblock
 	end
 
-	if self.supersized then
+	if self.supersized and (not self.transformdontsupersize) then
 		supersizeentity(temp)
 	end
 	
