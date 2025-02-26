@@ -413,7 +413,7 @@ function love.load()
 				"collectable", "powblock", "smallspring", "risingwater", "redseesaw", "snakeblock", "frozencoin", "entitytooltip", "spawnanimation",
 				"camerastop", "clearpipe", "track", "tilemoving", "laserfield", "checkpointflag", "ice", "pipe", "errorwindow", "filebrowser"}
 	for i = 1, #luas do
-		require(luas[i])
+		require("luas." .. luas[i])
 	end
 	print("done loading .luas!")
 	loadingbardraw(1)

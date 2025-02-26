@@ -109,6 +109,9 @@ function enemy:init(x, y, t, a, properties)
 		end
 	end
 
+	-- update qaud if quadno is changed, better than running the same check 10 times
+	local oldqaudno = (self.quadno or 1)
+
 	--right click menu
 	if self.rightclickmenu and self.a[3] then
 		local s = tostring(self.a[3])
@@ -202,7 +205,7 @@ function enemy:init(x, y, t, a, properties)
 						local name = v[1]
 						local value = v[2]
 						if (not self.casesensitive) and (name ~= "offsetX" and name ~= "offsetY" and name ~= "quadcenterX" and name ~= "quadcenterY") then
-							name = name:lower()
+							value = value:lower()
 						end
 						if type(value) == "table" then
 							self[name] = deepcopy(value)
@@ -218,8 +221,9 @@ function enemy:init(x, y, t, a, properties)
 		table.remove(self.a, 1)
 	end
 	
-	if type(self.quadgroup) == "table" then
-		self.quad = self.quadgroup[self.quadno or 1]
+	-- if quadno is changed in either rightclick
+	if oldqaudno ~= self.quadno then
+		self.quad = self.quadgroup[self.quadno]
 	end
 	
 	if self.customtimer then
@@ -2733,7 +2737,7 @@ function enemy:globalcollide(a, b, c, d, dir)
 	if self.thrown and (not self.dontkillwhenthrown) and not (b.resistsenemykill or b.resistseverything) then
 		if a == "enemy" then
 			if b:shotted("right", false, false, true) ~= false then
-				addpoints(b.firepoints or 200, self.x, self.y)
+				addpoints(b.firepoints or 200, self.x, self.y, self.noscore)
 				if self.throwncollisionignore then
 					return true
 				end
@@ -2751,7 +2755,7 @@ function enemy:globalcollide(a, b, c, d, dir)
 			end
 		elseif fireballkill[a] then
 			if b:shotted("right") ~= false and a ~= "bowser" then
-				addpoints(firepoints[a] or 200, self.x, self.y)
+				addpoints(firepoints[a] or 200, self.x, self.y, self.noscore)
 				if self.throwncollisionignore then
 					return true
 				end
@@ -2773,11 +2777,6 @@ function enemy:globalcollide(a, b, c, d, dir)
 	if self.killsenemies and ((self.killsenemiesonsides and (dir == "left" or dir == "right")) or (self.killsenemiesonbottom and dir == "floor") or (self.killsenemiesontop and dir == "ceil") or
 		(self.killsenemiesonleft and dir == "left") or (self.killsenemiesonright and dir == "right") or (self.killsenemiesonpassive and dir == "passive"))
 		and a == "enemy" and (not (b.resistsenemykill or b.resistseverything)) and (not b.killsenemies) then
-
-		if self.transforms and self:gettransformtrigger("enemykill") and (not self.justspawned) then
-			self:transform(self:gettransformsinto("enemykill"))
-		end
-		
 		return true
 	end
 	
@@ -2801,12 +2800,7 @@ function enemy:globalcollide(a, b, c, d, dir)
 					if self.bouncesonenemykill then
 						self.speedy = -(self.bounceforce or 10)
 					end
-					addpoints((firepoints[b.t] or 200), self.x, self.y)
-
-					if self.transforms and self:gettransformtrigger("enemykill") and (not self.justspawned) then
-						self:transform(self:gettransformsinto("enemykill"))
-					end
-					
+					addpoints((firepoints[b.t] or 200), self.x, self.y, self.noscore)
 					return true
 				end
 			end
@@ -2833,10 +2827,10 @@ function enemy:globalcollide(a, b, c, d, dir)
 		if b.enemykillsdontflyaway then
 			self.doesntflyawayonfireball = true
 		end
-		if b.small and not b.nocombo then
+		if (b.small) and (not b.nocombo) and (not (b.noscore or self.noscore)) then
 			if b.combo < #koopacombo then
 				b.combo = b.combo + 1
-				addpoints(koopacombo[b.combo], self.x, self.y)
+				addpoints(koopacombo[b.combo], self.x, self.y, self.noscore)
 			else
 				for i = 1, players do
 					if mariolivecount ~= false then
@@ -2844,11 +2838,11 @@ function enemy:globalcollide(a, b, c, d, dir)
 						respawnplayers()
 					end
 				end
-				table.insert(scrollingscores, scrollingscore:new("1up", self.x, self.y))
+				table.insert(scrollingscores, scrollingscore:new("1up", self.x, self.y, self.noscore))
 				playsound(oneupsound)
 			end
 		else
-			addpoints((firepoints[self.t] or 200), self.x, self.y)
+			addpoints((firepoints[self.t] or 200), self.x, self.y, self.noscore)
 		end
 		self:shotted(dir)
 

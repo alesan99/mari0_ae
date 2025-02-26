@@ -750,9 +750,12 @@ function koopa:hitenemy(a, b, dir)
 	if a ~= "tile" and a ~= "portalwall" and a ~= "platform" and (self.active or b.shellanimal) and self.small and self.speedx ~= 0 and a ~= "player" and a ~= "spring" and a ~= "donut" and a ~= "springgreen" and a ~= "bigmole" and a ~= "muncher" and a ~= "koopaling" and a ~= "bowser" then
 		if b.shotted and (not self.staystillfall) and (not (b.resistsenemykill or b.resistseverything)) then
 			if self.combo < #koopacombo then
+				if not (b.noscore or self.noscore) then 
 				self.combo = self.combo + 1
 				addpoints(koopacombo[self.combo], b.x, b.y)
+				end
 			else
+				if not (b.noscore or self.noscore) then 
 				for i = 1, players do
 					if mariolivecount ~= false then
 						mariolives[i] = mariolives[i]+1
@@ -761,6 +764,7 @@ function koopa:hitenemy(a, b, dir)
 				end
 				table.insert(scrollingscores, scrollingscore:new("1up", b.x, b.y))
 				playsound(oneupsound)
+				end
 			end
 			b:shotted(dir)
 		end

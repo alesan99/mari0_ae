@@ -1804,7 +1804,9 @@ function game_draw()
 		---UI
 		if ((not darkmode and not lightsout) or editormode) and not hudsimple then
 			love.graphics.scale(1/screenzoom,1/screenzoom)
-			if hudvisible then
+			if not editormode then
+				if hudvisible then drawHUD() end
+			else
 				drawHUD()
 			end
 			love.graphics.scale(screenzoom,screenzoom)
@@ -2849,7 +2851,7 @@ function game_draw()
 	
 	if testlevel then
 		love.graphics.setColor(255, 0, 0, 127)
-		properprintfast("TESTING LEVEL - PRESS ESC TO RETURN TO EDITOR", 16*scale, 0)
+		properprintfast("ESC TO EDITOR", 16*scale, 0)
 	end
 	
 	--pause menu
@@ -3052,10 +3054,17 @@ function drawentity(j, w, i, v, currentscissor, drop)
 			if v.graphiccolor and (not drop) then
 				love.graphics.setColor(v.graphiccolor)
 			end
+			if v.blending then
+				if v.premultiplied then
+					love.graphics.setBlendMode(v.blendmode,"premultiplied") else
+				    love.graphics.setBlendMode(v.blendmode)
+				end
+			end
 			love.graphics.draw(v.graphic, v.quad, math.floor(((v.x-xscroll)*16+v.offsetX)*scale), math.floor(((v.y-yscroll)*16-v.offsetY)*scale), v.rotation, dirscale, horscale, v.quadcenterX, v.quadcenterY)
 			if v.overlaygraphic then
 				love.graphics.draw(v.overlaygraphic, v.overlayquad, math.floor(((v.x-xscroll)*16+v.offsetX)*scale), math.floor(((v.y-yscroll)*16-v.offsetY)*scale), v.rotation, dirscale, horscale, v.quadcenterX, v.quadcenterY)
 			end
+			love.graphics.setBlendMode("alpha")
 		end
 	end
 	
@@ -3749,8 +3758,26 @@ function drawHUD()
 	end
 
 	local cy = 32 --collectable coin ui y
-		
-	if hudsimple then
+	
+	if editormode then
+		local scx = tostring(objects["player"][1].x)
+		local scy = tostring(objects["player"][1].y)
+		scx = string.sub(scx, 1, 5)
+		scy = string.sub(scy, 1, 5)
+
+		properprintfunc("X: "..scx, uispace*.5 - 24*scale, 8*scale)
+		properprintfunc("Y: "..scy, uispace*0.5-24*scale, 16*scale)
+
+		if ((entitylist[currenttile] and entitylist[currenttile].offset) or (enemiesdata[currenttile] and enemiesdata[currenttile].offsetable)) or (not tilequads[currenttile] and enemiesdata[currenttile]) then
+			if not tilequads[currenttile] and enemiesdata[currenttile] then
+				properprintfunc("picked enemy: "..tostring(currenttile), uispace*1.5-8*scale, 8*scale)
+			else 
+				properprintfunc("picked enemy: "..tostring(currenttile), uispace*2.5 - 20*scale, 8*scale) 
+			end
+		else
+			properprintfunc("picked tile: "..tostring(currenttile), uispace*2.5 - 20*scale, 8*scale)
+		end
+	elseif hudsimple then
 		cy = 22
 
 		--properprintfunc(playername .. " * " .. tostring(mariolives[1]), 16*scale, 8*scale)
@@ -7687,7 +7714,7 @@ function item(i, x, y, size)
 	end
 end
 
-function addpoints(i, x, y)
+function addpoints(i, x, y, noscoreCheck)
 	if not i then --or not x or not y
 		return false
 	end
@@ -8721,6 +8748,12 @@ function rendercustombackground(xscroll, yscroll, scrollfactor, scrollfactory)
 
 			local quad = false
 			if custombackgroundanim[i] then
+				if custombackgroundanim[i].blending then
+					if custombackgroundanim[i].premultiplied then
+						love.graphics.setBlendMode(custombackgroundanim[i].blendmode,"premultiplied") else
+						love.graphics.setBlendMode(custombackgroundanim[i].blendmode)
+					end
+				end
 				--animate
 				xscroll = xscroll - custombackgroundanim[i].x
 				yscroll = yscroll - custombackgroundanim[i].y
@@ -8761,6 +8794,7 @@ function rendercustombackground(xscroll, yscroll, scrollfactor, scrollfactory)
 						end
 					end
 				end
+				love.graphics.setBlendMode("alpha")
 			end
 		end
 	end
@@ -8783,6 +8817,12 @@ function rendercustomforeground(xscroll, yscroll, scrollfactor, scrollfactory)
 
 			local quad = false
 			if customforegroundanim[i] then
+				if customforegroundanim[i].blending then
+					if customforegroundanim[i].premultiplied then
+						love.graphics.setBlendMode(customforegroundanim[i].blendmode,"premultiplied") else
+						love.graphics.setBlendMode(customforegroundanim[i].blendmode)
+					end
+				end
 				--animate
 				xscroll = xscroll - customforegroundanim[i].x
 				yscroll = yscroll - customforegroundanim[i].y
@@ -8817,6 +8857,7 @@ function rendercustomforeground(xscroll, yscroll, scrollfactor, scrollfactory)
 					--end
 				end
 			end
+			love.graphics.setBlendMode("alpha")
 		end
 	end
 end
