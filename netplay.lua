@@ -25,12 +25,10 @@ local spammercount = 10
 local lobbytimeout = 12 --kick player if ping is higher than this (a ping this high means they've disconnected)
 
 function client_load(a, p)
-	address, port = a or "localhost", p or 27020
-
-	udp = socket.udp()
-	udp:settimeout(0)
- 
-	udp:setpeername(address, port)
+    address, port = a or "127.0.0.1", p or 27020 -- Use IPv4 loopback [[1]][[3]]
+    udp = socket.udp()
+    udp:settimeout(0)
+    udp:setpeername(address, port)
 	if tostring(udp) and not (tostring(udp):sub(1, 14) == "udp{connected}") then
 		udp:close()
 		notice.new("server not found", notice.red, 3)
@@ -66,23 +64,19 @@ function client_load(a, p)
 end
 
 function server_load(p)
-	port = p or 27020
-	
-	udp = socket.udp()
-	entity = nil
-	clients = {}
-	
-	udp:setsockname("*", port)
-	udp:settimeout(0)
-	
-	updatetimer = 0
-	actions = {}
-	enemyspawnx = 0
-	
-	SERVER = true
-	CLIENT = false
-	
-	return true
+    port = p or 27020
+    udp = socket.udp()
+    entity = nil
+    clients = {}
+	//fixed the issue where sometimes the host could host a UDP6 lobby
+    udp:setsockname("0.0.0.0", port) 
+    udp:settimeout(0)
+    updatetimer = 0
+    actions = {}
+    enemyspawnx = 0
+    SERVER = true
+    CLIENT = false
+    return true
 end
 
 function server_update(dt)
