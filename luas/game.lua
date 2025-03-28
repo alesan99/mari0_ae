@@ -3339,7 +3339,7 @@ function drawplayer(i, x, y, r, pad, drop)
 		end
 
 		if v.character and v.characterdata and v.characterdata.portalgununderhat then
-			if v.graphic[0] thens
+			if v.graphic[0] then
 				if drop then
 					love.graphics.setColor(dropshadowcolor)
 				else

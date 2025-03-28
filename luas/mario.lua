@@ -2920,7 +2920,6 @@ function mario:movement(dt)
 		end
 	end
 	
-	
 	if self.controlsenabled and self.shoe == "cloud" then
 		if upkey(self.playernumber) and self.y > -4 then
 			self.speedy = math.max(-cloudspeed, self.speedy - cloudacceleration*dt)
@@ -2952,22 +2951,31 @@ function mario:movement(dt)
 		else
 			self.speedx = -self.characterdata.maxrunspeed
 		end
-	elseif self.controlsenabled and runningkey and self.size ~= 5 then --RUNNING
+	end
+	local accelgrnd = self.characterdata.walkacceleration
+	local accelair = self.characterdata.walkaccelerationair
+	local maxspeed = maxwalkspeed
+	if runningkey then
+		accelgrnd = self.characterdata.runacceleration
+		accelair = self.characterdata.runaccelerationair
+		maxspeed = maxrunspeed
+	end
+	if (self.controlsenabled and self.size ~= 5) and not (self.shoe == "cloud" or self.capefly) then --WALKING + RUNNING
 		if mariorightkey and not self.statue then --MOVEMENT RIGHT
 			if self.jumping or self.falling then --IN AIR
 				if self[speedx] < maxwalkspeed then
 					if self[speedx] < 0 then
-						self[speedx] = self[speedx] + self.characterdata.runaccelerationair*dt*self.characterdata.airslidefactor
+						self[speedx] = self[speedx] + accelair*dt*self.characterdata.airslidefactor
 					else
-						self[speedx] = self[speedx] + self.characterdata.runaccelerationair*dt
+						self[speedx] = self[speedx] + accelair*dt
 					end
 					
 					self[speedx] = math.min(self[speedx], maxwalkspeed)
 				elseif self[speedx] > maxwalkspeed and self[speedx] < maxrunspeed then
 					if self[speedx] < 0 then
-						self[speedx] = self[speedx] + self.characterdata.runaccelerationair*dt*self.characterdata.airslidefactor
+						self[speedx] = self[speedx] + accelair*dt*self.characterdata.airslidefactor
 					else
-						self[speedx] = self[speedx] + self.characterdata.runaccelerationair*dt
+						self[speedx] = self[speedx] + accelair*dt
 					end
 					
 					self[speedx] = math.min(self[speedx], maxrunspeed)
@@ -2987,7 +2995,7 @@ function mario:movement(dt)
 						end
 					end
 				else
-					self[speedx] = self[speedx] + runacceleration*dt
+					self[speedx] = self[speedx] + accelgrnd*dt
 					self.animationstate = "running"
 				end
 				if self.gravitydir == "right" then
@@ -2996,7 +3004,7 @@ function mario:movement(dt)
 					self.animationdirection = "right"
 				end
 				
-				self[speedx] = math.min(self[speedx], maxrunspeed)
+				self[speedx] = math.min(self[speedx], maxspeed)
 				if self.size == 14 and self[speedx] == maxrunspeed and (not self.shoe) and (not self.pickup) and (not self.helmet) then --get into blueshell
 					self:duck(true)
 				end
@@ -3009,17 +3017,17 @@ function mario:movement(dt)
 			if self.jumping or self.falling then --IN AIR
 				if self[speedx] > -maxwalkspeed then
 					if self[speedx] > 0 then
-						self[speedx] = self[speedx] - self.characterdata.runaccelerationair*dt*self.characterdata.airslidefactor
+						self[speedx] = self[speedx] - accelair*dt*self.characterdata.airslidefactor
 					else
-						self[speedx] = self[speedx] - self.characterdata.runaccelerationair*dt
+						self[speedx] = self[speedx] - accelair*dt
 					end
 					
 					self[speedx] = math.max(self[speedx], -maxwalkspeed)
 				elseif self[speedx] < -maxwalkspeed and self[speedx] > -maxrunspeed then
 					if self[speedx] > 0 then
-						self[speedx] = self[speedx] - self.characterdata.runaccelerationair*dt*self.characterdata.airslidefactor
+						self[speedx] = self[speedx] - accelair*dt*self.characterdata.airslidefactor
 					else
-						self[speedx] = self[speedx] - self.characterdata.runaccelerationair*dt
+						self[speedx] = self[speedx] - accelair*dt
 					end
 					
 					self[speedx] = math.max(self[speedx], -maxrunspeed)
@@ -3039,7 +3047,7 @@ function mario:movement(dt)
 						end
 					end
 				else
-					self[speedx] = self[speedx] - runacceleration*dt
+					self[speedx] = self[speedx] - accelgrnd*dt
 					self.animationstate = "running"
 				end
 				if self.gravitydir == "right" then
@@ -3048,7 +3056,7 @@ function mario:movement(dt)
 					self.animationdirection = "left"
 				end
 				
-				self[speedx] = math.max(self[speedx], -maxrunspeed)
+				self[speedx] = math.max(self[speedx], -maxspeed)
 				if self.size == 14 and self[speedx] == -maxrunspeed and (not self.shoe) and (not self.pickup) and (not self.helmet) then --get into blueshell
 					self:duck(true)
 				end
@@ -3057,172 +3065,52 @@ function mario:movement(dt)
 				end
 			end
 		end
-
-		if (not mariorightkey and not marioleftkey) or (self.ducking and self.falling == false and self.jumping == false) or (not self.controlsenabled) then  --NO MOVEMENT
-			if self.jumping or self.falling then
-				if self[speedx] > 0 then
-					self[speedx] = self[speedx] - self.frictionair*dt
-					if self[speedx] < self.minspeed then
-						self[speedx] = 0
-						self.runframe = 1
-					end
-				else
-					self[speedx] = self[speedx] + self.frictionair*dt
-					if self[speedx] > -self.minspeed then
-						self[speedx] = 0
-						self.runframe = 1
-					end
+	end
+	if (not mariorightkey and not marioleftkey) or (self.ducking and self.falling == false and self.jumping == false) or (not self.controlsenabled) then --no movement
+		if self.jumping or self.falling then
+			if self[speedx] > 0 then
+				self[speedx] = self[speedx] - self.frictionair*dt
+				if self[speedx] < 0 then
+					self[speedx] = 0
+					self.runframe = 1
 				end
 			else
+				self[speedx] = self[speedx] + self.frictionair*dt
 				if self[speedx] > 0 then
-					if self[speedx] > maxrunspeed then
-						self[speedx] = self[speedx] - self.superfriction*dt
-					else	
-						self[speedx] = self[speedx] - self.friction*dt
-					end
-					if self[speedx] < self.minspeed then
-						self[speedx] = 0
-						self.runframe = 1
-						--self.animationstate = "idle"
-					end
-				else
-					if self[speedx] < -maxrunspeed then
-						self[speedx] = self[speedx] + self.superfriction*dt
-					else
-						self[speedx] = self[speedx] + self.friction*dt
-					end
-					if self[speedx] > -self.minspeed then
-						self[speedx] = 0
-						self.runframe = 1
-						--self.animationstate = "idle"
-					end
+					self[speedx] = 0
+					self.runframe = 1
 				end
 			end
-		end
-		
-	else --WALKING
-		if self.controlsenabled and mariorightkey and not self.statue then --MOVEMENT RIGHT
-			if self.jumping or self.falling then --IN AIR
-				if self[speedx] < maxwalkspeed then
-					if self[speedx] < 0 then
-						self[speedx] = self[speedx] + self.characterdata.walkaccelerationair*dt*self.characterdata.airslidefactor
-					else
-						self[speedx] = self[speedx] + self.characterdata.walkaccelerationair*dt
-					end
-					
-					self[speedx] = math.min(self[speedx], maxwalkspeed)
-				end
-			elseif self.ducking == false then --ON GROUND
-				if self[speedx] < maxwalkspeed then
-					if self[speedx] < 0 then
-						if self[speedx] < -maxrunspeed then
-							self[speedx] = self[speedx] + self.superfriction*dt + runacceleration*dt
-						else
-							self[speedx] = self[speedx] + self.friction*dt + runacceleration*dt
-						end
-						self.animationstate = "sliding"
-					else
-						self[speedx] = self[speedx] + walkacceleration*dt
-						self.animationstate = "running"
-					end
-					if self.gravitydir == "right" then
-						self.animationdirection = "left"
-					else
-						self.animationdirection = "right"
-					end
-					
-					self[speedx] = math.min(self[speedx], maxwalkspeed)
-				else
+		else
+			if self[speedx] > 0 then
+				if self[speedx] > maxrunspeed then
+					self[speedx] = self[speedx] - self.superfriction*dt
+				else	
 					self[speedx] = self[speedx] - self.friction*dt
-					self[speedx] = math.max(self[speedx], maxwalkspeed)
 				end
-				if self.shoe and self.shoe ~= "yoshi" and self[speedy] == 0 then --goomba shoe
-					self[speedy] = -goombashoehop; if self.shoe == "heel" then playsound(heelsound); heelsound:setPitch(1+(math.random(1,10)/20-.25)) end
-				end
-			end
-			
-		elseif self.controlsenabled and marioleftkey and not self.statue then --MOVEMENT LEFT
-			if self.jumping or self.falling then --IN AIR
-				if self[speedx] > -maxwalkspeed then
-					if self[speedx] > 0 then
-						self[speedx] = self[speedx] - self.characterdata.walkaccelerationair*dt*self.characterdata.airslidefactor
-					else
-						self[speedx] = self[speedx] - self.characterdata.walkaccelerationair*dt
-					end
-					
-					self[speedx] = math.max(self[speedx], -maxwalkspeed)
-				end
-			elseif self.ducking == false then --ON GROUND
-				if self[speedx] > -maxwalkspeed then
-					if self[speedx] > 0 then
-						if self[speedx] > maxrunspeed then
-							self[speedx] = self[speedx] - self.superfriction*dt - runacceleration*dt
-						else
-							self[speedx] = self[speedx] - self.friction*dt - runacceleration*dt
-						end
-						self.animationstate = "sliding"
-					else
-						self[speedx] = self[speedx] - walkacceleration*dt
-						self.animationstate = "running"
-					end
-					if self.gravitydir == "right" then
-						self.animationdirection = "right"
-					else
-						self.animationdirection = "left"
-					end
-					
-					self[speedx] = math.max(self[speedx], -maxwalkspeed)
-				else
-					self[speedx] = self[speedx] + self.friction*dt
-					self[speedx] = math.min(self[speedx], -maxwalkspeed)
-				end
-				if self.shoe and self.shoe ~= "yoshi" and self[speedy] == 0 then
-					self[speedy] = -goombashoehop; if self.shoe == "heel" then playsound(heelsound); heelsound:setPitch(1+(math.random(1,10)/20-.25)) end
-				end
-			end
-		end
-		if (not mariorightkey and not marioleftkey) or (self.ducking and self.falling == false and self.jumping == false) or (not self.controlsenabled) then --no movement
-			if self.jumping or self.falling then
-				if self[speedx] > 0 then
-					self[speedx] = self[speedx] - self.frictionair*dt
-					if self[speedx] < 0 then
-						self[speedx] = 0
-						self.runframe = 1
-					end
-				else
-					self[speedx] = self[speedx] + self.frictionair*dt
-					if self[speedx] > 0 then
-						self[speedx] = 0
-						self.runframe = 1
-					end
+				if self[speedx] < 0 then
+					self[speedx] = 0
+					self.runframe = 1
+					--self.animationstate = "idle"
 				end
 			else
+				if self[speedx] < -maxrunspeed then
+					self[speedx] = self[speedx] + self.superfriction*dt
+				else	
+					self[speedx] = self[speedx] + self.friction*dt
+				end
 				if self[speedx] > 0 then
-					if self[speedx] > maxrunspeed then
-						self[speedx] = self[speedx] - self.superfriction*dt
-					else	
-						self[speedx] = self[speedx] - self.friction*dt
-					end
-					if self[speedx] < 0 then
-						self[speedx] = 0
-						self.runframe = 1
-						--self.animationstate = "idle"
-					end
-				else
-					if self[speedx] < -maxrunspeed then
-						self[speedx] = self[speedx] + self.superfriction*dt
-					else	
-						self[speedx] = self[speedx] + self.friction*dt
-					end
-					if self[speedx] > 0 then
-						self[speedx] = 0
-						self.runframe = 1
-						--self.animationstate = "idle"
-					end
+					self[speedx] = 0
+					self.runframe = 1
+					--self.animationstate = "idle"
 				end
 			end
 		end
 	end
+	mario:walkMovement(dt)
+end
+
+function mario:walkMovement(dt)
 end
 
 function mario:runanimation(dt, speed, animationspeed)
