@@ -137,6 +137,9 @@ function editor_load(player_position) --{x, y, xscroll, yscroll}
 	powerlinestate = 1
 	selectiontoolclick = {{false, false}, {false, false}}
 	selectiontoolselection = {}
+
+	--init images
+	customenemyiconimg = love.graphics.newImage("graphics/GUI/customenemy.png")
 	
 	guielements["tabmain"] = guielement:new("button", 1, 1, TEXT["main"], maintab, 3)
 	guielements["tabmain"].fillcolor = {63, 63, 63}

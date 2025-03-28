@@ -98,6 +98,12 @@ function enemy:init(x, y, t, a, properties)
 	
 	self.speedx = 0
 	self.speedy = 0
+
+	self.enemyScript = love.filesystem.load("mappacks/"..mappack.."enemies/goomba.lua") -- Load the script
+	if self.enemyScript then
+    	self.enemyScript() -- Execute the loaded function
+    	table.insert(enemies, enemy) -- Add to your enemies list (assuming an `enemies` table)
+	end
 	
 	--Get our enemy's properties from the property table
 	for i, v in pairs(enemiesdata[self.t]) do

@@ -27,7 +27,7 @@ function menu_load()
 	openmappacksbutton.active = false
 	opendlcbutton = guielement:new("button", 241, 190, "open dlc folder", opendlcfolder, nil, 0, 2.5, 147, true)
 	opendlcbutton.active = false
-	mappacksearchbar = guielement:new("input", 240, 16, 15, searchmappacks, "", 100, nil, nil, 0)
+	mappacksearchbar = guielement:new("input", 21+11, 5, 25.5, searchmappacks, "", 100, nil, nil, 0) --x 240
 	mappacksearchbar.active = false
 	oldmappacksearchtable = {}
 	mappacksearchi = 1
@@ -511,7 +511,7 @@ function menu_draw()
 		love.graphics.draw(titleimage, titlequad[titleframe], x*scale, 24*scale, 0, scale, scale)
 		
 		love.graphics.setColor(255, 255, 255)
-		properprintF("©2012-2024 maurice", (x+titlewidth-144)*scale, 112*scale)
+		properprintF("©2012-2025 maurice", (x+titlewidth-144)*scale, 112*scale)
 		love.graphics.setColor(255, 255, 255, 255)
 		
 		if selection == 0 then
@@ -670,7 +670,7 @@ function menu_draw()
 	elseif gamestate == "mappackmenu" then
 		--background
 		love.graphics.setColor(0, 0, 0, 100)
-		love.graphics.rectangle("fill", 21*scale, 16*scale, 218*scale, 200*scale)
+		love.graphics.rectangle("fill", 21*scale, 5*scale, ((width-2)*16)*scale, 212*scale)
 		love.graphics.setColor(255, 255, 255, 255)
 		
 		--set scissor
@@ -692,7 +692,7 @@ function menu_draw()
 				--scrollbar offset
 				love.graphics.translate(0, -round(mappackscrollsmooth*60*scale))
 				
-				love.graphics.setScissor(21*scale, 16*scale, 218*scale, 200*scale)
+				love.graphics.setScissor(21*scale, 16*scale, ((width-2)*16)*scale, 200*scale)
 				
 				for i = math.max(1, math.floor(mappackscrollsmooth+1)), math.min(#mappacklist, math.floor(mappackscrollsmooth+5)) do
 					--back
@@ -743,14 +743,14 @@ function menu_draw()
 					end
 					
 					if mappackdescription[i] then
-						properprint( string.sub(mappackdescription[i] or "", 1, 17), 83*scale, (47+(i-1)*60)*scale)
-						
-						if mappackdescription[i]:len() > 17 then
-							properprint( string.sub(mappackdescription[i] or "", 18, 34), 83*scale, (56+(i-1)*60)*scale)
-						end
+						properprint( string.sub(mappackdescription[i] or "", 1, 34), 83*scale, (47+(i-1)*60)*scale)
 						
 						if mappackdescription[i]:len() > 34 then
-							properprint( string.sub(mappackdescription[i] or "", 35, 51), 83*scale, (65+(i-1)*60)*scale)
+							properprint( string.sub(mappackdescription[i] or "", 35, 68), 83*scale, (56+(i-1)*60)*scale)
+						end
+						
+						if mappackdescription[i]:len() > 68 then
+							properprint( string.sub(mappackdescription[i] or "", 69, 102), 83*scale, (65+(i-1)*60)*scale)
 						end
 					end
 					
@@ -766,21 +766,22 @@ function menu_draw()
 			
 				local i = mappackscrollsmooth / (#mappacklist-3.233)
 			
-				love.graphics.draw(mappackscrollbar, 227*scale, (20+i*160)*scale, 0, scale, scale)
+				love.graphics.draw(mappackscrollbar, ((width-1.5)*16)*scale, (20+i*160)*scale, 0, scale, scale)
 			
 				if mappackhorscrollsmooth <= 0.01 then
 					love.graphics.setScissor()
-					love.graphics.setColor(0, 0, 0, 200)
-					love.graphics.rectangle("fill", 241*scale, 125*scale, 150*scale, 65*scale)
+					--love.graphics.setColor(0, 0, 0, 200)
+					--love.graphics.rectangle("fill", 241*scale, 125*scale, 150*scale, 65*scale)
 					love.graphics.setColor(255, 255, 255, 255)
-					if not savefolderfailed then
-						properprintF(TEXT["mappack folder instructions"], 244*scale, 129*scale)
-					else
-						properprintF(TEXT["mappack folder fail"], 244*scale, 129*scale)
-					end
-					openmappacksbutton:draw()
-					properprintF("       open\n  mappacks folder", 239*scale, 194*scale)
+					--if not savefolderfailed then
+					--	properprintF(TEXT["mappack folder instructions"], 244*scale, 129*scale)
+					--else
+					--	properprintF(TEXT["mappack folder fail"], 244*scale, 129*scale)
+					--end
+					--openmappacksbutton:draw()
+					--properprintF("       open\n  mappacks folder", 239*scale, 194*scale)
 					if mappacksearchbar.active then
+						love.graphics.draw(mappacksearchimg, (21.2)*scale, (5.2)*scale, 0, scale, scale, 0, 0)
 						mappacksearchbar:draw()
 					end
 				end
@@ -1023,26 +1024,26 @@ function menu_draw()
 			end
 		end
 		--local
-		love.graphics.setColor(0, 0, 0)
-		love.graphics.rectangle("fill", 22*scale, 3*scale, 44*scale, 13*scale)
-		love.graphics.setColor(colors[0][1])
-		love.graphics.rectangle("fill", 23*scale, 4*scale, 42*scale, 11*scale)
-		love.graphics.setColor(colors[0][2])
-		properprint("local", 23*scale, 6*scale)
-		--dlc
-		love.graphics.setColor(0, 0, 0)
-		love.graphics.rectangle("fill", 70*scale, 3*scale, 29*scale, 13*scale)
-		love.graphics.setColor(colors[1][1])
-		love.graphics.rectangle("fill", 71*scale, 4*scale, 27*scale, 11*scale)
-		love.graphics.setColor(colors[1][2])
-		properprint("dlc", 72*scale, 6*scale)
-		--daily challenge
-		love.graphics.setColor(0, 0, 0)
-		love.graphics.rectangle("fill", 103*scale, 3*scale, 125*scale, 13*scale)
-		love.graphics.setColor(colors[2][1])
-		love.graphics.rectangle("fill", 104*scale, 4*scale, 123*scale, 11*scale)
-		love.graphics.setColor(colors[2][2])
-		properprint("daily challenge", 105*scale, 6*scale)
+		-- love.graphics.setColor(0, 0, 0)
+		-- love.graphics.rectangle("fill", 22*scale, 3*scale, 44*scale, 13*scale)
+		-- love.graphics.setColor(colors[0][1])
+		-- love.graphics.rectangle("fill", 23*scale, 4*scale, 42*scale, 11*scale)
+		-- love.graphics.setColor(colors[0][2])
+		-- properprint("local", 23*scale, 6*scale)
+		-- --dlc
+		-- love.graphics.setColor(0, 0, 0)
+		-- love.graphics.rectangle("fill", 70*scale, 3*scale, 29*scale, 13*scale)
+		-- love.graphics.setColor(colors[1][1])
+		-- love.graphics.rectangle("fill", 71*scale, 4*scale, 27*scale, 11*scale)
+		-- love.graphics.setColor(colors[1][2])
+		-- properprint("dlc", 72*scale, 6*scale)
+		-- --daily challenge
+		-- love.graphics.setColor(0, 0, 0)
+		-- love.graphics.rectangle("fill", 103*scale, 3*scale, 125*scale, 13*scale)
+		-- love.graphics.setColor(colors[2][1])
+		-- love.graphics.rectangle("fill", 104*scale, 4*scale, 123*scale, 11*scale)
+		-- love.graphics.setColor(colors[2][2])
+		-- properprint("daily challenge", 105*scale, 6*scale)
 		
 		if downloadingmappack then
 			love.graphics.setColor(0, 0, 0, 100)
@@ -1899,19 +1900,10 @@ function mappacks()
 	opendlcbutton.active = false
 	openmappacksbutton.active = false
 	mappacksearchbar.active = false
-	if mappackhorscroll == 0 then
-		loadmappacks()
-		openmappacksbutton.active = true
-		mappacksearchbar.active = true
-	elseif mappackhorscroll == 1 then
-		if (not onlineassetlist) or onlinemappacklisterror then
-			loadonlinemappacks()
-		end
-		mappacktype = "online"
-		opendlcbutton.active = true
-	elseif mappackhorscroll == 2 then
-		loaddailychallenge()
-	end
+	
+	loadmappacks()
+	openmappacksbutton.active = true
+	mappacksearchbar.active = true
 end
 
 function loadmappacks()
@@ -2918,6 +2910,7 @@ function menu_mousepressed(x, y, button)
 				elseif x > 103*scale and x < 225*scale then
 					mappackhorscroll = 2
 				end
+				mappackhorscroll = 0
 				if oldmappackhorscroll ~= mappackhorscroll then
 					openmappacksbutton.active = false
 					opendlcbutton.active = false
@@ -2935,7 +2928,7 @@ function menu_mousepressed(x, y, button)
 						scrollsmooth = onlinemappackscrollsmooth
 					end
 					if x > 25*scale and y > (20+(i-1)*60-round(scrollsmooth*60))*scale and y > 15*scale
-						and x < (mappackhighlight:getWidth()-30)*scale and y < (20+mappackhighlight:getHeight()+(i-1)*60-round(scrollsmooth*60))*scale then
+						and x < (mappackhighlight:getWidth()-160)*scale and y < (20+mappackhighlight:getHeight()+(i-1)*60-round(scrollsmooth*60))*scale then
 						menu_keypressed("return")
 					end
 				else
@@ -2947,7 +2940,7 @@ function menu_mousepressed(x, y, button)
 			if mappacktype == "online" then
 				i = onlinemappackscrollsmooth / (#onlineassetlist-3.233)
 			end
-			if x > 227*scale and x < 235*scale and y > (20+i*160)*scale and y < (52+i*160)*scale then --scrollbar
+			if x > 376*scale and x < (376+8)*scale and y > (20+i*160)*scale and y < (52+i*160)*scale then --scrollbar
 				mappackscrollmouse = true
 			end
 		end
@@ -3190,9 +3183,9 @@ function createmappack()
 	love.filesystem.createDirectory(mappackfolder .. "/" .. mappack .. "/animations/")
 	
 	local s = ""
-	s = s .. "name=new mappack" .. "\n"
+	s = s .. "name=mappack" .. "\n"
 	s = s .. "author=you" .. "\n"
-	s = s .. "description=the newest best  mappack?" .. "\n"
+	s = s .. "description=ae+ was here" .. "\n"
 	
 	love.filesystem.write(mappackfolder .. "/" .. mappack .. "/settings.txt", s)
 

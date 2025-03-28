@@ -62,7 +62,7 @@ function entitytooltip:draw(a)
 			if v.width and v.height then
 				local xoff, yoff = ((0.5-v.width/2+(v.spawnoffsetx or 0))*16 + v.offsetX - v.quadcenterX)*scale, (((v.spawnoffsety or 0)-v.height+1)*16-v.offsetY - v.quadcenterY)*scale
 				love.graphics.setColor(255, 0, 0, 150*(a/255))
-				love.graphics.rectangle("fill", self.x+(2+32-8)*scale, self.y+(10+32-8)*scale, 16*scale, 16*scale)
+				love.graphics.rectangle("fill", self.x*scale, self.y*scale, 4*scale, 4*scale)
 				love.graphics.setColor(255, 255, 255, a)
 				if self.graphic and self.quad then
 					love.graphics.draw(self.graphic, self.quad, self.x+(2+32-8)*scale+xoff, self.y+(10+32)*scale+yoff, 0, scale, scale)

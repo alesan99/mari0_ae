@@ -719,7 +719,7 @@ function game_update(dt)
 	--UPDATE OBJECTS
 	local delete
 	for i, v in kpairs(objects, objectskeys) do
-		if i ~= "tile" and i ~= "portalwall" and i ~= "screenboundary" and i ~= "coin" and i ~= "risingwater" and i ~= "clearpipesegment" and i ~= "tracksegment" and i ~= "funnel" and i ~= "clearpipe" then
+		if i ~= "tile" and i ~= "portalwall" and i ~= "screenboundary" and i ~= "risingwater" and i ~= "clearpipesegment" and i ~= "tracksegment" and i ~= "funnel" and i ~= "clearpipe" then
 			delete = nil
 			for j, w in pairs(v) do
 				if dropshadow and w.shot and w.rotation then
@@ -3323,7 +3323,7 @@ function drawplayer(i, x, y, r, pad, drop)
 			print("missing player graphics! fuck this game!")
 			return false
 		end
-		for k = 1, #v.graphic do
+		for k = 1, #v.graphic do --#v.graphic
 			if drop then
 				love.graphics.setColor(dropshadowcolor)
 			elseif v.colors[k] then
@@ -3333,11 +3333,13 @@ function drawplayer(i, x, y, r, pad, drop)
 			else
 				love.graphics.setColor(255, 255, 255, a)
 			end
+			--paletteShader.on(v.colors, mariocolors[v.playernumber])
 			love.graphics.draw(v.graphic[k], v.quad, math.floor(((px-xscroll)*16+offsetX)*scale), math.floor(((py-yscroll)*16-offsetY)*scale), pr, dirscale, horscale, v.quadcenterX, v.quadcenterY)
+			--paletteShader.off()
 		end
 
 		if v.character and v.characterdata and v.characterdata.portalgununderhat then
-			if v.graphic[0] then
+			if v.graphic[0] thens
 				if drop then
 					love.graphics.setColor(dropshadowcolor)
 				else
@@ -9071,13 +9073,14 @@ function drawmaptiles(drawtype, xscroll, yscroll)
 						end
 						
 						love.graphics.setColor(255, 0, 0, alpha)
-						love.graphics.rectangle("fill", math.floor((x-1-xoff+offsetx)*16*scale), math.floor(((y-1-yoff)*16-8)*scale), 16*scale, 16*scale)
+						--love.graphics.rectangle("fill", math.floor((x-1-xoff+offsetx)*16*scale), math.floor(((y-1-yoff)*16-8)*scale), 8*scale, 8*scale)
 						love.graphics.setColor(255, 255, 255, alpha)
 						if v.showicononeditor and v.icongraphic then
 							love.graphics.draw(v.icongraphic, math.floor((x-1-xoff+offsetx)*16*scale), ((y-1-yoff)*16-8)*scale, 0, scale, scale)
 						else
 							love.graphics.draw(v.graphic, v.quad, math.floor((x-1-xoff+offsetx)*16*scale+exoff), math.floor(((y-1-yoff)*16)*scale+eyoff), 0, (v.animationscalex or 1)*scale, (v.animationscaley or 1)*scale)
 						end
+						love.graphics.draw(customenemyiconimg, math.floor((x-1-xoff+offsetx)*16*scale), ((y-1-yoff)*16-8)*scale, 0, scale, scale)
 						if t["argument"] and t["argument"] == "b" then --supersize
 							love.graphics.setColor(255, 255, 255, 200)
 							love.graphics.draw(entityquads[313].image, entityquads[313].quad, math.floor((x-1-xoff)*16*scale), ((y-1-yoff)*16-8)*scale, 0, scale, scale)

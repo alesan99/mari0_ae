@@ -93,9 +93,9 @@ function intro_draw()
 		
 		local a2 = math.max(0, (1-(introprogress-.5)/0.3)*255)
 		love.graphics.setColor(150, 150, 150, a2)
-		properprint("loading mari0..", love.graphics.getWidth()/2-string.len("loading mari0..")*4*scale, 20*scale)
+		--properprint("loading mari0..", love.graphics.getWidth()/2-string.len("loading mari0..")*4*scale, 20*scale)
 		love.graphics.setColor(50, 50, 50, a2)
-		properprint(loadingtext, love.graphics.getWidth()/2-string.len(loadingtext)*4*scale, love.graphics.getHeight()/2+165*logoscale)
+		--properprint(loadingtext, love.graphics.getWidth()/2-string.len(loadingtext)*4*scale, love.graphics.getHeight()/2+165*logoscale)
 
 		love.graphics.setColor(255,255,255, a2)
 		love.graphics.rectangle("fill", 0, (height*16-3)*scale, (width*16)*scale, 3*scale)

@@ -197,7 +197,7 @@ local loadingbardraw = function(add)
 		love.graphics.scale(winwidth/(width*16*scale), winheight/(224*scale))
 	end
 	love.graphics.setColor(150, 150, 150)
-	properprint("loading mari0..", ((width*16)*scale)/2-string.len("loading mari0..")*4*scale, 20*scale)
+	properprint("loading mari0..", ((width*16)*scale)/2-string.len("loading mari0..")*4*scale, (7*16)*scale)
 	love.graphics.setColor(50, 50, 50)
 	local scale2 = scale
 	if scale2 <= 1 then
@@ -205,13 +205,13 @@ local loadingbardraw = function(add)
 	else
 		scale2 = 1
 	end
-	properprint(loadingtext, ((width*16)*scale)/2-string.len(loadingtext)*4*scale, ((height*16)*scale)/2+165*scale2)
+	--properprint(loadingtext, ((width*16)*scale)/2-string.len(loadingtext)*4*scale, ((height*16)*scale)/2+165*scale2)
 	if FamilyFriendly then
 		love.graphics.setColor(255, 255, 255)
 		properprint("stys.eu", ((width*16)*scale)/2-string.len("stys.eu")*4*scale, 110*scale)
 	else
 		love.graphics.setColor(255, 255, 255)
-		love.graphics.draw(logo, ((width*16)*scale)/2, ((height*16)*scale)/2, 0, scale2, scale2, 142, 150)
+		--love.graphics.draw(logo, ((width*16)*scale)/2, ((height*16)*scale)/2, 0, scale2, scale2, 142, 150)
 	end
 
 	loadingbarv = loadingbarv + (add)/(8)
@@ -281,7 +281,7 @@ function love.load()
 		changescale(scale, fullscreen)
 	end
 
-	love.window.setTitle( "Mari0: AE" )
+	love.window.setTitle( "Mari0: AE+" )
 	
 	love.window.setIcon(love.image.newImageData("graphics/icon.png"))
 	
@@ -369,22 +369,24 @@ function love.load()
 	math.randomseed(os.time());math.random();math.random()
 	
 	--intro
-	loadingtexts = {"reticulating splines", "rendering important stuff", "01110000011011110110111001111001", "sometimes, i dream about cheese",
-					"baking cake", "happy explosion day", "raising coolness by a fifth", "yay facepunch", "stabbing myself", "sharpening knives",
-					"tanaka, thai kick", "loading game genie..", "slime will find you", "becoming self-aware", "it's a secret to everybody", "there is no minus world", 
-					"oh my god, jc, a bomb", "silly loading message here", "motivational art by jorichi", "you're my favorite deputy", 
-					"licensed under wtfpl", "banned in australia", "loading anti-piracy module", "watch out there's a sni", "attack while its tail's up!", 
-					"what a horrible night to have a curse", "han shot first", "establishing connection to nsa servers..","how do i programm", 
-					"making palette inaccurate..", "y cant mario crawl?", "please hold..", "avoiding lawsuits", "loading bugs", "traduciendo a ingles",
-					"fixign typo..", "swing your arms", "this message will self destruct in 3 2 1", "preparing deadly neurotoxin", "loading asleons entetis..", 
-					"now with online multiplayer", "any second now..", "all according to keikaku", "we need pow blocks!", "cross your fingers",
-					"not accurate to the nes!", "improved stability to enhance user experience.", "0118 999 881 999 119 7253", "hoo-ray",
-					"removing herobrine", "how do i play multiplayer????", "not mario maker", "hello there", "this statement is false", 
-					"zap to the extreme", "it just works", "eat your arms", "travelling qpus...", "im a tire", "in real life!", "bold and brash", 
-					"giant enemy crabs", "but im super duper, with a big tuper", "see that mountain? you can climb it", "loading alesan99's stuff"}
+	-- loadingtexts = {"reticulating splines", "rendering important stuff", "01110000011011110110111001111001", "sometimes, i dream about cheese",
+	-- 				"baking cake", "happy explosion day", "raising coolness by a fifth", "yay facepunch", "stabbing myself", "sharpening knives",
+	-- 				"tanaka, thai kick", "loading game genie..", "slime will find you", "becoming self-aware", "it's a secret to everybody", "there is no minus world", 
+	-- 				"oh my god, jc, a bomb", "silly loading message here", "motivational art by jorichi", "you're my favorite deputy", 
+	-- 				"licensed under wtfpl", "banned in australia", "loading anti-piracy module", "watch out there's a sni", "attack while its tail's up!", 
+	-- 				"what a horrible night to have a curse", "han shot first", "establishing connection to nsa servers..","how do i programm", 
+	-- 				"making palette inaccurate..", "y cant mario crawl?", "please hold..", "avoiding lawsuits", "loading bugs", "traduciendo a ingles",
+	-- 				"fixign typo..", "swing your arms", "this message will self destruct in 3 2 1", "preparing deadly neurotoxin", "loading asleons entetis..", 
+	-- 				"now with online multiplayer", "any second now..", "all according to keikaku", "we need pow blocks!", "cross your fingers",
+	-- 				"not accurate to the nes!", "improved stability to enhance user experience.", "0118 999 881 999 119 7253", "hoo-ray",
+	-- 				"removing herobrine", "how do i play multiplayer????", "not mario maker", "hello there", "this statement is false", 
+	-- 				"zap to the extreme", "it just works", "eat your arms", "travelling qpus...", "im a tire", "in real life!", "bold and brash", 
+	-- 				"giant enemy crabs", "but im super duper, with a big tuper", "see that mountain? you can climb it", "loading alesan99's stuff"}
 						
-	loadingtext = loadingtexts[math.random(#loadingtexts)]
-	loadingbardraw(1)
+	-- loadingtext = loadingtexts[math.random(#loadingtexts)]
+	-- loadingbardraw(1)
+
+	--saving on memory
 	
 	--require ALL the files!
 	require "shaders"
@@ -414,15 +416,19 @@ function love.load()
 				"camerastop", "clearpipe", "track", "tilemoving", "laserfield", "checkpointflag", "ice", "pipe", "errorwindow", "filebrowser"}
 	for i = 1, #luas do
 		require("luas." .. luas[i])
+		print("requiring ".. luas[i])
 	end
 	print("done loading .luas!")
 	loadingbardraw(1)
 	local enemyluas = love.filesystem.getDirectoryItems("enemies")
 	for i = 1, #enemyluas do
 		require("enemies." .. enemyluas[i]:sub(1, enemyluas[i]:len()-4))
+		print("requiring ".. enemyluas[i])
 	end
 	print("done loading enemies!")
 	loadingbardraw(1)
+
+	paletteShader = require("shaders.paletteShader")
 
 	--json error window
 	JSONcrashgame = true
@@ -564,12 +570,13 @@ function love.load()
 	mappackloadingicon = love.graphics.newImage("graphics/GUI/mappackloading.png")
 	mappackoverlay = love.graphics.newImage("graphics/GUI/mappackoverlay.png")
 	mappackhighlight = love.graphics.newImage("graphics/GUI/mappackhighlight.png")
+	mappacksearchimg = love.graphics.newImage("graphics/GUI/search.png")
 	
 	mappackscrollbar = love.graphics.newImage("graphics/GUI/mappackscrollbar.png")
 	
 	uparrowimg = love.graphics.newImage("graphics/GUI/uparrow.png")
 	downarrowimg = love.graphics.newImage("graphics/GUI/downarrow.png")
-	customenemyiconimg = love.graphics.newImage("graphics/GUI/customenemy.png")
+	customenemyiconimg = nil
 
 	pathmarkerimg = love.graphics.newImage("graphics/GUI/pathmarker.png")
 	trackmarkerimg = love.graphics.newImage("graphics/GUI/trackmarker.png")
@@ -736,7 +743,7 @@ function love.load()
 			"enter fullscreen with alt and enter.",
 			"change your character in the settings!",
 			"add more playable characters in the 'mari0/alesans_entities/characters' folder."}
-	disabletips = false
+	disabletips = true
 
 	loadingbardraw(1)
 	
