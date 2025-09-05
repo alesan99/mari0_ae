@@ -3950,6 +3950,7 @@ function startlevel(level, reason)
 	else
 		love.audio.stop()
 	end
+	pausedaudio = nil
 	animationsystem_load()
 
 	local sublevel = false
