@@ -3052,10 +3052,17 @@ function drawentity(j, w, i, v, currentscissor, drop)
 			if v.graphiccolor and (not drop) then
 				love.graphics.setColor(v.graphiccolor)
 			end
+			if v.blending then
+				if v.premultiplied then
+					love.graphics.setBlendMode(v.blendmode,"premultiplied") else
+				    love.graphics.setBlendMode(v.blendmode)
+				end
+			end
 			love.graphics.draw(v.graphic, v.quad, math.floor(((v.x-xscroll)*16+v.offsetX)*scale), math.floor(((v.y-yscroll)*16-v.offsetY)*scale), v.rotation, dirscale, horscale, v.quadcenterX, v.quadcenterY)
 			if v.overlaygraphic then
 				love.graphics.draw(v.overlaygraphic, v.overlayquad, math.floor(((v.x-xscroll)*16+v.offsetX)*scale), math.floor(((v.y-yscroll)*16-v.offsetY)*scale), v.rotation, dirscale, horscale, v.quadcenterX, v.quadcenterY)
 			end
+			love.graphics.setBlendMode("alpha")
 		end
 	end
 	
@@ -8721,6 +8728,12 @@ function rendercustombackground(xscroll, yscroll, scrollfactor, scrollfactory)
 
 			local quad = false
 			if custombackgroundanim[i] then
+				if custombackgroundanim[i].blending then
+					if custombackgroundanim[i].premultiplied then
+						love.graphics.setBlendMode(custombackgroundanim[i].blendmode,"premultiplied") else
+						love.graphics.setBlendMode(custombackgroundanim[i].blendmode)
+					end
+				end
 				--animate
 				xscroll = xscroll - custombackgroundanim[i].x
 				yscroll = yscroll - custombackgroundanim[i].y
@@ -8761,6 +8774,7 @@ function rendercustombackground(xscroll, yscroll, scrollfactor, scrollfactory)
 						end
 					end
 				end
+				love.graphics.setBlendMode("alpha")
 			end
 		end
 	end
@@ -8783,6 +8797,12 @@ function rendercustomforeground(xscroll, yscroll, scrollfactor, scrollfactory)
 
 			local quad = false
 			if customforegroundanim[i] then
+				if customforegroundanim[i].blending then
+					if customforegroundanim[i].premultiplied then
+						love.graphics.setBlendMode(customforegroundanim[i].blendmode,"premultiplied") else
+						love.graphics.setBlendMode(customforegroundanim[i].blendmode)
+					end
+				end
 				--animate
 				xscroll = xscroll - customforegroundanim[i].x
 				yscroll = yscroll - customforegroundanim[i].y
@@ -8817,6 +8837,7 @@ function rendercustomforeground(xscroll, yscroll, scrollfactor, scrollfactory)
 					--end
 				end
 			end
+			love.graphics.setBlendMode("alpha")
 		end
 	end
 end
