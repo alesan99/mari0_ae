@@ -327,7 +327,21 @@ function plantfire:globalcollide(a, b)
 		end
 		if a == "tile" then
 			local x, y = b.cox, b.coy
-			if (tilequads[map[x][y][1]].breakable or (tilequads[map[x][y][1]].debris and blockdebrisquads[tilequads[map[x][y][1]].debris])) and not portalintile(x, y) then
+			if (tilequads[map[x][y][1]].breakable or (tilequads[map[x][y][1]].debris and blockdebrisquads[tilequads[map[x][y][1]].debris])) then
+				if portalintile(x, y) or (x-1 == flagx and y == flagy) then
+					playsound(blockhitsound)
+					self.delete = true
+					return true
+				end
+				for i, p in pairs(pipes) do
+					if p.coy == y-1 and
+					   (p.cox == x+1 and (p.dir == "right" or p.dir2 == "right") or
+					    p.cox == x-1 and (p.dir == "left" or p.dir2 == "left") ) then
+						playsound(blockhitsound)
+						self.delete = true
+						return true
+					end
+				end
 				map[x][y][1] = 1
 				objects["tile"][tilemap(x, y)] = nil
 				map[x][y]["gels"] = {}
