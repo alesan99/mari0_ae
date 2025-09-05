@@ -1189,6 +1189,11 @@ function love.update(dt)
 			for i, v in pairs(soundlist) do
 				v:setPitch( speed )
 			end
+			for i, v in pairs(enemiesdata) do
+				if v.sound then
+					v.sound:setPitch( speed )
+				end
+			end
 			music.pitch = speed
 			love.audio.setVolume(volume)
 		else
