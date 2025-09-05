@@ -68,6 +68,67 @@ local function anglesdiff(a1, a2)
 	return math.abs(a1-a2) --diff
 end
 
+--Custom timer optimization functions
+local function ct_set(self, ln) self[ln.p] = ln.a end
+ local function ct_set_p(self, ln) self[ln.p] = self[ln.a] end
+local function ct_setframe(self, ln) self.quad = self.quadgroup[ln.a] end
+ local function ct_setframe_p(self, ln) self.quad = self.quadgroup[self[ln.a]] end
+local function ct_add(self, ln) self[ln.p] = self[ln.p] + ln.a end
+ local function ct_add_p(self, ln) self[ln.p] = self[ln.p] + self[ln.a] end
+local function ct_sub(self, ln) self[ln.p] = self[ln.p] - ln.a end
+ local function ct_sub_p(self, ln) self[ln.p] = self[ln.p] - self[ln.a] end
+local function ct_mul(self, ln) self[ln.p] = self[ln.p] * ln.a end
+ local function ct_mul_p(self, ln) self[ln.p] = self[ln.p] * self[ln.a] end
+local function ct_div(self, ln) self[ln.p] = self[ln.p] / ln.a end
+ local function ct_div_p(self, ln) self[ln.p] = self[ln.p] / self[ln.a] end
+local function ct_rev(self, ln) if type(self[ln.p]) == "boolean" then self[ln.p] = not self[ln.p] else self[ln.p] = -self[ln.p] end end
+local function ct_rng(self, ln) if type(ln.a) == "number" then self[ln.p] = math.random()*ln.a else self[ln.p] = ln.a[math.random(#ln.a)] end end
+ local function ct_rng_p(self, ln) if type(self[ln.a]) == "number" then self[ln.p] = math.random()*self[ln.a] else self[ln.p] = self[ln.a][math.random(#ln.a)] end end
+local function ct_abs(self, ln) self[ln.p] = math.abs(self[ln.p]) end
+local function ct_sqrt(self, ln) self[ln.p] = math.sqrt(self[ln.p]) end
+local function ct_mod(self, ln) self[ln.p] = self[ln.p]%ln.a end
+ local function ct_mod_p(self, ln) self[ln.p] = self[ln.p]%self[ln.a] end
+local function ct_pow(self, ln) self[ln.p] = math.pow(self[ln.p],ln.a) end
+ local function ct_pow_p(self, ln) self[ln.p] = math.pow(self[ln.p],self[ln.a]) end
+local function ct_rnd(self, ln) self[ln.p] = math.floor(self[ln.p]+0.5) end
+local function ct_flr(self, ln) self[ln.p] = math.floor(self[ln.p]) end
+local function ct_cel(self, ln) self[ln.p] = math.ceil(self[ln.p]) end
+
+local function ct_sin(self, ln) self[ln.p] = math.sin(ln.a) end
+ local function ct_sin_p(self, ln) self[ln.p] = math.sin(self[ln.a]) end
+local function ct_cos(self, ln) self[ln.p] = math.cos(ln.a) end
+ local function ct_cos_p(self, ln) self[ln.p] = math.cos(self[ln.a]) end
+local function ct_tan(self, ln) self[ln.p] = math.tan(ln.a) end
+ local function ct_tan_p(self, ln) self[ln.p] = math.tan(self[ln.a]) end
+local function ct_atan2(self, ln)
+	local in1, in2 = ln.a[1],ln.a[2]
+	if ln.a[1] and type(ln.a[1]) == "table" and ln.a[1][1] and ln.a[1][1] == "property" then
+		in1 = self[ln.a[1][2]]
+	end
+	if ln.a[2] and type(ln.a[2]) == "table" and ln.a[2][1] and ln.a[2][1] == "property" then
+		in2 = self[ln.a[2][2]]
+	end
+	self[ln.p] = math.atan2(in1,in2)
+end
+local function ct_min(self, ln) self[ln.p] = math.min(self[ln.p],ln.a) end
+ local function ct_min_p(self, ln) self[ln.p] = math.min(self[ln.p],self[ln.a]) end
+local function ct_max(self, ln) self[ln.p] = math.max(self[ln.p],ln.a) end
+ local function ct_max_p(self, ln) self[ln.p] = math.max(self[ln.p],self[ln.a]) end
+local function ct_log(self, ln) self[ln.p] = math.log(ln.a) end
+ local function ct_log_p(self, ln) self[ln.p] = math.log(self[ln.a]) end
+
+local function ct_ton(self, ln) self[ln.p] = tonumber(self[ln.p]) end
+local function ct_tos(self, ln) self[ln.p] = tostring(self[ln.p]) end
+local function ct_cat(self, ln) self[ln.p] = self[ln.p] .. ln.a end
+ local function ct_cat_p(self, ln) self[ln.p] = self[ln.p] .. self[ln.a] end
+local function ct_sound(self, ln) self:playsound(ln.a) end
+ local function ct_sound_p(self, ln) self:playsound(self[ln.a]) end
+
+local function ct_if(self, ln) self:ifstatement(ln[2],ln[3],ln[4]) end
+local function ct_cta(self, ln) self:customtimeraction(ln[2],ln[3],ln[4]) end
+
+
+
 enemy = class:new()
 
 function enemy:init(x, y, t, a, properties)
@@ -222,9 +283,138 @@ function enemy:init(x, y, t, a, properties)
 		self.quad = self.quadgroup[self.quadno or 1]
 	end
 	
+
 	if self.customtimer then
 		self.customtimertimer = 0
 		self.currentcustomtimerstage = 1
+
+		if not self.customtimer.optimized then --timer optimization on spawn
+			self.customtimer.optimized = true
+			for i = 1, #self.customtimer do
+				local ln = self.customtimer[i]
+				local property = false
+				local arg = ln[3]
+
+				if arg and type(arg) == "table" and arg[1] and arg[2] and arg[1] == "property" then
+					arg = arg[2]
+					property = true
+				end
+
+				if type(ln[2]) == "table" then --The new *better* custom timer format
+					local a = ln[2][1] --action
+					local p = ln[2][2] --parameter
+					if a == "set" then
+						if p == "quadno" then
+							ln.func = (property and ct_setframe_p) or ct_setframe
+							ln.a = arg
+						else
+							ln.func = (property and ct_set_p) or ct_set
+							ln.p = p
+							ln.a = arg
+						end
+					elseif a == "add" then
+						ln.func = (property and ct_add_p) or ct_add
+						ln.p = p
+						ln.a = arg
+					elseif a == "subtract" then
+						ln.func = (property and ct_sub_p) or ct_sub
+						ln.p = p
+						ln.a = arg
+					elseif a == "multiply" then
+						ln.func = (property and ct_mul_p) or ct_mul
+						ln.p = p
+						ln.a = arg
+					elseif a == "divide" then
+						ln.func = (property and ct_div_p) or ct_div
+						ln.p = p
+						ln.a = arg
+					elseif a == "reverse" then
+						ln.func = ct_rev
+						ln.p = p
+					elseif a == "random" then
+						ln.func = (property and ct_rng_p) or ct_rng
+						ln.p = p
+						ln.a = arg
+					elseif a == "abs" then
+						ln.func = ct_abs
+						ln.p = p
+					elseif a == "sqrt" then
+						ln.func = ct_sqrt
+						ln.p = p
+					elseif a == "mod" then
+						ln.func = (property and ct_mod_p) or ct_mod
+						ln.p = p
+						ln.a = arg
+					elseif a == "pow" then
+						ln.func = (property and ct_pow_p) or ct_pow
+						ln.p = p
+						ln.a = arg
+					elseif a == "round" then
+						ln.func = ct_rnd
+						ln.p = p
+					elseif a == "floor" then
+						ln.func = ct_flr
+						ln.p = p
+					elseif a == "ceil" then
+						ln.func = ct_cel
+						ln.p = p
+					elseif a == "sin" then
+						ln.func = (property and ct_sin_p) or ct_sin
+						ln.p = p
+						ln.a = arg
+					elseif a == "cos" then
+						ln.func = (property and ct_cos_p) or ct_cos
+						ln.p = p
+						ln.a = arg
+					elseif a == "tan" then
+						ln.func = (property and ct_tan_p) or ct_tan
+						ln.p = p
+						ln.a = arg
+					elseif a == "atan2" then
+						ln.func = ct_atan2
+						ln.p = p
+						ln.a = ln[3]
+					elseif a == "min" then
+						ln.func = (property and ct_min_p) or ct_min
+						ln.p = p
+						ln.a = arg
+					elseif a == "max" then
+						ln.func = (property and ct_max_p) or ct_max
+						ln.p = p
+						ln.a = arg
+					elseif a == "log" then
+						ln.func = (property and ct_log_p) or ct_log
+						ln.p = p
+						ln.a = arg
+					elseif a == "tonumber" then
+						ln.func = ct_ton
+						ln.p = p
+					elseif a == "tostring" then
+						ln.func = ct_tos
+						ln.p = p
+					elseif a == "concat" then
+						ln.func = (property and ct_cat_p) or ct_cat
+						ln.p = p
+						ln.a = arg
+					elseif a == "if" then
+						ln.func = ct_if
+					else
+						ln.func = ct_cta
+					end
+				elseif ln[2] then --old format
+					if ln[2] == "setframe" then
+						ln.func = (property and ct_setframe_p) or ct_setframe
+						ln.a = arg
+					elseif ln[2] == "playsound" then
+						ln.func = (property and ct_sound_p) or ct_sound
+						ln.p = p
+						ln.a = arg
+					else
+						ln.func = ct_cta
+					end
+				end
+			end
+		end
 	end
 	
 	--Decide on a random movement if it's random..
@@ -2312,20 +2502,47 @@ function enemy:update(dt)
 			end
 		end
 	end
-	
-	if self.customtimer then
-		--[delay, [action, parameter], argument]
+	if self.customtimer then --[delay, [action, parameter], argument]
 		self.customtimertimer = self.customtimertimer + dt
-		while self.customtimertimer > self.customtimer[self.currentcustomtimerstage][1] do
-			self.customtimertimer = self.customtimertimer - self.customtimer[self.currentcustomtimerstage][1]
-			self:customtimeraction(self.customtimer[self.currentcustomtimerstage][2], self.customtimer[self.currentcustomtimerstage][3], self.customtimer[self.currentcustomtimerstage][4])
-			self.currentcustomtimerstage = self.currentcustomtimerstage + 1
-			if self.currentcustomtimerstage > #self.customtimer then
-				self.currentcustomtimerstage = 1
-				if self.dontloopcustomtimer then
-					self.customtimer = false
-					break
+		local ct = self.customtimer
+		local ln = ct[self.currentcustomtimerstage]
+
+		if ct.optimized then --optimized timers
+			if self.dontchecktimerend then --fast endless timers
+				while self.customtimertimer > ln[1] do
+					self.customtimertimer = self.customtimertimer - ln[1]
+					ln.func(self, ln) --run line functions
+					self.currentcustomtimerstage = self.currentcustomtimerstage + 1
+					ln = ct[self.currentcustomtimerstage]
 				end
+			else --timers that might reach the end
+				while self.customtimertimer > ln[1] do
+					self.customtimertimer = self.customtimertimer - ln[1]
+					ln.func(self, ln) --run line functions
+					self.currentcustomtimerstage = self.currentcustomtimerstage + 1
+					if self.currentcustomtimerstage > #ct then
+						self.currentcustomtimerstage = 1
+						if self.dontloopcustomtimer then
+							self.customtimer = false
+							break
+						end
+					end
+					ln = ct[self.currentcustomtimerstage]
+				end
+			end
+		else --unoptimized fallback code (maybe the timer was replaced)
+			while self.customtimertimer > ln[1] do
+				self.customtimertimer = self.customtimertimer - ln[1]
+				self:customtimeraction(ln[2], ln[3], ln[4])
+				self.currentcustomtimerstage = self.currentcustomtimerstage + 1
+				if self.currentcustomtimerstage > #ct then
+					self.currentcustomtimerstage = 1
+					if self.dontloopcustomtimer then
+						self.customtimer = false
+						break
+					end
+				end
+				ln = ct[self.currentcustomtimerstage]
 			end
 		end
 	end
@@ -2451,21 +2668,21 @@ end
 function enemy:customtimeraction(action, arg, arg2)
 	--set to a variable
 	local ogarg, ogarg2 = arg, arg2
-	if arg and type(arg) == "table" and arg[1] and arg[2] and arg[1] == "property" then
+	if arg and type(arg) == "table" and arg[1] == "property" then
 		arg = self[arg[2]]
 	end
 
 	if type(action) == "table" then --The new *better* custom timer format
 		local a = action[1] --action
 		local p = action[2] --parameter
-		if a == "set" then
+		if a == "add" then
+			self[p] = self[p] + arg
+		elseif a == "set" then
 			self[p] = arg
 			if p == "quadno" then
 				--update frame
 				self.quad = self.quadgroup[self.quadno]
 			end
-		elseif a == "add" then
-			self[p] = self[p] + arg
 		elseif a == "subtract" then
 			self[p] = self[p] - arg
 		elseif a == "multiply" then
@@ -2532,15 +2749,18 @@ function enemy:customtimeraction(action, arg, arg2)
 			--EXAMPLE: [0,["if","speedx",">=","speedy"],["set","speedy"],25]
 		end
 	else --backwards compatibility
-		if action == "bounce" then
-			if self.speedy == 0 then self.speedy = -(arg or 10) end
-		elseif action == "playsound" then
-			self:playsound(arg)
-		elseif action == "spawnenemy" then
+		if string.sub(action, 0, 1) == "-" then
+			return
+		end
+		if action == "spawnenemy" then
 			if self.spawnsenemyrandoms then
 				self.spawnsenemy = self.spawnsenemyrandoms[math.random(#self.spawnsenemyrandoms)]
 			end
 			self:spawnenemy(self.spawnsenemy)
+		elseif action == "playsound" then
+			self:playsound(arg)
+		elseif action == "bounce" then
+			if self.speedy == 0 then self.speedy = -(arg or 10) end
 		elseif action == "trackreverse" then
 			if self.tracked then
 				if self.trackcontroller.travel == "forward" then
@@ -2555,8 +2775,7 @@ function enemy:customtimeraction(action, arg, arg2)
 			elseif _G[arg .. "sound"] then
 				_G[arg .. "sound"]:stop()
 			end
-		end
-		if string.sub(action, 0, 7) == "reverse" then
+		elseif string.sub(action, 0, 7) == "reverse" then
 			local parameter = string.sub(action, 8, string.len(action))
 			self[parameter] = -self[parameter]
 		elseif string.sub(action, 0, 3) == "add" then
@@ -2594,14 +2813,14 @@ function enemy:ifstatement(t, action, arg)
 		if statementPass == true or check == "or" or step == 1 then
 			--get properties needed for comparison
 			local prop1,prop2 = t[i+1], t[i+3]
-			if (type(prop1) == "table" and prop1[1] and prop1[2] and prop1[1] == "property") then
+			if (type(prop1) == "table" and prop1[1] == "property") then
 				prop1 = self[prop1[2]]
 			else
 				prop1 = self[prop1]	
 			end
 			if (type(prop2) == "string" and self[prop2] ~= nil) then
 				prop2 = self[prop2]
-			elseif (type(prop2) == "table" and prop2[1] and prop2[2] and prop2[1] == "property") then
+			elseif (type(prop2) == "table" and prop2[1] == "property") then
 				prop2 = self[prop2[2]]
 			end
 
@@ -2613,22 +2832,22 @@ function enemy:ifstatement(t, action, arg)
 			comparison = comparison:lower()
 
 			local pass = false
-			if (comparison == "equal" or comparison == "==") and (prop1 == prop2) then
-				pass = true
-			elseif (comparison == "notequal" or comparison == "~=" or comparison == "!=") and (prop1 ~= prop2) then
-				pass = true
-			elseif (comparison == "greater" or comparison == ">") and (prop1 > prop2) then
-				pass = true
-			elseif (comparison == "less" or comparison == "<") and (prop1 < prop2) then
-				pass = true
-			elseif (comparison == "greaterequal" or comparison == ">=") and (prop1 >= prop2) then
-				pass = true
-			elseif (comparison == "lessequal" or comparison == "<=") and (prop1 <= prop2) then
-				pass = true
-			elseif (comparison == "exists") and prop1 ~= nil then
-				pass = true
-			elseif (comparison == "notexists") and prop1 == nil then
-				pass = true
+			if (comparison == "equal" or comparison == "==") then
+				pass = (prop1 == prop2)
+			elseif (comparison == "notequal" or comparison == "~=" or comparison == "!=") then
+				pass = (prop1 ~= prop2)
+			elseif (comparison == "greater" or comparison == ">") then
+				pass = (prop1 > prop2)
+			elseif (comparison == "less" or comparison == "<") then
+				pass = (prop1 < prop2)
+			elseif (comparison == "greaterequal" or comparison == ">=") then
+				pass = (prop1 >= prop2)
+			elseif (comparison == "lessequal" or comparison == "<=") then
+				pass = (prop1 <= prop2)
+			elseif (comparison == "exists") then
+				pass = prop1 ~= nil
+			elseif (comparison == "notexists") then
+				pass = prop1 == nil
 			end
 
 			statementPass = pass
