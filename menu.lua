@@ -2,6 +2,7 @@ local languagemenuopen = false
 local menu_updatemouseselection
 function menu_load()
 	love.audio.stop()
+	pausedaudio = nil
 	editormode = false
 	guielements = {}
 	gamestate = "menu"
