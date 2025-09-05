@@ -7087,7 +7087,7 @@ function hitontop(x, y)
 			for j, w in pairs(objects[v]) do
 				if w.width and (w.active or w.killedfromblocksbelownotactive) then
 					local cx = math.max(x-1,math.min(x,w.x))
-					if inrange(cx, w.x, w.x+w.width, true) and inrange(w.y+w.height, y-1, y-1.125, true) then
+					if inrange(cx, w.x, w.x+w.width,true) and inrange(w.y+w.height, y-1, y-1.125, true) then
 						--get dir
 						local dir = "right"
 						if w.x+w.width/2 < x-0.5 then
@@ -7111,8 +7111,8 @@ function hitontop(x, y)
 	end
 	for j, w in pairs(objects["enemy"]) do --custom enemies
 		if (not w.notkilledfromblocksbelow) and w.width and w.height and (w.active or w.killedfromblocksbelownotactive) then
-			local centerX = w.x + w.width/2
-			if inrange(centerX, x-1, x, true) and y-1 == w.y+w.height then
+			local cx = math.max(x-1,math.min(x,w.x))
+			if inrange(cx, w.x, w.x+w.width,true) and inrange(w.y+w.height, y-1, y-1.125, true) then
 				--get dir
 				local dir = "right"
 				if w.x+w.width/2 < x-0.5 then
@@ -7127,8 +7127,8 @@ function hitontop(x, y)
 		end
 	end
 	for j, w in pairs(objects["powblock"]) do --custom enemies
-		local centerX = w.x + w.width/2
-		if w.active and inrange(centerX, x-1, x, true) and y-1 == w.y+w.height then
+		local cx = math.max(x-1,math.min(x,w.x))
+		if w.active and inrange(cx, w.x, w.x+w.width,true) and inrange(w.y+w.height, y-1, y-1.125, true) then
 			w:hit()
 		end
 	end
@@ -7136,8 +7136,8 @@ function hitontop(x, y)
 	--make items jump
 	for i, v in pairs(jumpitems) do
 		for j, w in pairs(objects[v]) do
-			local centerX = w.x + w.width/2
-			if inrange(centerX, x-1, x, true) and y-1 == w.y+w.height then
+			local cx = math.max(x-1,math.min(x,w.x))
+			if inrange(cx, w.x, w.x+w.width,true) and inrange(w.y+w.height, y-1, y-1.125, true) then
 				if w.jump then
 					w:jump(x)
 				end
@@ -7146,8 +7146,8 @@ function hitontop(x, y)
 	end
 	for j, w in pairs(objects["enemy"]) do --custom enemies
 		if w.jumpsfromblocksbelow and w.width and w.height then
-			local centerX = w.x + w.width/2
-			if inrange(centerX, x-1, x, true) and y-1 == w.y+w.height then
+			local cx = math.max(x-1,math.min(x,w.x))
+			if inrange(cx, w.x, w.x+w.width,true) and inrange(w.y+w.height, y-1, y-1.125, true) then
 				w.falling = true
 				w.speedy = -(w.jumpforce or mushroomjumpforce)
 				if w.x+w.width/2 < x-0.5 then
