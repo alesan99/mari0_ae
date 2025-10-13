@@ -606,6 +606,13 @@ function enemy:update(dt)
 			self.drawable = not self.drawable
 		end
 	end
+
+	if self.passivepass then
+		self.passivepasstimer = self.passivepasstimer - dt
+		if self.passivepasstimer < 0 then
+			self.passivepass = false
+		end
+	end
 	
 	if self.transformkill then
 		if self.transformkilldeath then
@@ -3361,10 +3368,10 @@ function enemy:stomp(x, b)
 	
 		if self.transforms then
 			if self:gettransformtrigger("stomp") then
-				self:transform(self:gettransformsinto("stomp"), nil, "death")
+				self:transform(self:gettransformsinto("stomp"), nil, "stomp", b)
 				return
 			elseif self:gettransformtrigger("death") then
-				self:transform(self:gettransformsinto("death"), nil, "death")
+				self:transform(self:gettransformsinto("death"), nil, "stomp", b)
 				return
 			end
 		end
@@ -3642,7 +3649,7 @@ function enemy:spawnenemy(t)
 	temp.spawner = self
 end
 
-function enemy:transform(t, returntransform, death)
+function enemy:transform(t, returntransform, death, b)
 	if self.justspawned then
 		return false
 	end
@@ -3684,6 +3691,12 @@ function enemy:transform(t, returntransform, death)
 
 	local temp = enemy:new(self.x+self.width/2+.5+xoffset, self.y+self.height+yoffset, t, {}, properties)
 	temp.justspawned = true
+	if b then
+		temp.passivepass = b.playernumber or 1
+		temp.passivepasstimer = 0.1
+	else
+		temp.passivepass = false
+	end
 	
 	--set parameters after spawn
 	if not self.transformpassedparametersbeforespawn then
