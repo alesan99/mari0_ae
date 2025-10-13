@@ -5302,7 +5302,7 @@ function mario:rightcollide(a, b, passive)
 	if a == "mushroom" or a == "oneup" or a == "star" or a == "flower" or a == "poisonmush" or a == "threeup" or a == "smbsitem" or (a == "platform" and (b.dir == "right" or b.dir == "justright")) or a == "donut" or a == "hammersuit" or a == "frogsuit" or a == "leaf" or (a == "boomerang" and b.fireballthrower) then
 		return false
 	elseif a == "enemy" then
-		if b.ignoreleftcollide or b.dontstopmario then
+		if b.ignoreleftcollide or b.dontstopmario or b.passivepass and b.passivepass == self.playernumber then
 			return false
 		elseif (b.kills or b.killsonsides or b.killsonleft) then 
 			if self.invincible then
@@ -5689,7 +5689,7 @@ function mario:leftcollide(a, b)
 	if a == "mushroom" or a == "oneup" or a == "star" or a == "flower" or a == "poisonmush" or a == "threeup" or a == "smbsitem" or (a == "platform" and (b.dir == "right" or b.dir == "justright")) or a == "donut" or a == "hammersuit" or a == "frogsuit" or a == "leaf" or (a == "boomerang" and b.fireballthrower) then --NOTHING
 		return false
 	elseif a == "enemy" then
-		if b.ignorerightcollide or b.dontstopmario then
+		if b.ignorerightcollide or b.dontstopmario or b.passivepass and b.passivepass == self.playernumber then
 			return false
 		elseif (b.kills or b.killsonsides or b.killsonright) then 
 			if self.invincible then
@@ -5729,7 +5729,7 @@ function mario:leftcollide(a, b)
 				if b.instantkill then
 					self:die("lava")
 				else
-					self:die("Enemy (leftollide)")
+					self:die("Enemy (leftcollide)")
 				end
 				if b.solidkill then
 					return true
