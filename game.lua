@@ -2169,7 +2169,7 @@ function game_draw()
 						for y = 1, ytodraw do
 							for x = 1, xtodraw do
 								local backgroundtile = bmapt(math.floor(xscroll)+x, math.floor(yscroll)+y, 1)
-								if backgroundtile and tilequads[backgroundtile] and not tilequads[backgroundtile].invisible and (not tilequads[backgroundtile].collision) then
+								if backgroundtile and tilequads[backgroundtile] and not tilequads[backgroundtile].invisible then
 									if backgroundtile > 90000 then
 										love.graphics.draw(tilequads[backgroundtile].image, tilequads[backgroundtile]:getquad(math.floor(xscroll)+x, math.floor(yscroll)+y) or tilequads[backgroundtile].quad, math.floor((x-1-math.fmod(xscroll, 1))*16*scale), math.floor(((y-1-math.fmod(yscroll, 1))*16-8)*scale), 0, scale, scale)
 									else
