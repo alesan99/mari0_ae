@@ -2138,19 +2138,11 @@ function game_draw()
 				end
 
 				if i > 8 then
-					drawmaptiles("dropshadow", xscroll, yscroll)
 					if bmap_on then
 						if editormode then
 							love.graphics.setColor(255,255,255,100)
 						else
 							love.graphics.setColor(255,255,255,255)
-						end
-						love.graphics.draw(smbspritebatch[2], math.floor((-math.fmod(xscroll, 1)*16)*scale), math.floor((-math.fmod(yscroll, 1)*16)*scale))
-						love.graphics.draw(portalspritebatch[2], math.floor((-math.fmod(xscroll, 1)*16)*scale), math.floor((-math.fmod(yscroll, 1)*16)*scale))
-						if customtiles then
-							for ci = 1, #customspritebatch[2] do
-								love.graphics.draw(customspritebatch[2][ci], math.floor((-math.fmod(xscroll, 1)*16)*scale), math.floor((-math.fmod(yscroll, 1)*16)*scale))
-							end
 						end
 						-- animated background tiles
 						if animatedtilecount and animatedtilecount > 0 then
@@ -2180,6 +2172,7 @@ function game_draw()
 						end
 						love.graphics.setColor(255,255,255,255)
 					end
+					drawmaptiles("dropshadow", xscroll, yscroll)
 				else
 					drawmaptiles("collision", xscroll, yscroll)
 				end
