@@ -55,10 +55,12 @@ function meteor:init()
 
 	self.smoketimer = math.random()*.2
 
-	--delete if blocked by tile
-	if checkintile(self.x, 0, self.width, self.height, tileentities, self) then
-		self.dead = true
+	-- delete if it'll hit wall or players close to the ceiling
+	if (not checkintile(self.x, 0, self.width, self.height, tileentities, self))
+		and #checkrect(self.x, self.y, self.width, self.height+2, {"player"}) == 0 then
+		return
 	end
+	self.dead = true
 end
 
 function meteor:update(dt)
