@@ -4997,7 +4997,11 @@ function editor_mousepressed(x, y, button)
 			return
 		end
 		if editentities and map[cox][coy][2] then
-			currenttile = map[cox][coy][2]
+			if map[cox][coy][2] == currenttile and map[cox][coy]["argument"] == "b" then
+				currenttile = 313
+			else
+				currenttile = map[cox][coy][2]
+			end
 			return false
 		end
 		editentities = false
