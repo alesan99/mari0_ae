@@ -3538,6 +3538,17 @@ function enemy:portaled(exitdir)
 	end
 end
 
+function enemy:updateparameters(meathod, list, target)
+	target = target or {}
+	for i = 1, #list do
+		if list[i] ~= nil then
+			if meathod == "passed" then target[list[i]] = self[list[i]] end
+			if meathod == "set" then target[list[i][1]] = list[i][2] end
+		end
+	end
+	return target
+end
+
 function enemy:spawnenemy(t)
 	local speedx, speedy = 0, 0
 	if self.spawnenemyspeedx then
@@ -3587,45 +3598,32 @@ function enemy:spawnenemy(t)
 	local properties
 	--set parameters before spawn
 	if self.spawnpassedparametersbeforespawn then
-		if not properties then properties = {} end
-		if self.spawnpassedparameters then --pass parameters
-			for i = 1, #self.spawnpassedparameters do
-				if self.spawnpassedparameters[i] ~= nil then
-					properties[self.spawnpassedparameters[i]] = self[self.spawnpassedparameters[i]]
-				end
-			end
+		if type(self.spawnpassedparametersbeforespawn) == "table" then
+			properties = self:updateparameters("passed", self.spawnpassedparametersbeforespawn, properties)
+		elseif self.spawnpassedparameters then
+			properties = self:updateparameters("passed", self.spawnpassedparameters, properties)
 		end
 	end
 	if self.spawnsetparametersbeforespawn then
-		if not properties then properties = {} end
-		if self.spawnsetparameters then --set new parameters
-			for i = 1, #self.spawnsetparameters do
-				if self.spawnsetparameters[i] ~= nil then
-					properties[self.spawnsetparameters[i][1]] = self.spawnsetparameters[i][2]
-				end
-			end
+		if type(self.spawnsetparametersbeforespawn) == "table" then
+			properties = self:updateparameters("set", self.spawnsetparametersbeforespawn, properties)
+		elseif self.spawnsetparameters then
+			properties = self:updateparameters("set", self.spawnsetparameters, properties)
 		end
 	end
 	
 	local temp = enemy:new(self.x+self.width/2+.5+xoffset, self.y+self.height+yoffset, t, {}, properties)
 	temp.justspawned = true
 
-	if not self.spawnpassedparametersbeforespawn then
-		if self.spawnpassedparameters then --pass parameters
-			for i = 1, #self.spawnpassedparameters do
-				if self.spawnpassedparameters[i] ~= nil then
-					temp[self.spawnpassedparameters[i]] = self[self.spawnpassedparameters[i]]
-				end
-			end
+	--set parameters after spawn
+	if self.spawnpassedparameters then
+		if (not self.spawnpassedparametersbeforespawn) or type(self.spawnpassedparametersbeforespawn) == "table" then
+			self:updateparameters("passed", self.spawnpassedparameters, temp)
 		end
 	end
-	if not self.spawnsetparametersbeforespawn then
-		if self.spawnsetparameters then --set new parameters
-			for i = 1, #self.spawnsetparameters do
-				if self.spawnsetparameters[i] ~= nil then
-					temp[self.spawnsetparameters[i][1]] = self.spawnsetparameters[i][2]
-				end
-			end
+	if self.spawnsetparameters then
+		if (not self.spawnsetparametersbeforespawn) or type(self.spawnsetparametersbeforespawn) == "table" then
+			self:updateparameters("set", self.spawnsetparameters, temp)
 		end
 	end
 
@@ -3660,48 +3658,34 @@ function enemy:transform(t, returntransform, death)
 	end
 
 	local properties
-	--set parameters before spawn
+	--set parameters before transform
 	if self.transformpassedparametersbeforespawn then
-		if self.transformpassedparameters then
-			if not properties then properties = {} end
-			for i = 1, #self.transformpassedparameters do
-				if self.transformpassedparameters[i] ~= nil then
-					properties[self.transformpassedparameters[i]] = self[self.transformpassedparameters[i]]
-				end
-			end
+		if type(self.transformpassedparametersbeforespawn) == "table" then
+			properties = self:updateparameters("passed", self.transformpassedparametersbeforespawn, properties)
+		elseif self.transformpassedparameters then
+			properties = self:updateparameters("passed", self.transformpassedparameters, properties)
 		end
 	end
 	if self.transformsetparametersbeforespawn then
-		if self.transformsetparameters then --set new parameters
-			if not properties then properties = {} end
-			for i = 1, #self.transformsetparameters do
-				if self.transformsetparameters[i] ~= nil then
-					properties[self.transformsetparameters[i][1]] = self.transformsetparameters[i][2]
-				end
-			end
+		if type(self.transformsetparametersbeforespawn) == "table" then
+			properties = self:updateparameters("set", self.transformsetparametersbeforespawn, properties)
+		elseif self.transformsetparameters then
+			properties = self:updateparameters("set", self.transformsetparameters, properties)
 		end
 	end
 
 	local temp = enemy:new(self.x+self.width/2+.5+xoffset, self.y+self.height+yoffset, t, {}, properties)
 	temp.justspawned = true
-	
-	--set parameters after spawn
-	if not self.transformpassedparametersbeforespawn then
-		if self.transformpassedparameters then
-			for i = 1, #self.transformpassedparameters do
-				if self.transformpassedparameters[i] ~= nil then
-					temp[self.transformpassedparameters[i]] = self[self.transformpassedparameters[i]]
-				end
-			end
+
+	--set parameters after transform
+	if self.transformpassedparameters then
+		if (not self.transformpassedparametersbeforespawn) or type(self.transformpassedparametersbeforespawn) == "table" then
+			self:updateparameters("passed", self.transformpassedparameters, temp)
 		end
 	end
-	if not self.transformsetparametersbeforespawn then
-		if self.transformsetparameters then --set new parameters
-			for i = 1, #self.transformsetparameters do
-				if self.transformsetparameters[i] ~= nil then
-					temp[self.transformsetparameters[i][1]] = self.transformsetparameters[i][2]
-				end
-			end
+	if self.transformsetparameters then
+		if (not self.transformsetparametersbeforespawn) or type(self.transformsetparametersbeforespawn) == "table" then
+			self:updateparameters("set", self.transformsetparameters, temp)
 		end
 	end
 
