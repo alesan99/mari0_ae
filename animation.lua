@@ -900,15 +900,23 @@ function animation:update(dt)
 			elseif v[1] == "setplayersize" then
 				if v[3] == "everyone" then
 					for i = 1, players do
-						objects["player"][i]:setsize(tonumber(v[2]))
-						objects["player"][i].size = tonumber(v[2])
+						if objects["player"][i].characterdata.health then
+							objects["player"][i].health = math.min(objects["player"][i].characterdata.health, objects["player"][i].health + 1)
+						else
+							objects["player"][i]:setsize(tonumber(v[2]))
+							objects["player"][i].size = tonumber(v[2])
+						end
 						playsound(mushroomeatsound)
 					end
 				else
 					local i = tonumber(string.sub(v[3], -1))
 					if objects["player"][i] then
-						objects["player"][i]:setsize(tonumber(v[2]))
-						objects["player"][i].size = tonumber(v[2])
+						if objects["player"][i].characterdata.health then
+							objects["player"][i].health = math.min(objects["player"][i].characterdata.health, objects["player"][i].health + 1)
+						else
+							objects["player"][i]:setsize(tonumber(v[2]))
+							objects["player"][i].size = tonumber(v[2])
+						end
 						playsound(mushroomeatsound)
 					end
 				end
