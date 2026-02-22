@@ -316,7 +316,7 @@ function bomb:leftcollide(a, b)
 	end
 	
 	if self.stomped then
-		self.speedx = math.abs(self.speedx/2) --reduce speed a bit so it doesn't bounce as far
+		self.speedx = 0 -- math.abs(self.speedx/2) --reduce speed a bit so it doesn't bounce as far
 		self.animationdirection = "left"
 	elseif not self.explosion then
 		self.speedx = bombspeed
@@ -332,7 +332,7 @@ function bomb:rightcollide(a, b)
 	end
 	
 	if self.stomped then
-		self.speedx = -math.abs(self.speedx/2)
+		self.speedx = 0 -- -math.abs(self.speedx/2)
 		self.animationdirection = "right"
 	elseif not self.explosion then
 		self.speedx = -bombspeed
