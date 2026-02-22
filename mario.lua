@@ -8615,7 +8615,7 @@ function mario:fire()
 			return false
 		end
 		
-		if self.fireenemy or self.characterdata.fireenemy then
+		if (self.fireenemy or self.characterdata.fireenemy) and (not self.characterdata.firevanillaprojectiles) then
 			
 		elseif (self.size == 6 or self.size == 9 or self.size == 10) and self.animation ~= "grow2" and not self.fence and not self.vine then
 			if self.spinanimationtimer >= raccoonspintime and (not (self.speedy ~= 0 and self.raccoonfly)) then

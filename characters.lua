@@ -113,6 +113,7 @@ function loadcustomplayers()
 
 				--abilities
 				fireenemy = false,
+				firevanillaprojectiles = false,
 				smallducking = false,
 				breaksblockssmall = false,
 				skid = false,
