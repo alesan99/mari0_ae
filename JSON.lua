@@ -463,6 +463,7 @@ local function grok_array(self, text, start, etc)
    end
 
    local text_len = text:len()
+   local arrayidx = 0
    while i <= text_len do
 	  --AE Addition
 	  if text:sub(i,i) == ']' then
@@ -470,7 +471,9 @@ local function grok_array(self, text, start, etc)
 	  end
       local val, new_i = grok_one(self, text, i)
 
-      table.insert(VALUE, val)
+      arrayidx = arrayidx + 1
+      VALUE[arrayidx] = val
+      --table.insert(VALUE, val)
 
       i = skip_whitespace(text, new_i)
 

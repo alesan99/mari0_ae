@@ -103,17 +103,17 @@ function cannonballcannon:draw()
 	local r = 0
 	if self.dir == "left" then
 		r = math.pi*1.5
-	elseif self.dir == "left up" then
+	elseif self.dir == "left up" or self.dir == "up left" then
 		r = math.pi*1.75
-	elseif self.dir == "right up" then
+	elseif self.dir == "right up" or self.dir == "up right" then
 		r = math.pi*.25
 	elseif self.dir == "right" then
 		r = math.pi*.5
-	elseif self.dir == "right down" then
+	elseif self.dir == "right down" or self.dir == "down right" then
 		r = math.pi*.75
 	elseif self.dir == "down" then
 		r = math.pi
-	elseif self.dir == "left down" then
+	elseif self.dir == "left down" or self.dir == "down left" then
 		r = math.pi*1.25
 	end
 	local sx, sy = 1, 1
@@ -249,16 +249,16 @@ function cannonball:init(x, y, dir, speed, origin)
 	elseif dir == "up" then
 		self.speedx = 0
 		self.speedy = -speed
-	elseif dir == "right up" then
+	elseif dir == "right up" or dir == "up right" then
 		self.speedy = -speed*.707
 		self.speedx = speed*.707
-	elseif dir == "left up" then
+	elseif dir == "left up" or dir == "up left" then
 		self.speedy = -speed*.707
 		self.speedx = -speed*.707
-	elseif dir == "right down" then
+	elseif dir == "right down" or dir == "down right" then
 		self.speedy = speed*.707
 		self.speedx = speed*.707
-	elseif dir == "left down" then
+	elseif dir == "left down" or dir == "down left" then
 		self.speedy = speed*.707
 		self.speedx = -speed*.707
 	end

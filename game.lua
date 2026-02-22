@@ -8615,21 +8615,21 @@ function convertr(r, types, dontgivedefaultvalues) --convert right cick values
 			if dontgivedefaultvalues then
 				t[i] = nil
 			else
-				if id == "num" then
+				if id == "num" or id == "number" then
 					t[i] = 0
-				elseif id == "bool" then
+				elseif id == "bool" or id == "boolean" then
 					t[i] = false
-				elseif id == "string" then
+				elseif id == "string" or id == "str" then
 					t[i] = ""
 				else
 					t[i] = id
 				end
 			end
 		else
-			if id == "num" then
+			if id == "num" or id == "number" then
 				local s = t[i]:gsub("n", "-")
 				t[i] = tonumber(s) or 0
-			elseif id == "bool" then
+			elseif id == "bool" or id == "boolean" then
 				t[i] = (t[i] == "true")
 			end
 		end

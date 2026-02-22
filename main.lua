@@ -750,7 +750,9 @@ function love.load()
 	end
 
 	directionsimg = love.graphics.newImage("graphics/GUI/directions.png")
-	local directionquadnames = {"hor", "ver", "left", "up", "right", "down", "cw", "ccw", "left up", "right up", "left down", "right down"}
+	local directionquadnames = {"hor", "ver", "left", "up", "right", "down", "cw", "ccw", "up left", "up right", "down left", "down right",
+		"left up left", "up up left", "up up right", "right up right", "right down right", "down down right", "down down left", "left down left"
+	}
 	directionsquad = {}
 	for x = 1, #directionquadnames do
 		directionsquad[directionquadnames[x]] = love.graphics.newQuad((x-1)*7, 0, 7, 7, #directionquadnames*7, 7)

@@ -158,20 +158,40 @@ function enemy:init(x, y, t, a, properties)
 		local val
 		-- types
 		if self.rightclicktypes then
-			val = convertr(self.a[3], self.rightclicktypes)
+			local types = {}
+			for i = 1, #self.rightclicktypes do
+				if type(self.rightclicktypes[i]) == "table" then
+					for j = 1, #self.rightclicktypes[i] do
+						table.insert(types, self.rightclicktypes[i][j])
+					end
+				else
+					table.insert(types, self.rightclicktypes[i])
+				end
+			end
+			val = convertr(self.a[3], types)
 		else
 			local types = {}
 			local index = 0
 			for i = 1, #self.rightclick do
 				if self.rightclick[i][1] ~= "text" then
 					index = index + 1
-					if self.rightclick[i][1] == "dropdown" or self.rightclick[i][1] == "input" then
+					if self.rightclick[i][1] == "dropdown" or self.rightclick[i][1] == "input" or self.rightclick[i][1] == "inlineinput" then
 						local var = self.a[3]:split("|")
 						if tonumber(var[index]) then
 							types[index] = "num"
 						else
 							types[index] = "string"
 						end
+					elseif self.rightclick[i][1] == "buttonset" then
+						types[index] = "string"
+					elseif self.rightclick[i][1] == "slider" then
+						types[index] = "num"
+					elseif self.rightclick[i][1] == "range" then
+						types[index] = "num"
+						types[index+1] = "num"
+						types[index+2] = "num"
+						types[index+3] = "num"
+						index = index + 3
 					elseif self.rightclick[i][1] == "checkbox" then
 						types[index] = "bool"
 					end
@@ -192,10 +212,17 @@ function enemy:init(x, y, t, a, properties)
 								var = b
 							end
 						end
+					elseif self.rightclick[i][1] == "buttonset" then
+						local set = buttonsetoptions(self.rightclick[i][3])
+						for b = 1, #set do
+							if set[b][2] == val[index] then
+								var = b
+							end
+						end
 					elseif self.rightclick[i][1] == "checkbox" then -- first list is for if true, second for if it is false
 						if val[index] == true then var = 1 else var = 2 end
-					elseif self.rightclick[i][1] == "input" then
-						notice.new("you can't use a list\nfor an input!", notice.red, 3)
+					else
+						notice.new("you can't use a list\nfor an input, slider or range!", notice.red, 3)
 					end
 
 					for i, v in pairs(self.rightclick[i][2][var]) do
@@ -211,11 +238,21 @@ function enemy:init(x, y, t, a, properties)
 						end
 					end
 				else
-					self[self.rightclick[i][2]] = val[index]
+					if self.rightclick[i][1] == "range" then
+						local x, y, w, h = val[index], val[index+1], val[index+2], val[index+3]
+						if self.rightclick[i][2] ~= "customscissor" then -- blame maurice
+							x = x - (.5-self.width/2)
+							y = y + .5 - self.height
+						end
+
+						self[self.rightclick[i][2]] = {x, y, w, h}
+						index = index + 3
+					else
+						self[self.rightclick[i][2]] = val[index]
+					end
 				end
 			end
 		end
-		table.remove(self.a, 1)
 	end
 	
 	if type(self.quadgroup) == "table" then
