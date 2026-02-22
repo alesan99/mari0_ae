@@ -6809,6 +6809,44 @@ function portalintile(x, y)
 	return false
 end
 
+function hitblockconvert(x, y)
+	local invisblocks = {113,118,112,113}
+	local blocks = {113,114,117,113}
+	if type(x) == "table" then -- moving tile
+		if not x.noteblock then
+			if x.usedblockidx then
+				x.t = x.usedblockidx
+			elseif t.invisible then
+				x.t = invisblocks[spriteset]
+			else
+				x.t = blocks[spriteset]
+			end
+			x.coinblock = false
+			x.breakable = false
+			x.invisible = false
+			return true
+		end
+		return false
+	end
+	local r = map[x][y]
+	if not tilequads[r[1]].noteblock then
+		if tilequads[r[1]].usedblockidx then
+			map[x][y][1] = tilequads[r[1]].usedblockidx
+			if not tilequads[r[1]].collision then
+				objects["tile"][tilemap(x, y)] = nil
+				map[x][y]["gels"] = {}
+				checkportalremove(x, y)
+			end
+		elseif tilequads[r[1]].invisible then
+			map[x][y][1] = invisblocks[spriteset]
+		else
+			map[x][y][1] = blocks[spriteset]
+		end
+		return true
+	end
+	return false
+end
+
 function hitblock(x, y, t, v)
 	local size = (t and t.size) or 2
 	local dir, nospritebatch = "up", false
@@ -6895,65 +6933,19 @@ function hitblock(x, y, t, v)
 				blockbouncet.content = entityquads[r[2]].t
 			end
 			blockbouncet.content2 = size
-			if not tilequads[r[1]].noteblock then
-				if tilequads[r[1]].invisible then
-					if spriteset == 1 then
-						map[x][y][1] = 113
-					elseif spriteset == 2 then
-						map[x][y][1] = 118
-					elseif spriteset == 3 then
-						map[x][y][1] = 112
-					else
-						map[x][y][1] = 113
-					end
-				else
-					if spriteset == 1 then
-						map[x][y][1] = 113
-					elseif spriteset == 2 then
-						map[x][y][1] = 114
-					elseif spriteset == 3 then
-						map[x][y][1] = 117
-					else
-						map[x][y][1] = 113
-					end
-				end
+			if (not hitblockconvert(x, y)) and entityquads[r[2]] and entityquads[r[2]].t ~= "pipe" then -- noteblock
+				map[x][y][2] = nil
 			end
-			if entityquads[r[2]].t == "vine" then
+			if r[2] and entityquads[r[2]].t == "vine" then
 				playsound(vinesound)
-			elseif entityquads[r[2]].t ~= "pipe" then
+			elseif r[2] and entityquads[r[2]].t ~= "pipe" then
 				playsound(mushroomappearsound)
-			end
-			if tilequads[r[1]].noteblock then
-				if entityquads[r[2]] and entityquads[r[2]].t ~= "pipe" then
-					map[x][y][2] = nil
-				end
 			end
 		elseif #r > 1 and tablecontains(customenemies, r[2]) then
 			blockbouncet.content = r[2]
 			blockbouncet.content2 = size
+			hitblockconvert(x,y)
 			playsound("mushroomappear")
-			
-			if tilequads[r[1]]:getproperty("invisible", x, y) then
-				if spriteset == 1 then
-					map[x][y][1] = 113
-				elseif spriteset == 2 then
-					map[x][y][1] = 118
-				elseif spriteset == 3 then
-					map[x][y][1] = 112
-				else
-					map[x][y][1] = 113
-				end
-			else
-				if spriteset == 1 then
-					map[x][y][1] = 113
-				elseif spriteset == 2 then
-					map[x][y][1] = 114
-				elseif spriteset == 3 then
-					map[x][y][1] = 117
-				else
-					map[x][y][1] = 113
-				end
-			end
 		else
 			blockbouncet.content = false
 			blockbouncet.content2 = size
@@ -6974,30 +6966,8 @@ function hitblock(x, y, t, v)
 		if ((#r == 1 or (entityquads[r[2]] and (entityquads[r[2]].t == "tiletool" or entityquads[r[2]].t == "ice"))) and tilequads[r[1]].coinblock) or
 			(#r > 1 and (entityquads[r[2]] and entityquads[r[2]].t == "collectable") and (tilequads[r[1]].coinblock or tilequads[r[1]].breakable)) or
 		 	((#r > 1 and (entityquads[r[2]] and entityquads[r[2]].t == "coin") and tilequads[r[1]].breakable)) then --coinblock
+			hitblockconvert(x, y)
 			playsound(coinsound)
-			if tilequads[r[1]].invisible then
-				if spriteset == 1 then
-					map[x][y][1] = 113
-				elseif spriteset == 2 then
-					map[x][y][1] = 118
-				elseif spriteset == 3 then
-					map[x][y][1] = 112
-				else
-					map[x][y][1] = 113
-				end
-			else
-				if not tilequads[r[1]].noteblock then
-					if spriteset == 1 then
-						map[x][y][1] = 113
-					elseif spriteset == 2 then
-						map[x][y][1] = 114
-					elseif spriteset == 3 then
-						map[x][y][1] = 117
-					else
-						map[x][y][1] = 113
-					end
-				end
-			end
 			if entityquads[r[2]] and entityquads[r[2]].t == "collectable" then
 				local collectablet = getcollectable(x, y)
 				if collectablet then --was there one to collect?
@@ -7052,19 +7022,7 @@ function hitblock(x, y, t, v)
 			if not exists then
 				table.insert(coinblocktimers, {x, y, coinblocktime, 0})
 			elseif coinblocktimers[exists][3] <= 0 or coinblocktimers[exists][4] >= 20 then
-				if tilequads[r[1]].noteblock then
-					map[x][y][2] = nil
-				else
-					if spriteset == 1 then
-						map[x][y][1] = 113
-					elseif spriteset == 2 then
-						map[x][y][1] = 114
-					elseif spriteset == 3 then
-						map[x][y][1] = 117
-					else
-						map[x][y][1] = 113
-					end
-				end
+				hitblockconvert(x, y)
 			end
 		end
 		

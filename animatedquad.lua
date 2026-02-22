@@ -23,22 +23,23 @@ function animatedquad:init(imgpath, s, t)
 		self.timer = 0
 		self.spikes = {}
 		
-		self.delays = s:split(",")
-		
-		if self.delays[1] == "triggered" then
-			self.triggered = true
-			table.remove(self.delays, 1)
-		else
+		local list = s:split(",")
+		for i, v in pairs(list) do
+			if list[i] == "triggered" then
+				self.triggered = true
+			elseif list[i]:sub(1,10) == "usedblock:" then
+				self.usedblockidx = tonumber(list[i]:split(":")[2])
+			else
+				table.insert(self.delays, tonumber(list[i]))
+			end
+		end
+		if not self.triggered then
 			for i, v in ipairs(self.properties) do
 				if self.props.collision ~= v.collision or self.props.portalable ~= v.portalable then
 					self.cache = {}
 					break
 				end
 			end
-		end
-		
-		for i = 1, #self.delays do
-			self.delays[i] = tonumber(self.delays[i])
 		end
 		
 		local delaycount = #self.delays

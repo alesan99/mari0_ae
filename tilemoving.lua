@@ -66,6 +66,7 @@ function tilemoving:init(x, y, t)
 	self.platform = tilequads[self.t].platform
 	self.ice = tilequads[self.t].ice
 	self.noteblock = tilequads[self.t].noteblock
+	self.usedblockidx = tilequads[self.t].usedblockidx
 	self.offsetX = 8
 	self.offsetY = 0
 	self.quadcenterX = 8
@@ -265,20 +266,7 @@ function tilemoving:hit(a, b, getbroken)
 			table.insert(coinblocktimers, {self.cox, self.coy, coinblocktime})
 		elseif coinblocktimers[exists][3] <= 0 then
 			self.item = false
-			if not self.noteblock then
-				if spriteset == 1 then
-					self.t = 113
-				elseif spriteset == 2 then
-					self.t = 114
-				elseif spriteset == 3 then
-					self.t = 117
-				else
-					self.t = 113
-				end
-				self.coinblock = false
-				self.breakable = false
-				self.invisible = false
-			end
+			hitblockconvert(self)
 		end
 		self.blockbouncetimer = 0
 	elseif (self.coinblock or self.item) and (not self.getbroken) then
@@ -352,15 +340,7 @@ function tilemoving:hit(a, b, getbroken)
 			end
 			addpoints(200)
 		end
-		if spriteset == 1 then
-			self.t = 113
-		elseif spriteset == 2 then
-			self.t = 114
-		elseif spriteset == 3 then
-			self.t = 117
-		else
-			self.t = 113
-		end
+		hitblockconvert(self)
 
 		self.coinblock = false
 		self.item = false
