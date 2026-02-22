@@ -215,7 +215,9 @@ function risingwater:update(dt)
 						end
 						if self.sand then
 							local gravity = yacceleration or b.gravity
-							if lowgravity and not b.ignorelowgravity then
+							if b.ignoregravity then
+								gravity = 0
+							elseif lowgravity and not b.ignorelowgravity then
 								if b.jumping or (b.falling and b.speedy < 0) then
 									gravity = (b.gravity or yacceleration)*lowgravityjumpingmult
 								else
