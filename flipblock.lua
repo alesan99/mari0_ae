@@ -69,7 +69,8 @@ function flipblock:init(x, y, t, r)
 		table.insert(self.checktable, "player")
 		table.insert(self.checktable, "enemy")
 	end
-	
+
+	self.ignoretoggle = false
 	self.flip = false
 	self.timer = 0
 	self.blockbouncetimer = blockbouncetime
@@ -158,6 +159,11 @@ function flipblock:update(dt)
 			end
 		end
 	end
+
+	if self.ignoretoggle then
+		self.ignoretoggle = self.ignoretoggle - 1
+		if self.ignoretoggle <= 0 then self.ignoretoggle = false end
+	end
 end
 
 function flipblock:leftcollide(a, b)
@@ -182,9 +188,16 @@ function flipblock:globalcollide(a, b)
 end
 
 function flipblock:hit()
+	if self.ignoretoggle then
+		self.ignoretoggle = 2
+		return
+	end
+
 	self.blockbouncetimer = 0
 	if self.flippable then
 		self.flip = true
+	else
+		self.ignoretoggle = 2
 	end
 
 	if self.t == "actionblock" then
