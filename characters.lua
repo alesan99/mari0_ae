@@ -454,7 +454,7 @@ local function _splitimageshaders(img, color, exclude, imagedata)
 		return love.graphics.newImage(outputdata)
 	end
 	local c = love.graphics.getCanvas()
-	love.graphics.setCanvas(output)
+	love.graphics.setCanvas{output, stencil=true}
 	love.graphics.setShader(splitShader)
 	splitShader:send("inputImage", drawable)
 	splitShader:send("splitColor", {color[1]/255,color[2]/255,color[3]/255})

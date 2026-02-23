@@ -70,7 +70,7 @@ local function CreateShaderPass()
 	function pass:predraw()
 		if supported and self.on and self.canvas then
 			--self.canvas.canvas:clear(love.graphics.getBackgroundColor())
-			love.graphics.setCanvas(self.canvas.canvas)
+			love.graphics.setCanvas{self.canvas.canvas, stencil=true}
 			love.graphics.clear(love.graphics.getBackgroundColor()) --0.10.0
 			return self.canvas.canvas
 		end
