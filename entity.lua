@@ -1591,9 +1591,9 @@ rightclicktype["boxtube"] = {
 	end,
 	objfunc = function()
 		rightclicktype["boxtube"].t, rightclicktype["boxtube"].tnames = rightclicktype["boxtube"].maketable()
-		rightclickobjects[8].entries = rightclicktype["boxtube"].t
-		rightclickobjects[8].displayentries = rightclicktype["boxtube"].tnames
-		rightclickobjects[8]:updatePos()
+		rightclickobjects[2].entries = rightclicktype["boxtube"].t
+		rightclickobjects[2].displayentries = rightclicktype["boxtube"].tnames
+		rightclickobjects[2]:updatePos()
 	end,
 	savefunc = function()
 		if tonumber(rightclickvalues2[3]) then
@@ -1602,14 +1602,10 @@ rightclicktype["boxtube"] = {
 		end
 	end,
 	format = {
-		"on load:",
-		{"checkbox", 1, "drop box"},
-		"",
-		{"checkbox", 2, "respawn obj"},
-		"if destroyed",
-		"",
 		"object:",
-		{"dropdown", 3, 13, function(v) rightclickobjects[8].var = v; rightclickvalues2[3] = rightclicktype["boxtube"].t[v] end, {}}, --"dropdown", var, width (in chars), func, {entries}
+		{"dropdown", 3, 13, function(v) rightclickobjects[2].var = v; rightclickvalues2[3] = rightclicktype["boxtube"].t[v] end, {}}, --"dropdown", var, width (in chars), func, {entries}
+		{"checkbox", 1, "drop on load"},
+		{"checkbox", 2, "respawns?"},
 		{"button", 2, {"link trigger", startrclink},{"x", resetrclink, textcolor = {255, 0, 0}}}
 	},
 	t = {}
