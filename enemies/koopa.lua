@@ -685,7 +685,7 @@ function koopa:rightcollide(a, b)
 end
 
 function koopa:hitwall(a, b, dir)
-	if a == "tile" or a == "portalwall" or a == "spring" or a == "donut" or a == "springgreen" or a == "bigmole" or a == "muncher" or (a == "flipblock" and not b.flippable) or a == "frozencoin" or a == "buttonblock" or (a == "enemy" and (b.resistsenemykill or b.resistseverything)) or a == "clearpipesegment" or a == "tilemoving" then	
+	if a == "tile" or a == "portalwall" or a == "spring" or a == "donut" or a == "springgreen" or a == "bigmole" or a == "muncher" or (a == "flipblock" and not b.flippable) or a == "frozencoin" or a == "buttonblock" or (a == "enemy" and (b.resistsenemykill or b.resistseverything)) or a == "clearpipesegment" or a == "tilemoving" or a == "cannonballcannon" then	
 		if self.small then
 			if not self.staystillfall then
 				if self.t == "bigkoopa" or self.t == "bigbeetle" then
@@ -747,7 +747,7 @@ function koopa:hitwall(a, b, dir)
 end
 
 function koopa:hitenemy(a, b, dir)
-	if a ~= "tile" and a ~= "portalwall" and a ~= "platform" and (self.active or b.shellanimal) and self.small and self.speedx ~= 0 and a ~= "player" and a ~= "spring" and a ~= "donut" and a ~= "springgreen" and a ~= "bigmole" and a ~= "muncher" and a ~= "koopaling" and a ~= "bowser" then
+	if a ~= "tile" and a ~= "portalwall" and a ~= "platform" and (self.active or b.shellanimal) and self.small and self.speedx ~= 0 and a ~= "player" and a ~= "spring" and a ~= "donut" and a ~= "springgreen" and a ~= "bigmole" and a ~= "muncher" and a ~= "koopaling" and a ~= "bowser" and a ~= "cannonballcannon" then
 		if b.shotted and (not self.staystillfall) and (not (b.resistsenemykill or b.resistseverything)) then
 			if self.combo < #koopacombo then
 				self.combo = self.combo + 1
