@@ -432,6 +432,13 @@ function buttonblock:init(x, y, color, solid)
 	self.offsetY = 0
 	self.quadcenterX = 8
 	self.quadcenterY = 8
+
+	self.squishtable = {"enemy"}
+	for i, v in pairs(enemies) do
+		if objects[v] then
+			table.insert(self.squishtable, v)
+		end
+	end
 end
 
 function buttonblock:draw()
@@ -447,6 +454,16 @@ function buttonblock:change()
 	else
 		self.quad = self.quadon
 		self.active = true
+
+		-- Kill enemies
+		local rectcol = checkrect(self.x, self.y, self.width, self.height, self.squishtable)
+		for i = 1, #rectcol, 2 do
+			local v = objects[rectcol[i]][rectcol[i+1]]
+			if (not v.resistseverything) and (not v.resistsblocksquish) and v.shotted then
+				local dir = (self.x < v.x) and 1 or -1
+				v:shotted(dir)
+			end
+		end
 	end
 end
 
