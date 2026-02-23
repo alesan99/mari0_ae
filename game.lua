@@ -1552,7 +1552,7 @@ function game_draw()
 		rendercustombackground(xscroll, yscroll, scrollfactor, scrollfactory)
 
 		--BACKGROUND TILES
-		if bmap_on then
+		if bmap_on and not _3DMODE then
 			if editormode then
 				love.graphics.setColor(255,255,255,100)
 			else
@@ -2136,7 +2136,42 @@ function game_draw()
 						love.graphics.draw(customspritebatch[1][i], math.floor((-math.fmod(xscroll, 1)*16)*scale), math.floor((-math.fmod(yscroll, 1)*16)*scale))
 					end
 				end
+
 				if i > 8 then
+					if bmap_on then
+						if editormode then
+							love.graphics.setColor(255,255,255,100)
+						else
+							love.graphics.setColor(255,255,255,255)
+						end
+						-- animated background tiles
+						if animatedtilecount and animatedtilecount > 0 then
+							local xfromdraw,xtodraw, yfromdraw,ytodraw, xoff,yoff = getdrawrange(xscroll,yscroll)
+							for y = 1, ytodraw do
+								for x = 1, xtodraw do
+									local backgroundtile = bmapt(math.floor(xscroll)+x, math.floor(yscroll)+y, 1)
+									if backgroundtile and backgroundtile > 90000 and tilequads[backgroundtile] and not tilequads[backgroundtile].invisible then
+										love.graphics.draw(tilequads[backgroundtile].image, tilequads[backgroundtile]:getquad(math.floor(xscroll)+x, math.floor(yscroll)+y) or tilequads[backgroundtile].quad, math.floor((x-1-math.fmod(xscroll, 1))*16*scale), math.floor(((y-1-math.fmod(yscroll, 1))*16-8)*scale), 0, scale, scale)
+									end
+								end
+							end
+						end
+						-- static background tiles
+						local xfromdraw,xtodraw, yfromdraw,ytodraw, xoff,yoff = getdrawrange(xscroll,yscroll)
+						for y = 1, ytodraw do
+							for x = 1, xtodraw do
+								local backgroundtile = bmapt(math.floor(xscroll)+x, math.floor(yscroll)+y, 1)
+								if backgroundtile and tilequads[backgroundtile] and not tilequads[backgroundtile].invisible then
+									if backgroundtile > 90000 then
+										love.graphics.draw(tilequads[backgroundtile].image, tilequads[backgroundtile]:getquad(math.floor(xscroll)+x, math.floor(yscroll)+y) or tilequads[backgroundtile].quad, math.floor((x-1-math.fmod(xscroll, 1))*16*scale), math.floor(((y-1-math.fmod(yscroll, 1))*16-8)*scale), 0, scale, scale)
+									else
+										love.graphics.draw(tilequads[backgroundtile].image, tilequads[backgroundtile].quad, math.floor((x-1-math.fmod(xscroll, 1))*16*scale), math.floor(((y-1-math.fmod(yscroll, 1))*16-8)*scale), 0, scale, scale)
+									end
+								end
+							end
+						end
+						love.graphics.setColor(255,255,255,255)
+					end
 					drawmaptiles("dropshadow", xscroll, yscroll)
 				else
 					drawmaptiles("collision", xscroll, yscroll)
