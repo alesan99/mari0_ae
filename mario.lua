@@ -7177,6 +7177,19 @@ function destroyblock(x, y, v) --v = true, "nopoints"
 	if portalintile(x, y) or editormode then
 		return
 	end
+
+	local r = map[x][y]
+	if (not group) and r["group"] then
+		--tile is grouped by tile tool
+		local x1, y1, x2, y2 = r["group"][1], r["group"][2], r["group"][3], r["group"][4]
+		for tx = x1, x2 do
+			for ty = y1, y2 do
+				if not (x == tx and y == ty) then
+					destroyblock(tx, ty, v, true)
+				end
+			end
+		end
+	end
 	
 	local debris = tilequads[map[x][y][1]].debris
 	map[x][y][1] = 1
