@@ -3690,7 +3690,7 @@ function mario:jump(force)
 		self.redseesaw = false
 		
 		if not self.water then
-			if (self.gravitydir == "left" or self.gravitydir == "right") and self.speedx ~= 0 then
+			if (self.gravitydir == "left" or self.gravitydir == "right") and (self.speedx ~= 0 and (not (self.characterdata.doublejump or self.characterdata.dbljmppls))) then
 				return false
 			else
 				if self.spring then
