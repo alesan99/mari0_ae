@@ -465,7 +465,9 @@ function enemy:init(x, y, t, a, properties)
 	
 	if self.spawnsenemy then
 		self.spawnenemytimer = 0
-		self.spawnenemydelay = self.spawnenemydelays[math.random(#self.spawnenemydelays)]
+		if self.spawnenemydelays then
+			self.spawnenemydelay = self.spawnenemydelays[math.random(#self.spawnenemydelays)]
+		end
 	end
 
 	if self.bounces and (self.bouncedelay or self.bouncedelays) then
@@ -781,48 +783,52 @@ function enemy:update(dt)
 			self.speedx = -3
 			return false
 		end
-		
-		local playernear = false
-		if self.dontspawnenemyonplayernear or self.spawnenemyonplayernear then
-			local dist = self.spawnenemydist or self.dontspawnenemydist or 3
-			if type(dist) == "table" then
-				local col = checkrect(self.x+dist[1], self.y+dist[2], dist[3], dist[4], {"player"})
-				if #col > 0 then
-					playernear = true
-				end
-			else
-				for i = 1, players do
-					local v = objects["player"][i]
-					if inrange(v.x+v.width/2, self.x+self.width/2-(dist), self.x+self.width/2+(dist)) then
+
+		if self.spawnenemydelay then
+			local playernear = false
+			if self.dontspawnenemyonplayernear or self.spawnenemyonplayernear then
+				local dist = self.spawnenemydist or self.dontspawnenemydist or 3
+				if type(dist) == "table" then
+					local col = checkrect(self.x+dist[1], self.y+dist[2], dist[3], dist[4], {"player"})
+					if #col > 0 then
 						playernear = true
-						break
+					end
+				else
+					for i = 1, players do
+						local v = objects["player"][i]
+						if inrange(v.x+v.width/2, self.x+self.width/2-(dist), self.x+self.width/2+(dist)) then
+							playernear = true
+							break
+						end
 					end
 				end
-			end
-			if self.spawnenemyonplayernear then
-				playernear = not playernear
-			end
-		end
-
-		if (not playernear) then
-			self.spawnenemytimer = self.spawnenemytimer + dt
-			while self.spawnenemytimer >= self.spawnenemydelay and self.spawnallow and (not self.spawnmax or self:getspawnedenemies() < self.spawnmax) do
-				if self.spawnsenemyrandoms then
-					self.spawnsenemy = self.spawnsenemyrandoms[math.random(#self.spawnsenemyrandoms)]
-				end
-				self:spawnenemy(self.spawnsenemy)
-				self.spawnenemytimer = 0
-				self.spawnenemydelay = self.spawnenemydelays[math.random(#self.spawnenemydelays)]
-				self.throwanimationstate = 0
-				if self.animationtype == "frames" then
-					self.quad = self.quadgroup[self.quadi + self.throwanimationstate]
+				if self.spawnenemyonplayernear then
+					playernear = not playernear
 				end
 			end
-			
-			if self.throwpreparetime and self.spawnenemytimer >= (self.spawnenemydelay - self.throwpreparetime) then
-				self.throwanimationstate = self.throwquadoffset
-				if self.animationtype == "frames" then
-					self.quad = self.quadgroup[self.quadi + self.throwanimationstate]
+	
+			if (not playernear) then
+				self.spawnenemytimer = self.spawnenemytimer + dt
+				while self.spawnenemytimer >= self.spawnenemydelay and self.spawnallow and (not self.spawnmax or self:getspawnedenemies() < self.spawnmax) do
+					if self.spawnsenemyrandoms then
+						self.spawnsenemy = self.spawnsenemyrandoms[math.random(#self.spawnsenemyrandoms)]
+					end
+					self:spawnenemy(self.spawnsenemy)
+					self.spawnenemytimer = 0
+					if self.spawnenemydelays then
+						self.spawnenemydelay = self.spawnenemydelays[math.random(#self.spawnenemydelays)]
+					end
+					self.throwanimationstate = 0
+					if self.animationtype == "frames" then
+						self.quad = self.quadgroup[self.quadi + self.throwanimationstate]
+					end
+				end
+				
+				if self.throwpreparetime and self.spawnenemytimer >= (self.spawnenemydelay - self.throwpreparetime) then
+					self.throwanimationstate = self.throwquadoffset
+					if self.animationtype == "frames" then
+						self.quad = self.quadgroup[self.quadi + self.throwanimationstate]
+					end
 				end
 			end
 		end
