@@ -15,6 +15,10 @@ end
 
 function intro_update(dt)
 	allowskip = true
+	if AutoSkipIntro then
+		intro_finish()
+		return
+	end
 	if introprogress < introduration+blackafterintro then
 		introprogress = introprogress + dt
 		if introprogress > introduration+blackafterintro then

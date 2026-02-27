@@ -3105,6 +3105,7 @@ function loadnitpicks()
 		end
 		PersistentEditorToolsLocal = t.persistenteditortoolslocal
 		DPIFix = t.dpifix
+		AutoSkipIntro = t.autoskipintro
 	end
 end
 
