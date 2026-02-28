@@ -4726,6 +4726,10 @@ function mario:floorcollide(a, b)
 			self.falling = fall
 			self.animationstate = anim
 			return false
+		elseif b.pushlikecube then
+			if self:pushbox(a, b, "floor") then
+				return false
+			end
 		elseif b.stompable then
 			if b.stompbounce or (b.stompbounceifsmall and self.size ~= 16) then--bounce off of enemy
 				self:stompbounce(a, b)
@@ -4838,7 +4842,7 @@ function mario:floorcollide(a, b)
 			self:die("Enemy (floorcollide)")
 		end
 	elseif a == "energyball" then
-		if self.pickup and not self.pickup.rigidgrab then
+		if self.pickup and ((not self.pickup.rigidgrab) or self.pickup.carrylikecube) then
 			if (self.pointingangle > math.pi/2 or self.pointingangle < -math.pi/2) then
 				return false
 			end
@@ -4895,17 +4899,8 @@ function mario:floorcollide(a, b)
 		end
 		self.tileice = true
 	elseif a == "box" or a == "core" then
-		--check if box can even move
-		if (b.gravitydir and (b.gravitydir == "left" or b.gravitydir == "right") and self.gravitydir == b.gravitydir) then
-			if self.speedy > maxwalkspeed/2 then
-				self.speedy = self.speedy - self.speedy * 6 * gdt
-			end
-
-			local out = checkrect(b.x, b.y+self.speedy*gdt, b.width, b.height, {"exclude", b}, true)
-			if #out == 0 then
-				b.speedy = self.speedy
-				return false
-			end
+		if self:pushbox(a, b, "floor") then
+			return false
 		end
 	end
 
@@ -5304,6 +5299,10 @@ function mario:rightcollide(a, b, passive)
 	elseif a == "enemy" then
 		if b.ignoreleftcollide or b.dontstopmario then
 			return false
+		elseif b.pushlikecube then
+			if self:pushbox(a, b, "right") then
+				return false
+			end
 		elseif (b.kills or b.killsonsides or b.killsonleft) then 
 			if self.invincible then
 				if b.shellanimal and b.small and b.speedx == 0 then
@@ -5411,7 +5410,7 @@ function mario:rightcollide(a, b, passive)
 			self:die("Enemy (rightcollide)")
 		end
 	elseif a == "energyball" then
-		if self.pickup and not self.pickup.rigidgrab then
+		if self.pickup and ((not self.pickup.rigidgrab) or self.pickup.carrylikecube) then
 			if passive then
 				if b.x+b.width/2 > self.x+self.width/2 and self.pointingangle < 0 then --right
 					return false
@@ -5558,17 +5557,8 @@ function mario:rightcollide(a, b, passive)
 			return false
 		end
 	elseif a == "box" or a == "core" then
-		--check if box can even move
-		if not (b.gravitydir and (b.gravitydir ~= "down" and b.gravitydir ~= "up") and self.gravitydir == b.gravitydir) then
-			if self.speedx > maxwalkspeed/2 then
-				self.speedx = self.speedx - self.speedx * 6 * gdt
-			end
-
-			local out = checkrect(b.x+self.speedx*gdt, b.y, b.width, b.height, {"exclude", b}, true)
-			if #out == 0 then
-				b.speedx = self.speedx
-				return false
-			end
+		if self:pushbox(a, b, "right") then
+			return false
 		end
 	elseif a == "turret" then
 		if self.starred then 
@@ -5691,6 +5681,10 @@ function mario:leftcollide(a, b)
 	elseif a == "enemy" then
 		if b.ignorerightcollide or b.dontstopmario then
 			return false
+		elseif b.pushlikecube then
+			if self:pushbox(a, b, "left") then
+				return false
+			end
 		elseif (b.kills or b.killsonsides or b.killsonright) then 
 			if self.invincible then
 				if b.shellanimal and b.small and b.speedx == 0 then
@@ -5797,7 +5791,7 @@ function mario:leftcollide(a, b)
 			self:die("Enemy (leftcollide)")
 		end
 	elseif a == "energyball" then
-		if self.pickup and not self.pickup.rigidgrab then
+		if self.pickup and ((not self.pickup.rigidgrab) or self.pickup.carrylikecube) then
 			if self.pointingangle > 0 then --left
 				return false
 			end
@@ -5930,17 +5924,8 @@ function mario:leftcollide(a, b)
 			return false
 		end
 	elseif a == "box" or a == "core" then
-		--check if box can even move
-		if not (b.gravitydir and (b.gravitydir ~= "down" and b.gravitydir ~= "up") and self.gravitydir == b.gravitydir) then
-			if self.speedx < -maxwalkspeed/2 then
-				self.speedx = self.speedx + math.abs(self.speedx) * 6 * gdt
-			end
-
-			local out = checkrect(b.x+self.speedx*gdt, b.y, b.width, b.height, {"exclude", b}, true)
-			if #out == 0 then
-				b.speedx = self.speedx
-				return false
-			end
+		if self:pushbox(a, b, "left") then
+			return false
 		end
 	elseif a == "turret" then
 		if self.starred then 
@@ -6025,6 +6010,10 @@ function mario:ceilcollide(a, b)
 	elseif a == "enemy" then
 		if b.ignorefloorcollide or b.dontstopmario then
 			return false
+		elseif b.pushlikecube then
+			if self:pushbox(a, b, "ceil") then
+				return false
+			end
 		elseif (b.kills or b.killsonbottom) then
 			if (not self.helmet) and b.helmetable and self:helmeted(b.helmetable) then
 				b.kill = true
@@ -6142,24 +6131,15 @@ function mario:ceilcollide(a, b)
 			self:die("Enemy (ceilcollide)")
 		end
 	elseif a == "energyball" then
-		if self.pickup and not self.pickup.rigidgrab then
+		if self.pickup and ((not self.pickup.rigidgrab) or self.pickup.carrylikecube) then
 			if self.pointingangle > -math.pi/2 and self.pointingangle < math.pi/2 then
 				return false
 			end
 		end
 		self:die("time")
 	elseif a == "box" or a == "core" then
-		--check if box can even move
-		if (b.gravitydir and (b.gravitydir == "left" or b.gravitydir == "right") and self.gravitydir == b.gravitydir) then
-			if self.speedy < -maxwalkspeed/2 then
-				self.speedy = self.speedy + math.abs(self.speedy) * 6 * gdt
-			end
-
-			local out = checkrect(b.x, b.y+self.speedy*gdt, b.width, b.height, {"exclude", b}, true)
-			if #out == 0 then
-				b.speedy = self.speedy
-				return false
-			end
+		if self:pushbox(a, b, "ceil") then
+			return false
 		end
 	elseif a == "flipblock" then
 		if self.helmet == "spikey" then
@@ -6425,31 +6405,9 @@ function mario:passivecollide(a, b)
 	elseif a == "tilemoving" and b.speedy < 0 then
 		b:hit()
 		return false
-	elseif a == "box" or a == "core" then
-		if not (b.gravitydir and (b.gravitydir ~= "down" and b.gravitydir ~= "up") and self.gravitydir == b.gravitydir) then
-			if self.speedx < 0 then
-				if self.speedx < -maxwalkspeed/2 then
-					self.speedx = self.speedx - self.speedx * 6 * gdt
-				end
-				
-			--check if box can even move
-				local out = checkrect(b.x+self.speedx*gdt, b.y, b.width, b.height, {"exclude", b})
-				if #out == 0 then	
-					b.speedx = self.speedx
-					return false
-				end
-			else
-				if self.speedx > maxwalkspeed/2 then
-					self.speedx = self.speedx - self.speedx * 6 * gdt
-				end
-				
-				--check if box can even move
-				local out = checkrect(b.x+self.speedx*gdt, b.y, b.width, b.height, {"exclude", b})
-				if #out == 0 then	
-					b.speedx = self.speedx
-					return false
-				end
-			end
+	elseif a == "box" or a == "core" or (a == "enemy" and b.pushlikecube) then
+		if self:pushbox(a, b, "passive") then
+			return false
 		end
 	elseif a == "bigmole" then
 		if self.y+self.height < b.y+0.2 then
@@ -6562,6 +6520,63 @@ function mario:starcollide(a, b)
 	elseif a == "muncher" or a == "plantcreepersegment" then
 		--nothing
 	end
+end
+
+function mario:pushbox(a, b, dir)
+	if dir == "passive" then
+		dir = (self.speedx >= 0) and "right" or "left"
+	end
+	local dampening = 6
+	if dir == "left" or dir == "right" then
+		if not (b.gravitydir and (b.gravitydir ~= "down" and b.gravitydir ~= "up") and self.gravitydir == b.gravitydir) then
+			if dir == "right" then  -- passive with speed >= 0
+				if self.speedx > maxwalkspeed/2 then
+					self.speedx = self.speedx - self.speedx * dampening * gdt
+				end
+
+				local out = checkrect(b.x+self.speedx*gdt, b.y, b.width, b.height, {"exclude", b}, true)
+				if #out == 0 then
+					b.speedx = self.speedx
+					return true
+				end
+			else -- left / passive with speed < 0
+				if self.speedx < -maxwalkspeed/2 then
+					self.speedx = self.speedx + math.abs(self.speedx) * dampening * gdt
+				end
+
+				local out = checkrect(b.x+self.speedx*gdt, b.y, b.width, b.height, {"exclude", b}, true)
+				if #out == 0 then
+					b.speedx = self.speedx
+					return true
+				end
+			end
+		end
+	else
+		if (b.gravitydir and (b.gravitydir == "left" or b.gravitydir == "right") and self.gravitydir == b.gravitydir) then
+			if dir == "floor" then
+				if self.speedy > maxwalkspeed/2 then
+					self.speedy = self.speedy - self.speedy * dampening * gdt
+				end
+
+				local out = checkrect(b.x, b.y+self.speedy*gdt, b.width, b.height, {"exclude", b}, true)
+				if #out == 0 then
+					b.speedy = self.speedy
+					return true
+				end
+			else -- ceil
+				if self.speedy < -maxwalkspeed/2 then
+					self.speedy = self.speedy + math.abs(self.speedy) * dampening * gdt
+				end
+
+				local out = checkrect(b.x, b.y+self.speedy*gdt, b.width, b.height, {"exclude", b}, true)
+				if #out == 0 then
+					b.speedy = self.speedy
+					return true
+				end
+			end
+		end
+	end
+	return false
 end
 
 function mario:hitspring(b)
@@ -7392,7 +7407,7 @@ function mario:die(how)
 end
 
 function mario:laser(dir)
-	if self.pickup and not self.pickup.rigidgrab then
+	if self.pickup and ((not self.pickup.rigidgrab) or (self.pickup.carrylikecube and not self.pickup.dontstoplaser)) then
 		if dir == "right" and self.pointingangle < 0 then
 			return
 		elseif dir == "left" and self.pointingangle > 0 then
@@ -7573,7 +7588,7 @@ end
 function mario:dropbox() --uploading...
 	self.pickup:dropped(self.gravitydir)
 
-	if self.pickup.rigidgrab then
+	if self.pickup.rigidgrab and (not self.pickup.carrylikecube) then
 		self.pickup = nil
 		return
 	end
@@ -8591,15 +8606,17 @@ function mario:fire()
 			self.pickupready:used(self.playernumber)
 			self.pickupready = false
 		elseif self.pickup and self.pickup.rigidgrab then
-			if self.pickup.carryable then
-				local out = checkrect(self.pickup.x, self.pickup.y, self.pickup.width, self.pickup.height, {"exclude", self.pickup, {"player"}}, true)
-				if #out == 0 then
+			if (not self.pickup.dontdropwhenholdingrunbutton) then
+				if self.pickup.carryable then
+					local out = checkrect(self.pickup.x, self.pickup.y, self.pickup.width, self.pickup.height, {"exclude", self.pickup, {"player"}}, true)
+					if #out == 0 then
+						self:dropbox()
+						return false
+					end
+				else
 					self:dropbox()
 					return false
 				end
-			else
-				self:dropbox()
-				return false
 			end
 		end
 
@@ -8890,7 +8907,7 @@ function mario:dive(water)
 end
 
 function mario:turretshot(tx, ty, sx, sy, knockback) --turret
-	if self.pickup and not self.pickup.rigidgrab then
+	if self.pickup and ((not self.pickup.rigidgrab) or self.pickup.carrylikecube) then
 		if tx > self.x+self.width/2 and self.pointingangle < 0 then --right
 			return false
 		elseif tx < self.x+self.width/2 and self.pointingangle > 0 then --left

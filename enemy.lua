@@ -1730,43 +1730,48 @@ function enemy:update(dt)
 			end
 		end
 	end
-	if (self.friction or self.airfriction) and self.movement ~= "truffleshuffle" then
-		local friction = friction
-		if self.airfriction and self.falling then
-			friction = self.airfriction
-		elseif type(self.friction) == "number" then
-			friction = self.friction
-		end
-		if self.speedx > 0 then
-			self.speedx = self.speedx - friction*dt
-			if self.speedx < 0 then
-				self.speedx = 0
+
+	if (not self.pushlikecubepushed) then
+		if (self.friction or self.airfriction) and self.movement ~= "truffleshuffle" then
+			local friction = friction
+			if self.airfriction and self.falling then
+				friction = self.airfriction
+			elseif type(self.friction) == "number" then
+				friction = self.friction
 			end
-		else
-			self.speedx = self.speedx + friction*dt
 			if self.speedx > 0 then
-				self.speedx = 0
+				self.speedx = self.speedx - friction*dt
+				if self.speedx < 0 then
+					self.speedx = 0
+				end
+			else
+				self.speedx = self.speedx + friction*dt
+				if self.speedx > 0 then
+					self.speedx = 0
+				end
 			end
 		end
-	end
-	if (self.verticalfriction or self.verticalairfriction) then
-		local friction = friction
-		if self.verticalairfriction and self.falling then
-			friction = self.verticalairfriction
-		elseif type(self.verticalfriction) == "number" then
-			friction = self.verticalfriction
-		end
-		if self.speedy > 0 then
-			self.speedy = self.speedy - friction*dt
-			if self.speedy < 0 then
-				self.speedy = 0
+		if (self.verticalfriction or self.verticalairfriction) then
+			local friction = friction
+			if self.verticalairfriction and self.falling then
+				friction = self.verticalairfriction
+			elseif type(self.verticalfriction) == "number" then
+				friction = self.verticalfriction
 			end
-		else
-			self.speedy = self.speedy + friction*dt
 			if self.speedy > 0 then
-				self.speedy = 0
+				self.speedy = self.speedy - friction*dt
+				if self.speedy < 0 then
+					self.speedy = 0
+				end
+			else
+				self.speedy = self.speedy + friction*dt
+				if self.speedy > 0 then
+					self.speedy = 0
+				end
 			end
 		end
+	else
+		self.pushlikecubepushed = true
 	end
 
 	if self.xrelativetocamera then
@@ -2187,14 +2192,19 @@ function enemy:update(dt)
 			local oldx = self.x
 			local oldy = self.y
 			
-			local offsetx = (self.carryoffsetx or 0)
-			if self.carryoffsetx then --carry in the direction player is facing
-				if (self.carryparent.portalgun and self.carryparent.pointingangle > 0) or self.carryparent.animationdirection == "left" then
-					offsetx = -offsetx
+			if self.carrylikecube then
+				self.x = (self.carryparent.x+math.sin(-self.carryparent.pointingangle)*0.3)+(self.carryoffsetx or 0)
+				self.y = (self.carryparent.y-math.cos(-self.carryparent.pointingangle)*0.3)+(self.carryoffsety or 0)
+			else
+				local offsetx = (self.carryoffsetx or 0)
+				if self.carryoffsetx then --carry in the direction player is facing
+					if (self.carryparent.portalgun and self.carryparent.pointingangle > 0) or self.carryparent.animationdirection == "left" then
+						offsetx = -offsetx
+					end
 				end
+				self.x = (self.carryparent.x+self.carryparent.width/2-self.width/2) + offsetx
+				self.y = (self.carryparent.y-self.height)+(self.carryoffsety or 0)
 			end
-			self.x = (self.carryparent.x+self.carryparent.width/2-self.width/2) + offsetx
-			self.y = (self.carryparent.y-self.height)+(self.carryoffsety or 0)
 
 			if self.carryquad then
 				self.quadi = self.carryquad
@@ -2674,18 +2684,32 @@ function enemy:globalcollide(a, b, c, d, dir)
 		end
 	end
 	
-	if a == "player" and self.removeonmariocontact then
-		if self.transforms then
-			if self:gettransformtrigger("mariocontact") then
-				self:transform(self:gettransformsinto("mariocontact"), nil, "death")
-			elseif self:gettransformtrigger("death") then
-				self:transform(self:gettransformsinto("death"), nil, "death")
-				return
+	if a == "player" then
+		if self.removeonmariocontact then
+			if self.transforms then
+				if self:gettransformtrigger("mariocontact") then
+					self:transform(self:gettransformsinto("mariocontact"), nil, "death")
+				elseif self:gettransformtrigger("death") then
+					self:transform(self:gettransformsinto("death"), nil, "death")
+					return
+				end
 			end
+			self.kill = true
+			self.drawable = false
+			return true
 		end
-		self.kill = true
-		self.drawable = false
-		return true
+		if self.pushlikecube then
+			if dir == "passive" then
+				if self.x+self.width > b.x+b.width then
+					self.x = b.x+b.width
+				else
+					self.x = b.x-self.width
+				end
+			else
+				self.cubepushed = true
+			end
+			return true
+		end
 	end
 
 	if self.kickable then
