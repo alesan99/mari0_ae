@@ -1,5 +1,5 @@
 function enemies_load()
-	defaultvalues = {quadcount=1, quadno=1}
+	defaultvalues = {quadcount=1, quadno=1, animationstart=1}
 
 	enemiesdata = {}
 	customenemies = {}
@@ -328,15 +328,17 @@ function loadenemyquad(s, no_notices)
 		enemiesdata[s].drawable = true
 		enemiesdata[s].quadgroup = enemiesdata[s].quadbase[spriteset]
 		if enemiesdata[s].animationtype == "frames" or enemiesdata[s].animationtype == "character" then
+			--[[ no longer needed as animationstart defaults at 1
 			if not no_notices then
 				if not enemiesdata[s].animationstart then
 					print(s .. " IS MISSING ANIMATIONSTART")
 					notice.new(s .. " is missing\nanimationstart frame", notice.red, 5)
 				end
-			end
+			end]]
 			enemiesdata[s].quad = enemiesdata[s].quadbase[spriteset][enemiesdata[s].animationstart]
 		else
 			enemiesdata[s].quad = enemiesdata[s].quadbase[spriteset][enemiesdata[s].quadno]
 		end
 	end
 end
+
