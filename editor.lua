@@ -7053,12 +7053,16 @@ function togglebonusstage(var)
 	guielements["bonusstagecheckbox"].var = bonusstage; levelmodified = true
 end
 function togglecustombackground(var)
-	if var ~= nil then
-		custombackground = var
+	if var == true and guielements["backgrounddropdown"].var then
+		custombackground = custombackgrounds[guielements["backgrounddropdown"].var]
 	else
-		custombackground = not custombackground
+		if var ~= nil then
+			custombackground = var
+		else
+			custombackground = not custombackground
+		end
 	end
-	
+		
 	if custombackground then
 		loadcustombackground(custombackground)
 	end
@@ -7066,10 +7070,14 @@ function togglecustombackground(var)
 	guielements["custombackgroundcheckbox"].var = custombackground; levelmodified = true
 end
 function togglecustomforeground(var)
-	if var ~= nil then
-		customforeground = var
+	if var == true and guielements["foregrounddropdown"].var then
+		customforeground = custombackgrounds[guielements["foregrounddropdown"].var]
 	else
-		customforeground = not customforeground
+		if var ~= nil then
+			customforeground = var
+		else
+			customforeground = not customforeground
+		end
 	end
 	
 	if customforeground then
