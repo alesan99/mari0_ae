@@ -995,7 +995,7 @@ function checkrect(x, y, width, height, list, statics, condition)
 							skip = true
 						end
 						--masktable
-						if (inobj.mask ~= nil and inobj.mask[w.category] == true) or (w.mask ~= nil and w.mask[inobj.category] == true) or (w.ignorecheckrect and w.ignorecheckrect[w.category]) then
+						if (inobj.mask ~= nil and inobj.mask[w.category] == true) or (w.mask ~= nil and w.mask[inobj.category] == true) or w.ignorecheckrect then
 							skip = true
 						end
 					end

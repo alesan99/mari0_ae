@@ -14,7 +14,7 @@ function gel:init(x, y, id)
 	self.active = true
 	self.category = 8
 	self.mask = {false, false, true, true, true, true, true, true, false, false, true}
-	self.ignorecheckrect = {[8] = true}
+	self.ignorecheckrect = true
 	self.gravity = 50
 	--self.autodelete = true
 	self.extremeautodelete = true
