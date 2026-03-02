@@ -6544,8 +6544,10 @@ function mario:starcollide(a, b)
 	if a == "enemy" then
 		if b.resistsstar then
 			return true
-		elseif b:shotted("right", nil, nil, false, true) then
-			addpoints(firepoints[b.t] or 100, self.x, self.y)
+		else
+			if b:shotted("right", nil, nil, false, true) then
+				addpoints(firepoints[b.t] or 100, self.x, self.y)
+			end
 			return true
 		end
 	elseif (a == "goomba" or a == "koopa" or a == "plant" or a == "bowser" or a == "squid" or a == "cheep" or a == "hammerbro" or a == "lakito" or a == "bulletbill" or a == "flyingfish" or a == "downplant" or a == "bigbill" or a == "cannonball" or (a == "kingbill" and not (levelfinished and not self.controlsenabled)) or a == "sidestepper" or a == "barrel" or a == "icicle" or a == "angrysun"
