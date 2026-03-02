@@ -105,6 +105,8 @@ removekeys[:player]:amount			removes keys
 setnumber:name:=/+:v				change number by something
 resetnumbers						resets all animation numbers
 launchplayer[:player]:x:y			launches player at defined speed
+launchplayerx[:player]:x			launches player at defined speed in the x axis
+launchplayery[:player]:y			launches player at defined speed in the y axis
 addtime:time						adds <seconds> time
 removetime:time						removes <seconds> time
 settime:time						sets time
@@ -753,6 +755,30 @@ function animation:update(dt)
 					local i = tonumber(string.sub(v[2], -1))
 					if objects["player"][i] then
 						objects["player"][i].speedx = tonumber(sx) or 0
+						objects["player"][i].speedy = tonumber(sy) or 0
+					end
+				end
+			elseif v[1] == "launchplayerx" then
+				local sx = v[3]:gsub("B","-")
+				if v[2] == "everyone" then
+					for i = 1, players do
+						objects["player"][i].speedx = tonumber(sx) or 0
+					end
+				else
+					local i = tonumber(string.sub(v[2], -1))
+					if objects["player"][i] then
+						objects["player"][i].speedx = tonumber(sx) or 0
+					end
+				end
+			elseif v[1] == "launchplayery" then
+				local sy = v[3]:gsub("B","-")
+				if v[2] == "everyone" then
+					for i = 1, players do
+						objects["player"][i].speedy = tonumber(sy) or 0
+					end
+				else
+					local i = tonumber(string.sub(v[2], -1))
+					if objects["player"][i] then
 						objects["player"][i].speedy = tonumber(sy) or 0
 					end
 				end

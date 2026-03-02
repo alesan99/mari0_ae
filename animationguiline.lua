@@ -1837,6 +1837,46 @@ table.insert(toenter, {name = "launchplayer",
 	}
 })
 
+table.insert(toenter, {name = "launchplayerx", 
+	t = {
+		t="action",
+		nicename="launch player x:",
+		entries={
+			{
+				t="playerselection",
+			},
+			{
+				t="text",
+				value="x speed",
+			},
+			{
+				t="numinput",
+				default="0",
+			},
+		}
+	}
+})
+
+table.insert(toenter, {name = "launchplayery", 
+	t = {
+		t="action",
+		nicename="launch player y:",
+		entries={
+			{
+				t="playerselection",
+			},
+			{
+				t="text",
+				value="y speed",
+			},
+			{
+				t="numinput",
+				default="0",
+			},
+		}
+	}
+})
+
 table.insert(toenter, {name = "setplayerlight", 
 	t = {
 		t="action",
