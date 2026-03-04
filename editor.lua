@@ -2430,11 +2430,15 @@ function editor_draw()
 					local customenemydescription = (tile and (not tonumber(tile)) and tablecontains(customenemies, tile) and 
 						enemiesdata[tile] and enemiesdata[tile].description)
 					if tonumber(tile) or customenemydescription then
-						local newstring = entitydescriptions[tile]
+						local newstring
 						if customenemydescription then
 							newstring = enemiesdata[tile].description
 						elseif TEXT["entitydescriptions"] and TEXT["entitydescriptions"][tile] then
-							newstring = TEXT["entitydescriptions"][tile]
+							local name = entitylist[tile].name or entitylist[tile].t
+							newstring = name .. " - " .. TEXT["entitydescriptions"][tile]
+						else
+							local name = entitylist[tile].name or entitylist[tile].t
+							newstring = name .. " - " .. entitydescriptions[tile]
 						end
 						if string.len(newstring) > 49 then
 							local chari = 49
