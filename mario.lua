@@ -4663,9 +4663,7 @@ function mario:floorcollide(a, b)
 	--star logic
 	if self.starred or bigmario or self.statue then
 		if self:starcollide(a, b) then
-			if b.solidkill then
-				return true
-			else
+			if not b.solidkill then
 				return false
 			end
 		end
@@ -4735,9 +4733,7 @@ function mario:floorcollide(a, b)
 			return false
 		elseif b.kills or b.killsontop then
 			if self.invincible then
-				if b.solidkill then
-					return true
-				else
+				if not b.solidkill then
 					return false
 				end
 			elseif self.shoe and (not b.resistsshoe) and ((not b.resistsstar) or (b.resistsstarnotshoe)) then		
@@ -4745,9 +4741,7 @@ function mario:floorcollide(a, b)
 					addpoints(b.firepoints or 200, self.x, self.y)
 				end
 				self:stompbounce(a, b)
-				if b.solidkill then
-					return true
-				else
+				if not b.solidkill then
 					return false
 				end
 			elseif self.shoe and (b.resistsshoe or b.resistseverything) and b.walkonwithshoe then
@@ -4758,9 +4752,7 @@ function mario:floorcollide(a, b)
 				else
 					self:die("enemy")
 				end
-				if b.solidkill then
-					return true
-				else
+				if not b.solidkill then
 					return false
 				end
 			end
@@ -5235,9 +5227,7 @@ function mario:rightcollide(a, b, passive)
 	--star logic
 	if self.starred or bigmario or self.statue then
 		if self:starcollide(a, b) then
-			if b.solidkill then
-				return true
-			else
+			if not b.solidkill then
 				return false
 			end
 		end
@@ -5311,9 +5301,7 @@ function mario:rightcollide(a, b, passive)
 					playsound("shot")
 					addpoints(500, b.x, b.y)
 				end
-				if b.solidkill then
-					return true
-				else
+				if not b.solidkill then
 					return false
 				end
 			else
@@ -5345,9 +5333,7 @@ function mario:rightcollide(a, b, passive)
 					self:die("Enemy (rightcollide)")
 				end
 				
-				if b.solidkill then
-					return true
-				else
+				if not b.solidkill then
 					return false
 				end
 			end
@@ -5621,9 +5607,7 @@ function mario:leftcollide(a, b)
 	--star logic
 	if self.starred or bigmario or self.statue then
 		if self:starcollide(a, b) then
-			if b.solidkill then
-				return true
-			else
+			if not b.solidkill then
 				return false
 			end
 		end
@@ -5698,9 +5682,7 @@ function mario:leftcollide(a, b)
 					playsound("shot")
 					addpoints(500, b.x, b.y)
 				end
-				if b.solidkill then
-					return true
-				else
+				if not b.solidkill then
 					return false
 				end
 			else
@@ -5731,9 +5713,7 @@ function mario:leftcollide(a, b)
 				else
 					self:die("Enemy (leftollide)")
 				end
-				if b.solidkill then
-					return true
-				else
+				if not b.solidkill then
 					return false
 				end
 			end
@@ -5993,9 +5973,7 @@ function mario:ceilcollide(a, b)
 	--star logic
 	if self.starred or bigmario or self.statue then
 		if self:starcollide(a, b) then
-			if b.solidkill then
-				return true
-			else
+			if not b.solidkill then
 				return false
 			end
 		end
@@ -6037,9 +6015,7 @@ function mario:ceilcollide(a, b)
 			end
 
 			if self.invincible then
-				if b.solidkill then
-					return true
-				else
+				if not b.solidkill then
 					return false
 				end
 			else
@@ -6063,9 +6039,7 @@ function mario:ceilcollide(a, b)
 				else
 					self:die("Enemy (Ceilcollided)")
 				end
-				if b.solidkill then
-					return true
-				else
+				if not b.solidkill then
 					return false
 				end
 			end
@@ -6465,9 +6439,7 @@ function mario:passivecollide(a, b)
 			else
 				self:die("enemy")
 			end
-			if b.solidkill then
-				return true
-			else
+			if not b.solidkill then
 				return false
 			end
 		end
