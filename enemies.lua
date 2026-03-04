@@ -208,17 +208,6 @@ function loadenemy(filename)
 			--doing it up there messed up the order or something
 			enemiesdata[s][i] = v
 		end
-
-		if enemiesdata[s].fireenemy then
-			for i, v in pairs(enemiesdata[s].fireenemy) do
-				local a = i:lower()
-				if type(v) == "string" then
-					enemiesdata[s].fireenemy[a] = v:lower()
-				else
-					enemiesdata[s].fireenemy[a] = v
-				end
-			end
-		end
 		
 		for i, v in pairs(defaultvalues) do
 			if enemiesdata[s][i] == nil then

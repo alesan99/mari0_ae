@@ -8456,15 +8456,6 @@ function mario:firecustomenemy(i)
 			end
 			table.insert(self.fireenemykillonbuttonrelease[t], obj)
 		end
-		if gettable(f.killonbuttonrelease, i) then
-			if not self.fireenemykillonbuttonrelease then
-				self.fireenemykillonbuttonrelease = {}
-			end
-			if not self.fireenemykillonbuttonrelease[t] then
-				self.fireenemykillonbuttonrelease[t] = {}
-			end
-			table.insert(self.fireenemykillonbuttonrelease[t], obj)
-		end
 		if gettable(f.ride, i) then
 			self.fireenemyride = obj
 			self.fireenemyoffsetx = gettable(f.rideoffsetx, i) or 0
