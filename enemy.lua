@@ -743,7 +743,16 @@ function enemy:update(dt)
 		end
 	elseif self.animationtype == "frames" then
 		self.animationtimer = self.animationtimer + dt
-		if type(self.animationspeed) == "table" then
+		if self.synccoinanimation then -- sync to coin palette flash
+			if self.synccoinanimation == "pingpong" then
+				-- pingpong conservative images
+				self.quadi = self.animationstart + math.floor((math.min(coinanimation,7-coinanimation)-1)/3 * self.animationframes)
+			else
+				-- cycle all frames
+				self.quadi = self.animationstart + math.floor((coinanimation-1)/5 * self.animationframes)
+			end
+			self.quad = self.quadgroup[self.quadi]
+		elseif type(self.animationspeed) == "table" then
 			while self.animationtimer > self.animationspeed[self.animationtimerstage] do
 				self.animationtimer = self.animationtimer - self.animationspeed[self.animationtimerstage]
 				self.quadi = self.quadi + 1
