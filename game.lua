@@ -853,214 +853,194 @@ function game_update(dt)
 
 	--HORIZONTAL
 	
-	local oldscroll = splitxscroll[1]
-	
+	local oldscroll = xscroll
 	if autoscroll and autoscrollx ~= false and not minimapdragging then
-		local splitwidth = width/#splitscreen
-		for split = 1, #splitscreen do
-			local oldscroll = splitxscroll[split]
-			--scrolling
-			--LEFT
-			local i = 1
-			while i <= players and objects["player"][i].dead do
-				i = i + 1
+		--scrolling
+		--LEFT
+		local i = 1
+		while i <= players and objects["player"][i].dead do
+			i = i + 1
+		end
+		local fastestplayer = objects["player"][i]
+		
+		if fastestplayer then
+			if not CLIENT and not SERVER then
+				for i = 1, players do
+					if not objects["player"][i].dead and objects["player"][i].x > fastestplayer.x then
+						fastestplayer = objects["player"][i]
+					end
+				end
 			end
-			local fastestplayer = objects["player"][i]
 			
+			--LEFT
+			if (not (autoscrollingx and not editormode)) and (camerasetting ~= 3 or editormode) then
+				if fastestplayer.x < xscroll + scrollingleftstart*screenzoom2 and xscroll > 0 then
+					if fastestplayer.x < xscroll + scrollingleftstart*screenzoom2 and fastestplayer.speedx < 0 then
+						if fastestplayer.speedx < -scrollrate then
+							xscroll = xscroll - scrollrate*dt
+						else
+							xscroll = xscroll + fastestplayer.speedx*dt
+						end
+					end
+				
+					if fastestplayer.x < xscroll + scrollingleftcomplete*screenzoom2 then
+						xscroll = xscroll - scrollrate*dt
+						if fastestplayer.x > xscroll + scrollingleftcomplete*screenzoom2 then
+							xscroll = fastestplayer.x - scrollingleftcomplete*screenzoom2
+						end
+					end
+				end
+			end
+			if autoscrollingx and not editormode then
+				xscroll = math.max(0, math.min(mapwidth-width*screenzoom2, xscroll + autoscrollingx*dt))
+			end
 			
-			if fastestplayer then
-				if not CLIENT and not SERVER then
-					for i = 1, players do
-						if not objects["player"][i].dead and objects["player"][i].x > fastestplayer.x then
-							fastestplayer = objects["player"][i]
+			--RIGHT
+			if not (autoscrollingx and not editormode) then
+				if fastestplayer.x > xscroll + width*screenzoom2 - scrollingstart*screenzoom2 and xscroll < mapwidth - width*screenzoom2 then
+					if fastestplayer.x > xscroll + width*screenzoom2 - scrollingstart*screenzoom2 and fastestplayer.speedx > 0.3 then
+						if fastestplayer.speedx > scrollrate then
+							xscroll = xscroll + scrollrate*dt
+						else
+							xscroll = xscroll + fastestplayer.speedx*dt
 						end
 					end
-				end
 				
-				local oldscroll = splitxscroll[split]
-				
-				--LEFT
-
-				if (not (autoscrollingx and not editormode)) and (camerasetting ~= 3 or editormode) then
-					if fastestplayer.x < splitxscroll[split] + scrollingleftstart*screenzoom2 and splitxscroll[split] > 0 then
-						if fastestplayer.x < splitxscroll[split] + scrollingleftstart*screenzoom2 and fastestplayer.speedx < 0 then
-							if fastestplayer.speedx < -scrollrate then
-								splitxscroll[split] = splitxscroll[split] - scrollrate*dt
-							else
-								splitxscroll[split] = splitxscroll[split] + fastestplayer.speedx*dt
-							end
-						end
-					
-						if fastestplayer.x < splitxscroll[split] + scrollingleftcomplete*screenzoom2 then
-							splitxscroll[split] = splitxscroll[split] - scrollrate*dt
-							if fastestplayer.x > splitxscroll[split] + scrollingleftcomplete*screenzoom2 then
-								splitxscroll[split] = fastestplayer.x - scrollingleftcomplete*screenzoom2
-							end
+					if fastestplayer.x > xscroll + width*screenzoom2 - scrollingcomplete*screenzoom2 then
+						xscroll = xscroll + scrollrate*dt
+						if xscroll > fastestplayer.x - (width*screenzoom2 - scrollingcomplete*screenzoom2) then
+							xscroll = fastestplayer.x - (width*screenzoom2 - scrollingcomplete*screenzoom2)
 						end
 					end
 				end
-				if autoscrollingx and not editormode then
-					splitxscroll[split] = math.max(0, math.min(mapwidth-width*screenzoom2, splitxscroll[split] + autoscrollingx*dt))
+				if camerasetting == 3 then
+					objects["screenboundary"]["left"].x = xscroll
 				end
-				
-				--RIGHT
-				
-				if not (autoscrollingx and not editormode) then
-					if fastestplayer.x > splitxscroll[split] + width*screenzoom2 - scrollingstart*screenzoom2 and splitxscroll[split] < mapwidth - width*screenzoom2 then
-						if fastestplayer.x > splitxscroll[split] + width*screenzoom2 - scrollingstart*screenzoom2 and fastestplayer.speedx > 0.3 then
-							if fastestplayer.speedx > scrollrate then
-								splitxscroll[split] = splitxscroll[split] + scrollrate*dt
-							else
-								splitxscroll[split] = splitxscroll[split] + fastestplayer.speedx*dt
-							end
-						end
-					
-						if fastestplayer.x > splitxscroll[split] + width*screenzoom2 - scrollingcomplete*screenzoom2 then
-							splitxscroll[split] = splitxscroll[split] + scrollrate*dt
-							if splitxscroll[split] > fastestplayer.x - (width*screenzoom2 - scrollingcomplete*screenzoom2) then
-								splitxscroll[split] = fastestplayer.x - (width*screenzoom2 - scrollingcomplete*screenzoom2)
-							end
-						end
+			end
+
+			--just force that shit
+			if not levelfinished and not (autoscrollingx and not editormode) then
+				if fastestplayer.x > xscroll + width*screenzoom2 - scrollingcomplete*screenzoom2 then
+					xscroll = xscroll + superscroll*dt
+					if fastestplayer.x < xscroll + width*screenzoom2 - scrollingcomplete*screenzoom2 then
+						xscroll = fastestplayer.x - width*screenzoom2 + scrollingcomplete*screenzoom2
 					end
-					if camerasetting == 3 then
-						objects["screenboundary"]["left"].x = xscroll
+				elseif fastestplayer.x < xscroll + scrollingleftcomplete*screenzoom2 and (camerasetting ~= 3 or editormode) then
+					xscroll = xscroll - superscroll*dt
+					if fastestplayer.x > xscroll + scrollingleftcomplete*screenzoom2 then
+						xscroll = fastestplayer.x - scrollingleftcomplete*screenzoom2
 					end
 				end
+			end
 
-				--just force that shit
-				if not levelfinished and not (autoscrollingx and not editormode) then
-					if fastestplayer.x > splitxscroll[split] + width*screenzoom2 - scrollingcomplete*screenzoom2 then
-						splitxscroll[split] = splitxscroll[split] + superscroll*dt
-						if fastestplayer.x < splitxscroll[split] + width*screenzoom2 - scrollingcomplete*screenzoom2 then
-							splitxscroll[split] = fastestplayer.x - width*screenzoom2 + scrollingcomplete*screenzoom2
-						end
-					elseif fastestplayer.x < splitxscroll[split] + scrollingleftcomplete*screenzoom2 and (camerasetting ~= 3 or editormode) then
-						splitxscroll[split] = splitxscroll[split] - superscroll*dt
-						if fastestplayer.x > splitxscroll[split] + scrollingleftcomplete*screenzoom2 then
-							splitxscroll[split] = fastestplayer.x - scrollingleftcomplete*screenzoom2
-						end
-					end
-				end
+			--CLAMP
+			if xscroll > mapwidth-width then
+				xscroll = math.max(0, mapwidth-width)
+				hitrightside()
+			end
 
-				--CLAMP
-				if splitxscroll[split] > mapwidth-width then
-					splitxscroll[split] = math.max(0, mapwidth-width)
-					hitrightside()
-				end
-
-				if (axex and splitxscroll[split] > axex-width and axex >= width) then
-					splitxscroll[split] = axex-width
-					hitrightside()
-				end
-				if splitxscroll[split] < 0 then
-					splitxscroll[split] = 0
-				end
+			if (axex and xscroll > axex-width and axex >= width) then
+				xscroll = axex-width
+				hitrightside()
+			end
+			if xscroll < 0 then
+				xscroll = 0
 			end
 		end
-		
 	end
-	
 	
 	--VERTICAL SCROLLING
-	local oldscrolly = splityscroll[1]
+	local oldscrolly = yscroll
 	if autoscroll and autoscrolly ~= false and not minimapdragging then
-		for split = 1, #splitscreen do
-			local fastestplayer = 1
-			while fastestplayer <= players and objects["player"][fastestplayer].dead do
-				fastestplayer = fastestplayer + 1
-			end
-			if not CLIENT and not SERVER and objects["player"][fastestplayer] then
-				if mapwidth <= width then
-					for i = 1, players do
-						if not objects["player"][i].dead and math.abs(starty-objects["player"][i].y) > math.abs(starty-objects["player"][fastestplayer].y) then
-							fastestplayer = i
-						end
-					end
-				else
-					for i = 1, players do
-						if not objects["player"][i].dead and objects["player"][i].x > objects["player"][fastestplayer].x then
-							fastestplayer = i
-						end
+		local fastestplayer = 1
+		while fastestplayer <= players and objects["player"][fastestplayer].dead do
+			fastestplayer = fastestplayer + 1
+		end
+		if not CLIENT and not SERVER and objects["player"][fastestplayer] then
+			if mapwidth <= width then
+				for i = 1, players do
+					if not objects["player"][i].dead and math.abs(starty-objects["player"][i].y) > math.abs(starty-objects["player"][fastestplayer].y) then
+						fastestplayer = i
 					end
 				end
-			end
-			if mapheight > 15*screenzoom2 and objects["player"][fastestplayer] then
-				if not (autoscrollingy and not editormode) then
-					local px, py = objects["player"][fastestplayer].x, objects["player"][fastestplayer].y
-					if objects["player"][fastestplayer].height > 2 then
-						py = objects["player"][fastestplayer].y+objects["player"][fastestplayer].height/2
+			else
+				for i = 1, players do
+					if not objects["player"][i].dead and objects["player"][i].x > objects["player"][fastestplayer].x then
+						fastestplayer = i
 					end
-					local pspeed = objects["player"][1].speedy
-					if objects["player"][fastestplayer].oldy and pspeed == 0 and math.abs(objects["player"][fastestplayer].y-objects["player"][fastestplayer].oldy) < 3 then
-						pspeed = (objects["player"][fastestplayer].y-objects["player"][fastestplayer].oldy)/dt
-					end
-					objects["player"][fastestplayer].oldy = objects["player"][fastestplayer].y
-					
-					local sx, sy = px-xscroll, py-yscroll--position on screen
-					yscrolltarget = yscrolltarget or splityscroll[split]
-
-					local upbound = 9*screenzoom2
-					local downbound = 4*screenzoom2
-					if camerasetting == 2 then
-						upbound = 8*screenzoom2
-						downbound = 6*screenzoom2
-					end
-					if speed == 0 then
-						yscrolltarget = math.min(py-downbound, math.max(py-upbound, yscrolltarget))--(objects["player"][fastestplayer].y+objects["player"][fastestplayer].width/2)-(height/2)
-					elseif sy > upbound then
-						yscrolltarget = py-upbound
-					elseif sy < downbound then
-						yscrolltarget = py-downbound
-					end
-
-					local seeking = false
-					local yscrolltarget = math.min(math.max(0, mapheight-height*screenzoom2-1), math.max(0, yscrolltarget))
-					if objects["player"][fastestplayer].animationstate == "idle" then
-						if objects["player"][fastestplayer].upkeytimer > seektime then
-							yscrolltarget = yscrolltarget - seekrange
-							yscrolltarget = math.min(math.max(0, mapheight-height*screenzoom2-1), math.max(0, yscrolltarget))
-							seeking = true
-						elseif objects["player"][fastestplayer].downkeytimer > seektime then
-							yscrolltarget = yscrolltarget + seekrange
-							yscrolltarget = math.min(math.max(0, mapheight-height*screenzoom2-1), math.max(0, yscrolltarget))
-							seeking = true
-						end
-					end
-					
-					local diff = math.abs(splityscroll[split]-yscrolltarget)
-					local speed = math.abs(pspeed)--scrollrate*(diff/1.5)+0.5 --math.min(superscrollrate)?
-					if seeking then	
-						speed = seekspeed
-					elseif speed == 0 then--not objects["player"][fastestplayer].jumping and not objects["player"][fastestplayer].falling then
-						if diff > 2.5 then
-							speed = superscrollrate
-						else
-							speed = scrollrate
-						end
-					end
-					if yscrolltarget > splityscroll[split] then
-						splityscroll[split] = math.min(yscrolltarget, splityscroll[split] + speed*dt)
-					elseif yscrolltarget < splityscroll[split] then
-						splityscroll[split] = math.max(yscrolltarget, splityscroll[split] - speed*dt)
-					end
-
-					if splityscroll[split] > mapheight-height*screenzoom2-1 then
-						splityscroll[split] = math.max(0, mapheight-height*screenzoom2-1)
-					end
-					
-					if splityscroll[split] < 0 then
-						splityscroll[split] = 0
-					end
-				elseif not editormode then
-					--vertical autoscrolling
-					splityscroll[split] = math.max(0, math.min(mapheight-height*screenzoom2-1, splityscroll[split] + autoscrollingy*dt))
 				end
 			end
 		end
-	end
-	
-	if players == 2 then
-		--updatesplitscreen()
+		if mapheight > 15*screenzoom2 and objects["player"][fastestplayer] then
+			if not (autoscrollingy and not editormode) then
+				local px, py = objects["player"][fastestplayer].x, objects["player"][fastestplayer].y
+				if objects["player"][fastestplayer].height > 2 then
+					py = objects["player"][fastestplayer].y+objects["player"][fastestplayer].height/2
+				end
+				local pspeed = objects["player"][1].speedy
+				if objects["player"][fastestplayer].oldy and pspeed == 0 and math.abs(objects["player"][fastestplayer].y-objects["player"][fastestplayer].oldy) < 3 then
+					pspeed = (objects["player"][fastestplayer].y-objects["player"][fastestplayer].oldy)/dt
+				end
+				objects["player"][fastestplayer].oldy = objects["player"][fastestplayer].y
+				
+				local sx, sy = px-xscroll, py-yscroll--position on screen
+				yscrolltarget = yscrolltarget or yscroll
+
+				local upbound = 9*screenzoom2
+				local downbound = 4*screenzoom2
+				if camerasetting == 2 then
+					upbound = 8*screenzoom2
+					downbound = 6*screenzoom2
+				end
+				if speed == 0 then
+					yscrolltarget = math.min(py-downbound, math.max(py-upbound, yscrolltarget))--(objects["player"][fastestplayer].y+objects["player"][fastestplayer].width/2)-(height/2)
+				elseif sy > upbound then
+					yscrolltarget = py-upbound
+				elseif sy < downbound then
+					yscrolltarget = py-downbound
+				end
+
+				local seeking = false
+				local yscrolltarget = math.min(math.max(0, mapheight-height*screenzoom2-1), math.max(0, yscrolltarget))
+				if objects["player"][fastestplayer].animationstate == "idle" then
+					if objects["player"][fastestplayer].upkeytimer > seektime then
+						yscrolltarget = yscrolltarget - seekrange
+						yscrolltarget = math.min(math.max(0, mapheight-height*screenzoom2-1), math.max(0, yscrolltarget))
+						seeking = true
+					elseif objects["player"][fastestplayer].downkeytimer > seektime then
+						yscrolltarget = yscrolltarget + seekrange
+						yscrolltarget = math.min(math.max(0, mapheight-height*screenzoom2-1), math.max(0, yscrolltarget))
+						seeking = true
+					end
+				end
+				
+				local diff = math.abs(yscroll-yscrolltarget)
+				local speed = math.abs(pspeed)--scrollrate*(diff/1.5)+0.5 --math.min(superscrollrate)?
+				if seeking then	
+					speed = seekspeed
+				elseif speed == 0 then--not objects["player"][fastestplayer].jumping and not objects["player"][fastestplayer].falling then
+					if diff > 2.5 then
+						speed = superscrollrate
+					else
+						speed = scrollrate
+					end
+				end
+				if yscrolltarget > yscroll then
+					yscroll = math.min(yscrolltarget, yscroll + speed*dt)
+				elseif yscrolltarget < yscroll then
+					yscroll = math.max(yscrolltarget, yscroll - speed*dt)
+				end
+				if yscroll > mapheight-height*screenzoom2-1 then
+					yscroll = math.max(0, mapheight-height*screenzoom2-1)
+				end
+				if yscroll < 0 then
+					yscroll = 0
+				end
+			elseif not editormode then
+				--vertical autoscrolling
+				yscroll = math.max(0, math.min(mapheight-height*screenzoom2-1, yscroll + autoscrollingy*dt))
+			end
+		end
 	end
 
 	--camera pan x
@@ -1074,7 +1054,6 @@ function game_update(dt)
 		local i = xpantimer/xpantime
 		
 		xscroll = math.min(mapwidth-width, xpanstart + xpandiff*i)
-		splitxscroll[1] = xscroll
 	end
 	
 	--camera pan y
@@ -1088,7 +1067,6 @@ function game_update(dt)
 		local i = ypantimer/ypantime
 		
 		yscroll = math.min(mapheight-height, ypanstart + ypandiff*i)
-		splityscroll[1] = yscroll
 	end
 
 	for j, w in pairs(objects["camerastop"]) do
@@ -1096,9 +1074,9 @@ function game_update(dt)
 	end
 	
 	--SPRITEBATCH UPDATE and CASTLEREPEATS
-	if math.floor(splitxscroll[1]) ~= spritebatchX[1] then
+	if math.floor(xscroll) ~= spritebatchX[1] then
 		if not editormode then
-			for currentx = lastrepeat+1, math.floor(splitxscroll[1])+2 do
+			for currentx = lastrepeat+1, math.floor(xscroll)+2 do
 				lastrepeat = math.floor(currentx)
 				--castlerepeat?
 				--get mazei
@@ -1225,15 +1203,15 @@ function game_update(dt)
 		end
 		
 		generatespritebatch()
-		spritebatchX[1] = math.floor(splitxscroll[1])
+		spritebatchX[1] = math.floor(xscroll)
 		
-		if editormode == false and splitxscroll[1] < mapwidth-width then
-			local x1, x2 = math.ceil(prevxscroll)+math.ceil(width*screenzoom2)+1, math.floor(splitxscroll[1])+math.ceil(width*screenzoom2)+1
-			if prevxscroll > splitxscroll[1] then --spawn enemies in both directions
-				x1, x2 = math.floor(splitxscroll[1])+1, math.floor(prevxscroll)+1
+		if editormode == false and xscroll < mapwidth-width then
+			local x1, x2 = math.ceil(prevxscroll)+math.ceil(width*screenzoom2)+1, math.floor(xscroll)+math.ceil(width*screenzoom2)+1
+			if prevxscroll > xscroll then --spawn enemies in both directions
+				x1, x2 = math.floor(xscroll)+1, math.floor(prevxscroll)+1
 			end
 			for x = math.max(1, x1), math.min(mapwidth, x2) do
-				for y = math.max(1, math.floor(splityscroll[1])+1), math.min(mapheight, math.ceil(splityscroll[1])+math.ceil(height*screenzoom2)+1+2) do
+				for y = math.max(1, math.floor(yscroll)+1), math.min(mapheight, math.ceil(yscroll)+math.ceil(height*screenzoom2)+1+2) do
 					spawnenemyentity(x, y)
 				end
 				if goombaattack then
@@ -1267,14 +1245,14 @@ function game_update(dt)
 			end
 		end
 	end
-	if math.floor(splityscroll[1]) ~= spritebatchY[1] then
+	if math.floor(yscroll) ~= spritebatchY[1] then
 		generatespritebatch()
-		spritebatchY[1] = math.floor(splityscroll[1])
+		spritebatchY[1] = math.floor(yscroll)
 		if editormode == false then
-			for x = math.max(1, math.floor(splitxscroll[1])+1), math.min(mapwidth, math.ceil(splitxscroll[1])+math.ceil(width*screenzoom2)+1) do
-				local y1, y2 = math.floor(splityscroll[1])+1, math.floor(prevyscroll)+1
-				if prevyscroll < splityscroll[1] then
-					y1, y2 = math.floor(prevyscroll)+1+math.ceil(height*screenzoom2)+2, math.floor(splityscroll[1])+1+math.ceil(height*screenzoom2)+2
+			for x = math.max(1, math.floor(xscroll)+1), math.min(mapwidth, math.ceil(xscroll)+math.ceil(width*screenzoom2)+1) do
+				local y1, y2 = math.floor(yscroll)+1, math.floor(prevyscroll)+1
+				if prevyscroll < yscroll then
+					y1, y2 = math.floor(prevyscroll)+1+math.ceil(height*screenzoom2)+2, math.floor(yscroll)+1+math.ceil(height*screenzoom2)+2
 				end
 				for y = math.max(1, y1), math.min(mapheight, y2) do
 					spawnenemyentity(x, y)
@@ -1282,8 +1260,8 @@ function game_update(dt)
 			end
 		end
 	end
-	prevxscroll = splitxscroll[1]
-	prevyscroll = splityscroll[1]
+	prevxscroll = xscroll
+	prevyscroll = yscroll
 
 	--portal update
 	for i, v in pairs(portals) do
@@ -1374,7 +1352,7 @@ function game_update(dt)
 		while firetimer > firedelay do
 			firetimer = firetimer - firedelay
 			firedelay = math.random(4)
-			local obj = fire:new(splitxscroll[1] + width, math.random(3)+7)
+			local obj = fire:new(xscroll + width, math.random(3)+7)
 			if objects["bowser"]["boss"] and objects["bowser"]["boss"].supersized then
 				supersizeentity(obj)
 			end
@@ -1412,7 +1390,7 @@ function game_update(dt)
 		while bulletbilltimer > bulletbilldelay do
 			bulletbilltimer = bulletbilltimer - bulletbilldelay
 			bulletbilldelay = math.random(5, 40)/10
-			table.insert(objects["bulletbill"], bulletbill:new(splitxscroll[1]+width+2, yscroll+math.random(4, 12), "left"))
+			table.insert(objects["bulletbill"], bulletbill:new(xscroll+width+2, yscroll+math.random(4, 12), "left"))
 		end
 	end
 	
@@ -1501,1231 +1479,1231 @@ end
 local clearpipesegmentdrawqueue = {}
 
 function game_draw()
-	for split = 1, #splitscreen do
-		love.graphics.push()
-		love.graphics.translate((split-1)*width*16*scale/#splitscreen, yoffset*scale)
-		love.graphics.scale(screenzoom,screenzoom)
-		
-		--This is just silly
-		if earthquake > 0 and sonicrainboom and #objects["glados"] == 0 then
-			local colortable = {{242, 111, 51}, {251, 244, 174}, {95, 186, 76}, {29, 151, 212}, {101, 45, 135}, {238, 64, 68}}
-			for i = 1, backgroundstripes do
-				local r, g, b = unpack(colortable[math.fmod(i-1, 6)+1])
-				local a = earthquake/rainboomearthquake*255
-				
-				love.graphics.setColor(r, g, b, a)
-				
-				local alpha = math.rad((i/backgroundstripes + math.fmod(sunrot/5, 1)) * 360)
-				local point1 = {width*8*scale+300*scale*math.cos(alpha), 112*scale+300*scale*math.sin(alpha)}
-				
-				alpha = math.rad(((i+1)/backgroundstripes + math.fmod(sunrot/5, 1)) * 360)
-				local point2 = {width*8*scale+300*scale*math.cos(alpha), 112*scale+300*scale*math.sin(alpha)}
-				
-				love.graphics.polygon("fill", width*8*scale, 112*scale, point1[1], point1[2], point2[1], point2[2])
-			end
-		end
-		
-		love.graphics.setColor(255, 255, 255, 255)
-		--tremoooor!
-		if earthquake > 0 and not pausemenuopen then
-			tremorx = (math.random()-.5)*2*earthquake*scale
-			tremory = (math.random()-.5)*2*earthquake*scale
-			
-			love.graphics.translate(round(tremorx), round(tremory))
-		end
-		
-		--[[local currentscissor = {(split-1)*width*16*scale/#splitscreen, 0, width*16*scale/#splitscreen, height*16*scale}
-		love.graphics.setScissor(unpack(currentscissor))]]
-		currentscissor = {}
-		xscroll = splitxscroll[split]
-		yscroll = splityscroll[split]
-		if screenzoom ~= 1 then
-			xscroll = math.floor(xscroll*16)/16
-			yscroll = math.floor(yscroll*16)/16
-		end
+	love.graphics.push()
+	love.graphics.translate(0, yoffset*scale)
+	love.graphics.scale(screenzoom,screenzoom)
 	
-		love.graphics.setColor(255, 255, 255, 255)
+	--This is just silly
+	if earthquake > 0 and sonicrainboom and #objects["glados"] == 0 then
+		local colortable = {{242, 111, 51}, {251, 244, 174}, {95, 186, 76}, {29, 151, 212}, {101, 45, 135}, {238, 64, 68}}
+		for i = 1, backgroundstripes do
+			local r, g, b = unpack(colortable[math.fmod(i-1, 6)+1])
+			local a = earthquake/rainboomearthquake*255
+			
+			love.graphics.setColor(r, g, b, a)
+			
+			local alpha = math.rad((i/backgroundstripes + math.fmod(sunrot/5, 1)) * 360)
+			local point1 = {width*8*scale+300*scale*math.cos(alpha), 112*scale+300*scale*math.sin(alpha)}
+			
+			alpha = math.rad(((i+1)/backgroundstripes + math.fmod(sunrot/5, 1)) * 360)
+			local point2 = {width*8*scale+300*scale*math.cos(alpha), 112*scale+300*scale*math.sin(alpha)}
+			
+			love.graphics.polygon("fill", width*8*scale, 112*scale, point1[1], point1[2], point2[1], point2[2])
+		end
+	end
+	
+	love.graphics.setColor(255, 255, 255, 255)
+	--tremoooor!
+	if earthquake > 0 and not pausemenuopen then
+		tremorx = (math.random()-.5)*2*earthquake*scale
+		tremory = (math.random()-.5)*2*earthquake*scale
 		
-		local xfromdraw,xtodraw, yfromdraw,ytodraw, xoff,yoff = getdrawrange(xscroll,yscroll)
-		
-		--custom background
-		rendercustombackground(xscroll, yscroll, scrollfactor, scrollfactory)
+		love.graphics.translate(round(tremorx), round(tremory))
+	end
+	
+	--[[local currentscissor = {width*16*scale, 0, width*16*scale, height*16*scale}
+	love.graphics.setScissor(unpack(currentscissor))]]
+	currentscissor = {}
+	xscroll = xscroll
+	yscroll = yscroll
+	if screenzoom ~= 1 then
+		xscroll = math.floor(xscroll*16)/16
+		yscroll = math.floor(yscroll*16)/16
+	end
 
-		--BACKGROUND TILES
-		if bmap_on then
-			if editormode then
-				love.graphics.setColor(255,255,255,100)
-			else
-				love.graphics.setColor(255,255,255,255)
+	love.graphics.setColor(255, 255, 255, 255)
+	
+	local xfromdraw,xtodraw, yfromdraw,ytodraw, xoff,yoff = getdrawrange(xscroll,yscroll)
+	
+	--custom background
+	rendercustombackground(xscroll, yscroll, scrollfactor, scrollfactory)
+
+	--BACKGROUND TILES
+	if bmap_on then
+		if editormode then
+			love.graphics.setColor(255,255,255,100)
+		else
+			love.graphics.setColor(255,255,255,255)
+		end
+		love.graphics.draw(smbspritebatch[2], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
+		love.graphics.draw(portalspritebatch[2], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
+		if customtiles then
+			for i = 1, #customspritebatch[2] do
+				love.graphics.draw(customspritebatch[2][i], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
 			end
-			love.graphics.draw(smbspritebatch[2], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
-			love.graphics.draw(portalspritebatch[2], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
-			if customtiles then
-				for i = 1, #customspritebatch[2] do
-					love.graphics.draw(customspritebatch[2][i], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
+		end
+		if animatedtilecount and animatedtilecount > 0 then
+			for y = 1, ytodraw do
+				for x = 1, xtodraw do
+					local backgroundtile = bmapt(math.floor(xscroll)+x, math.floor(yscroll)+y, 1)
+					if backgroundtile and backgroundtile > 90000 and tilequads[backgroundtile] and not tilequads[backgroundtile].invisible then
+						love.graphics.draw(tilequads[backgroundtile].image, tilequads[backgroundtile].quad, math.floor((x-1-math.fmod(xscroll, 1))*16*scale), math.floor(((y-1-math.fmod(yscroll, 1))*16-8)*scale), 0, scale, scale)
+					end
 				end
 			end
-			if animatedtilecount and animatedtilecount > 0 then
-				for y = 1, ytodraw do
-					for x = 1, xtodraw do
-						local backgroundtile = bmapt(math.floor(xscroll)+x, math.floor(yscroll)+y, 1)
-						if backgroundtile and backgroundtile > 90000 and tilequads[backgroundtile] and not tilequads[backgroundtile].invisible then
-							love.graphics.draw(tilequads[backgroundtile].image, tilequads[backgroundtile].quad, math.floor((x-1-math.fmod(xscroll, 1))*16*scale), math.floor(((y-1-math.fmod(yscroll, 1))*16-8)*scale), 0, scale, scale)
+		end
+		love.graphics.setColor(255,255,255,255)
+	end
+
+	--DROP SHADOW
+	if dropshadow and not _3DMODE then
+		love.graphics.push()
+		love.graphics.translate(3*scale, 3*scale)
+		love.graphics.setColor(dropshadowcolor)
+		love.graphics.draw(smbspritebatch[1], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
+		love.graphics.draw(portalspritebatch[1], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
+		if customtiles then
+			for i = 1, #customspritebatch[1] do
+				love.graphics.draw(customspritebatch[1][i], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
+			end
+		end
+		drawmaptiles("dropshadow", xscroll, yscroll)
+		
+		--OBJECTS
+		for j, w in pairs(objects["tilemoving"]) do
+			w:draw()
+		end
+		for j, w in pairs(objects["checkpointflag"]) do
+			w:draw("drop")
+		end
+		for j, w in pairs(objects["spring"]) do
+			w:draw()
+		end
+		for j, w in pairs(objects["smallspring"]) do
+			w:draw()
+		end
+		for j, w in pairs(objects["door"]) do
+			w:draw()
+		end
+		for j, w in pairs(objects["platform"]) do
+			w:draw("drop")
+		end
+		for j, w in pairs(objects["belt"]) do
+			w:draw()
+		end
+		for j, w in pairs(objects["collectable"]) do
+			w:draw()
+		end
+		for j, w in pairs(objects["yoshi"]) do
+			w:draw()
+		end
+		--[[for j, w in pairs(objects["redseesaw"]) do --has overlapping shadows
+			w:draw()
+		end]]
+		for j, w in kpairs(objects, objectskeys) do
+			if j ~= "tile" then
+				for i, v in pairs(w) do
+					if v.drawable and (not v.nodropshadow) then--and not v.drawback then
+						love.graphics.setColor(dropshadowcolor)
+						if j == "player" then
+							drawplayer(v.playernumber, nil, nil, nil, nil, "dropshadow")
+						else
+							drawentity(j,w,i,v,currentscissor,true)
 						end
 					end
 				end
 			end
-			love.graphics.setColor(255,255,255,255)
+		end
+		love.graphics.pop()
+		love.graphics.setColor(255,255,255,255)
+	end
+	
+	--Mushroom under tiles
+	for j, w in pairs(objects["mushroom"]) do
+		w:draw()
+	end
+	
+	--Flowers under tiles
+	for j, w in pairs(objects["flower"]) do
+		w:draw()
+	end
+	
+	--Oneup under tiles
+	for j, w in pairs(objects["oneup"]) do
+		w:draw()
+	end
+	
+	--star tiles
+	for j, w in pairs(objects["star"]) do
+		w:draw()
+	end
+
+	--Poisonmush under tiles
+	for j, w in pairs(objects["poisonmush"]) do
+		w:draw()
+	end
+
+	--Threeupunder tiles
+	for j, w in pairs(objects["threeup"]) do
+		w:draw()
+	end
+	
+	-- + Clock under tiles
+	for j, w in pairs(objects["smbsitem"]) do
+		w:draw()
+	end
+	
+	--Hammersuit under tiles
+	for j, w in pairs(objects["hammersuit"]) do
+		w:draw()
+	end
+	
+	--Frogsuit under tiles
+	for j, w in pairs(objects["frogsuit"]) do
+		w:draw()
+	end
+	
+	--Yoshi egg under tiles
+	for j, w in pairs(objects["yoshiegg"]) do
+		w:draw()
+	end
+	
+	--pbutton thing under tiles
+	for j, w in pairs(objects["pbutton"]) do
+		if w.inblock then
+			w:draw()
+		end
+	end
+	
+	--castleflag
+	if levelfinished and levelfinishtype == "flag" and showcastleflag then
+		love.graphics.draw(castleflagimg, math.floor((flagx+6-xscroll)*16*scale), (flagy-7+10/16)*16*scale+(castleflagy-yscroll)*16*scale, 0, scale, scale) 
+	end
+	
+	--itemanimations (custom enemies coming out of blocks)
+	for j, w in pairs(itemanimations) do
+		w:draw()
+	end
+
+	--risingwater under
+	for j, w in pairs(objects["risingwater"]) do
+		if not w.drawover then
+			w:draw()
+		end
+	end
+	
+	--TILES
+	if not _3DMODE then
+		love.graphics.draw(smbspritebatch[1], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
+		love.graphics.draw(portalspritebatch[1], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
+		if customtiles then
+			for i = 1, #customspritebatch[1] do
+				love.graphics.draw(customspritebatch[1][i], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
+			end
 		end
 
-		--DROP SHADOW
-		if dropshadow and not _3DMODE then
-			love.graphics.push()
-			love.graphics.translate(3*scale, 3*scale)
-			love.graphics.setColor(dropshadowcolor)
-			love.graphics.draw(smbspritebatch[1], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
-			love.graphics.draw(portalspritebatch[1], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
-			if customtiles then
-				for i = 1, #customspritebatch[1] do
-					love.graphics.draw(customspritebatch[1][i], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
+		local lmap = map
+		drawmaptiles("main", xscroll, yscroll)
+	end
+
+	--Moving Tiles (tilemoving)
+	for j, w in pairs(objects["tilemoving"]) do
+		w:draw()
+	end
+
+	--OBJECTS
+	for i, v in pairs(objects["enemy"]) do	
+		if v.drawback and v.drawable then
+			love.graphics.setColor(255, 255, 255)
+			drawentity("enemy",nil,i,v,currentscissor)
+		end
+	end
+	
+	--conveyor belt
+	love.graphics.setColor(255, 255, 255)
+	for j, w in pairs(objects["belt"]) do
+		w:draw()
+	end
+	
+	--collectable
+	love.graphics.setColor(255, 255, 255)
+	for j, w in pairs(objects["collectable"]) do
+		w:draw()
+	end
+
+	--[[frozen coin
+	for j, w in pairs(objects["frozencoin"]) do
+		w:draw()
+	end]]
+	
+	--door sprites
+	for j, w in pairs(objects["doorsprite"]) do
+		w:draw()
+	end
+
+	--track switches
+	for j, w in pairs(tracks) do
+		w:draw()
+	end
+
+	--checkpoint flag
+	for j, w in pairs(objects["checkpointflag"]) do
+		w:draw()
+	end
+
+	--pow block
+	for j, w in pairs(objects["powblock"]) do
+		w:draw()
+	end
+
+	--snakeblock
+	love.graphics.setColor(255,255,255)
+	for j, w in pairs(objects["snakeblock"]) do
+		w:draw()
+	end
+
+	--switch blocks
+	--[[for j, w in pairs(objects["buttonblock"]) do
+		w:draw()
+	end]]
+
+	--plantcreeper
+	for j, w in pairs(objects["plantcreeper"]) do
+		w:draw()
+	end
+
+	love.graphics.setColor(255, 255, 255)
+	--Groundlights
+	for j, w in pairs(objects["groundlight"]) do
+		w:draw()
+	end
+	
+	---UI
+	if ((not darkmode and not lightsout) or editormode) and not hudsimple then
+		love.graphics.scale(1/screenzoom,1/screenzoom)
+		if hudvisible then
+			drawHUD()
+		end
+		love.graphics.scale(screenzoom,screenzoom)
+	end
+	
+	love.graphics.setColor(255, 255, 255)
+	
+	if players > 1 then
+		drawmultiHUD()
+	end
+	
+	love.graphics.setColor(255, 255, 255)
+	--text
+	for j, w in pairs(objects["text"]) do
+		w:draw()
+	end
+	
+	love.graphics.setColor(255, 255, 255)
+	--vines
+	for j, w in pairs(objects["vine"]) do
+		w:draw()
+	end
+	
+	love.graphics.setColor(255, 255, 255)
+	--warpzonetext
+	if displaywarpzonetext then
+		properprint("welcome to warp zone!", (mapwidth-14-1/16-xscroll)*16*scale, (5.5-yscroll)*16*scale)
+		for i, v in pairs(warpzonenumbers) do
+			properprint(v[3], math.floor((v[1]-xscroll-1-9/16)*16*scale), (v[2]-3-yscroll)*16*scale)
+		end
+	end
+	
+	love.graphics.setColor(255, 255, 255)
+	--platforms
+	for j, w in pairs(objects["platform"]) do
+		w:draw()
+	end
+	
+	love.graphics.setColor(255, 255, 255)
+	--platforms
+	for j, w in pairs(objects["seesawplatform"]) do
+		w:draw()
+	end
+	
+	love.graphics.setColor(255, 255, 255)
+	--seesaws
+	for j, w in pairs(seesaws) do
+		w:draw()
+	end
+
+	--red seesaws (these are the actual seesaws)
+	for j, w in pairs(objects["redseesaw"]) do
+		w:draw()
+	end
+	
+	love.graphics.setColor(255, 255, 255)
+	--springs
+	for j, w in pairs(objects["spring"]) do
+		w:draw()
+	end
+
+	--small spring
+	for j, w in pairs(objects["smallspring"]) do
+		w:draw()
+	end
+	
+	love.graphics.setColor(255, 255, 255)
+
+	--rocket turret laser
+	for j, w in pairs(objects["rocketturret"]) do
+		w:draw()
+	end
+	
+	--flag
+	if flagx then
+		if flagimg:getHeight() == 16 then
+			love.graphics.draw(flagimg, math.floor((flagimgx-1-xscroll)*16*scale), ((flagimgy-yscroll)*16-8)*scale, 0, scale, scale)
+		else
+			love.graphics.draw(flagimg, flagquad[spriteset][math.floor(flaganimation)], math.floor((flagimgx-1-xscroll)*16*scale), ((flagimgy-yscroll)*16-8)*scale, 0, scale, scale)
+		end
+		if levelfinishtype == "flag" then
+			properprint2(flagscore, math.floor((flagimgx+4/16-xscroll)*16*scale), ((14-flagimgy-yscroll+(flagy-13)*2)*16-8)*scale, 0, scale, scale)
+		end
+	end
+	
+	love.graphics.setColor(255, 255, 255)
+	--axe
+	if axex then
+		love.graphics.draw(axeimg, axequads[spriteset][coinframe], math.floor((axex-1-xscroll)*16*scale), (axey-1.5-yscroll)*16*scale, 0, scale, scale)
+		
+		if showtoad then--marioworld ~= 8
+			love.graphics.draw(toadimg, math.floor((mapwidth-7-xscroll)*16*scale), (11.0625-yscroll)*16*scale, 0, scale, scale)
+		else
+			love.graphics.draw(peachimg, math.floor((mapwidth-7-xscroll)*16*scale), (11.0625-yscroll)*16*scale, 0, scale, scale)
+		end
+	end
+	
+	love.graphics.setColor(255, 255, 255)
+	--levelfinish text and toad
+	if levelfinished and levelfinishtype == "castle" then
+		if levelfinishedmisc2 == 1 then
+			if levelfinishedmisc >= 1 then
+				properprint(toadtext[1], math.floor(((mapwidth-8-xscroll-math.floor(#toadtext[1]/2)/2)*16-1)*scale), (4.5-yscroll)*16*scale)
+			end
+			if levelfinishedmisc == 2 then
+				properprint(toadtext[2], math.floor(((mapwidth-8-xscroll-math.floor(#toadtext[2]/2)/2)*16-1)*scale), (6.5-yscroll)*16*scale) --say what
+				properprint(toadtext[3], math.floor(((mapwidth-8-xscroll-math.floor(#toadtext[2]/2)/2)*16-1)*scale), (7.5-yscroll)*16*scale) --bummer.
+			end
+		else
+			if levelfinishedmisc >= 1 then
+				properprint(peachtext[1], math.floor(((mapwidth-8-xscroll-math.floor(#peachtext[1]/2)/2)*16-1)*scale), (4.5-yscroll)*16*scale)
+			end
+			if levelfinishedmisc >= 2 then
+				properprint(peachtext[2], math.floor(((mapwidth-8-xscroll-math.floor(#peachtext[2]/2)/2)*16-1)*scale), (6-yscroll)*16*scale)
+			end
+			if levelfinishedmisc >= 3 then
+				properprint(peachtext[3], math.floor(((mapwidth-8-xscroll-math.floor(#peachtext[3]/2)/2)*16-1)*scale), (7-yscroll)*16*scale)
+			end
+			if levelfinishedmisc >= 4 then
+				properprint(peachtext[4], math.floor(((mapwidth-8-xscroll-math.floor(#peachtext[4]/2)/2)*16-1)*scale), (8.5-yscroll)*16*scale)
+			end
+			if levelfinishedmisc == 5 then
+				properprint(peachtext[5], math.floor(((mapwidth-8-xscroll-math.floor(#peachtext[5]/2)/2)*16-1)*scale), (9.5-yscroll)*16*scale)
+			end
+		end
+		
+		if showtoad then--marioworld ~= 8
+			love.graphics.draw(toadimg, math.floor((mapwidth-7-xscroll)*16*scale), (11.0625-yscroll)*16*scale, 0, scale, scale)
+		else
+			love.graphics.draw(peachimg, math.floor((mapwidth-7-xscroll)*16*scale), (11.0625-yscroll)*16*scale, 0, scale, scale)
+		end
+	end
+	
+	love.graphics.setColor(255, 255, 255)
+	--Fireworks
+	for j, w in pairs(fireworks) do
+		w:draw()
+	end
+	
+	love.graphics.setColor(255, 255, 255)
+	--Buttons
+	for j, w in pairs(objects["button"]) do
+		w:draw()
+	end
+	
+	love.graphics.setColor(255, 255, 255)
+	--Pushbuttons
+	for j, w in pairs(objects["pushbutton"]) do
+		w:draw()
+	end
+	
+	love.graphics.setColor(255, 255, 255)
+	--portal gun pedestal
+	for j, w in pairs(objects["pedestal"]) do
+		w:draw()
+	end
+	
+	love.graphics.setColor(255, 255, 255)
+	--hardlight bridges
+	for j, w in pairs(objects["lightbridgebody"]) do
+		w:draw()
+	end
+	
+	love.graphics.setColor(255, 255, 255)
+	--laser
+	for j, w in pairs(objects["laser"]) do
+		w:draw()
+	end
+	
+	love.graphics.setColor(255, 255, 255)
+	--laserdetector
+	for j, w in pairs(objects["laserdetector"]) do
+		w:draw()
+	end
+	
+	love.graphics.setColor(255, 255, 255)
+
+	--lightbridge
+	for j, w in pairs(objects["lightbridge"]) do
+		w:draw()
+	end
+	
+	love.graphics.setColor(255, 255, 255)
+	--Faithplates
+	for j, w in pairs(objects["faithplate"]) do
+		w:draw()
+	end
+	
+	love.graphics.setColor(255, 255, 255)
+	--turrets
+	for j, w in pairs(objects["turret"]) do
+		w:draw()
+	end
+	for j, w in pairs(objects["turretshot"]) do
+		w:draw()
+	end
+	
+	--yoshi
+	love.graphics.setColor(255, 255, 255)
+	for j, w in pairs(objects["yoshi"]) do
+		w:draw()
+	end
+	
+	love.graphics.setColor(255, 255, 255)
+	--Bubbles
+	for j, w in pairs(bubbles) do
+		w:draw()
+	end
+	
+	love.graphics.setColor(255, 255, 255)
+	--miniblocks
+	for i, v in pairs(miniblocks) do
+		v:draw()
+	end
+	
+	--emancipateanimations
+	for i, v in pairs(emancipateanimations) do
+		v:draw()
+	end
+	
+	--emancipationfizzles
+	for i, v in pairs(emancipationfizzles) do
+		v:draw()
+	end
+	
+	--chainchomp
+	for j, w in pairs(objects["chainchomp"]) do
+		w:draw()
+	end
+
+	--spikeball
+	for j, w in pairs(objects["spikeball"]) do
+		w:draw()
+	end
+	
+	--skewer
+	for j, w in pairs(objects["skewer"]) do
+		w:draw()
+	end
+	
+	--OBJECTS
+	for j, w in kpairs(objects, objectskeys) do	
+		if j ~= "tile" then
+			for i, v in pairs(w) do
+				if v.drawable and not v.drawback then
+					love.graphics.setColor(255, 255, 255)
+					drawentity(j,w,i,v,currentscissor)
 				end
 			end
-			drawmaptiles("dropshadow", xscroll, yscroll)
+		end
+	end
+	
+	love.graphics.setColor(255, 255, 255)
+	
+	--mario dk hammer
+	for j, w in pairs(objects["player"]) do
+		if w.drawable and w.dkhammer then
+			local dir = 1
+			if w.animationdirection == "left" then
+				dir = -1
+			end
+			if w.dkhammerframe == 1 then
+				love.graphics.draw(dkhammerimg, math.floor((w.x+(w.width/2)-xscroll)*16*scale), math.floor((w.y-1-(11/16)-yscroll)*16*scale), 0, dir*scale, scale, 8, 0)
+			else
+				if dir == 1 then
+					love.graphics.draw(dkhammerimg, math.floor((w.x+w.width+.5-xscroll)*16*scale), math.floor((w.y+w.height-1-yscroll)*16*scale), math.pi/2, dir*scale, scale, 8, 8)
+				else
+					love.graphics.draw(dkhammerimg, math.floor((w.x-.5-xscroll)*16*scale), math.floor((w.y+w.height-1-yscroll)*16*scale), math.pi*1.5, dir*scale, scale, 8, 8)
+				end
+			end
+		end
+	end
+	
+	love.graphics.setColor(255, 255, 255)
+	
+	--[[regiontrigger
+	for j, w in pairs(objects["regiontrigger"]) do
+		w:draw()
+	end]]
+
+	
+	--pipes
+	--[[for j, w in pairs(pipes) do
+		w:draw()
+	end
+	for j, w in pairs(exitpipes) do
+		w:draw()
+	end]]
+
+	--Cannon ball cannon
+	for j, w in pairs(objects["cannonballcannon"]) do
+		w:draw()
+	end
+	
+	--bowser
+	for j, w in pairs(objects["bowser"]) do
+		w:draw()
+	end
+
+	--clearpipes
+	if #clearpipesegmentdrawqueue > 0 then
+		--these used to be drawn on the foreground layer, but they would draw ontop of stuff they shouldn't
+		for j, w in pairs(clearpipesegmentdrawqueue) do
+			if objects["clearpipesegment"][w] then
+				objects["clearpipesegment"][w]:draw()
+			end
+		end
+					drawmaptiles("dropshadow", xscroll, yscroll)
+		clearpipesegmentdrawqueue = {}
+	end
+	
+	--Clear Pipe Debug
+	for j, w in pairs(clearpipes) do
+		w:draw()
+	end
+	love.graphics.setColor(255,255,255)
+
+	--3D Mode
+	if _3DMODE then
+		for i = 16, -8, -1 do
+			love.graphics.push()
+			local color = {255, 255, 255, 255}--255-((i-1)*16)}
+			love.graphics.translate(i*scale, i*scale)
+			love.graphics.scale(1-(((2*scale)/(width*16*scale))*(i)), 1-(((2*scale)/(height*16*scale))*(i)))
+			love.graphics.setColor(color)
+			love.graphics.draw(smbspritebatch[1], math.floor((-math.fmod(xscroll, 1)*16)*scale), math.floor((-math.fmod(yscroll, 1)*16)*scale))
+			love.graphics.draw(portalspritebatch[1], math.floor((-math.fmod(xscroll, 1)*16)*scale), math.floor((-math.fmod(yscroll, 1)*16)*scale))
+			if customtiles then
+				for i = 1, #customspritebatch[1] do
+					love.graphics.draw(customspritebatch[1][i], math.floor((-math.fmod(xscroll, 1)*16)*scale), math.floor((-math.fmod(yscroll, 1)*16)*scale))
+				end
+			end
+			if i > 8 then
+				drawmaptiles("dropshadow", xscroll, yscroll)
+			else
+				drawmaptiles("collision", xscroll, yscroll)
+			end
 			
 			--OBJECTS
-			for j, w in pairs(objects["tilemoving"]) do
-				w:draw()
-			end
-			for j, w in pairs(objects["checkpointflag"]) do
-				w:draw("drop")
-			end
-			for j, w in pairs(objects["spring"]) do
-				w:draw()
-			end
-			for j, w in pairs(objects["smallspring"]) do
-				w:draw()
-			end
-			for j, w in pairs(objects["door"]) do
-				w:draw()
-			end
-			for j, w in pairs(objects["platform"]) do
-				w:draw("drop")
-			end
-			for j, w in pairs(objects["belt"]) do
-				w:draw()
-			end
-			for j, w in pairs(objects["collectable"]) do
-				w:draw()
-			end
-			for j, w in pairs(objects["yoshi"]) do
-				w:draw()
-			end
-			--[[for j, w in pairs(objects["redseesaw"]) do --has overlapping shadows
-				w:draw()
-			end]]
-			for j, w in kpairs(objects, objectskeys) do
-				if j ~= "tile" then
-					for i, v in pairs(w) do
-						if v.drawable and (not v.nodropshadow) then--and not v.drawback then
-							love.graphics.setColor(dropshadowcolor)
-							if j == "player" then
-								drawplayer(v.playernumber, nil, nil, nil, nil, "dropshadow")
-							else
-								drawentity(j,w,i,v,currentscissor,true)
+			if i > 0 and i < 8 then
+				for j, w in pairs(objects["tilemoving"]) do
+					w:draw()
+				end
+				for j, w in kpairs(objects, objectskeys) do	
+					if j ~= "tile" then
+						for i, v in pairs(w) do
+							if v.drawable and (not v.nodropshadow) then--and not v.drawback then
+								love.graphics.setColor(color)
+								if j == "player" then
+									drawplayer(v.playernumber, nil, nil, nil, nil)--, "dropshadow")
+								else
+									drawentity(j,w,i,v,currentscissor)
+								end
 							end
 						end
 					end
 				end
 			end
 			love.graphics.pop()
-			love.graphics.setColor(255,255,255,255)
 		end
-		
-		--Mushroom under tiles
-		for j, w in pairs(objects["mushroom"]) do
-			w:draw()
-		end
-		
-		--Flowers under tiles
-		for j, w in pairs(objects["flower"]) do
-			w:draw()
-		end
-		
-		--Oneup under tiles
-		for j, w in pairs(objects["oneup"]) do
-			w:draw()
-		end
-		
-		--star tiles
-		for j, w in pairs(objects["star"]) do
-			w:draw()
-		end
+		love.graphics.setColor(255,255,255,255)
+	end
+	
+	--lakito
+	--[[for j, w in pairs(objects["lakito"]) do
+		w:draw()
+	end]]
+	
+	--angrysun
+	for j, w in pairs(objects["angrysun"]) do
+		w:draw()
+	end
 
-		--Poisonmush under tiles
-		for j, w in pairs(objects["poisonmush"]) do
-			w:draw()
-		end
+	--ice block
+	for j, w in pairs(objects["ice"]) do
+		w:draw()
+	end
 
-		--Threeupunder tiles
-		for j, w in pairs(objects["threeup"]) do
-			w:draw()
-		end
-		
-		-- + Clock under tiles
-		for j, w in pairs(objects["smbsitem"]) do
-			w:draw()
-		end
-		
-		--Hammersuit under tiles
-		for j, w in pairs(objects["hammersuit"]) do
-			w:draw()
-		end
-		
-		--Frogsuit under tiles
-		for j, w in pairs(objects["frogsuit"]) do
-			w:draw()
-		end
-		
-		--Yoshi egg under tiles
-		for j, w in pairs(objects["yoshiegg"]) do
-			w:draw()
-		end
-		
-		--pbutton thing under tiles
-		for j, w in pairs(objects["pbutton"]) do
-			if w.inblock then
-				w:draw()
-			end
-		end
-		
-		--castleflag
-		if levelfinished and levelfinishtype == "flag" and showcastleflag then
-			love.graphics.draw(castleflagimg, math.floor((flagx+6-xscroll)*16*scale), (flagy-7+10/16)*16*scale+(castleflagy-yscroll)*16*scale, 0, scale, scale) 
-		end
-		
-		--itemanimations (custom enemies coming out of blocks)
-		for j, w in pairs(itemanimations) do
-			w:draw()
-		end
+	
+	--[[for j, w in pairs(objects["trackcontroller"]) do
+		w:draw()
+	end]]
+	
+	--torpedo ted launcher
+	for j, w in pairs(objects["torpedolauncher"]) do
+		w:draw()
+	end
+	
+	--kingbill
+	for j, w in pairs(objects["kingbill"]) do
+		w:draw()
+	end
+	
+	--excursion funnel
+	for j, w in pairs(objects["funnel"]) do
+		w:draw()
+	end
+	
+	--Geldispensers
+	for j, w in pairs(objects["geldispenser"]) do
+		w:draw()
+	end
+	
+	--Cubedispensers
+	for j, w in pairs(objects["cubedispenser"]) do
+		w:draw()
+	end
+	
+	--Emancipationgrills
+	for j, w in pairs(emancipationgrills) do
+		w:draw()
+	end
 
-		--risingwater under
-		for j, w in pairs(objects["risingwater"]) do
-			if not w.drawover then
-				w:draw()
-			end
-		end
-		
-		--TILES
-		if not _3DMODE then
-			love.graphics.draw(smbspritebatch[1], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
-			love.graphics.draw(portalspritebatch[1], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
-			if customtiles then
-				for i = 1, #customspritebatch[1] do
-					love.graphics.draw(customspritebatch[1][i], math.floor((-(xoff-math.floor(xscroll))*16)*scale), math.floor((-(yoff-math.floor(yscroll))*16)*scale))
-				end
-			end
+	--Laserfields
+	for j, w in pairs(laserfields) do
+		w:draw()
+	end
+	
+	--Doors
+	for j, w in pairs(objects["door"]) do
+		w:draw()
+	end
 
-			local lmap = map
-			drawmaptiles("main", xscroll, yscroll)
+	--risingwater over
+	for j, w in pairs(objects["risingwater"]) do
+		if w.drawover then
+			w:draw()
 		end
+	end
+	
+	--Wallindicators
+	for j, w in pairs(objects["wallindicator"]) do
+		w:draw()
+	end
+	
+	--Walltimers
+	for j, w in pairs(objects["walltimer"]) do
+		w:draw()
+	end
+	
+	--Notgates
+	for j, w in pairs(objects["notgate"]) do
+		w:draw()
+	end
+	
+	--Orgates
+	for j, w in pairs(objects["orgate"]) do
+		w:draw()
+	end
+	
+	--Andgates
+	for j, w in pairs(objects["andgate"]) do
+		w:draw()
+	end
 
-		--Moving Tiles (tilemoving)
-		for j, w in pairs(objects["tilemoving"]) do
-			w:draw()
-		end
+	--Animatedtiletrigger
+	for j, w in pairs(objects["animatedtiletrigger"]) do
+		w:draw()
+	end
 
-		--OBJECTS
-		for i, v in pairs(objects["enemy"]) do	
-			if v.drawback and v.drawable then
-				love.graphics.setColor(255, 255, 255)
-				drawentity("enemy",nil,i,v,currentscissor)
-			end
-		end
-		
-		--conveyor belt
-		love.graphics.setColor(255, 255, 255)
-		for j, w in pairs(objects["belt"]) do
-			w:draw()
-		end
-		
-		--collectable
-		love.graphics.setColor(255, 255, 255)
-		for j, w in pairs(objects["collectable"]) do
-			w:draw()
-		end
+	--Gucci Flipflop
+	for j, w in pairs(objects["rsflipflop"]) do
+		w:draw()
+	end
+	
+	--Squarewave
+	for j, w in pairs(objects["squarewave"]) do
+		w:draw()
+	end
+	
+	--Delayers
+	for j, w in pairs(objects["delayer"]) do
+		w:draw()
+	end
+	
+	--Randomizer
+	for j, w in pairs(objects["randomizer"]) do
+		w:draw()
+	end
+	
+	--Musicchanger
+	for j, w in pairs(objects["musicchanger"]) do
+		w:draw()
+	end
+	
+	--particles
+	for j, w in pairs(portalparticles) do
+		w:draw()
+	end
 
-		--[[frozen coin
-		for j, w in pairs(objects["frozencoin"]) do
-			w:draw()
-		end]]
-		
-		--door sprites
-		for j, w in pairs(objects["doorsprite"]) do
-			w:draw()
-		end
-
-		--track switches
-		for j, w in pairs(tracks) do
-			w:draw()
-		end
-
-		--checkpoint flag
-		for j, w in pairs(objects["checkpointflag"]) do
-			w:draw()
-		end
-
-		--pow block
-		for j, w in pairs(objects["powblock"]) do
-			w:draw()
-		end
-
-		--snakeblock
-		love.graphics.setColor(255,255,255)
-		for j, w in pairs(objects["snakeblock"]) do
-			w:draw()
-		end
-
-		--switch blocks
-		--[[for j, w in pairs(objects["buttonblock"]) do
-			w:draw()
-		end]]
-
-		--plantcreeper
-		for j, w in pairs(objects["plantcreeper"]) do
-			w:draw()
-		end
-
-		love.graphics.setColor(255, 255, 255)
-		--Groundlights
-		for j, w in pairs(objects["groundlight"]) do
-			w:draw()
-		end
-		
-		---UI
-		if ((not darkmode and not lightsout) or editormode) and not hudsimple then
-			love.graphics.scale(1/screenzoom,1/screenzoom)
-			if hudvisible then
-				drawHUD()
-			end
-			love.graphics.scale(screenzoom,screenzoom)
-		end
-		
-		love.graphics.setColor(255, 255, 255)
-		
-		if players > 1 then
-			drawmultiHUD()
-		end
-		
-		love.graphics.setColor(255, 255, 255)
-		--text
-		for j, w in pairs(objects["text"]) do
-			w:draw()
-		end
-		
-		love.graphics.setColor(255, 255, 255)
-		--vines
-		for j, w in pairs(objects["vine"]) do
-			w:draw()
-		end
-		
-		love.graphics.setColor(255, 255, 255)
-		--warpzonetext
-		if displaywarpzonetext then
-			properprint("welcome to warp zone!", (mapwidth-14-1/16-xscroll)*16*scale, (5.5-yscroll)*16*scale)
-			for i, v in pairs(warpzonenumbers) do
-				properprint(v[3], math.floor((v[1]-xscroll-1-9/16)*16*scale), (v[2]-3-yscroll)*16*scale)
-			end
-		end
-		
-		love.graphics.setColor(255, 255, 255)
-		--platforms
-		for j, w in pairs(objects["platform"]) do
-			w:draw()
-		end
-		
-		love.graphics.setColor(255, 255, 255)
-		--platforms
-		for j, w in pairs(objects["seesawplatform"]) do
-			w:draw()
-		end
-		
-		love.graphics.setColor(255, 255, 255)
-		--seesaws
-		for j, w in pairs(seesaws) do
-			w:draw()
-		end
-
-		--red seesaws (these are the actual seesaws)
-		for j, w in pairs(objects["redseesaw"]) do
-			w:draw()
-		end
-		
-		love.graphics.setColor(255, 255, 255)
-		--springs
-		for j, w in pairs(objects["spring"]) do
-			w:draw()
-		end
-
-		--small spring
-		for j, w in pairs(objects["smallspring"]) do
-			w:draw()
-		end
-		
-		love.graphics.setColor(255, 255, 255)
-
-		--rocket turret laser
-		for j, w in pairs(objects["rocketturret"]) do
-			w:draw()
-		end
-		
-		--flag
-		if flagx then
-			if flagimg:getHeight() == 16 then
-				love.graphics.draw(flagimg, math.floor((flagimgx-1-xscroll)*16*scale), ((flagimgy-yscroll)*16-8)*scale, 0, scale, scale)
-			else
-				love.graphics.draw(flagimg, flagquad[spriteset][math.floor(flaganimation)], math.floor((flagimgx-1-xscroll)*16*scale), ((flagimgy-yscroll)*16-8)*scale, 0, scale, scale)
-			end
-			if levelfinishtype == "flag" then
-				properprint2(flagscore, math.floor((flagimgx+4/16-xscroll)*16*scale), ((14-flagimgy-yscroll+(flagy-13)*2)*16-8)*scale, 0, scale, scale)
-			end
-		end
-		
-		love.graphics.setColor(255, 255, 255)
-		--axe
-		if axex then
-			love.graphics.draw(axeimg, axequads[spriteset][coinframe], math.floor((axex-1-xscroll)*16*scale), (axey-1.5-yscroll)*16*scale, 0, scale, scale)
-			
-			if showtoad then--marioworld ~= 8
-				love.graphics.draw(toadimg, math.floor((mapwidth-7-xscroll)*16*scale), (11.0625-yscroll)*16*scale, 0, scale, scale)
-			else
-				love.graphics.draw(peachimg, math.floor((mapwidth-7-xscroll)*16*scale), (11.0625-yscroll)*16*scale, 0, scale, scale)
-			end
-		end
-		
-		love.graphics.setColor(255, 255, 255)
-		--levelfinish text and toad
-		if levelfinished and levelfinishtype == "castle" then
-			if levelfinishedmisc2 == 1 then
-				if levelfinishedmisc >= 1 then
-					properprint(toadtext[1], math.floor(((mapwidth-8-xscroll-math.floor(#toadtext[1]/2)/2)*16-1)*scale), (4.5-yscroll)*16*scale)
-				end
-				if levelfinishedmisc == 2 then
-					properprint(toadtext[2], math.floor(((mapwidth-8-xscroll-math.floor(#toadtext[2]/2)/2)*16-1)*scale), (6.5-yscroll)*16*scale) --say what
-					properprint(toadtext[3], math.floor(((mapwidth-8-xscroll-math.floor(#toadtext[2]/2)/2)*16-1)*scale), (7.5-yscroll)*16*scale) --bummer.
-				end
-			else
-				if levelfinishedmisc >= 1 then
-					properprint(peachtext[1], math.floor(((mapwidth-8-xscroll-math.floor(#peachtext[1]/2)/2)*16-1)*scale), (4.5-yscroll)*16*scale)
-				end
-				if levelfinishedmisc >= 2 then
-					properprint(peachtext[2], math.floor(((mapwidth-8-xscroll-math.floor(#peachtext[2]/2)/2)*16-1)*scale), (6-yscroll)*16*scale)
-				end
-				if levelfinishedmisc >= 3 then
-					properprint(peachtext[3], math.floor(((mapwidth-8-xscroll-math.floor(#peachtext[3]/2)/2)*16-1)*scale), (7-yscroll)*16*scale)
-				end
-				if levelfinishedmisc >= 4 then
-					properprint(peachtext[4], math.floor(((mapwidth-8-xscroll-math.floor(#peachtext[4]/2)/2)*16-1)*scale), (8.5-yscroll)*16*scale)
-				end
-				if levelfinishedmisc == 5 then
-					properprint(peachtext[5], math.floor(((mapwidth-8-xscroll-math.floor(#peachtext[5]/2)/2)*16-1)*scale), (9.5-yscroll)*16*scale)
-				end
-			end
-			
-			if showtoad then--marioworld ~= 8
-				love.graphics.draw(toadimg, math.floor((mapwidth-7-xscroll)*16*scale), (11.0625-yscroll)*16*scale, 0, scale, scale)
-			else
-				love.graphics.draw(peachimg, math.floor((mapwidth-7-xscroll)*16*scale), (11.0625-yscroll)*16*scale, 0, scale, scale)
-			end
-		end
-		
-		love.graphics.setColor(255, 255, 255)
-		--Fireworks
-		for j, w in pairs(fireworks) do
-			w:draw()
-		end
-		
-		love.graphics.setColor(255, 255, 255)
-		--Buttons
-		for j, w in pairs(objects["button"]) do
-			w:draw()
-		end
-		
-		love.graphics.setColor(255, 255, 255)
-		--Pushbuttons
-		for j, w in pairs(objects["pushbutton"]) do
-			w:draw()
-		end
-		
-		love.graphics.setColor(255, 255, 255)
-		--portal gun pedestal
-		for j, w in pairs(objects["pedestal"]) do
-			w:draw()
-		end
-		
-		love.graphics.setColor(255, 255, 255)
-		--hardlight bridges
-		for j, w in pairs(objects["lightbridgebody"]) do
-			w:draw()
-		end
-		
-		love.graphics.setColor(255, 255, 255)
-		--laser
-		for j, w in pairs(objects["laser"]) do
-			w:draw()
-		end
-		
-		love.graphics.setColor(255, 255, 255)
-		--laserdetector
-		for j, w in pairs(objects["laserdetector"]) do
-			w:draw()
-		end
-		
-		love.graphics.setColor(255, 255, 255)
-
-		--lightbridge
-		for j, w in pairs(objects["lightbridge"]) do
-			w:draw()
-		end
-		
-		love.graphics.setColor(255, 255, 255)
-		--Faithplates
-		for j, w in pairs(objects["faithplate"]) do
-			w:draw()
-		end
-		
-		love.graphics.setColor(255, 255, 255)
-		--turrets
-		for j, w in pairs(objects["turret"]) do
-			w:draw()
-		end
-		for j, w in pairs(objects["turretshot"]) do
-			w:draw()
-		end
-		
-		--yoshi
-		love.graphics.setColor(255, 255, 255)
-		for j, w in pairs(objects["yoshi"]) do
-			w:draw()
-		end
-		
-		love.graphics.setColor(255, 255, 255)
-		--Bubbles
-		for j, w in pairs(bubbles) do
-			w:draw()
-		end
-		
-		love.graphics.setColor(255, 255, 255)
-		--miniblocks
-		for i, v in pairs(miniblocks) do
-			v:draw()
-		end
-		
-		--emancipateanimations
-		for i, v in pairs(emancipateanimations) do
-			v:draw()
-		end
-		
-		--emancipationfizzles
-		for i, v in pairs(emancipationfizzles) do
-			v:draw()
-		end
-		
-		--chainchomp
-		for j, w in pairs(objects["chainchomp"]) do
-			w:draw()
-		end
-
-		--spikeball
-		for j, w in pairs(objects["spikeball"]) do
-			w:draw()
-		end
-		
-		--skewer
-		for j, w in pairs(objects["skewer"]) do
-			w:draw()
-		end
-		
-		--OBJECTS
-		for j, w in kpairs(objects, objectskeys) do	
-			if j ~= "tile" then
-				for i, v in pairs(w) do
-					if v.drawable and not v.drawback then
-						love.graphics.setColor(255, 255, 255)
-						drawentity(j,w,i,v,currentscissor)
-					end
-				end
-			end
-		end
-		
-		love.graphics.setColor(255, 255, 255)
-		
-		--mario dk hammer
-		for j, w in pairs(objects["player"]) do
-			if w.drawable and w.dkhammer then
-				local dir = 1
-				if w.animationdirection == "left" then
-					dir = -1
-				end
-				if w.dkhammerframe == 1 then
-					love.graphics.draw(dkhammerimg, math.floor((w.x+(w.width/2)-xscroll)*16*scale), math.floor((w.y-1-(11/16)-yscroll)*16*scale), 0, dir*scale, scale, 8, 0)
-				else
-					if dir == 1 then
-						love.graphics.draw(dkhammerimg, math.floor((w.x+w.width+.5-xscroll)*16*scale), math.floor((w.y+w.height-1-yscroll)*16*scale), math.pi/2, dir*scale, scale, 8, 8)
-					else
-						love.graphics.draw(dkhammerimg, math.floor((w.x-.5-xscroll)*16*scale), math.floor((w.y+w.height-1-yscroll)*16*scale), math.pi*1.5, dir*scale, scale, 8, 8)
-					end
-				end
-			end
-		end
-		
-		love.graphics.setColor(255, 255, 255)
-		
-		--[[regiontrigger
-		for j, w in pairs(objects["regiontrigger"]) do
-			w:draw()
-		end]]
-
-		
-		--pipes
-		--[[for j, w in pairs(pipes) do
-			w:draw()
-		end
-		for j, w in pairs(exitpipes) do
-			w:draw()
-		end]]
-
-		--Cannon ball cannon
-		for j, w in pairs(objects["cannonballcannon"]) do
-			w:draw()
-		end
-		
-		--bowser
-		for j, w in pairs(objects["bowser"]) do
-			w:draw()
-		end
-
-		--clearpipes
-		if #clearpipesegmentdrawqueue > 0 then
-			--these used to be drawn on the foreground layer, but they would draw ontop of stuff they shouldn't
-			for j, w in pairs(clearpipesegmentdrawqueue) do
-				if objects["clearpipesegment"][w] then
-					objects["clearpipesegment"][w]:draw()
-				end
-			end
-			clearpipesegmentdrawqueue = {}
-		end
-		
-		--Clear Pipe Debug
-		for j, w in pairs(clearpipes) do
-			w:draw()
-		end
-		love.graphics.setColor(255,255,255)
-
-		--3D Mode
-		if _3DMODE then
-			for i = 16, -8, -1 do
-				love.graphics.push()
-				local color = {255, 255, 255, 255}--255-((i-1)*16)}
-				love.graphics.translate(i*scale, i*scale)
-				love.graphics.scale(1-(((2*scale)/(width*16*scale))*(i)), 1-(((2*scale)/(height*16*scale))*(i)))
-				love.graphics.setColor(color)
-				love.graphics.draw(smbspritebatch[1], math.floor((-math.fmod(xscroll, 1)*16)*scale), math.floor((-math.fmod(yscroll, 1)*16)*scale))
-				love.graphics.draw(portalspritebatch[1], math.floor((-math.fmod(xscroll, 1)*16)*scale), math.floor((-math.fmod(yscroll, 1)*16)*scale))
-				if customtiles then
-					for i = 1, #customspritebatch[1] do
-						love.graphics.draw(customspritebatch[1][i], math.floor((-math.fmod(xscroll, 1)*16)*scale), math.floor((-math.fmod(yscroll, 1)*16)*scale))
-					end
-				end
-				if i > 8 then
-					drawmaptiles("dropshadow", xscroll, yscroll)
-				else
-					drawmaptiles("collision", xscroll, yscroll)
-				end
-				
-				--OBJECTS
-				if i > 0 and i < 8 then
-					for j, w in pairs(objects["tilemoving"]) do
-						w:draw()
-					end
-					for j, w in kpairs(objects, objectskeys) do	
-						if j ~= "tile" then
-							for i, v in pairs(w) do
-								if v.drawable and (not v.nodropshadow) then--and not v.drawback then
-									love.graphics.setColor(color)
-									if j == "player" then
-										drawplayer(v.playernumber, nil, nil, nil, nil)--, "dropshadow")
-									else
-										drawentity(j,w,i,v,currentscissor)
-									end
-								end
-							end
-						end
-					end
-				end
-				love.graphics.pop()
-			end
-			love.graphics.setColor(255,255,255,255)
-		end
-		
-		--lakito
-		--[[for j, w in pairs(objects["lakito"]) do
-			w:draw()
-		end]]
-		
-		--angrysun
-		for j, w in pairs(objects["angrysun"]) do
-			w:draw()
-		end
-
-		--ice block
-		for j, w in pairs(objects["ice"]) do
-			w:draw()
-		end
-
-		
-		--[[for j, w in pairs(objects["trackcontroller"]) do
-			w:draw()
-		end]]
-		
-		--torpedo ted launcher
-		for j, w in pairs(objects["torpedolauncher"]) do
-			w:draw()
-		end
-		
-		--kingbill
-		for j, w in pairs(objects["kingbill"]) do
-			w:draw()
-		end
-		
-		--excursion funnel
-		for j, w in pairs(objects["funnel"]) do
-			w:draw()
-		end
-		
-		--Geldispensers
-		for j, w in pairs(objects["geldispenser"]) do
-			w:draw()
-		end
-		
-		--Cubedispensers
-		for j, w in pairs(objects["cubedispenser"]) do
-			w:draw()
-		end
-		
-		--Emancipationgrills
-		for j, w in pairs(emancipationgrills) do
-			w:draw()
-		end
-
-		--Laserfields
-		for j, w in pairs(laserfields) do
-			w:draw()
-		end
-		
-		--Doors
-		for j, w in pairs(objects["door"]) do
-			w:draw()
-		end
-
-		--risingwater over
-		for j, w in pairs(objects["risingwater"]) do
-			if w.drawover then
-				w:draw()
-			end
-		end
-		
-		--Wallindicators
-		for j, w in pairs(objects["wallindicator"]) do
-			w:draw()
-		end
-		
-		--Walltimers
-		for j, w in pairs(objects["walltimer"]) do
-			w:draw()
-		end
-		
-		--Notgates
-		for j, w in pairs(objects["notgate"]) do
-			w:draw()
-		end
-		
-		--Orgates
-		for j, w in pairs(objects["orgate"]) do
-			w:draw()
-		end
-		
-		--Andgates
-		for j, w in pairs(objects["andgate"]) do
-			w:draw()
-		end
-
-		--Animatedtiletrigger
-		for j, w in pairs(objects["animatedtiletrigger"]) do
-			w:draw()
-		end
-
-		--Gucci Flipflop
-		for j, w in pairs(objects["rsflipflop"]) do
-			w:draw()
-		end
-		
-		--Squarewave
-		for j, w in pairs(objects["squarewave"]) do
-			w:draw()
-		end
-		
-		--Delayers
-		for j, w in pairs(objects["delayer"]) do
-			w:draw()
-		end
-		
-		--Randomizer
-		for j, w in pairs(objects["randomizer"]) do
-			w:draw()
-		end
-		
-		--Musicchanger
-		for j, w in pairs(objects["musicchanger"]) do
-			w:draw()
-		end
-		
-		--particles
-		for j, w in pairs(portalparticles) do
-			w:draw()
-		end
-
-		love.graphics.setColor(255, 255, 255)
-		
-		--portals
-		for i, v in pairs(portals) do
-			v:draw()
-		end		
-		
-		
-		--cappy
-		for j, w in pairs(objects["cappy"]) do
-			w:draw()
-		end
-		
-		--draw collision (debug)
-		if HITBOXDEBUG and (editormode or testlevel) then
-			local lw = love.graphics.getLineWidth()
-			love.graphics.setLineWidth(.5*scale)
-			for i, v in kpairs(objects, objectskeys) do
-				for j, k in pairs(v) do
-					if k.width then
-						if xscroll >= k.x-width and k.x+k.width > xscroll then
-							if k.active and not k.red then
-								love.graphics.setColor(255, 255, 255)
-							else
-								love.graphics.setColor(255, 0, 0)
-							end
-							
-							if k.SLOPE then
-								local points = {0,k.y1, 1,k.y2, 1,1.05, 0,1.05}
-								if k.UPSIDEDOWNSLOPE then
-									points[5], points[6] = 1,-0.05
-									points[7], points[8] = 0,-0.05
-								end
-								for i = 1, #points, 2 do
-									points[i] = math.floor((points[i]+k.x-xscroll)*16*scale)+.5
-									points[i+1] = math.floor((points[i+1]+k.y-yscroll-.5)*16*scale)+.5
-								end
-								love.graphics.polygon("line", unpack(points))
-							elseif k.width <= 1/16 then
-								love.graphics.rectangle("fill", math.floor((k.x-xscroll)*16*scale), math.floor((k.y-yscroll-.5)*16*scale), k.width*16*scale, k.height*16*scale)
-							elseif incognito then
-								love.graphics.rectangle("fill", math.floor((k.x-xscroll)*16*scale)+.5, math.floor((k.y-yscroll-.5)*16*scale)+.5, k.width*16*scale-1, k.height*16*scale-1)
-							else
-								love.graphics.rectangle("line", math.floor((k.x-xscroll)*16*scale)+.5, math.floor((k.y-yscroll-.5)*16*scale)+.5, k.width*16*scale-1, k.height*16*scale-1)
-							end
-							if k.killzonex then
-								love.graphics.circle("line", math.floor((k.x+k.killzonex-xscroll)*16*scale)+.5, math.floor((k.y+k.killzoney-yscroll-.5)*16*scale)+.5, (math.sqrt(k.killzoner))*16*scale)
-							end
-							if k.playerneardist and type(k.playerneardist) == "table" and #k.playerneardist == 4 then
-								love.graphics.setColor(0, 255, 255)
-								love.graphics.rectangle("line", math.floor((k.x+k.playerneardist[1]-xscroll)*16*scale)+.5, math.floor((k.y+k.playerneardist[2]-yscroll-.5)*16*scale)+.5, k.playerneardist[3]*16*scale-1, k.playerneardist[4]*16*scale-1)
-							end
-							if k.movementpath then
-								love.graphics.setColor(0, 255, 33)
-								local t = {}
-								for i = 1, #k.movementpath do
-									table.insert(t, math.floor((k.startx+k.movementpath[i][1]-xscroll)*16*scale)+.5)
-									table.insert(t, math.floor((k.starty+k.movementpath[i][2]-yscroll-.5)*16*scale)+.5)
-								end
-								if not k.movementpathturnaround then
-									table.insert(t, math.floor((k.startx+k.movementpath[1][1]-xscroll)*16*scale)+.5)
-									table.insert(t, math.floor((k.starty+k.movementpath[1][2]-yscroll-.5)*16*scale)+.5)
-								end
-								love.graphics.line(t)
-							end
-							if k.carryrange then
-								love.graphics.setColor(0, 255, 255)
-								love.graphics.rectangle("line", math.floor((k.x+k.carryrange[1]-xscroll)*16*scale)+.5, math.floor((k.y+k.carryrange[2]-yscroll-.5)*16*scale)+.5, k.carryrange[3]*16*scale-1, k.carryrange[4]*16*scale-1)
-							end
-							if k.blowrange then
-								love.graphics.setColor(100, 255, 255)
-								love.graphics.rectangle("line", math.floor((k.x+k.blowrange[1]-xscroll)*16*scale)+.5, math.floor((k.y+k.blowrange[2]-yscroll-.5)*16*scale)+.5, k.blowrange[3]*16*scale-1, k.blowrange[4]*16*scale-1)
-							end
-
-							--[[if k.pointingangle then
-								local xcenter = k.x + 6/16 - math.sin(k.pointingangle)*userange
-								local ycenter = k.y + 6/16 - math.cos(k.pointingangle)*userange
-							
-								love.graphics.setColor(0, 255, 255)
-								love.graphics.rectangle("line", math.floor((xcenter-usesquaresize/2-xscroll)*16*scale)+.5, math.floor((ycenter-usesquaresize/2-yscroll-.5)*16*scale)+.5, usesquaresize*16*scale-1, usesquaresize*16*scale-1)
-							end]]
-						end
-					end
-				end
-			end
-			
-			love.graphics.setColor(234, 160, 45, 155)
-			for j, w in pairs(objects["regiontrigger"]) do
-				love.graphics.rectangle("fill", math.floor((w.rx-xscroll)*16*scale)+.5, math.floor((w.ry-yscroll-.5)*16*scale)+.5, w.rw*16*scale-1, w.rh*16*scale-1)
-			end
-
-			for j, w in pairs(userects) do
-				love.graphics.setColor(0, 255, 255, 150)
-				love.graphics.rectangle("line", math.floor((w.x-xscroll)*16*scale)+.5, math.floor((w.y-yscroll-.5)*16*scale)+.5, w.width*16*scale-1, w.height*16*scale-1)
-			end
-			love.graphics.setLineWidth(lw)
-
-			--animation numbers
-			if HITBOXDEBUGANIMS then
-				love.graphics.setColor(255, 255, 255, 225)
-				local x, y, max = 0, 2, 0
-				for i, n in pairs(animationnumbers) do
-					local text = i .. ": " .. n
-					if #text > max then
-						max = #text
-					end
-					properprint(text, x*scale, y*scale)
-					y = y + 10
-					if y >= (height*16)-10 then
-						x, y = x + 8*(max+1), 2
-					end
-				end
-			end
-		end
-
-		--portalwalldebug
-		--[[if portalwalldebug then
-			for j, v in pairs(portals) do
-				for k = 1, 2 do
-					for i = 1, 6 do
-						if objects["portalwall"][v.number .. "-" .. k .. "-" .. i] then
-							objects["portalwall"][v.number .. "-" .. k .. "-" .. i]:draw()
-						end
-					end
-				end
-			end
-		end]]
-		
-		love.graphics.setColor(255, 255, 255)
-		
-		--COINBLOCKANIMATION
-		for i, v in pairs(coinblockanimations) do
-			if v.t and v.t == "collectable" then
-				love.graphics.draw(collectableimg, collectablequad[spriteset][v.i][v.frame], math.floor((v.x - xscroll + 1/16)*16*scale), math.floor(((v.y + v.offsety - 8/16 - yscroll)*16-8)*scale), 0, scale, scale, 16, 16)
-			else
-				love.graphics.draw(coinblockanimationimage, coinblockanimationquads[v.frame], math.floor((v.x - xscroll)*16*scale), math.floor(((v.y - yscroll)*16-8)*scale), 0, scale, scale, 4, 54)
-			end
-		end
-		
-		--SCROLLING SCORE
-		for i, v in pairs(scrollingscores) do
-			if type(scrollingscores[i].i) == "number" then
-				properprint2(scrollingscores[i].i, math.floor((scrollingscores[i].x-0.4)*16*scale), math.floor((scrollingscores[i].y-1.5-scrollingscoreheight*(scrollingscores[i].timer/scrollingscoretime))*16*scale))
-			elseif scrollingscores[i].i == "1up" then
-				love.graphics.draw(oneuptextimage, math.floor((scrollingscores[i].x)*16*scale), math.floor((scrollingscores[i].y-1.5-scrollingscoreheight*(scrollingscores[i].timer/scrollingscoretime))*16*scale), 0, scale, scale)
-			elseif scrollingscores[i].i == "3up" then
-				love.graphics.draw(threeuptextimage, math.floor((scrollingscores[i].x)*16*scale), math.floor((scrollingscores[i].y-1.5-scrollingscoreheight*(scrollingscores[i].timer/scrollingscoretime))*16*scale), 0, scale, scale)
-			end
-		end
-		
-		--BLOCK DEBRIS
-		for i, v in pairs(blockdebristable) do
-			v:draw()
-		end
-		
-		local minex, miney, minecox, minecoy
-		
-		--PORTAL UI STUFF
-		if levelfinished == false then
-			for pl = 1, players do
-				player = objects["player"][pl]
-				if player.controlsenabled and player.t == "portal" and player.vine == false and player.fence == false and player.portalgun then
-					local sourcex, sourcey = player.x+player.portalsourcex, player.y+player.portalsourcey
-					local cox, coy, side, tend, x, y = traceline(sourcex, sourcey, player.pointingangle)
-					
-					local portalpossible = true
-					if cox == false or getportalposition(1, cox, coy, side, tend) == false then
-						portalpossible = false
-					end
-					
-					love.graphics.setColor(255, 255, 255, 255)
-					
-					local dist = math.sqrt(((x-xscroll)*16*scale - (sourcex-xscroll)*16*scale)^2 + ((y-yscroll-.5)*16*scale - (sourcey-yscroll-.5)*16*scale)^2)/16/scale
-					
-					portaldotspritebatch:clear()
-					for i = 1, dist/portaldotsdistance+1 do
-						if((i-1+portaldotstimer/portaldotstime)/(dist/portaldotsdistance)) < 1 then
-							local xplus = ((x-xscroll)*16*scale - (sourcex-xscroll)*16*scale)*((i-1+portaldotstimer/portaldotstime)/(dist/portaldotsdistance))
-							local yplus = ((y-.5-yscroll)*16*scale - (sourcey-.5-yscroll)*16*scale)*((i-1+portaldotstimer/portaldotstime)/(dist/portaldotsdistance))
-						
-							local dotx = (sourcex-xscroll)*16*scale + xplus
-							local doty = (sourcey-.5-yscroll)*16*scale + yplus
-						
-							local radius = math.sqrt(xplus^2 + yplus^2)/scale
-							
-							
-							local alpha = 255
-							if radius < portaldotsouter then
-								alpha = (radius-portaldotsinner) * (255/(portaldotsouter-portaldotsinner))
-								if alpha < 0 then
-									alpha = 0
-								end
-							end
-							if portalpossible == false then
-								portaldotspritebatch:setColor(255, 0, 0, alpha)
-							else
-								portaldotspritebatch:setColor(0, 255, 0, alpha)
-							end
-							portaldotspritebatch:add(math.floor(dotx-0.25*scale), math.floor(doty-0.25*scale), 0, scale, scale)
-						end
-					end
-					
-					love.graphics.draw(portaldotspritebatch, 0,0)
-				
-					love.graphics.setColor(255, 255, 255, 255)
-					
-					if cox ~= false then
-						if portalpossible == false then
-							love.graphics.setColor(255, 0, 0)
+	love.graphics.setColor(255, 255, 255)
+	
+	--portals
+	for i, v in pairs(portals) do
+		v:draw()
+	end		
+	
+	
+	--cappy
+	for j, w in pairs(objects["cappy"]) do
+		w:draw()
+	end
+	
+	--draw collision (debug)
+	if HITBOXDEBUG and (editormode or testlevel) then
+		local lw = love.graphics.getLineWidth()
+		love.graphics.setLineWidth(.5*scale)
+		for i, v in kpairs(objects, objectskeys) do
+			for j, k in pairs(v) do
+				if k.width then
+					if xscroll >= k.x-width and k.x+k.width > xscroll then
+						if k.active and not k.red then
+							love.graphics.setColor(255, 255, 255)
 						else
-							love.graphics.setColor(0, 255, 0)
+							love.graphics.setColor(255, 0, 0)
 						end
 						
-						local rotation = 0
-						if side == "right" then
-							rotation = math.pi/2
-						elseif side == "down" then
-							rotation = math.pi
-						elseif side == "left" then
-							rotation = math.pi/2*3
+						if k.SLOPE then
+							local points = {0,k.y1, 1,k.y2, 1,1.05, 0,1.05}
+							if k.UPSIDEDOWNSLOPE then
+								points[5], points[6] = 1,-0.05
+								points[7], points[8] = 0,-0.05
+							end
+							for i = 1, #points, 2 do
+								points[i] = math.floor((points[i]+k.x-xscroll)*16*scale)+.5
+								points[i+1] = math.floor((points[i+1]+k.y-yscroll-.5)*16*scale)+.5
+							end
+							love.graphics.polygon("line", unpack(points))
+						elseif k.width <= 1/16 then
+							love.graphics.rectangle("fill", math.floor((k.x-xscroll)*16*scale), math.floor((k.y-yscroll-.5)*16*scale), k.width*16*scale, k.height*16*scale)
+						elseif incognito then
+							love.graphics.rectangle("fill", math.floor((k.x-xscroll)*16*scale)+.5, math.floor((k.y-yscroll-.5)*16*scale)+.5, k.width*16*scale-1, k.height*16*scale-1)
+						else
+							love.graphics.rectangle("line", math.floor((k.x-xscroll)*16*scale)+.5, math.floor((k.y-yscroll-.5)*16*scale)+.5, k.width*16*scale-1, k.height*16*scale-1)
 						end
-						love.graphics.draw(portalcrosshairimg, math.floor((x-xscroll)*16*scale), math.floor((y-.5-yscroll)*16*scale), rotation, scale, scale, 4, 8)
+						if k.killzonex then
+							love.graphics.circle("line", math.floor((k.x+k.killzonex-xscroll)*16*scale)+.5, math.floor((k.y+k.killzoney-yscroll-.5)*16*scale)+.5, (math.sqrt(k.killzoner))*16*scale)
+						end
+						if k.playerneardist and type(k.playerneardist) == "table" and #k.playerneardist == 4 then
+							love.graphics.setColor(0, 255, 255)
+							love.graphics.rectangle("line", math.floor((k.x+k.playerneardist[1]-xscroll)*16*scale)+.5, math.floor((k.y+k.playerneardist[2]-yscroll-.5)*16*scale)+.5, k.playerneardist[3]*16*scale-1, k.playerneardist[4]*16*scale-1)
+						end
+						if k.movementpath then
+							love.graphics.setColor(0, 255, 33)
+							local t = {}
+							for i = 1, #k.movementpath do
+								table.insert(t, math.floor((k.startx+k.movementpath[i][1]-xscroll)*16*scale)+.5)
+								table.insert(t, math.floor((k.starty+k.movementpath[i][2]-yscroll-.5)*16*scale)+.5)
+							end
+							if not k.movementpathturnaround then
+								table.insert(t, math.floor((k.startx+k.movementpath[1][1]-xscroll)*16*scale)+.5)
+								table.insert(t, math.floor((k.starty+k.movementpath[1][2]-yscroll-.5)*16*scale)+.5)
+							end
+							love.graphics.line(t)
+						end
+						if k.carryrange then
+							love.graphics.setColor(0, 255, 255)
+							love.graphics.rectangle("line", math.floor((k.x+k.carryrange[1]-xscroll)*16*scale)+.5, math.floor((k.y+k.carryrange[2]-yscroll-.5)*16*scale)+.5, k.carryrange[3]*16*scale-1, k.carryrange[4]*16*scale-1)
+						end
+						if k.blowrange then
+							love.graphics.setColor(100, 255, 255)
+							love.graphics.rectangle("line", math.floor((k.x+k.blowrange[1]-xscroll)*16*scale)+.5, math.floor((k.y+k.blowrange[2]-yscroll-.5)*16*scale)+.5, k.blowrange[3]*16*scale-1, k.blowrange[4]*16*scale-1)
+						end
+
+						--[[if k.pointingangle then
+							local xcenter = k.x + 6/16 - math.sin(k.pointingangle)*userange
+							local ycenter = k.y + 6/16 - math.cos(k.pointingangle)*userange
+						
+							love.graphics.setColor(0, 255, 255)
+							love.graphics.rectangle("line", math.floor((xcenter-usesquaresize/2-xscroll)*16*scale)+.5, math.floor((ycenter-usesquaresize/2-yscroll-.5)*16*scale)+.5, usesquaresize*16*scale-1, usesquaresize*16*scale-1)
+						end]]
 					end
 				end
 			end
 		end
 		
-		--Portal projectile
-		portalprojectilespritebatch:clear()
-		for i, v in pairs(portalprojectiles) do
-			v:particledraw()
-		end
-		love.graphics.setColor(255,255,255)
-		love.graphics.draw(portalprojectilespritebatch,0,0)
-		for i, v in pairs(portalprojectiles) do
-			v:draw()
-		end
-		
-		love.graphics.setColor(255, 255, 255)
-		
-		--nothing to see here
-		for i, v in pairs(rainbooms) do
-			v:draw()
-		end
-		
-		--Foreground tiles
-		drawmaptiles("foreground", xscroll, yscroll)
-		
-		love.graphics.setColor(255, 255, 255)
-		--Poofs
-		for j, w in pairs(poofs) do
-			w:draw()
-		end
-		
-		--custom foreground
-		rendercustomforeground(xscroll, yscroll, scrollfactor2, scrollfactor2y)
-		
-		--UI over everything
-		love.graphics.scale(1/screenzoom,1/screenzoom)
-		if hudsimple and ((not darkmode and not lightsout) or editormode) then
-			if hudvisible then
-				drawHUD()
-			end
+		love.graphics.setColor(234, 160, 45, 155)
+		for j, w in pairs(objects["regiontrigger"]) do
+			love.graphics.rectangle("fill", math.floor((w.rx-xscroll)*16*scale)+.5, math.floor((w.ry-yscroll-.5)*16*scale)+.5, w.rw*16*scale-1, w.rh*16*scale-1)
 		end
 
-		--Player markers
-		if players > 1 then--playermarkers then
-			for i = 1, players do
-				local v = objects["player"][i]
-				if not v.dead and v.drawable and v.y < mapheight-.5 then
-					--get if player offscreen
-					local right, left, up, down = false, false, false, false
-					if v.x > xscroll+width then
-						right = true
+		for j, w in pairs(userects) do
+			love.graphics.setColor(0, 255, 255, 150)
+			love.graphics.rectangle("line", math.floor((w.x-xscroll)*16*scale)+.5, math.floor((w.y-yscroll-.5)*16*scale)+.5, w.width*16*scale-1, w.height*16*scale-1)
+		end
+		love.graphics.setLineWidth(lw)
+
+		--animation numbers
+		if HITBOXDEBUGANIMS then
+			love.graphics.setColor(255, 255, 255, 225)
+			local x, y, max = 0, 2, 0
+			for i, n in pairs(animationnumbers) do
+				local text = i .. ": " .. n
+				if #text > max then
+					max = #text
+				end
+				properprint(text, x*scale, y*scale)
+				y = y + 10
+				if y >= (height*16)-10 then
+					x, y = x + 8*(max+1), 2
+				end
+			end
+		end
+	end
+
+	--portalwalldebug
+	--[[if portalwalldebug then
+		for j, v in pairs(portals) do
+			for k = 1, 2 do
+				for i = 1, 6 do
+					if objects["portalwall"][v.number .. "-" .. k .. "-" .. i] then
+						objects["portalwall"][v.number .. "-" .. k .. "-" .. i]:draw()
 					end
+				end
+			end
+		end
+	end]]
+	
+	love.graphics.setColor(255, 255, 255)
+	
+	--COINBLOCKANIMATION
+	for i, v in pairs(coinblockanimations) do
+		if v.t and v.t == "collectable" then
+			love.graphics.draw(collectableimg, collectablequad[spriteset][v.i][v.frame], math.floor((v.x - xscroll + 1/16)*16*scale), math.floor(((v.y + v.offsety - 8/16 - yscroll)*16-8)*scale), 0, scale, scale, 16, 16)
+		else
+			love.graphics.draw(coinblockanimationimage, coinblockanimationquads[v.frame], math.floor((v.x - xscroll)*16*scale), math.floor(((v.y - yscroll)*16-8)*scale), 0, scale, scale, 4, 54)
+		end
+	end
+	
+	--SCROLLING SCORE
+	for i, v in pairs(scrollingscores) do
+		if type(scrollingscores[i].i) == "number" then
+			properprint2(scrollingscores[i].i, math.floor((scrollingscores[i].x-0.4)*16*scale), math.floor((scrollingscores[i].y-1.5-scrollingscoreheight*(scrollingscores[i].timer/scrollingscoretime))*16*scale))
+		elseif scrollingscores[i].i == "1up" then
+			love.graphics.draw(oneuptextimage, math.floor((scrollingscores[i].x)*16*scale), math.floor((scrollingscores[i].y-1.5-scrollingscoreheight*(scrollingscores[i].timer/scrollingscoretime))*16*scale), 0, scale, scale)
+		elseif scrollingscores[i].i == "3up" then
+			love.graphics.draw(threeuptextimage, math.floor((scrollingscores[i].x)*16*scale), math.floor((scrollingscores[i].y-1.5-scrollingscoreheight*(scrollingscores[i].timer/scrollingscoretime))*16*scale), 0, scale, scale)
+		end
+	end
+	
+	--BLOCK DEBRIS
+	for i, v in pairs(blockdebristable) do
+		v:draw()
+	end
+	
+	local minex, miney, minecox, minecoy
+	
+	--PORTAL UI STUFF
+	if levelfinished == false then
+		for pl = 1, players do
+			player = objects["player"][pl]
+			if player.controlsenabled and player.t == "portal" and player.vine == false and player.fence == false and player.portalgun then
+				local sourcex, sourcey = player.x+player.portalsourcex, player.y+player.portalsourcey
+				local cox, coy, side, tend, x, y = traceline(sourcex, sourcey, player.pointingangle)
+				
+				local portalpossible = true
+				if cox == false or getportalposition(1, cox, coy, side, tend) == false then
+					portalpossible = false
+				end
+				
+				love.graphics.setColor(255, 255, 255, 255)
+				
+				local dist = math.sqrt(((x-xscroll)*16*scale - (sourcex-xscroll)*16*scale)^2 + ((y-yscroll-.5)*16*scale - (sourcey-yscroll-.5)*16*scale)^2)/16/scale
+				
+				portaldotspritebatch:clear()
+				for i = 1, dist/portaldotsdistance+1 do
+					if((i-1+portaldotstimer/portaldotstime)/(dist/portaldotsdistance)) < 1 then
+						local xplus = ((x-xscroll)*16*scale - (sourcex-xscroll)*16*scale)*((i-1+portaldotstimer/portaldotstime)/(dist/portaldotsdistance))
+						local yplus = ((y-.5-yscroll)*16*scale - (sourcey-.5-yscroll)*16*scale)*((i-1+portaldotstimer/portaldotstime)/(dist/portaldotsdistance))
 					
-					if v.x+v.width < xscroll then
-						left = true
-					end
+						local dotx = (sourcex-xscroll)*16*scale + xplus
+						local doty = (sourcey-.5-yscroll)*16*scale + yplus
 					
-					if v.y > yscroll + .5 + height then
-						down = true
-					end
-					
-					if v.y+v.height < yscroll +.5 then
-						up = true
-					end
-					
-					if up or left or down or right then
-						local x, y
-						local angx, angy = 0, 0
-						if right then
-							x = width
-							angx = 1
-						elseif left then
-							x = 0
-							angx = -1
-						end
-						if up then
-							y = 0
-							angy = -1
-						elseif down then
-							y = height
-							angy = 1
-						end
-						if not x then
-							x = v.x-xscroll+v.width/2
-						end
-						if not y then
-							y = v.y-yscroll-3/16
-						end
-						local r = -math.atan2(angx, angy)-math.pi/2
-						--limit x or y if right angle
-						if math.fmod(r, math.pi/2) == 0 then
-							if up or down then
-								x = math.max(x, 15/16)
-								x = math.min(x, width-15/16)
-							else
-								y = math.max(y, 15/16)
-								y = math.min(y, height-15/16)
+						local radius = math.sqrt(xplus^2 + yplus^2)/scale
+						
+						
+						local alpha = 255
+						if radius < portaldotsouter then
+							alpha = (radius-portaldotsinner) * (255/(portaldotsouter-portaldotsinner))
+							if alpha < 0 then
+								alpha = 0
 							end
 						end
-						
-						love.graphics.setColor(backgroundcolor[background])
-						love.graphics.draw(markbaseimg, math.floor(x*16*scale), math.floor(y*16*scale), r, scale, scale, 0, 15)
-						
-						local dist = 21.5
-						
-						local xadd = math.cos(r)*dist
-						local yadd = math.sin(r)*dist
-						
-						love.graphics.setColor(255, 255, 255)
-						local func = function() love.graphics.circle("fill", math.floor((x*16+xadd)*scale), math.floor((y*16+yadd-.5)*scale), 13.5*scale) end
-						love.graphics.stencil(func)
-						love.graphics.setStencilTest("greater", 0)
-						
-						local playerx, playery = x*16+xadd, y*16+yadd+3
-						
-						--draw map
-						for x = math.floor(v.x), math.floor(v.x)+3 do
-							for y = math.floor(v.y), math.floor(v.y)+3 do
-								if inmap(x, y) then
-									local t = map[x][y]
-									if t then
-										local tilenumber = tonumber(t[1])
-										if tilequads[tilenumber].coinblock and tilequads[tilenumber].invisible == false then --coinblock
-											love.graphics.draw(coinblockimage, coinblockquads[spriteset][coinframe], math.floor((x-1-v.x-6/16)*16*scale+playerx*scale), math.floor((y-1.5-v.y)*16*scale+playery*scale), 0, scale, scale)
-										elseif tilenumber ~= 0 and not tilequads[tilenumber].invisible then
-											love.graphics.draw(tilequads[tilenumber].image, tilequads[tilenumber].quad, math.floor((x-1-v.x-6/16)*16*scale+playerx*scale), math.floor((y-1.5-v.y)*16*scale+playery*scale), 0, scale, scale)
-										end
+						if portalpossible == false then
+							portaldotspritebatch:setColor(255, 0, 0, alpha)
+						else
+							portaldotspritebatch:setColor(0, 255, 0, alpha)
+						end
+						portaldotspritebatch:add(math.floor(dotx-0.25*scale), math.floor(doty-0.25*scale), 0, scale, scale)
+					end
+				end
+				
+				love.graphics.draw(portaldotspritebatch, 0,0)
+			
+				love.graphics.setColor(255, 255, 255, 255)
+				
+				if cox ~= false then
+					if portalpossible == false then
+						love.graphics.setColor(255, 0, 0)
+					else
+						love.graphics.setColor(0, 255, 0)
+					end
+					
+					local rotation = 0
+					if side == "right" then
+						rotation = math.pi/2
+					elseif side == "down" then
+						rotation = math.pi
+					elseif side == "left" then
+						rotation = math.pi/2*3
+					end
+					love.graphics.draw(portalcrosshairimg, math.floor((x-xscroll)*16*scale), math.floor((y-.5-yscroll)*16*scale), rotation, scale, scale, 4, 8)
+				end
+			end
+		end
+	end
+	
+	--Portal projectile
+	portalprojectilespritebatch:clear()
+	for i, v in pairs(portalprojectiles) do
+		v:particledraw()
+	end
+	love.graphics.setColor(255,255,255)
+	love.graphics.draw(portalprojectilespritebatch,0,0)
+	for i, v in pairs(portalprojectiles) do
+		v:draw()
+	end
+	
+	love.graphics.setColor(255, 255, 255)
+	
+	--nothing to see here
+	for i, v in pairs(rainbooms) do
+		v:draw()
+	end
+	
+	--Foreground tiles
+	drawmaptiles("foreground", xscroll, yscroll)
+	
+	love.graphics.setColor(255, 255, 255)
+	--Poofs
+	for j, w in pairs(poofs) do
+		w:draw()
+	end
+	
+	--custom foreground
+	rendercustomforeground(xscroll, yscroll, scrollfactor2, scrollfactor2y)
+	
+	--UI over everything
+	love.graphics.scale(1/screenzoom,1/screenzoom)
+	if hudsimple and ((not darkmode and not lightsout) or editormode) then
+		if hudvisible then
+			drawHUD()
+		end
+	end
+
+	--Player markers
+	if players > 1 then--playermarkers then
+		for i = 1, players do
+			local v = objects["player"][i]
+			if not v.dead and v.drawable and v.y < mapheight-.5 then
+				--get if player offscreen
+				local right, left, up, down = false, false, false, false
+				if v.x > xscroll+width then
+					right = true
+				end
+				
+				if v.x+v.width < xscroll then
+					left = true
+				end
+				
+				if v.y > yscroll + .5 + height then
+					down = true
+				end
+				
+				if v.y+v.height < yscroll +.5 then
+					up = true
+				end
+				
+				if up or left or down or right then
+					local x, y
+					local angx, angy = 0, 0
+					if right then
+						x = width
+						angx = 1
+					elseif left then
+						x = 0
+						angx = -1
+					end
+					if up then
+						y = 0
+						angy = -1
+					elseif down then
+						y = height
+						angy = 1
+					end
+					if not x then
+						x = v.x-xscroll+v.width/2
+					end
+					if not y then
+						y = v.y-yscroll-3/16
+					end
+					local r = -math.atan2(angx, angy)-math.pi/2
+					--limit x or y if right angle
+					if math.fmod(r, math.pi/2) == 0 then
+						if up or down then
+							x = math.max(x, 15/16)
+							x = math.min(x, width-15/16)
+						else
+							y = math.max(y, 15/16)
+							y = math.min(y, height-15/16)
+						end
+					end
+					
+					love.graphics.setColor(backgroundcolor[background])
+					love.graphics.draw(markbaseimg, math.floor(x*16*scale), math.floor(y*16*scale), r, scale, scale, 0, 15)
+					
+					local dist = 21.5
+					
+					local xadd = math.cos(r)*dist
+					local yadd = math.sin(r)*dist
+					
+					love.graphics.setColor(255, 255, 255)
+					local func = function() love.graphics.circle("fill", math.floor((x*16+xadd)*scale), math.floor((y*16+yadd-.5)*scale), 13.5*scale) end
+					love.graphics.stencil(func)
+					love.graphics.setStencilTest("greater", 0)
+					
+					local playerx, playery = x*16+xadd, y*16+yadd+3
+					
+					--draw map
+					for x = math.floor(v.x), math.floor(v.x)+3 do
+						for y = math.floor(v.y), math.floor(v.y)+3 do
+							if inmap(x, y) then
+								local t = map[x][y]
+								if t then
+									local tilenumber = tonumber(t[1])
+									if tilequads[tilenumber].coinblock and tilequads[tilenumber].invisible == false then --coinblock
+										love.graphics.draw(coinblockimage, coinblockquads[spriteset][coinframe], math.floor((x-1-v.x-6/16)*16*scale+playerx*scale), math.floor((y-1.5-v.y)*16*scale+playery*scale), 0, scale, scale)
+									elseif tilenumber ~= 0 and not tilequads[tilenumber].invisible then
+										love.graphics.draw(tilequads[tilenumber].image, tilequads[tilenumber].quad, math.floor((x-1-v.x-6/16)*16*scale+playerx*scale), math.floor((y-1.5-v.y)*16*scale+playery*scale), 0, scale, scale)
 									end
 								end
 							end
 						end
-						
-						drawplayer(i, (playerx/16)+xscroll-(6/16), (playery/16)+yscroll)
-						
-						love.graphics.setStencilTest()
-						
-						love.graphics.setColor(v.colors[1] or {255, 255, 255})
-						love.graphics.draw(markoverlayimg, math.floor(x*16*scale), math.floor(y*16*scale), r, scale, scale, 0, 15)
 					end
+					
+					drawplayer(i, (playerx/16)+xscroll-(6/16), (playery/16)+yscroll)
+					
+					love.graphics.setStencilTest()
+					
+					love.graphics.setColor(v.colors[1] or {255, 255, 255})
+					love.graphics.draw(markoverlayimg, math.floor(x*16*scale), math.floor(y*16*scale), r, scale, scale, 0, 15)
 				end
-				love.graphics.setScissor()
 			end
+			love.graphics.setScissor()
 		end
+	end
+	
+	--Minecraft
+	--black border
+	if objects["player"][mouseowner] and playertype == "minecraft" and not levelfinished then
+		local v = objects["player"][mouseowner]
+		local sourcex, sourcey = v.x+v.portalsourcex, v.y+v.portalsourcey
+		local cox, coy, side, tend, x, y = traceline(sourcex, sourcey, v.pointingangle)
 		
-		--Minecraft
-		--black border
-		if objects["player"][mouseowner] and playertype == "minecraft" and not levelfinished then
-			local v = objects["player"][mouseowner]
-			local sourcex, sourcey = v.x+v.portalsourcex, v.y+v.portalsourcey
-			local cox, coy, side, tend, x, y = traceline(sourcex, sourcey, v.pointingangle)
+		if cox then
+			local dist = math.sqrt((v.x+v.width/2 - x)^2 + (v.y+v.height/2 - y)^2)
+			if dist <= minecraftrange then
+				love.graphics.setColor(0, 0, 0, 170)
+				love.graphics.rectangle("line", math.floor((cox-1-xscroll)*16*scale)-.5, (coy-1-.5-yscroll)*16*scale-.5, 16*scale, 16*scale)
 			
-			if cox then
-				local dist = math.sqrt((v.x+v.width/2 - x)^2 + (v.y+v.height/2 - y)^2)
-				if dist <= minecraftrange then
-					love.graphics.setColor(0, 0, 0, 170)
-					love.graphics.rectangle("line", math.floor((cox-1-xscroll)*16*scale)-.5, (coy-1-.5-yscroll)*16*scale-.5, 16*scale, 16*scale)
-				
-					if breakingblockX and (cox ~= breakingblockX or coy ~= breakingblockY) then
-						breakingblockX = cox
-						breakingblockY = coy
-						breakingblockprogress = 0
-					elseif not breakingblockX and love.mouse.isDown("l") then
-						breakingblockX = cox
-						breakingblockY = coy
-						breakingblockprogress = 0
-					end
-				elseif love.mouse.isDown("l") then
+				if breakingblockX and (cox ~= breakingblockX or coy ~= breakingblockY) then
+					breakingblockX = cox
+					breakingblockY = coy
+					breakingblockprogress = 0
+				elseif not breakingblockX and love.mouse.isDown("l") then
 					breakingblockX = cox
 					breakingblockY = coy
 					breakingblockprogress = 0
 				end
-			else
-				breakingblockX = nil
+			elseif love.mouse.isDown("l") then
+				breakingblockX = cox
+				breakingblockY = coy
+				breakingblockprogress = 0
 			end
-			--break animation
-			if breakingblockX then
-				love.graphics.setColor(255, 255, 255, 255)
-				local frame = math.ceil((breakingblockprogress/minecraftbreaktime)*10)
-				if frame ~= 0 then
-					love.graphics.draw(minecraftbreakimg, minecraftbreakquad[frame], (breakingblockX-1-xscroll)*16*scale, (breakingblockY-1.5-yscroll)*16*scale, 0, scale, scale)
-				end
-			end
+		else
+			breakingblockX = nil
+		end
+		--break animation
+		if breakingblockX then
 			love.graphics.setColor(255, 255, 255, 255)
-			
-			--gui
-			love.graphics.draw(minecraftgui, (width*8-91)*scale, 202*scale, 0, scale, scale)
-			
-			love.graphics.setColor(255, 255, 255, 200)
-			for i = 1, 9 do
-				local t = inventory[i].t
-				
-				if t ~= nil then
-					love.graphics.draw(tilequads[t].image, tilequads[t].quad, (width*8-88+(i-1)*20)*scale, 205*scale, 0, scale, scale)
-				end
+			local frame = math.ceil((breakingblockprogress/minecraftbreaktime)*10)
+			if frame ~= 0 then
+				love.graphics.draw(minecraftbreakimg, minecraftbreakquad[frame], (breakingblockX-1-xscroll)*16*scale, (breakingblockY-1.5-yscroll)*16*scale, 0, scale, scale)
 			end
+		end
+		love.graphics.setColor(255, 255, 255, 255)
+		
+		--gui
+		love.graphics.draw(minecraftgui, (width*8-91)*scale, 202*scale, 0, scale, scale)
+		
+		love.graphics.setColor(255, 255, 255, 200)
+		for i = 1, 9 do
+			local t = inventory[i].t
 			
-			love.graphics.setColor(255, 255, 255, 255)
-			love.graphics.draw(minecraftselected, (width*8-92+(mccurrentblock-1)*20)*scale, 201*scale, 0, scale, scale)
-			
-			for i = 1, 9 do
-				if inventory[i].t ~= nil then
-					local count = inventory[i].count
-					properprint(count, (width*8-72+(i-1)*20-string.len(count)*8)*scale, 205*scale)
-				end
+			if t ~= nil then
+				love.graphics.draw(tilequads[t].image, tilequads[t].quad, (width*8-88+(i-1)*20)*scale, 205*scale, 0, scale, scale)
 			end
 		end
 		
-		love.graphics.pop()
+		love.graphics.setColor(255, 255, 255, 255)
+		love.graphics.draw(minecraftselected, (width*8-92+(mccurrentblock-1)*20)*scale, 201*scale, 0, scale, scale)
+		
+		for i = 1, 9 do
+			if inventory[i].t ~= nil then
+				local count = inventory[i].count
+				properprint(count, (width*8-72+(i-1)*20-string.len(count)*8)*scale, 205*scale)
+			end
+		end
 	end
+	
+	love.graphics.pop()
+
 	love.graphics.setScissor()
 	if lightsout and not editormode then
 		local pass = true
@@ -2826,10 +2804,6 @@ function game_draw()
 	
 	if earthquake > 0 and not pausemenuopen then
 		love.graphics.translate(-round(tremorx), -round(tremory))
-	end
-	
-	for i = 2, #splitscreen do
-		love.graphics.line((i-1)*width*16*scale/#splitscreen, 0, (i-1)*width*16*scale/#splitscreen, mapheight*16*scale)
 	end
 	
 	if editormode then
@@ -3910,30 +3884,6 @@ function drawmultiHUD()
 	end
 end
 
-function updatesplitscreen()
-	if players == 2 then
-		if #splitscreen == 1 then
-			if math.abs(objects["player"][1].x - objects["player"][2].x) > width - scrollingstart - scrollingleftstart then
-				if objects["player"][1].x < objects["player"][2].x then
-					splitscreen = {{1}, {2}}
-				else
-					splitscreen = {{2}, {1}}
-				end
-				
-				splitxscroll = {xscroll, xscroll+width/2}
-				generatespritebatch()
-			end
-		else
-			if splitxscroll[2] <= splitxscroll[1]+width/2 then
-				splitscreen = {{1, 2}}
-				
-				xscroll = splitxscroll[1]
-				generatespritebatch()
-			end
-		end
-	end
-end
-
 function startlevel(level, reason)
 	skipupdate = true
 	love.keyboard.setKeyRepeat(false)
@@ -4034,15 +3984,11 @@ function startlevel(level, reason)
 	prevyscroll = 0
 	xpan = false
 	ypan = false
-	splitscreen = {{}}
 	checkpoints = {}
 	checkpointpoints = {}
 	repeatX = 0
 	lastrepeat = 0
 	displaywarpzonetext = false
-	for i = 1, players do
-		table.insert(splitscreen[1], i)
-	end
 	checkpointi = 0
 	mazesfuck = true
 	mazestarts = {}
@@ -4139,8 +4085,6 @@ function startlevel(level, reason)
 	end
 	objects["screenboundary"]["left"] = screenboundary:new(0)
 	
-	splitxscroll = {0}
-	splityscroll = {0}
 	setscreenzoom(1)
 	
 	startx = 3
@@ -4356,28 +4300,25 @@ function startlevel(level, reason)
 	
 	if autoscrollingx then
 		--start further left
-		splitxscroll = {startx-scrollingleftcomplete-5}
+		xscroll = startx-scrollingleftcomplete-5
 	else
-		splitxscroll = {startx-scrollingleftcomplete-2}
+		xscroll = startx-scrollingleftcomplete-2
 	end
-	if splitxscroll[1] > mapwidth - width then
-		splitxscroll[1] = mapwidth - width
+	if xscroll > mapwidth - width then
+		xscroll = mapwidth - width
 	end
-	
-	if splitxscroll[1] < 0 then
-		splitxscroll[1] = 0
-	end
-	
-	splityscroll = {starty-height/2}
-	
-	if splityscroll[1] > mapheight-height-1 then
-		splityscroll[1] = math.max(0, mapheight-height-1)
+	if xscroll < 0 then
+		xscroll = 0
 	end
 	
-	if splityscroll[1] < 0 then
-		splityscroll[1] = 0
+	yscroll = starty-height/2
+	if yscroll > mapheight-height-1 then
+		yscroll = math.max(0, mapheight-height-1)
 	end
-	yscrolltarget = splityscroll[1]
+	if yscroll < 0 then
+		yscroll = 0
+	end
+	yscrolltarget = yscroll
 	
 	--add the players
 	local mul = 0.5
@@ -4434,8 +4375,8 @@ function startlevel(level, reason)
 		if mapwidth < width*screenzoom2+1 then
 			xtodo = mapwidth
 		end
-		for x = math.floor(splitxscroll[1]), math.floor(splitxscroll[1])+xtodo do
-			for y = math.floor(splityscroll[1]), math.floor(splityscroll[1])+height*screenzoom2+2 do
+		for x = math.floor(xscroll), math.floor(xscroll)+xtodo do
+			for y = math.floor(yscroll), math.floor(yscroll)+height*screenzoom2+2 do
 				spawnenemyentity(x, y)
 			end
 		end
@@ -4494,8 +4435,8 @@ function startlevel(level, reason)
 	
 	updatespritebatch()
 
-	prevxscroll = splitxscroll[1]
-	prevyscroll = splityscroll[1]
+	prevxscroll = xscroll
+	prevyscroll = yscroll
 end
 
 function loadmap(filename)
@@ -4904,7 +4845,7 @@ function updatespritebatch()
 		end
 	end
 	
-	local xscroll, yscroll = splitxscroll[split], splityscroll[split]
+	local xscroll, yscroll = xscroll, yscroll
 
 	local xfromdraw,xtodraw, yfromdraw,ytodraw, xoff,yoff = getdrawrange(xscroll,yscroll,"spritebatch")
 	
@@ -8400,11 +8341,11 @@ function camerasnap(targetx, targety, anim)
 
 	if autoscrollx or anim then
 		xscroll = math.max(0, math.min(x, mapwidth-width))
-		splitxscroll[1] = xscroll
+		xscroll = xscroll
 	end
 	if autoscrolly or anim then
 		yscroll = math.max(0, math.min(y, mapheight-height-1))
-		splityscroll[1] = yscroll
+		yscroll = yscroll
 	end
 
 	if not (editormode and not testlevel) then

@@ -4,7 +4,7 @@ function meteor:init()
 	self.width = 12/16
 	self.height = 12/16
 	self.y = -self.height
-	self.x = math.random(math.floor(splitxscroll[1]), math.floor(splitxscroll[1])+width)
+	self.x = math.random(math.floor(xscroll), math.floor(xscroll)+width)
 	self.rotation = 0 --for portals
 	
 	self.speedy = meteorspeeds[math.random(1,#meteorspeeds)]

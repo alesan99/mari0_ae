@@ -543,17 +543,17 @@ function editor_update(dt)
 		if (love.keyboard.isDown("left") or (android and leftkey(1) and not autoscroll)) and ((rightclickmenuopen or (not brushsizetoggle)) and not typingintextinput) then
 			autoscroll = false
 			guielements["autoscrollcheckbox"].var = autoscroll
-			splitxscroll[1] = splitxscroll[1] - speed*gdt
-			if splitxscroll[1] < 0 then
-				splitxscroll[1] = 0
+			xscroll = xscroll - speed*gdt
+			if xscroll < 0 then
+				xscroll = 0
 			end
 			generatespritebatch()
 		elseif (love.keyboard.isDown("right") or (android and rightkey(1) and not autoscroll)) and ((rightclickmenuopen or (not brushsizetoggle)) and not typingintextinput) then
 			autoscroll = false
 			guielements["autoscrollcheckbox"].var = autoscroll
-			splitxscroll[1] = splitxscroll[1] + speed*gdt
-			if splitxscroll[1] > mapwidth-width then
-				splitxscroll[1] = mapwidth-width
+			xscroll = xscroll + speed*gdt
+			if xscroll > mapwidth-width then
+				xscroll = mapwidth-width
 			end
 			generatespritebatch()
 		end
@@ -561,17 +561,17 @@ function editor_update(dt)
 			if (love.keyboard.isDown("up") or (android and upkey(1) and not autoscroll)) then
 				autoscroll = false
 				guielements["autoscrollcheckbox"].var = autoscroll
-				splityscroll[1] = splityscroll[1] - speed*gdt
-				if splityscroll[1] < 0 then
-					splityscroll[1] = 0
+				yscroll = yscroll - speed*gdt
+				if yscroll < 0 then
+					yscroll = 0
 				end
 				generatespritebatch()
 			elseif (love.keyboard.isDown("down") or (android and downkey(1) and not autoscroll)) then
 				autoscroll = false
 				guielements["autoscrollcheckbox"].var = autoscroll
-				splityscroll[1] = splityscroll[1] + speed*gdt
-				if splityscroll[1] >= mapheight-height-1 then
-					splityscroll[1] = mapheight-height-1
+				yscroll = yscroll + speed*gdt
+				if yscroll >= mapheight-height-1 then
+					yscroll = mapheight-height-1
 				end
 				generatespritebatch()
 			end
@@ -990,7 +990,7 @@ function editor_update(dt)
 							if yscroll < 0 then
 								yscroll = 0
 							end
-							splityscroll[1] = yscroll
+							yscroll = yscroll
 						end
 					elseif mousey >= (minimapy+minimapheight*2+4-5)*scale then
 						if yscroll < mapheight-height then
@@ -998,27 +998,27 @@ function editor_update(dt)
 							if yscroll > mapheight-height-1 then
 								yscroll = mapheight-height-1
 							end
-							splityscroll[1] = yscroll
+							yscroll = yscroll
 						end
 					end
 				
-					splitxscroll[1] = (mousex/scale-3-width) / 2 + minimapscroll
+					xscroll = (mousex/scale-3-width) / 2 + minimapscroll
 					
-					if splitxscroll[1] < minimapscroll then
-						splitxscroll[1] = minimapscroll
+					if xscroll < minimapscroll then
+						xscroll = minimapscroll
 					end
-					if splitxscroll[1] > 170 + minimapscroll then
-						splitxscroll[1] = 170 + minimapscroll
+					if xscroll > 170 + minimapscroll then
+						xscroll = 170 + minimapscroll
 					end
-					if splitxscroll[1] > mapwidth-width then
-						splitxscroll[1] = mapwidth-width
+					if xscroll > mapwidth-width then
+						xscroll = mapwidth-width
 					end
 	
 					--SPRITEBATCH UPDATE
-					if math.floor(splitxscroll[1]) ~= spritebatchX[1] or math.floor(splityscroll[1]) ~= spritebatchY[1] then
+					if math.floor(xscroll) ~= spritebatchX[1] or math.floor(yscroll) ~= spritebatchY[1] then
 						generatespritebatch()
-						spritebatchX[1] = math.floor(splitxscroll[1])
-						spritebatchY[1] = math.floor(splityscroll[1])
+						spritebatchX[1] = math.floor(xscroll)
+						spritebatchY[1] = math.floor(yscroll)
 					end
 				end
 			elseif minimapdragging and mousey >= (height-8)*16*scale then --full minimap
@@ -1273,8 +1273,8 @@ function editor_draw()
 				table.insert(table1, v)
 			end
 			
-			for x = math.floor(splitxscroll[1]), math.floor(splitxscroll[1])+width+1 do
-				for y = math.floor(splityscroll[1]), math.floor(splityscroll[1])+height+1 do
+			for x = math.floor(xscroll), math.floor(xscroll)+width+1 do
+				for y = math.floor(yscroll), math.floor(yscroll)+height+1 do
 					for i, v in pairs(table1) do
 						if inmap(x, y) and #map[x][y] > 1 and map[x][y][2] == v then							
 							local r = map[x][y]
@@ -1301,7 +1301,7 @@ function editor_draw()
 							else
 								love.graphics.setColor(255, 150, 150, 150)
 							end
-							love.graphics.rectangle("fill", math.floor((x-splitxscroll[1]-1)*16*scale), ((y-splityscroll[1]-1)*16-8)*scale, 16*scale, 16*scale)
+							love.graphics.rectangle("fill", math.floor((x-xscroll-1)*16*scale), ((y-yscroll-1)*16-8)*scale, 16*scale, 16*scale)
 							
 							if drawline then
 								local tx, ty = x, y
@@ -1741,8 +1741,8 @@ function editor_draw()
 					local x2, y2 = mousex, mousey
 					
 					--draw proper outputs
-					for x = math.floor(splitxscroll[1]), math.floor(splitxscroll[1])+width+1 do
-						for y = math.floor(splityscroll[1]), math.floor(splityscroll[1])+height+1 do
+					for x = math.floor(xscroll), math.floor(xscroll)+width+1 do
+						for y = math.floor(yscroll), math.floor(yscroll)+height+1 do
 							for i, v in pairs(outputsi) do
 								if inmap(x, y) and #map[x][y] > 1 and map[x][y][2] == v then							
 									local r = map[x][y]
@@ -1751,7 +1751,7 @@ function editor_draw()
 									else
 										love.graphics.setColor(255, 150, 150, 150)
 									end
-									love.graphics.rectangle("fill", math.floor((x-splitxscroll[1]-1)*16*scale), ((y-splityscroll[1]-1)*16-8)*scale, 16*scale, 16*scale)
+									love.graphics.rectangle("fill", math.floor((x-xscroll-1)*16*scale), ((y-yscroll-1)*16-8)*scale, 16*scale, 16*scale)
 								end
 							end
 						end
@@ -1838,15 +1838,15 @@ function editor_draw()
 								local tilei = w[1]
 								if tilei == 1 and pastemode == 1 then
 									love.graphics.setColor(255, 255, 255, 8)
-									love.graphics.draw(tilequads[tilei].image, tilequads[tilei].quad, math.floor((x-splitxscroll[1]-1 + pastecenter[1])*16*scale)+(i-1)*16*scale, ((y-splityscroll[1]-1 + pastecenter[2])*16+8)*scale+((j-1)*16*scale), 0, scale, scale)
+									love.graphics.draw(tilequads[tilei].image, tilequads[tilei].quad, math.floor((x-xscroll-1 + pastecenter[1])*16*scale)+(i-1)*16*scale, ((y-yscroll-1 + pastecenter[2])*16+8)*scale+((j-1)*16*scale), 0, scale, scale)
 								else
 									love.graphics.setColor(255, 255, 255, 72)
-									love.graphics.draw(tilequads[tilei].image, tilequads[tilei].quad, math.floor((x-splitxscroll[1]-1 + pastecenter[1])*16*scale)+(i-1)*16*scale, ((y-splityscroll[1]-1 + pastecenter[2])*16+8)*scale+((j-1)*16*scale), 0, scale, scale)
+									love.graphics.draw(tilequads[tilei].image, tilequads[tilei].quad, math.floor((x-xscroll-1 + pastecenter[1])*16*scale)+(i-1)*16*scale, ((y-yscroll-1 + pastecenter[2])*16+8)*scale+((j-1)*16*scale), 0, scale, scale)
 								end
 								local entityi = w[2]
 								if entityi and type(w[2]) == "number" then
 									love.graphics.setColor(255, 255, 255, 72)
-									love.graphics.draw(entityquads[entityi].image, entityquads[entityi].quad, math.floor((x-splitxscroll[1]-1 + pastecenter[1])*16*scale)+(i-1)*16*scale, ((y-splityscroll[1]-1 + pastecenter[2])*16+8)*scale+((j-1)*16*scale), 0, scale, scale)
+									love.graphics.draw(entityquads[entityi].image, entityquads[entityi].quad, math.floor((x-xscroll-1 + pastecenter[1])*16*scale)+(i-1)*16*scale, ((y-yscroll-1 + pastecenter[2])*16+8)*scale+((j-1)*16*scale), 0, scale, scale)
 								end
 							end
 						end
@@ -1854,7 +1854,7 @@ function editor_draw()
 					if android then
 						love.graphics.setColor(255, 255, 255, 200)
 						love.graphics.setLineWidth(1*scale)
-						love.graphics.rectangle("line",math.floor((x-splitxscroll[1]-1)*16*scale), math.floor(((y-splityscroll[1]-1)*16+8)*scale), 16*scale, 16*scale)
+						love.graphics.rectangle("line",math.floor((x-xscroll-1)*16*scale), math.floor(((y-yscroll-1)*16+8)*scale), 16*scale, 16*scale)
 					end
 				end
 			
@@ -1891,10 +1891,10 @@ function editor_draw()
 					end
 					love.graphics.setStencilTest()
 				elseif editentities == false and not pastingtiles then
-					love.graphics.draw(tilequads[currenttile].image, tilequads[currenttile].quad, math.floor((x-splitxscroll[1]-1)*16*scale), math.floor(((y-splityscroll[1]-1)*16+8)*scale), 0, scale, scale)
+					love.graphics.draw(tilequads[currenttile].image, tilequads[currenttile].quad, math.floor((x-xscroll-1)*16*scale), math.floor(((y-yscroll-1)*16+8)*scale), 0, scale, scale)
 					if android then
 						love.graphics.setLineWidth(1*scale)
-						love.graphics.rectangle("line",math.floor((x-splitxscroll[1]-1)*16*scale), math.floor(((y-splityscroll[1]-1)*16+8)*scale), 16*scale, 16*scale)
+						love.graphics.rectangle("line",math.floor((x-xscroll-1)*16*scale), math.floor(((y-yscroll-1)*16+8)*scale), 16*scale, 16*scale)
 					end
 					if editortilemousescroll and (brushsizex <= 1 and brushsizey <= 1) then
 						for i = 1, 2 do
@@ -1902,7 +1902,7 @@ function editor_draw()
 							if currenttile - i >= 1 then
 								if currenttile - i >= 89996 and currenttile - i < 90001 then
 								else
-									love.graphics.draw(tilequads[currenttile-i].image, tilequads[currenttile-i].quad, math.floor((x-splitxscroll[1]-1)*16*scale), math.floor(((y-splityscroll[1]-1)*16+8-((i*16)+i))*scale), 0, scale, scale)
+									love.graphics.draw(tilequads[currenttile-i].image, tilequads[currenttile-i].quad, math.floor((x-xscroll-1)*16*scale), math.floor(((y-yscroll-1)*16+8-((i*16)+i))*scale), 0, scale, scale)
 								end
 							end
 						end
@@ -1910,7 +1910,7 @@ function editor_draw()
 							love.graphics.setColor(255, 255, 255, 200-(i*70))
 							if (currenttile + i > smbtilecount+portaltilecount+customtilecount and currenttile + i < 90000) or (currenttile + i > animatedtilecount+90000 and currenttile + i > 89996) then
 							else
-								love.graphics.draw(tilequads[currenttile+i].image, tilequads[currenttile+i].quad, math.floor((x-splitxscroll[1]-1)*16*scale), math.floor(((y-splityscroll[1]-1)*16+8+((i*16)+i))*scale), 0, scale, scale)
+								love.graphics.draw(tilequads[currenttile+i].image, tilequads[currenttile+i].quad, math.floor((x-xscroll-1)*16*scale), math.floor(((y-yscroll-1)*16+8+((i*16)+i))*scale), 0, scale, scale)
 							end
 						end
 					elseif (brushsizex > 1 or brushsizey > 1) then
@@ -1919,7 +1919,7 @@ function editor_draw()
 								if yl == 1 and xl == 1 then
 								else
 									love.graphics.setColor(255, 255, 255, 200)
-									love.graphics.draw(tilequads[currenttile].image, tilequads[currenttile].quad, math.floor((x-splitxscroll[1]-1+xl-1)*16*scale), math.floor(((y-splityscroll[1]-1+yl-1)*16+8)*scale), 0, scale, scale)
+									love.graphics.draw(tilequads[currenttile].image, tilequads[currenttile].quad, math.floor((x-xscroll-1+xl-1)*16*scale), math.floor(((y-yscroll-1+yl-1)*16+8)*scale), 0, scale, scale)
 								end
 							end
 						end
@@ -1931,7 +1931,7 @@ function editor_draw()
 							for y = math.floor(yscroll)+1, math.min(mapheight, math.floor(yscroll+height)+1) do
 								if onscreen(x-1, y-1, 1, 1) and ontile == map[x][y][1] then
 									love.graphics.setColor(255, 255, 255, 200)
-									love.graphics.draw(tilequads[currenttile].image, tilequads[currenttile].quad, math.floor((x-splitxscroll[1]-1)*16*scale), math.floor(((y-splityscroll[1]-2)*16+8)*scale), 0, scale, scale)
+									love.graphics.draw(tilequads[currenttile].image, tilequads[currenttile].quad, math.floor((x-xscroll-1)*16*scale), math.floor(((y-yscroll-2)*16+8)*scale), 0, scale, scale)
 								end
 							end
 						end
@@ -1945,7 +1945,7 @@ function editor_draw()
 							local x, y = t[1], t[2]
 							--if onscreen(x-1, y-1, 1, 1) then
 								love.graphics.setColor(255, 255, 255, 200)
-								love.graphics.draw(tilequads[currenttile].image, tilequads[currenttile].quad, math.floor((x-splitxscroll[1]-1)*16*scale), math.floor(((y-splityscroll[1]-2)*16+8)*scale), 0, scale, scale)
+								love.graphics.draw(tilequads[currenttile].image, tilequads[currenttile].quad, math.floor((x-xscroll-1)*16*scale), math.floor(((y-yscroll-2)*16+8)*scale), 0, scale, scale)
 							--end
 						end
 					end
@@ -1978,11 +1978,11 @@ function editor_draw()
 							love.graphics.draw(v.graphic, v.quad, math.floor((x-xscroll-1+offsetx)*16*scale+xoff), math.floor(((y-yscroll)*16)*scale+yoff), 0, scale, scale)
 						end
 					else
-						love.graphics.draw(entityquads[currenttile].image, entityquads[currenttile].quad, math.floor((x-splitxscroll[1]-1+offsetx)*16*scale), math.floor(((y-splityscroll[1]-1)*16+8)*scale), 0, scale, scale)
+						love.graphics.draw(entityquads[currenttile].image, entityquads[currenttile].quad, math.floor((x-xscroll-1+offsetx)*16*scale), math.floor(((y-yscroll-1)*16+8)*scale), 0, scale, scale)
 					end
 					if android then
 						love.graphics.setLineWidth(1*scale)
-						love.graphics.rectangle("line",math.floor((x-splitxscroll[1]-1)*16*scale), math.floor(((y-splityscroll[1]-1)*16+8)*scale), 16*scale, 16*scale)
+						love.graphics.rectangle("line",math.floor((x-xscroll-1)*16*scale), math.floor(((y-yscroll-1)*16+8)*scale), 16*scale, 16*scale)
 					end
 					if editortilemousescroll and ( brushsizex <= 1 and brushsizey <= 1) then
 						if type(editortilemousescroll) == "table" then
@@ -1990,26 +1990,26 @@ function editor_draw()
 							for i = 1, 2 do
 								love.graphics.setColor(255, 255, 255, 200-(i*70))
 								if tonumber(t[i]) and t[i] > 0 then
-									love.graphics.draw(entityquads[t[i]].image, entityquads[t[i]].quad, math.floor((x-splitxscroll[1]-1)*16*scale), math.floor(((y-splityscroll[1]-1)*16+8-((i*16)+i))*scale), 0, scale, scale)
+									love.graphics.draw(entityquads[t[i]].image, entityquads[t[i]].quad, math.floor((x-xscroll-1)*16*scale), math.floor(((y-yscroll-1)*16+8-((i*16)+i))*scale), 0, scale, scale)
 								end
 							end
 							for i = 1, 2 do
 								love.graphics.setColor(255, 255, 255, 200-(i*70))
 								if tonumber(t[2+i]) and t[2+i] > 0 then
-									love.graphics.draw(entityquads[t[2+i]].image, entityquads[t[2+i]].quad, math.floor((x-splitxscroll[1]-1)*16*scale), math.floor(((y-splityscroll[1]-1)*16+8+((i*16)+i))*scale), 0, scale, scale)
+									love.graphics.draw(entityquads[t[2+i]].image, entityquads[t[2+i]].quad, math.floor((x-xscroll-1)*16*scale), math.floor(((y-yscroll-1)*16+8+((i*16)+i))*scale), 0, scale, scale)
 								end
 							end
 						elseif type(currenttile) == "number" then
 							for i = 1, 2 do
 								love.graphics.setColor(255, 255, 255, 200-(i*70))
 								if currenttile - i > 0 then
-									love.graphics.draw(entityquads[currenttile-i].image, entityquads[currenttile-i].quad, math.floor((x-splitxscroll[1]-1)*16*scale), math.floor(((y-splityscroll[1]-1)*16+8-((i*16)+i))*scale), 0, scale, scale)
+									love.graphics.draw(entityquads[currenttile-i].image, entityquads[currenttile-i].quad, math.floor((x-xscroll-1)*16*scale), math.floor(((y-yscroll-1)*16+8-((i*16)+i))*scale), 0, scale, scale)
 								end
 							end
 							for i = 1, 2 do
 								love.graphics.setColor(255, 255, 255, 200-(i*70))
 								if currenttile + i < #entitylist then
-									love.graphics.draw(entityquads[currenttile+i].image, entityquads[currenttile+i].quad, math.floor((x-splitxscroll[1]-1)*16*scale), math.floor(((y-splityscroll[1]-1)*16+8+((i*16)+i))*scale), 0, scale, scale)
+									love.graphics.draw(entityquads[currenttile+i].image, entityquads[currenttile+i].quad, math.floor((x-xscroll-1)*16*scale), math.floor(((y-yscroll-1)*16+8+((i*16)+i))*scale), 0, scale, scale)
 								end
 							end
 						end
@@ -2020,14 +2020,14 @@ function editor_draw()
 								elseif not tilequads[currenttile] and enemiesdata[currenttile] then --custom enemy
 									local v = enemiesdata[currenttile]
 									if v.showicononeditor and v.icongraphic then
-										love.graphics.draw(v.icongraphic, math.floor((x-splitxscroll[1]-1+xl-1)*16*scale), math.floor(((y-splityscroll[1]-0.5+yl-1)*16)*scale), 0, scale, scale)
+										love.graphics.draw(v.icongraphic, math.floor((x-xscroll-1+xl-1)*16*scale), math.floor(((y-yscroll-0.5+yl-1)*16)*scale), 0, scale, scale)
 									else
 										local xoff, yoff = ((0.5-v.width/2+(v.spawnoffsetx or 0))*16 + v.offsetX - v.quadcenterX)*scale, (((v.spawnoffsety or 0)-v.height+1)*16-v.offsetY - v.quadcenterY)*scale
-										love.graphics.draw(v.graphic, v.quad, math.floor((x-splitxscroll[1]-1+xl-1)*16*scale+xoff), math.floor(((y-splityscroll[1]-1+yl-1)*16+16)*scale+yoff), 0, scale, scale)
+										love.graphics.draw(v.graphic, v.quad, math.floor((x-xscroll-1+xl-1)*16*scale+xoff), math.floor(((y-yscroll-1+yl-1)*16+16)*scale+yoff), 0, scale, scale)
 									end
 								else
 									love.graphics.setColor(255, 255, 255, 200)
-									love.graphics.draw(entityquads[currenttile].image, entityquads[currenttile].quad, math.floor((x-splitxscroll[1]-1+xl-1)*16*scale), math.floor(((y-splityscroll[1]-1+yl-1)*16+8)*scale), 0, scale, scale)
+									love.graphics.draw(entityquads[currenttile].image, entityquads[currenttile].quad, math.floor((x-xscroll-1+xl-1)*16*scale), math.floor(((y-yscroll-1+yl-1)*16+8)*scale), 0, scale, scale)
 								end
 							end
 						end
@@ -2097,7 +2097,7 @@ function editor_draw()
 				love.graphics.setColor(255, 255, 255, 120)
 				for i, t in pairs(selectiontoolselection) do
 					local x, y = t[1], t[2]
-					love.graphics.rectangle("fill", math.floor((x-splitxscroll[1]-1)*16*scale), ((y-splityscroll[1]-1)*16-8)*scale, 16*scale, 16*scale)
+					love.graphics.rectangle("fill", math.floor((x-xscroll-1)*16*scale), ((y-yscroll-1)*16-8)*scale, 16*scale, 16*scale)
 				end
 			end
 		end
@@ -2565,8 +2565,8 @@ function editor_draw()
 			love.graphics.setScissor()
 			
 			love.graphics.setColor(255, 0, 0)
-			drawrectangle(splitxscroll[1]*2+minimapx-minimapscroll*2, minimapy, (width+2)*2, 34)
-			drawrectangle(splitxscroll[1]*2+minimapx-minimapscroll*2+1, minimapy+1, (width+1)*2, 32)
+			drawrectangle(xscroll*2+minimapx-minimapscroll*2, minimapy, (width+2)*2, 34)
+			drawrectangle(xscroll*2+minimapx-minimapscroll*2+1, minimapy+1, (width+1)*2, 32)
 			guielements["autoscrollcheckbox"]:draw()
 			
 			if minimapdragging == false then
@@ -4061,9 +4061,6 @@ function mapwidthapply()
 		yscroll = math.max(0, mapheight-height-1)
 	end
 	
-	splitxscroll = {xscroll}
-	splityscroll = {yscroll}
-	
 	--move all them links!
 	for x = 1, mapwidth do
 		for y = 1, mapheight do
@@ -5276,8 +5273,8 @@ function editor_mousepressed(x, y, button)
 				if zoom1 ~= screenzoom then
 					xscroll = centerx - (width*(1/screenzoom))*r1
 					yscroll = centery - (height*(1/screenzoom))*r2
-					splitxscroll[1] = xscroll
-					splityscroll[1] = yscroll
+					xscroll = xscroll
+					yscroll = yscroll
 				end
 				autoscroll = false
 				return
@@ -5319,8 +5316,8 @@ function editor_mousepressed(x, y, button)
 				if zoom1 ~= screenzoom then
 					xscroll = centerx - (width*(1/screenzoom))*r1
 					yscroll = centery - (height*(1/screenzoom))*r2
-					splitxscroll[1] = xscroll
-					splityscroll[1] = yscroll
+					xscroll = xscroll
+					yscroll = yscroll
 				end
 				autoscroll = false
 				return
@@ -6865,17 +6862,17 @@ function editor_mousemoved(x, y, dx, dy)
 			nmoy = 0
 		
 			local mapx, mapy = (width*16 - w)/2, (height*16 - h)/2
-			splitxscroll[1] = splitxscroll[1]+dx/s/scale
-			if splitxscroll[1] < 0 then
-				splitxscroll[1] = 0
-			elseif splitxscroll[1] > mapwidth-width then
-				splitxscroll[1] = mapwidth-width
+			xscroll = xscroll+dx/s/scale
+			if xscroll < 0 then
+				xscroll = 0
+			elseif xscroll > mapwidth-width then
+				xscroll = mapwidth-width
 			end
-			splityscroll[1] = splityscroll[1]+dy/s/scale
-			if splityscroll[1] < 0 then
-				splityscroll[1] = 0
-			elseif splityscroll[1] > mapheight-height-1 then
-				splityscroll[1] = mapheight-height-1
+			yscroll = yscroll+dy/s/scale
+			if yscroll < 0 then
+				yscroll = 0
+			elseif yscroll > mapheight-height-1 then
+				yscroll = mapheight-height-1
 			end
 			
 			toggleautoscroll(false)

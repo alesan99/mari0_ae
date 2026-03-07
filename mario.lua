@@ -804,7 +804,6 @@ function mario:update(dt)
 					xscroll = math.max(0, mapwidth-width-1)
 					hitrightside()
 				end
-				splitxscroll = {xscroll}
 			end	
 		end
 	end

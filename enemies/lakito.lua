@@ -66,7 +66,7 @@ function lakito:update(dt)
 			self.timer = self.timer + dt
 			if self.timer > lakitorespawn then
 				self.y = self.starty - 12/16
-				self.x = splitxscroll[#splitxscroll] + width
+				self.x = xscroll + width
 				self.timer = 0
 				self.shot = false
 				self.active = true

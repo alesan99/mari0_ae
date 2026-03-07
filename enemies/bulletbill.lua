@@ -12,7 +12,7 @@ end
 
 function rocketlauncher:update(dt)
 	self.timer = self.timer + dt
-	if self.timer > self.time and self.x > splitxscroll[1] and self.x < splitxscroll[1]+width+2 then
+	if self.timer > self.time and self.x > xscroll and self.x < xscroll+width+2 then
 		if self:fire() then
 			self.timer = 0
 			self:randomtime()
