@@ -7174,8 +7174,15 @@ function hitontop(x, y)
 end
 
 function destroyblock(x, y, v) --v = true, "nopoints"
-	if portalintile(x, y) or editormode then
+	if portalintile(x, y) or (x-1 == flagx and y == flagy) or editormode then
 		return
+	end
+	for i, p in pairs(pipes) do --don't break blocks in front of pipes
+		if p.coy == y-1 and
+		   (p.cox == x+1 and (p.dir == "right" or p.dir2 == "right") or
+		    p.cox == x-1 and (p.dir == "left" or p.dir2 == "left") ) then
+			return
+		end
 	end
 	
 	local debris = tilequads[map[x][y][1]].debris
