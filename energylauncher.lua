@@ -278,7 +278,9 @@ function energyball:update(dt)
 		if self.hp <= 0 then
 			table.insert(emancipateanimations, emancipateanimation:new(self.x, self.y, self.width, self.height, self.graphic, self.quad, self.speedx*0.2, self.speedy*0.2, self.rotation, self.offsetX, self.offsetY, self.quadcenterX, self.quadcenterY))
 		end
-		self.parent:callback(self.catched)
+		if self.parent then
+			self.parent:callback(self.catched)
+		end
 		return true
 	end
 end
@@ -456,5 +458,7 @@ end
 
 function energyball:autodeleted()
 	self.destroy = true
-	self.parent:callback(self.catched)
+	if self.parent then
+		self.parent:callback(self.catched)
+	end
 end

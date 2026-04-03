@@ -362,6 +362,9 @@ hiddenentitylist = {
 	{t="gel3", name="gel white"},
 	{t="gel4", name="gel purple"},
 	{t="gelcleanse", name="gel cleanse"},
+	{t="pellet", name="e.pellet"},
+	{t="pelletgreen", name="e.pellet green"},
+	{t="turretrocket", name="turret rocket"}
 }
 
 --sort spawnable entities into a neat table
