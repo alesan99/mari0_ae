@@ -245,6 +245,16 @@ table.insert(toenter, {name = "whennumber",
 
 --CONDITIONS:
 
+table.insert(toenter, {name = "or", 
+	t = {
+		t="condition",
+		nicename="OR",
+		entries={
+			
+		}
+	}
+})
+
 table.insert(toenter, {name = "noprevsublevel", 
 	t = {
 		t="condition",
@@ -1954,6 +1964,18 @@ table.insert(toenter, {name = "changeswitchstate",
 	}
 })
 
+table.insert(toenter, {name = "sethudvisibility", 
+	t = {
+		t="action",
+		nicename="set hud visible:",
+		entries={
+			{
+				t="visibility",
+			},
+		}
+	}
+})
+
 --SORT ALPHABETICALLY (I didn't even know you could greater/less compare strings.)
 table.sort(toenter, function(a, b) return a.t.nicename < b.t.nicename end)
 
@@ -2166,6 +2188,12 @@ function animationguiline:init(tabl, t2)
 					dropwidth = 24
 					args = {true, false}
 					displayargs = {"notify the player", "don't notify the player"}
+
+				elseif v.t == "visibility" then
+					dropdown = true
+					dropwidth = 4
+					args = {true, false}
+					displayargs = {"show", "hide"}
 				end
 				
 				if dropdown then

@@ -3525,7 +3525,7 @@ function enemy:triggeranimation(s)
 				anim:trigger()
 			end
 		end
-		animationtriggerfuncs[s].triggered = true
+		animationtriggerfuncs[s].continue = true
 	end
 end
 

@@ -351,8 +351,7 @@ function animation:update(dt)
 					end
 				end
 			elseif self.waiting.t == "trigger" then
-				if animationtriggerfuncs[self.waiting.name] and animationtriggerfuncs[self.waiting.name].triggered then
-					animationtriggerfuncs[self.waiting.name].triggered = nil
+				if animationtriggerfuncs[self.waiting.name] and animationtriggerfuncs[self.waiting.name].continue then
 					self.waiting = false
 				end
 			end
@@ -389,6 +388,10 @@ function animation:update(dt)
 				self.waiting = {t="input", button=v[2], player=v[3]}
 			elseif v[1] == "waitfortrigger" then
 				self.waiting = {t="trigger", name=v[2]}
+				if not animationtriggerfuncs[v[2]] then
+					animationtriggerfuncs[v[2]] = {}
+				end
+				animationtriggerfuncs[v[2]].continue = false
 			elseif v[1] == "setcamerax" then
 				xscroll = tonumber(v[2])
 			elseif v[1] == "setcameray" then
@@ -954,7 +957,7 @@ function animation:update(dt)
 					for i = 1, #animationtriggerfuncs[v[2]] do
 						animationtriggerfuncs[v[2]][i]:trigger()
 					end
-					animationtriggerfuncs[v[2]].triggered = true
+					animationtriggerfuncs[v[2]].continue = true
 				end
 				
 			elseif v[1] == "addkeys" then
@@ -1040,6 +1043,8 @@ function animation:update(dt)
 				end
 			elseif v[1] == "resetnumbers" then
 				animationnumbers = {}
+			elseif v[1] == "sethudvisibility" then
+				hudvisibleoverride = v[2]
 			elseif v[1] == "repeat" then
 				self.currentaction = 1
 				break
@@ -1064,40 +1069,38 @@ function animation:trigger()
 		local pass = true
 
 		for i, v in pairs(self.conditions) do
-			if v[1] == "noprevsublevel" then
+			if v[1] == "or" then
+				if pass then 
+					break
+				end
+				pass = true
+			elseif v[1] == "noprevsublevel" then
 				if prevsublevel then
 					pass = false
-					break
 				end
 			elseif v[1] == "sublevelequals" then
 				if (v[2] == "main" and (tonumber(actualsublevel) ~= 0)) or (v[2] ~= "main" and tonumber(v[2]) ~= tonumber(actualsublevel)) then
 					pass = false
-					break
 				end
 			elseif v[1] == "levelequals" then
 				if tonumber(v[2]) ~= tonumber(mariolevel) then
 					pass = false
-					break
 				end
 			elseif v[1] == "worldequals" then
 				if tonumber(v[2]) ~= tonumber(marioworld) then
 					pass = false
-					break
 				end
 			elseif v[1] == "requirecoins" then
 				if mariocoincount < tonumber(v[2]) then
 					pass = false
-					break
 				end
 			elseif v[1] == "requirecollectables" then
 				if (not collectablescount[tonumber(v[3])]) or collectablescount[tonumber(v[3])] < tonumber(v[2]) then
 					pass = false
-					break
 				end
 			elseif v[1] == "requirepoints" then
 				if marioscore < tonumber(v[2]) then
 					pass = false
-					break
 				end
 			elseif v[1] == "ifcoins" then
 				local value = tonumber(v[3])
@@ -1145,7 +1148,6 @@ function animation:trigger()
 					local key = p.key or 0
 					if key < tonumber(v[2]) then
 						pass = false
-						break
 					end
 				end
 			elseif v[1] == "playerissize" then
@@ -1162,7 +1164,6 @@ function animation:trigger()
 					local p = objects["player"][i]
 					if (not p) or p.size ~= tonumber(v[2]) then
 						pass = false
-						break
 					end
 				end
 			elseif v[1] == "buttonhelddown" then
@@ -1193,7 +1194,6 @@ function animation:trigger()
 				end
 				if not held then
 					pass = false
-					break
 				end
 			elseif v[1] == "ifnumber" then
 				local name = tostring(v[2])
@@ -1223,7 +1223,6 @@ function animation:trigger()
 			elseif v[1] == "requireplayers" then
 				if players < tonumber(v[2]) then
 					pass = false
-					break
 				end	
 			end
 		end

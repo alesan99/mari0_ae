@@ -53,6 +53,7 @@ function game_load(suspended, deletesuspend)
 	if not dcplaying then
 		loadmappacksettings()
 	end
+	hudvisibleoverride = nil
 
 	updatemappacksettings()
 	
@@ -1804,8 +1805,14 @@ function game_draw()
 		---UI
 		if ((not darkmode and not lightsout) or editormode) and not hudsimple then
 			love.graphics.scale(1/screenzoom,1/screenzoom)
-			if hudvisible then
-				drawHUD()
+			if hudvisibleoverride ~= nil then
+				if hudvisibleoverride then
+					drawHUD()
+				end
+			else
+				if hudvisible then
+					drawHUD()
+				end
 			end
 			love.graphics.scale(screenzoom,screenzoom)
 		end
@@ -2554,8 +2561,14 @@ function game_draw()
 		--UI over everything
 		love.graphics.scale(1/screenzoom,1/screenzoom)
 		if hudsimple and ((not darkmode and not lightsout) or editormode) then
-			if hudvisible then
-				drawHUD()
+			if hudvisibleoverride ~= nil then
+				if hudvisibleoverride then
+					drawHUD()
+				end
+			else
+				if hudvisible then
+					drawHUD()
+				end
 			end
 		end
 
@@ -2802,15 +2815,27 @@ function game_draw()
 		love.graphics.rectangle("fill", 0, 0, width*16*scale, 224*scale)
 		love.graphics.setColor(255, 255, 255)
 		love.graphics.setStencilTest()
-		if hudvisible then
-			drawHUD()
+		if hudvisibleoverride ~= nil then
+			if hudvisibleoverride then
+				drawHUD()
+			end
+		else
+			if hudvisible then
+				drawHUD()
+			end
 		end
 	end
 
 	--UI over everything in darkmode
 	if ((darkmode or lightsout) and not editormode) then
-		if hudvisible then
-			drawHUD()
+		if hudvisibleoverride ~= nil then
+			if hudvisibleoverride then
+				drawHUD()
+			end
+		else
+			if hudvisible then
+				drawHUD()
+			end
 		end
 	end
 	
@@ -4674,6 +4699,7 @@ function loadmap(filename)
 			end
 		end
 	end
+	hudvisibleoverride = nil
 
 	--ANIMATED TILES make lists of every tile in level
 	for i = 1, #animatedtiles do
