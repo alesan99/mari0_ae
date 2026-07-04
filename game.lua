@@ -47,6 +47,7 @@ function game_load(suspended, deletesuspend)
 	realtime = false
 	continuesublevelmusic = false
 	nolowtime = false
+	disablewallclipping = false
 	nocoinlimit = false
 	alwaysdeletesuspend = false
 	setphysics(1)

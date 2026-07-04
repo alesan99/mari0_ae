@@ -4433,6 +4433,12 @@ function mario:setsize(size, oldsize)
 		end
 		self.width = width
 		self.height = height
+
+		if disablewallclipping and self.animation ~= "grow1" and self.animation ~= "grow2" then
+			if size ~= 8 and self.gravitydir == "down" and checkintile(self.x, self.y-self.height, self.width, self.height, {}, self, "ignoreplatforms") then
+				self:duck(true)
+			end
+		end
 	end
 	
 	if ducking and (size > 1 or self.characterdata.smallducking) and size ~= 5 and size ~= 8 and size ~= 16 then
@@ -6472,7 +6478,7 @@ function mario:passivecollide(a, b)
 			end
 		end
 	end
-	if self.passivemoved == false then
+	if self.passivemoved == false and (not disablewallclipping) then
 		self.passivemoved = true
 		if a == "tile" then
 			local x, y = b.cox, b.coy
@@ -7639,16 +7645,19 @@ function mario:cubeemancipate()
 end
 
 function mario:duck(ducking, size, dontmove, playercontrols) --goose
-	if self.ducking and (self.quicksand or mariomakerphysics) and self.gravitydir == "down" and playercontrols then
-		--[[dont unduck if clipping
+	--[[if self.ducking and (self.quicksand or mariomakerphysics) and self.gravitydir == "down" and playercontrols then
+		dont unduck if clipping
 		if self.size ~= 14 and
 			checkintile(self.x, self.y-self.height, self.width, self.height, tileentities, self, "ignoreplatforms") then
 			return false
-		end]]
-	end
+		end
+	end]]
 	if self.ducking and playercontrols then
 		--dont unduck if under clearpipe
 		if checkinclearpipesegment(self.x, self.y-self.height, self.width, self.height) then
+			return false
+		end
+		if disablewallclipping and self.gravitydir == "down" and checkintile(self.x, self.y-self.height, self.width, self.height, {}, self, "ignoreplatforms") then
 			return false
 		end
 	end
